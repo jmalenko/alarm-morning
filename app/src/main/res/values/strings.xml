@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Alarm Morning</string>
+
+    <!-- Calendar activity -->
+    <string name="title_activity_calendar">Scheduled alarms</string>
+
+    <!-- Default activity -->
+    <string name="title_activity_defaults">Default alarms</string>
+
+    <!-- Settings activity -->
+    <string name="title_activity_settings">Settings</string>
+
+    <string name="alarm_unset">Off</string>
+
+    <!-- Ring activity-->
+    <string name="title_activity_ring">Alarm</string>
+
+    <string name="dismiss_button">Dismiss</string>
+
+
+    <!-- Common -->
+    <string name="alarm_state_default">Default</string>
+    <string name="alarm_state_changed">Changed</string>
+    <string name="alarm_state_offday">Off day</string>
+    <string name="alarm_state_passed">Passed</string>
+    <string name="alarm_state_ringing">Ringing</string>
+
+    <!-- Descriptions for accessibility -->
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+
+    <!-- Menu (left drawer) -->
+    <string-array name="menu_items_array">
+        <item>Scheduled alarms</item>
+        <item>Default alarms</item>
+        <item>Settings</item>
+        <item>Ring alarm now</item>
+        <item>When is next alarm?</item>
+        <item>Clean up database</item>
+    </string-array>
+
+</resources>

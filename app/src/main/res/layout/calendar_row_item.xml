@@ -1,0 +1,58 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
+
+    <TextView
+        android:id="@+id/textDayOfWeekCal"
+        android:layout_width="100dp"
+        android:layout_height="40dp"
+        android:background="@color/calendar_day"
+        android:gravity="center"
+        android:textSize="@dimen/text_size_day_of_week"
+        />
+
+    <TextView
+        android:id="@+id/textTimeCal"
+        android:layout_width="wrap_content"
+        android:layout_height="64dp"
+        android:layout_marginLeft="@dimen/margin_medium"
+        android:layout_marginRight="@dimen/margin_tiny"
+        android:layout_toRightOf="@id/textDayOfWeekCal"
+        android:textSize="@dimen/text_size_time"
+        />
+
+    <TextView
+        android:id="@+id/textDate"
+        android:layout_width="100dp"
+        android:layout_height="24dp"
+        android:layout_below="@id/textDayOfWeekCal"
+        android:layout_toLeftOf="@id/textTimeCal"
+        android:background="@color/calendar_day"
+        android:gravity="center"
+        android:textSize="@dimen/text_size_date"
+        />
+
+
+    <TextView
+        android:id="@+id/textState"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="@dimen/margin_medium"
+        android:layout_toRightOf="@id/textTimeCal"
+        android:gravity="end"
+        android:textAlignment="textEnd"
+        />
+
+    <TextView
+        android:id="@+id/textComment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/textState"
+        android:layout_marginRight="@dimen/margin_medium"
+        android:layout_toRightOf="@id/textTimeCal"
+        />
+
+</RelativeLayout>
