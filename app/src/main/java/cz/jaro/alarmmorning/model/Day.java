@@ -1,7 +1,11 @@
 package cz.jaro.alarmmorning.model;
 
+import android.content.Context;
+
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+
+import cz.jaro.alarmmorning.SystemAlarm;
 
 /**
  * Created by jmalenko on 18.12.2015.
@@ -127,5 +131,26 @@ public class Day {
                 setState(AlarmDataSource.DAY_STATE_ENABLED);
                 break;
         }
+    }
+
+    public boolean isNextAlarm(Context context) {
+        Calendar alarmTime1 = getDateTime();
+
+        AlarmDataSource datasource = new AlarmDataSource(context);
+        datasource.open();
+
+        Calendar now = new GregorianCalendar();
+        Calendar alarmTime2 = datasource.getNextAlarm(now);
+
+        datasource.close();
+
+        return alarmTime1.equals(alarmTime2);
+    }
+
+    public long getTimeToRing() {
+        Calendar alarmTime1 = getDateTime();
+        Calendar now = new GregorianCalendar();
+
+        return alarmTime1.getTimeInMillis() - now.getTimeInMillis();
     }
 }

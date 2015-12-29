@@ -3,6 +3,7 @@ package cz.jaro.alarmmorning;
 import android.app.FragmentManager;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -61,6 +62,8 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
     public void onBindViewHolder(CalendarViewHolder viewHolder, final int position) {
         Calendar date = addDays(today, position);
 
+        Resources res = calendarActivity.getResources();
+
         int dayOfWeek = date.get(Calendar.DAY_OF_WEEK);
         String dayOfWeekText = Localization.dayOfWeekToString(dayOfWeek);
         viewHolder.getTextDayOfWeek().setText(dayOfWeekText);
@@ -73,26 +76,59 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         if (day.isEnabled()) {
             timeText = Localization.timeToString(day.getHourX(), day.getMinuteX(), calendarActivity);
         } else {
-            timeText = calendarActivity.getResources().getString(R.string.alarm_unset);
+            timeText = res.getString(R.string.alarm_unset);
         }
         viewHolder.getTextTime().setText(timeText);
 
         String stateText;
         if (day.isPassed()) {
-            stateText = calendarActivity.getResources().getString(R.string.alarm_state_passed);
+            stateText = res.getString(R.string.alarm_state_passed);
         } else {
             switch (day.getState()) {
                 case AlarmDataSource.DAY_STATE_DEFAULT:
                     stateText = "";
                     break;
                 default:
-                    stateText = calendarActivity.getResources().getString(R.string.alarm_state_changed);
+                    stateText = res.getString(R.string.alarm_state_changed);
                     break;
             }
         }
         viewHolder.getTextState().setText(stateText);
 
-//        viewHolder.getTextComment().setText("Alarm will sound in 8:25. This is a long text.");
+        String messageText;
+        Context context = calendarActivity.getBaseContext();
+        if (day.isNextAlarm(context)) {
+            long diff = day.getTimeToRing();
+
+            long remaining = diff;
+            long length;
+
+            length = 24 * 60 * 60 * 1000;
+            long days = remaining / length;
+            remaining = remaining % length;
+
+            length = 60 * 60 * 1000;
+            long hours = remaining / length;
+            remaining = remaining % length;
+
+            length = 60 * 1000;
+            long minutes = remaining / length;
+            remaining = remaining % length;
+
+            length = 1000;
+            long seconds = remaining / length;
+
+            if (days > 0) {
+                messageText = String.format(res.getString(R.string.time_to_ring_message_days), days, hours);
+            } else if (hours > 0) {
+                messageText = String.format(res.getString(R.string.time_to_ring_message_hours), hours, minutes);
+            } else {
+                messageText = String.format(res.getString(R.string.time_to_ring_message_minutes), minutes, seconds);
+            }
+        } else {
+            messageText = "";
+        }
+        viewHolder.getTextComment().setText(messageText);
 
         viewHolder.setDay(day);
     }
