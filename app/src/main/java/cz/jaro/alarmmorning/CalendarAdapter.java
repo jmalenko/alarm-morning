@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -100,30 +101,14 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         if (day.isNextAlarm(context)) {
             long diff = day.getTimeToRing();
 
-            long remaining = diff;
-            long length;
+            TimeDifference timeDifference = TimeDifference.getTimeUnits(diff);
 
-            length = 24 * 60 * 60 * 1000;
-            long days = remaining / length;
-            remaining = remaining % length;
-
-            length = 60 * 60 * 1000;
-            long hours = remaining / length;
-            remaining = remaining % length;
-
-            length = 60 * 1000;
-            long minutes = remaining / length;
-            remaining = remaining % length;
-
-            length = 1000;
-            long seconds = remaining / length;
-
-            if (days > 0) {
-                messageText = String.format(res.getString(R.string.time_to_ring_message_days), days, hours);
-            } else if (hours > 0) {
-                messageText = String.format(res.getString(R.string.time_to_ring_message_hours), hours, minutes);
+            if (timeDifference.days > 0) {
+                messageText = String.format(res.getString(R.string.time_to_ring_message_days), timeDifference.days, timeDifference.hours);
+            } else if (timeDifference.hours > 0) {
+                messageText = String.format(res.getString(R.string.time_to_ring_message_hours), timeDifference.hours, timeDifference.minutes);
             } else {
-                messageText = String.format(res.getString(R.string.time_to_ring_message_minutes), minutes, seconds);
+                messageText = String.format(res.getString(R.string.time_to_ring_message_minutes), timeDifference.minutes, timeDifference.seconds);
             }
         } else {
             messageText = "";
@@ -168,7 +153,12 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
 
     private void save(Day day) {
         datasource.saveDay(day);
+
         refresh();
+
+        String toastText = formatToastText(day);
+        Context context = calendarActivity.getBaseContext();
+        Toast.makeText(context, toastText, Toast.LENGTH_LONG).show();
     }
 
     private void refresh() {
@@ -177,6 +167,30 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         Context context = calendarActivity.getBaseContext();
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
         systemAlarm.setAlarm();
+    }
+
+    private String formatToastText(Day day) {
+        Resources res = calendarActivity.getResources();
+        String toastText;
+
+        if (!day.isEnabled()) {
+            toastText = res.getString(R.string.time_to_ring_toast_off);
+        } else {
+            long diff = day.getTimeToRing();
+
+            if (diff < 0) {
+                toastText = res.getString(R.string.time_to_ring_toast_passed);
+            } else {
+                TimeDifference timeDifference = TimeDifference.getTimeUnits(diff);
+                if (timeDifference.days > 0) {
+                    toastText = String.format(res.getString(R.string.time_to_ring_toast_days), timeDifference.days, timeDifference.hours, timeDifference.minutes);
+                } else if (timeDifference.hours > 0) {
+                    toastText = String.format(res.getString(R.string.time_to_ring_toast_hours), timeDifference.hours, timeDifference.minutes);
+                } else {
+                    toastText = String.format(res.getString(R.string.time_to_ring_toast_minutes), timeDifference.minutes, timeDifference.seconds);
+                }
+            }        }
+        return toastText;
     }
 
     /**
@@ -260,4 +274,35 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         }
     }
 
+    private static class TimeDifference {
+        long days;
+        long hours;
+        long minutes;
+        long seconds;
+
+        public static TimeDifference getTimeUnits(long diff) {
+            TimeDifference timeDifference = new TimeDifference();
+
+            long remaining = diff;
+            long length;
+
+            length = 24 * 60 * 60 * 1000;
+            timeDifference.days = remaining / length;
+            remaining = remaining % length;
+
+            length = 60 * 60 * 1000;
+            timeDifference.hours = remaining / length;
+            remaining = remaining % length;
+
+            length = 60 * 1000;
+            timeDifference.minutes = remaining / length;
+            remaining = remaining % length;
+
+            length = 1000;
+            timeDifference.seconds = remaining / length;
+
+            return timeDifference;
+        }
+    }
 }
+
