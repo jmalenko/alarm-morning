@@ -29,6 +29,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -260,6 +261,8 @@ public class CalendarActivity extends Activity {
         private CalendarAdapter adapter;
         private RecyclerView.LayoutManager layoutManager;
 
+        private Handler handler = new Handler();
+
         public CalendarFragment() {
             // Empty constructor required for fragment subclasses
         }
@@ -282,14 +285,30 @@ public class CalendarActivity extends Activity {
             // item separator
             recyclerView.addItemDecoration(new SimpleDividerItemDecoration(getActivity()));
 
+            // handler for refreshing the content
+            handler.postDelayed(runnable, 1000);
+
             return rootView;
+        }
+
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
         }
 
         @Override
         public void onResume() {
             super.onResume();
-            adapter.onResume();
+            adapter.onSystemTimeChange();
         }
+
+        private Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                adapter.onSystemTimeChange();
+                handler.postDelayed(this, 1000);
+            }
+        };
     }
 
 }

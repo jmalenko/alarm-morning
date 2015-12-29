@@ -42,8 +42,9 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         this.calendarActivity = calendarActivity;
     }
 
-    public void onResume() {
+    public void onSystemTimeChange() {
         today = new GregorianCalendar();
+        notifyDataSetChanged();
     }
 
     /**
