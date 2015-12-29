@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -42,7 +43,9 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         datasource.open();
 
         this.calendarActivity = calendarActivity;
+    }
 
+    public void onResume() {
         today = new GregorianCalendar();
     }
 

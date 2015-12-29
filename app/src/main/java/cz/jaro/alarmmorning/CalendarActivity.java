@@ -258,7 +258,7 @@ public class CalendarActivity extends Activity {
     public static class CalendarFragment extends Fragment {
 
         private RecyclerView recyclerView;
-        private RecyclerView.Adapter adapter;
+        private CalendarAdapter adapter;
         private RecyclerView.LayoutManager layoutManager;
 
         public CalendarFragment() {
@@ -286,6 +286,11 @@ public class CalendarActivity extends Activity {
             return rootView;
         }
 
+        @Override
+        public void onResume() {
+            super.onResume();
+            adapter.onResume();
+        }
     }
 
 }
