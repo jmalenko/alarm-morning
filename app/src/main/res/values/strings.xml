@@ -21,11 +21,18 @@
 
 
     <!-- Common -->
-    <string name="alarm_state_default">Default</string>
     <string name="alarm_state_changed">Changed</string>
-    <string name="alarm_state_offday">Off day</string>
     <string name="alarm_state_passed">Passed</string>
-    <string name="alarm_state_ringing">Ringing</string>
+
+    <string name="time_to_ring_toast_days">This alarm is set for %1$d days, %2$d hours and %3$d minutes from now</string>
+    <string name="time_to_ring_toast_hours">This alarm is set for %1$d hours and %2$d minutes from now</string>
+    <string name="time_to_ring_toast_minutes">This alarm is set for %1$d minutes and %2$d seconds from now</string>
+    <string name="time_to_ring_toast_off">This alarm is off</string>
+    <string name="time_to_ring_toast_passed">This alarm is set to passed time; it will not ring</string>
+
+    <string name="time_to_ring_message_days">%1$dd %2$dh</string>
+    <string name="time_to_ring_message_hours">%1$dh %2$dm</string>
+    <string name="time_to_ring_message_minutes">%1$dm %2$ds</string>
 
     <!-- Descriptions for accessibility -->
     <string name="drawer_open">Open navigation drawer</string>

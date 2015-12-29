@@ -1,6 +1,11 @@
 package cz.jaro.alarmmorning.model;
 
+import android.content.Context;
+
+import java.util.Calendar;
 import java.util.GregorianCalendar;
+
+import cz.jaro.alarmmorning.SystemAlarm;
 
 /**
  * Created by jmalenko on 18.12.2015.
@@ -9,7 +14,7 @@ public class Day {
 
     private long id;
 
-    GregorianCalendar date;
+    Calendar date;
 
     /**
      * 0 = as default
@@ -18,9 +23,9 @@ public class Day {
      */
     private int state;
 
-    private int hours;
+    private int hour;
 
-    private int minutes;
+    private int minute;
 
     private Defaults defaults;
 
@@ -32,11 +37,11 @@ public class Day {
         this.id = id;
     }
 
-    public GregorianCalendar getDate() {
+    public Calendar getDate() {
         return date;
     }
 
-    public void setDate(GregorianCalendar date) {
+    public void setDate(Calendar date) {
         this.date = date;
     }
 
@@ -48,20 +53,20 @@ public class Day {
         this.state = state;
     }
 
-    public int getHours() {
-        return hours;
+    public int getHour() {
+        return hour;
     }
 
-    public void setHours(int hours) {
-        this.hours = hours;
+    public void setHour(int hour) {
+        this.hour = hour;
     }
 
-    public int getMinutes() {
-        return minutes;
+    public int getMinute() {
+        return minute;
     }
 
-    public void setMinutes(int minutes) {
-        this.minutes = minutes;
+    public void setMinute(int minute) {
+        this.minute = minute;
     }
 
     public Defaults getDefaults() {
@@ -72,4 +77,80 @@ public class Day {
         this.defaults = defaults;
     }
 
+    public boolean isPassed() {
+        Calendar now = new GregorianCalendar();
+        if (isEnabled()) {
+            if (getDateTime().before(now)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isEnabled() {
+        return state == AlarmDataSource.DAY_STATE_ENABLED ||
+                (state == AlarmDataSource.DAY_STATE_DEFAULT && defaults.isEnabled());
+    }
+
+    public int getHourX() {
+        if (hour == AlarmDataSource.VALUE_UNSET || state == AlarmDataSource.DAY_STATE_DEFAULT)
+            return defaults.getHour();
+        else
+            return hour;
+    }
+
+    public int getMinuteX() {
+        if (minute == AlarmDataSource.VALUE_UNSET || state == AlarmDataSource.DAY_STATE_DEFAULT)
+            return defaults.getMinute();
+        else
+            return minute;
+    }
+
+    public Calendar getDateTime() {
+        Calendar alarmTime = (Calendar) date.clone();
+
+        alarmTime.set(Calendar.HOUR_OF_DAY, getHourX());
+        alarmTime.set(Calendar.MINUTE, getMinuteX());
+        alarmTime.set(Calendar.SECOND, 0);
+        alarmTime.set(Calendar.MILLISECOND, 0);
+
+        return alarmTime;
+    }
+
+    public void reverse() {
+        switch (getState()) {
+            case AlarmDataSource.DAY_STATE_DEFAULT:
+                setState(defaults.isEnabled() ? AlarmDataSource.DAY_STATE_DISABLED : AlarmDataSource.DAY_STATE_ENABLED);
+                break;
+
+            case AlarmDataSource.DAY_STATE_ENABLED:
+                setState(AlarmDataSource.DAY_STATE_DISABLED);
+                break;
+
+            case AlarmDataSource.DAY_STATE_DISABLED:
+                setState(AlarmDataSource.DAY_STATE_ENABLED);
+                break;
+        }
+    }
+
+    public boolean isNextAlarm(Context context) {
+        Calendar alarmTime1 = getDateTime();
+
+        AlarmDataSource datasource = new AlarmDataSource(context);
+        datasource.open();
+
+        Calendar now = new GregorianCalendar();
+        Calendar alarmTime2 = datasource.getNextAlarm(now);
+
+        datasource.close();
+
+        return alarmTime1.equals(alarmTime2);
+    }
+
+    public long getTimeToRing() {
+        Calendar alarmTime1 = getDateTime();
+        Calendar now = new GregorianCalendar();
+
+        return alarmTime1.getTimeInMillis() - now.getTimeInMillis();
+    }
 }

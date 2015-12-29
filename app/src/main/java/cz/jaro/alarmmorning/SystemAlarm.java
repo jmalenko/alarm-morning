@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import cz.jaro.alarmmorning.model.AlarmDataSource;
@@ -43,8 +44,8 @@ public class SystemAlarm {
         AlarmDataSource datasource = new AlarmDataSource(context);
         datasource.open();
 
-        GregorianCalendar currentTime = new GregorianCalendar();
-        GregorianCalendar alarmTime = datasource.getNextAlarm(currentTime);
+        Calendar now = new GregorianCalendar();
+        Calendar alarmTime = datasource.getNextAlarm(now);
 
         datasource.close();
 

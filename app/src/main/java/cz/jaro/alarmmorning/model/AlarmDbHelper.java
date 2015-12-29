@@ -19,15 +19,15 @@ public class AlarmDbHelper extends SQLiteOpenHelper {
     public static final String COLUMN_DEFAULTS_ID = "_id";
     public static final String COLUMN_DEFAULTS_DAY_OF_WEEK = "day_of_week";
     public static final String COLUMN_DEFAULTS_STATE = "state";
-    public static final String COLUMN_DEFAULTS_HOURS = "hours";
-    public static final String COLUMN_DEFAULTS_MINUTES = "minutes";
+    public static final String COLUMN_DEFAULTS_HOUR = "hour";
+    public static final String COLUMN_DEFAULTS_MINUTE = "minute";
 
     public static final String TABLE_DAY = "day";
     public static final String COLUMN_DAY_ID = "_id";
     public static final String COLUMN_DAY_DATE = "date";
     public static final String COLUMN_DAY_STATE = "state";
-    public static final String COLUMN_DAY_HOURS = "hours";
-    public static final String COLUMN_DAY_MINUTES = "minutes";
+    public static final String COLUMN_DAY_HOUR = "hour";
+    public static final String COLUMN_DAY_MINUTE = "minute";
 
     public AlarmDbHelper(Context context) {
         super(context, DATABASE_NAME, null, PATCHES.length);
@@ -35,8 +35,8 @@ public class AlarmDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase database) {
-        for (int i = 0; i < PATCHES.length; i++) {
-            PATCHES[i].apply(database);
+        for (Patch PATCH : PATCHES) {
+            PATCH.apply(database);
         }
     }
 
@@ -66,15 +66,15 @@ public class AlarmDbHelper extends SQLiteOpenHelper {
                     COLUMN_DEFAULTS_ID + " integer primary key autoincrement, " +
                     COLUMN_DEFAULTS_DAY_OF_WEEK + " integer unique not null," +
                     COLUMN_DEFAULTS_STATE + " integer not null," +
-                    COLUMN_DEFAULTS_HOURS + " integer," +
-                    COLUMN_DEFAULTS_MINUTES + " integer" +
+                    COLUMN_DEFAULTS_HOUR + " integer," +
+                    COLUMN_DEFAULTS_MINUTE + " integer" +
                     ");";
             String DATABASE_CREATE_TABLE_DAY = "create table " + TABLE_DAY + "(" +
                     COLUMN_DAY_ID + " integer primary key autoincrement, " +
                     COLUMN_DAY_DATE + " text unique not null," +
                     COLUMN_DAY_STATE + " integer not null," +
-                    COLUMN_DAY_HOURS + " integer," +
-                    COLUMN_DAY_MINUTES + " integer" +
+                    COLUMN_DAY_HOUR + " integer," +
+                    COLUMN_DAY_MINUTE + " integer" +
                     ");";
 
             // Create tables
@@ -83,9 +83,9 @@ public class AlarmDbHelper extends SQLiteOpenHelper {
 
             // Initialize
             ContentValues values = new ContentValues();
-            values.put(COLUMN_DEFAULTS_STATE, AlarmDataSource.DEFAULT_STATE_UNSET);
-            values.put(COLUMN_DEFAULTS_HOURS, 7);
-            values.put(COLUMN_DEFAULTS_MINUTES, 0);
+            values.put(COLUMN_DEFAULTS_STATE, AlarmDataSource.DEFAULT_STATE_DISABLED);
+            values.put(COLUMN_DEFAULTS_HOUR, 7);
+            values.put(COLUMN_DEFAULTS_MINUTE, 0);
             for (int dayOfWeek : AlarmDataSource.allDaysOfWeek) {
                 values.put(COLUMN_DEFAULTS_DAY_OF_WEEK, dayOfWeek);
                 database.insert(TABLE_DEFAULTS, null, values);

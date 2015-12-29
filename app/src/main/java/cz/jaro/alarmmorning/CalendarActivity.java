@@ -29,6 +29,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -168,51 +169,51 @@ public class CalendarActivity extends Activity {
 
                     values = new ContentValues();
                     values.put(AlarmDbHelper.COLUMN_DEFAULTS_DAY_OF_WEEK, Calendar.MONDAY);
-                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_STATE, AlarmDataSource.DEFAULT_STATE_SET);
-                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_HOURS, 7);
-                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_MINUTES, 1);
+                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_STATE, AlarmDataSource.DEFAULT_STATE_ENABLED);
+                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_HOUR, 7);
+                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_MINUTE, 1);
                     database.insert(AlarmDbHelper.TABLE_DEFAULTS, null, values);
 
                     values = new ContentValues();
                     values.put(AlarmDbHelper.COLUMN_DEFAULTS_DAY_OF_WEEK, Calendar.TUESDAY);
-                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_STATE, AlarmDataSource.DEFAULT_STATE_SET);
-                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_HOURS, 7);
-                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_MINUTES, 2);
+                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_STATE, AlarmDataSource.DEFAULT_STATE_ENABLED);
+                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_HOUR, 7);
+                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_MINUTE, 2);
                     database.insert(AlarmDbHelper.TABLE_DEFAULTS, null, values);
 
                     values = new ContentValues();
                     values.put(AlarmDbHelper.COLUMN_DEFAULTS_DAY_OF_WEEK, Calendar.WEDNESDAY);
-                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_STATE, AlarmDataSource.DEFAULT_STATE_SET);
-                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_HOURS, 7);
-                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_MINUTES, 3);
+                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_STATE, AlarmDataSource.DEFAULT_STATE_ENABLED);
+                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_HOUR, 7);
+                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_MINUTE, 3);
                     database.insert(AlarmDbHelper.TABLE_DEFAULTS, null, values);
 
                     values = new ContentValues();
                     values.put(AlarmDbHelper.COLUMN_DEFAULTS_DAY_OF_WEEK, Calendar.THURSDAY);
-                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_STATE, AlarmDataSource.DEFAULT_STATE_SET);
-                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_HOURS, 7);
-                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_MINUTES, 4);
+                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_STATE, AlarmDataSource.DEFAULT_STATE_ENABLED);
+                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_HOUR, 7);
+                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_MINUTE, 4);
                     database.insert(AlarmDbHelper.TABLE_DEFAULTS, null, values);
 
                     values = new ContentValues();
                     values.put(AlarmDbHelper.COLUMN_DEFAULTS_DAY_OF_WEEK, Calendar.FRIDAY);
-                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_STATE, AlarmDataSource.DEFAULT_STATE_SET);
-                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_HOURS, 7);
-                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_MINUTES, 5);
+                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_STATE, AlarmDataSource.DEFAULT_STATE_ENABLED);
+                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_HOUR, 7);
+                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_MINUTE, 5);
                     database.insert(AlarmDbHelper.TABLE_DEFAULTS, null, values);
 
                     values = new ContentValues();
                     values.put(AlarmDbHelper.COLUMN_DEFAULTS_DAY_OF_WEEK, Calendar.SATURDAY);
-                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_STATE, AlarmDataSource.DEFAULT_STATE_UNSET);
-                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_HOURS, 8);
-                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_MINUTES, 0);
+                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_STATE, AlarmDataSource.DEFAULT_STATE_DISABLED);
+                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_HOUR, 8);
+                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_MINUTE, 0);
                     database.insert(AlarmDbHelper.TABLE_DEFAULTS, null, values);
 
                     values = new ContentValues();
                     values.put(AlarmDbHelper.COLUMN_DEFAULTS_DAY_OF_WEEK, Calendar.SUNDAY);
-                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_STATE, AlarmDataSource.DEFAULT_STATE_UNSET);
-                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_HOURS, 9);
-                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_MINUTES, 0);
+                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_STATE, AlarmDataSource.DEFAULT_STATE_DISABLED);
+                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_HOUR, 9);
+                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_MINUTE, 0);
                     database.insert(AlarmDbHelper.TABLE_DEFAULTS, null, values);
 
                     database.delete(AlarmDbHelper.TABLE_DAY, null, null);
@@ -260,6 +261,8 @@ public class CalendarActivity extends Activity {
         private CalendarAdapter adapter;
         private RecyclerView.LayoutManager layoutManager;
 
+        private Handler handler = new Handler();
+
         public CalendarFragment() {
             // Empty constructor required for fragment subclasses
         }
@@ -282,14 +285,30 @@ public class CalendarActivity extends Activity {
             // item separator
             recyclerView.addItemDecoration(new SimpleDividerItemDecoration(getActivity()));
 
+            // handler for refreshing the content
+            handler.postDelayed(runnable, 1000);
+
             return rootView;
+        }
+
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
         }
 
         @Override
         public void onResume() {
             super.onResume();
-            adapter.onResume();
+            adapter.onSystemTimeChange();
         }
+
+        private Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                adapter.onSystemTimeChange();
+                handler.postDelayed(this, 1000);
+            }
+        };
     }
 
 }
