@@ -218,7 +218,6 @@ public class CalendarActivity extends Activity {
                     database.delete(AlarmDbHelper.TABLE_DAY, null, null);
 
                     recreate();
-                    return;
             }
         }
     }

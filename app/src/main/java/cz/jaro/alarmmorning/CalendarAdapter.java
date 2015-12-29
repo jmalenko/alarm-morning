@@ -276,9 +276,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
             int hours = getArguments().getInt(HOURS);
             int minutes = getArguments().getInt(MINUTES);
 
-            TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(), calendarViewHolder.calendarAdapter, hours, minutes, DateFormat.is24HourFormat(getActivity()));
-
-            return timePickerDialog;
+            return new TimePickerDialog(getActivity(), calendarViewHolder.calendarAdapter, hours, minutes, DateFormat.is24HourFormat(getActivity()));
         }
 
     }
