@@ -168,51 +168,51 @@ public class CalendarActivity extends Activity {
 
                     values = new ContentValues();
                     values.put(AlarmDbHelper.COLUMN_DEFAULTS_DAY_OF_WEEK, Calendar.MONDAY);
-                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_STATE, AlarmDataSource.DEFAULT_STATE_SET);
-                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_HOURS, 7);
-                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_MINUTES, 1);
+                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_STATE, AlarmDataSource.DEFAULT_STATE_ENABLED);
+                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_HOUR, 7);
+                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_MINUTE, 1);
                     database.insert(AlarmDbHelper.TABLE_DEFAULTS, null, values);
 
                     values = new ContentValues();
                     values.put(AlarmDbHelper.COLUMN_DEFAULTS_DAY_OF_WEEK, Calendar.TUESDAY);
-                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_STATE, AlarmDataSource.DEFAULT_STATE_SET);
-                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_HOURS, 7);
-                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_MINUTES, 2);
+                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_STATE, AlarmDataSource.DEFAULT_STATE_ENABLED);
+                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_HOUR, 7);
+                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_MINUTE, 2);
                     database.insert(AlarmDbHelper.TABLE_DEFAULTS, null, values);
 
                     values = new ContentValues();
                     values.put(AlarmDbHelper.COLUMN_DEFAULTS_DAY_OF_WEEK, Calendar.WEDNESDAY);
-                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_STATE, AlarmDataSource.DEFAULT_STATE_SET);
-                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_HOURS, 7);
-                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_MINUTES, 3);
+                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_STATE, AlarmDataSource.DEFAULT_STATE_ENABLED);
+                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_HOUR, 7);
+                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_MINUTE, 3);
                     database.insert(AlarmDbHelper.TABLE_DEFAULTS, null, values);
 
                     values = new ContentValues();
                     values.put(AlarmDbHelper.COLUMN_DEFAULTS_DAY_OF_WEEK, Calendar.THURSDAY);
-                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_STATE, AlarmDataSource.DEFAULT_STATE_SET);
-                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_HOURS, 7);
-                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_MINUTES, 4);
+                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_STATE, AlarmDataSource.DEFAULT_STATE_ENABLED);
+                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_HOUR, 7);
+                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_MINUTE, 4);
                     database.insert(AlarmDbHelper.TABLE_DEFAULTS, null, values);
 
                     values = new ContentValues();
                     values.put(AlarmDbHelper.COLUMN_DEFAULTS_DAY_OF_WEEK, Calendar.FRIDAY);
-                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_STATE, AlarmDataSource.DEFAULT_STATE_SET);
-                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_HOURS, 7);
-                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_MINUTES, 5);
+                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_STATE, AlarmDataSource.DEFAULT_STATE_ENABLED);
+                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_HOUR, 7);
+                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_MINUTE, 5);
                     database.insert(AlarmDbHelper.TABLE_DEFAULTS, null, values);
 
                     values = new ContentValues();
                     values.put(AlarmDbHelper.COLUMN_DEFAULTS_DAY_OF_WEEK, Calendar.SATURDAY);
-                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_STATE, AlarmDataSource.DEFAULT_STATE_UNSET);
-                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_HOURS, 8);
-                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_MINUTES, 0);
+                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_STATE, AlarmDataSource.DEFAULT_STATE_DISABLED);
+                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_HOUR, 8);
+                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_MINUTE, 0);
                     database.insert(AlarmDbHelper.TABLE_DEFAULTS, null, values);
 
                     values = new ContentValues();
                     values.put(AlarmDbHelper.COLUMN_DEFAULTS_DAY_OF_WEEK, Calendar.SUNDAY);
-                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_STATE, AlarmDataSource.DEFAULT_STATE_UNSET);
-                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_HOURS, 9);
-                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_MINUTES, 0);
+                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_STATE, AlarmDataSource.DEFAULT_STATE_DISABLED);
+                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_HOUR, 9);
+                    values.put(AlarmDbHelper.COLUMN_DEFAULTS_MINUTE, 0);
                     database.insert(AlarmDbHelper.TABLE_DEFAULTS, null, values);
 
                     database.delete(AlarmDbHelper.TABLE_DAY, null, null);

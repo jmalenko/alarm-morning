@@ -1,26 +1,21 @@
 package cz.jaro.alarmmorning;
 
-import android.app.Dialog;
-import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
-import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import cz.jaro.alarmmorning.model.AlarmDataSource;
 import cz.jaro.alarmmorning.model.Day;
-import cz.jaro.alarmmorning.model.Defaults;
 
 /**
  * Provide views to RecyclerView with data from mDataSet.
@@ -29,7 +24,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
 
     private CalendarActivity calendarActivity;
 
-    private GregorianCalendar today;
+    private Calendar today;
 
     private AlarmDataSource datasource;
 
@@ -64,7 +59,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
      */
     @Override
     public void onBindViewHolder(CalendarViewHolder viewHolder, final int position) {
-        GregorianCalendar date = addDays(today, position);
+        Calendar date = addDays(today, position);
 
         int dayOfWeek = date.get(Calendar.DAY_OF_WEEK);
         String dayOfWeekText = Localization.dayOfWeekToString(dayOfWeek);
@@ -75,21 +70,9 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
 
         Day day = datasource.loadDay(date);
         String timeText;
-        if (day.getState() == AlarmDataSource.DAY_STATE_DEFAULT) {
-            Defaults defaults = day.getDefaults();
-            if (defaults.getState() == AlarmDataSource.DEFAULT_STATE_SET) {
-                timeText = Localization.timeToString(defaults.getHours(), defaults.getMinutes(), calendarActivity);
-            } else {
-                timeText = calendarActivity.getResources().getString(R.string.alarm_unset);
-            }
-        } else if (day.getState() == AlarmDataSource.DAY_STATE_SET) {
-            if (day.getHours() == AlarmDataSource.VALUE_UNSET) {
-                Defaults defaults = day.getDefaults();
-                timeText = Localization.timeToString(defaults.getHours(), defaults.getMinutes(), calendarActivity);
-            } else {
-                timeText = Localization.timeToString(day.getHours(), day.getMinutes(), calendarActivity);
-            }
-        } else { // day.getState() == AlarmDataSource.DAY_STATE_UNSET
+        if (day.isEnabled()) {
+            timeText = Localization.timeToString(day.getHourX(), day.getMinuteX(), calendarActivity);
+        } else {
             timeText = calendarActivity.getResources().getString(R.string.alarm_unset);
         }
         viewHolder.getTextTime().setText(timeText);
@@ -122,54 +105,42 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         return AlarmDataSource.HORIZON_DAYS;
     }
 
-    public static GregorianCalendar addDays(GregorianCalendar today, int numberOfDays) {
-        GregorianCalendar date = (GregorianCalendar) today.clone();
+    public static Calendar addDays(Calendar today, int numberOfDays) {
+        Calendar date = (Calendar) today.clone();
         date.add(Calendar.DATE, numberOfDays);
         return date;
     }
 
+    public void setChangingDay(Day changingDay) {
+        this.changingDay = changingDay;
+    }
+
     @Override
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-        // Save data
-        changingDay.setState(AlarmDataSource.DAY_STATE_SET);
-        changingDay.setHours(hourOfDay);
-        changingDay.setMinutes(minute);
+        changingDay.setState(AlarmDataSource.DAY_STATE_ENABLED);
+        changingDay.setHour(hourOfDay);
+        changingDay.setMinute(minute);
 
-        datasource.saveDay(changingDay);
-
-        notifyDataSetChanged();
-
-        Context context = calendarActivity.getBaseContext();
-        SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
-        systemAlarm.setAlarm();
+        save(changingDay);
     }
 
     public void onLongClick() {
-        // Save data
-        if (changingDay.getState() == AlarmDataSource.DAY_STATE_DEFAULT) {
-            Defaults defaults = changingDay.getDefaults();
-            if (defaults.getState() == AlarmDataSource.DEFAULT_STATE_SET) {
-                changingDay.setState(AlarmDataSource.DAY_STATE_UNSET);
-            } else { // defaults.getState() == AlarmDataSource.DEFAULT_STATE_UNSET
-                changingDay.setState(AlarmDataSource.DAY_STATE_SET);
-            }
-        } else if (changingDay.getState() == AlarmDataSource.DAY_STATE_SET) {
-            changingDay.setState(AlarmDataSource.DAY_STATE_UNSET);
-        } else { // changingDay.getState() == AlarmDataSource.DAY_STATE_UNSET
-            changingDay.setState(AlarmDataSource.DAY_STATE_SET);
-        }
+        changingDay.reverse();
 
-        datasource.saveDay(changingDay);
+        save(changingDay);
+    }
 
+    private void save(Day day) {
+        datasource.saveDay(day);
+        refresh();
+    }
+
+    private void refresh() {
         notifyDataSetChanged();
 
         Context context = calendarActivity.getBaseContext();
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
         systemAlarm.setAlarm();
-    }
-
-    public void setChangingDay(Day changingDay) {
-        this.changingDay = changingDay;
     }
 
     /**
@@ -234,23 +205,12 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
 
             TimePickerFragment fragment = new TimePickerFragment();
 
-            fragment.setCalendarViewHolder(this);
+            fragment.setOnTimeSetListener(calendarAdapter);
 
-            // Preset current time
+            // Preset time
             Bundle bundle = new Bundle();
-            if (day.getState() == AlarmDataSource.DAY_STATE_DEFAULT) {
-                bundle.putInt(TimePickerFragment.HOURS, day.getDefaults().getHours());
-                bundle.putInt(TimePickerFragment.MINUTES, day.getDefaults().getMinutes());
-            } else {
-                if (day.getHours() == AlarmDataSource.VALUE_UNSET) {
-                    Defaults defaults = day.getDefaults();
-                    bundle.putInt(TimePickerFragment.HOURS, defaults.getHours());
-                    bundle.putInt(TimePickerFragment.MINUTES, defaults.getMinutes());
-                } else {
-                    bundle.putInt(TimePickerFragment.HOURS, day.getHours());
-                    bundle.putInt(TimePickerFragment.MINUTES, day.getMinutes());
-                }
-            }
+            bundle.putInt(TimePickerFragment.HOURS, day.getHourX());
+            bundle.putInt(TimePickerFragment.MINUTES, day.getMinuteX());
             fragment.setArguments(bundle);
 
             fragment.show(fragmentManager, "timePicker");
@@ -262,27 +222,6 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
             calendarAdapter.onLongClick();
             return true;
         }
-    }
-
-    public static class TimePickerFragment extends DialogFragment {
-
-        public static final String HOURS = "hours";
-        public static final String MINUTES = "minutes";
-
-        private CalendarViewHolder calendarViewHolder;
-
-        public void setCalendarViewHolder(CalendarViewHolder calendarViewHolder) {
-            this.calendarViewHolder = calendarViewHolder;
-        }
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            int hours = getArguments().getInt(HOURS);
-            int minutes = getArguments().getInt(MINUTES);
-
-            return new TimePickerDialog(getActivity(), calendarViewHolder.calendarAdapter, hours, minutes, DateFormat.is24HourFormat(getActivity()));
-        }
-
     }
 
 }

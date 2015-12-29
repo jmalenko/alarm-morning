@@ -20,9 +20,9 @@ public class Defaults {
      */
     private int dayOfWeek;
 
-    private int hours;
+    private int hour;
 
-    private int minutes;
+    private int minute;
 
     public long getId() {
         return id;
@@ -48,23 +48,31 @@ public class Defaults {
         this.state = state;
     }
 
-    public int getHours() {
-        return hours;
+    public int getHour() {
+        return hour;
     }
 
-    public void setHours(int hours) {
-        this.hours = hours;
+    public void setHour(int hour) {
+        this.hour = hour;
     }
 
-    public int getMinutes() {
-        return minutes;
+    public int getMinute() {
+        return minute;
     }
 
-    public void setMinutes(int minutes) {
-        this.minutes = minutes;
+    public void setMinute(int minute) {
+        this.minute = minute;
     }
 
     public boolean isEnabled() {
-        return state == AlarmDataSource.DEFAULT_STATE_SET;
+        return state == AlarmDataSource.DEFAULT_STATE_ENABLED;
+    }
+
+    public void reverse() {
+        if (isEnabled()) {
+            setState(AlarmDataSource.DEFAULT_STATE_DISABLED);
+        } else {
+            setState(AlarmDataSource.DEFAULT_STATE_ENABLED);
+        }
     }
 }

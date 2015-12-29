@@ -21,11 +21,8 @@
 
 
     <!-- Common -->
-    <string name="alarm_state_default">Default</string>
     <string name="alarm_state_changed">Changed</string>
-    <string name="alarm_state_offday">Off day</string>
     <string name="alarm_state_passed">Passed</string>
-    <string name="alarm_state_ringing">Ringing</string>
 
     <!-- Descriptions for accessibility -->
     <string name="drawer_open">Open navigation drawer</string>

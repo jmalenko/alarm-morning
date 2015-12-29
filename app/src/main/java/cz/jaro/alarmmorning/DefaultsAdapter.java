@@ -1,13 +1,10 @@
 package cz.jaro.alarmmorning;
 
-import android.app.Dialog;
-import android.app.DialogFragment;
 import android.app.FragmentManager;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
-import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,7 +28,6 @@ public class DefaultsAdapter extends RecyclerView.Adapter<DefaultsAdapter.Defaul
     /**
      * Initialize the Adapter.
      *
-     * @param defaultsActivity
      */
     public DefaultsAdapter(DefaultsActivity defaultsActivity) {
         this.defaultsActivity = defaultsActivity;
@@ -65,8 +61,8 @@ public class DefaultsAdapter extends RecyclerView.Adapter<DefaultsAdapter.Defaul
         viewHolder.getTextDayOfWeek().setText(dayOfWeekText);
 
         String timeText;
-        if (defaults.getState() == AlarmDataSource.DEFAULT_STATE_SET) {
-            timeText = Localization.timeToString(defaults.getHours(), defaults.getMinutes(), defaultsActivity);
+        if (defaults.isEnabled()) {
+            timeText = Localization.timeToString(defaults.getHour(), defaults.getMinute(), defaultsActivity);
         } else {
             timeText = defaultsActivity.getResources().getString(R.string.alarm_unset);
         }
@@ -93,30 +89,26 @@ public class DefaultsAdapter extends RecyclerView.Adapter<DefaultsAdapter.Defaul
 
     @Override
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-        // Save data
-        changingDefaults.setState(AlarmDataSource.DEFAULT_STATE_SET);
-        changingDefaults.setHours(hourOfDay);
-        changingDefaults.setMinutes(minute);
+        changingDefaults.setState(AlarmDataSource.DEFAULT_STATE_ENABLED);
+        changingDefaults.setHour(hourOfDay);
+        changingDefaults.setMinute(minute);
 
-        datasource.saveDefault(changingDefaults);
-
-        notifyDataSetChanged();
-
-        Context context = defaultsActivity.getBaseContext();
-        SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
-        systemAlarm.setAlarm();
+        save(changingDefaults);
     }
 
     public void onLongClick() {
-        // Save data
-        if (changingDefaults.getState() == AlarmDataSource.DEFAULT_STATE_SET) {
-            changingDefaults.setState(AlarmDataSource.DEFAULT_STATE_UNSET);
-        } else {
-            changingDefaults.setState(AlarmDataSource.DEFAULT_STATE_SET);
-        }
+        changingDefaults.reverse();
 
-        datasource.saveDefault(changingDefaults);
+        save(changingDefaults);
+    }
 
+    private void save(Defaults defaults) {
+        datasource.saveDefault(defaults);
+
+        refresh();
+    }
+
+    private void refresh() {
         notifyDataSetChanged();
 
         Context context = defaultsActivity.getBaseContext();
@@ -167,12 +159,12 @@ public class DefaultsAdapter extends RecyclerView.Adapter<DefaultsAdapter.Defaul
 
             TimePickerFragment fragment = new TimePickerFragment();
 
-            fragment.setDefaultViewHolder(this);
+            fragment.setOnTimeSetListener(defaultsAdapter);
 
-            // Preset current time
+            // Preset time
             Bundle bundle = new Bundle();
-            bundle.putInt(TimePickerFragment.HOURS, defaults.getHours());
-            bundle.putInt(TimePickerFragment.MINUTES, defaults.getMinutes());
+            bundle.putInt(TimePickerFragment.HOURS, defaults.getHour());
+            bundle.putInt(TimePickerFragment.MINUTES, defaults.getMinute());
             fragment.setArguments(bundle);
 
             fragment.show(fragmentManager, "timePicker");
@@ -186,27 +178,4 @@ public class DefaultsAdapter extends RecyclerView.Adapter<DefaultsAdapter.Defaul
         }
     }
 
-    public static class TimePickerFragment extends DialogFragment {
-
-        public static final String HOURS = "hours";
-        public static final String MINUTES = "minutes";
-
-        private DefaultViewHolder defaultViewHolder;
-
-        public void setDefaultViewHolder(DefaultViewHolder defaultViewHolder) {
-            this.defaultViewHolder = defaultViewHolder;
-        }
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            int hours = getArguments().getInt(HOURS);
-            int minutes = getArguments().getInt(MINUTES);
-
-            TimePickerDialog timePickerDialog = new TimePickerDialog(getActivity(), defaultViewHolder.defaultsAdapter, hours, minutes, DateFormat.is24HourFormat(getActivity()));
-
-            return timePickerDialog;
-        }
-
-    }
 }
-

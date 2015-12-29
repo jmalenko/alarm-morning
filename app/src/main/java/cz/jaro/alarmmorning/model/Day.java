@@ -3,8 +3,6 @@ package cz.jaro.alarmmorning.model;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-import cz.jaro.alarmmorning.Localization;
-
 /**
  * Created by jmalenko on 18.12.2015.
  */
@@ -12,7 +10,7 @@ public class Day {
 
     private long id;
 
-    GregorianCalendar date;
+    Calendar date;
 
     /**
      * 0 = as default
@@ -21,9 +19,9 @@ public class Day {
      */
     private int state;
 
-    private int hours;
+    private int hour;
 
-    private int minutes;
+    private int minute;
 
     private Defaults defaults;
 
@@ -35,11 +33,11 @@ public class Day {
         this.id = id;
     }
 
-    public GregorianCalendar getDate() {
+    public Calendar getDate() {
         return date;
     }
 
-    public void setDate(GregorianCalendar date) {
+    public void setDate(Calendar date) {
         this.date = date;
     }
 
@@ -51,20 +49,20 @@ public class Day {
         this.state = state;
     }
 
-    public int getHours() {
-        return hours;
+    public int getHour() {
+        return hour;
     }
 
-    public void setHours(int hours) {
-        this.hours = hours;
+    public void setHour(int hour) {
+        this.hour = hour;
     }
 
-    public int getMinutes() {
-        return minutes;
+    public int getMinute() {
+        return minute;
     }
 
-    public void setMinutes(int minutes) {
-        this.minutes = minutes;
+    public void setMinute(int minute) {
+        this.minute = minute;
     }
 
     public Defaults getDefaults() {
@@ -85,32 +83,49 @@ public class Day {
         return false;
     }
 
-    private boolean isEnabled() {
-        return state == AlarmDataSource.DAY_STATE_SET ||
+    public boolean isEnabled() {
+        return state == AlarmDataSource.DAY_STATE_ENABLED ||
                 (state == AlarmDataSource.DAY_STATE_DEFAULT && defaults.isEnabled());
     }
 
-    private int getHoursX() {
-        if (hours == AlarmDataSource.VALUE_UNSET)
-            return defaults.getHours();
+    public int getHourX() {
+        if (hour == AlarmDataSource.VALUE_UNSET || state == AlarmDataSource.DAY_STATE_DEFAULT)
+            return defaults.getHour();
         else
-            return hours;
+            return hour;
     }
 
-    private int getMinutesX() {
-        if (minutes == AlarmDataSource.VALUE_UNSET)
-            return defaults.getMinutes();
+    public int getMinuteX() {
+        if (minute == AlarmDataSource.VALUE_UNSET || state == AlarmDataSource.DAY_STATE_DEFAULT)
+            return defaults.getMinute();
         else
-            return minutes;
+            return minute;
     }
 
-    private Calendar getDateTime() {
-        Calendar alarm = (Calendar) date.clone();
+    public Calendar getDateTime() {
+        Calendar alarmTime = (Calendar) date.clone();
 
-        alarm.set(Calendar.HOUR, getHoursX());
-        alarm.set(Calendar.MINUTE, getMinutesX());
+        alarmTime.set(Calendar.HOUR_OF_DAY, getHourX());
+        alarmTime.set(Calendar.MINUTE, getMinuteX());
+        alarmTime.set(Calendar.SECOND, 0);
+        alarmTime.set(Calendar.MILLISECOND, 0);
 
-        return alarm;
+        return alarmTime;
     }
 
+    public void reverse() {
+        switch (getState()) {
+            case AlarmDataSource.DAY_STATE_DEFAULT:
+                setState(defaults.isEnabled() ? AlarmDataSource.DAY_STATE_DISABLED : AlarmDataSource.DAY_STATE_ENABLED);
+                break;
+
+            case AlarmDataSource.DAY_STATE_ENABLED:
+                setState(AlarmDataSource.DAY_STATE_DISABLED);
+                break;
+
+            case AlarmDataSource.DAY_STATE_DISABLED:
+                setState(AlarmDataSource.DAY_STATE_ENABLED);
+                break;
+        }
+    }
 }

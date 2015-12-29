@@ -26,15 +26,15 @@ public class AlarmDataSource {
     // Database fields
     private SQLiteDatabase database;
     private AlarmDbHelper dbHelper;
-    private static final String[] allColumnsDefaults = {AlarmDbHelper.COLUMN_DEFAULTS_ID, AlarmDbHelper.COLUMN_DEFAULTS_DAY_OF_WEEK, AlarmDbHelper.COLUMN_DEFAULTS_STATE, AlarmDbHelper.COLUMN_DEFAULTS_HOURS, AlarmDbHelper.COLUMN_DEFAULTS_MINUTES};
-    private static final String[] allColumnsDay = {AlarmDbHelper.COLUMN_DAY_ID, AlarmDbHelper.COLUMN_DAY_DATE, AlarmDbHelper.COLUMN_DAY_STATE, AlarmDbHelper.COLUMN_DAY_HOURS, AlarmDbHelper.COLUMN_DAY_MINUTES};
+    private static final String[] allColumnsDefaults = {AlarmDbHelper.COLUMN_DEFAULTS_ID, AlarmDbHelper.COLUMN_DEFAULTS_DAY_OF_WEEK, AlarmDbHelper.COLUMN_DEFAULTS_STATE, AlarmDbHelper.COLUMN_DEFAULTS_HOUR, AlarmDbHelper.COLUMN_DEFAULTS_MINUTE};
+    private static final String[] allColumnsDay = {AlarmDbHelper.COLUMN_DAY_ID, AlarmDbHelper.COLUMN_DAY_DATE, AlarmDbHelper.COLUMN_DAY_STATE, AlarmDbHelper.COLUMN_DAY_HOUR, AlarmDbHelper.COLUMN_DAY_MINUTE};
 
-    public static final int DEFAULT_STATE_UNSET = 0;
-    public static final int DEFAULT_STATE_SET = 1;
+    public static final int DEFAULT_STATE_DISABLED = 0;
+    public static final int DEFAULT_STATE_ENABLED = 1;
 
     public static final int DAY_STATE_DEFAULT = 0;
-    public static final int DAY_STATE_SET = 1;
-    public static final int DAY_STATE_UNSET = 2;
+    public static final int DAY_STATE_ENABLED = 1;
+    public static final int DAY_STATE_DISABLED = 2;
 
     public static final int VALUE_UNSET = -1;
 
@@ -61,17 +61,17 @@ public class AlarmDataSource {
         return defaults;
     }
 
-    public int saveDefault(Defaults defaults) {
+    public void saveDefault(Defaults defaults) {
         ContentValues values = new ContentValues();
+        values.put(AlarmDbHelper.COLUMN_DEFAULTS_DAY_OF_WEEK, defaults.getDayOfWeek());
         values.put(AlarmDbHelper.COLUMN_DEFAULTS_STATE, defaults.getState());
-        values.put(AlarmDbHelper.COLUMN_DEFAULTS_HOURS, defaults.getHours());
-        values.put(AlarmDbHelper.COLUMN_DEFAULTS_MINUTES, defaults.getMinutes());
+        values.put(AlarmDbHelper.COLUMN_DEFAULTS_HOUR, defaults.getHour());
+        values.put(AlarmDbHelper.COLUMN_DEFAULTS_MINUTE, defaults.getMinute());
 
-        int rowAffected = database.update(AlarmDbHelper.TABLE_DEFAULTS, values, AlarmDbHelper.COLUMN_DEFAULTS_DAY_OF_WEEK + " = " + defaults.getDayOfWeek(), null);
-        return rowAffected;
+        database.insertWithOnConflict(AlarmDbHelper.TABLE_DEFAULTS, null, values, SQLiteDatabase.CONFLICT_REPLACE);
     }
 
-    public Day loadDay(GregorianCalendar date) {
+    public Day loadDay(Calendar date) {
         Day day;
 
         String dateText = dateToText(date);
@@ -81,8 +81,8 @@ public class AlarmDataSource {
             day = new Day();
             day.setDate(date);
             day.setState(DAY_STATE_DEFAULT);
-            day.setHours(VALUE_UNSET);
-            day.setMinutes(VALUE_UNSET);
+            day.setHour(VALUE_UNSET);
+            day.setMinute(VALUE_UNSET);
         } else {
             cursor.moveToFirst();
             day = cursorToDay(cursor);
@@ -101,20 +101,20 @@ public class AlarmDataSource {
         ContentValues values = new ContentValues();
         values.put(AlarmDbHelper.COLUMN_DAY_DATE, dateText);
         values.put(AlarmDbHelper.COLUMN_DAY_STATE, day.getState());
-        values.put(AlarmDbHelper.COLUMN_DAY_HOURS, day.getHours());
-        values.put(AlarmDbHelper.COLUMN_DAY_MINUTES, day.getMinutes());
+        values.put(AlarmDbHelper.COLUMN_DAY_HOUR, day.getHour());
+        values.put(AlarmDbHelper.COLUMN_DAY_MINUTE, day.getMinute());
 
         long id = database.insertWithOnConflict(AlarmDbHelper.TABLE_DAY, null, values, SQLiteDatabase.CONFLICT_REPLACE);
 
         printDB();
     }
 
-    private String dateToText(GregorianCalendar date) {
+    private String dateToText(Calendar date) {
         return iso8601Format.format(date.getTime());
     }
 
-    private GregorianCalendar textToDate(String dateText) {
-        GregorianCalendar date = new GregorianCalendar();
+    private Calendar textToDate(String dateText) {
+        Calendar date = new GregorianCalendar();
         try {
             Date date2 = iso8601Format.parse(dateText);
             date.setTimeInMillis(date2.getTime());
@@ -125,31 +125,18 @@ public class AlarmDataSource {
         }
     }
 
-    public GregorianCalendar getNextAlarm(GregorianCalendar currentTime) {
-        GregorianCalendar date = new GregorianCalendar();
+    public Calendar getNextAlarm(Calendar now) {
+        Calendar date = new GregorianCalendar();
 
         for (int daysInAdvance = 0; daysInAdvance < HORIZON_DAYS; daysInAdvance++, date.add(Calendar.DATE, 1)) {
             Day day = loadDay(date);
-            if (day.getState() == DAY_STATE_UNSET) {
+            if (!day.isEnabled()) {
                 continue;
             }
 
-            GregorianCalendar alarmTime = day.getDate();
-            if (day.getHours() == AlarmDataSource.VALUE_UNSET) {
-                int dayOfWeek = alarmTime.get(Calendar.DAY_OF_WEEK);
-                Defaults defaults = loadDefault(dayOfWeek);
-                day.setDefaults(defaults);
+            Calendar alarmTime = day.getDateTime();
 
-                alarmTime.set(Calendar.HOUR_OF_DAY, defaults.getHours());
-                alarmTime.set(Calendar.MINUTE, defaults.getMinutes());
-            } else {
-                alarmTime.set(Calendar.HOUR_OF_DAY, day.getHours());
-                alarmTime.set(Calendar.MINUTE, day.getMinutes());
-            }
-            alarmTime.set(Calendar.SECOND, 0);
-            alarmTime.set(Calendar.MILLISECOND, 0);
-
-            if (alarmTime.getTime().before(currentTime.getTime())) {
+            if (alarmTime.getTime().before(now.getTime())) {
                 continue;
             }
 
@@ -164,8 +151,8 @@ public class AlarmDataSource {
         defaults.setId(cursor.getLong(0));
         defaults.setDayOfWeek(cursor.getInt(1));
         defaults.setState(cursor.getInt(2));
-        defaults.setHours(cursor.getInt(3));
-        defaults.setMinutes(cursor.getInt(4));
+        defaults.setHour(cursor.getInt(3));
+        defaults.setMinute(cursor.getInt(4));
         return defaults;
     }
 
@@ -174,12 +161,12 @@ public class AlarmDataSource {
         day.setId(cursor.getLong(0));
 
         String dateText = cursor.getString(1);
-        GregorianCalendar date = textToDate(dateText);
+        Calendar date = textToDate(dateText);
         day.setDate(date);
 
         day.setState(cursor.getInt(2));
-        day.setHours(cursor.getInt(3));
-        day.setMinutes(cursor.getInt(4));
+        day.setHour(cursor.getInt(3));
+        day.setMinute(cursor.getInt(4));
         return day;
     }
 
@@ -190,7 +177,7 @@ public class AlarmDataSource {
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             Defaults defaults = cursorToDefaults(cursor);
-            Log.d(TAG, " " + defaults.getId() + " | " + defaults.getDayOfWeek() + " | " + defaults.getState() + " | " + defaults.getHours() + " | " + defaults.getMinutes());
+            Log.d(TAG, " " + defaults.getId() + " | " + defaults.getDayOfWeek() + " | " + defaults.getState() + " | " + defaults.getHour() + " | " + defaults.getMinute());
             cursor.moveToNext();
         }
         cursor.close();
@@ -201,7 +188,7 @@ public class AlarmDataSource {
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             Day day = cursorToDay(cursor);
-            Log.d(TAG, " " + day.getId() + " | " + dateToText(day.getDate()) + " | " + day.getState() + " | " + day.getHours() + " | " + day.getMinutes());
+            Log.d(TAG, " " + day.getId() + " | " + dateToText(day.getDate()) + " | " + day.getState() + " | " + day.getHour() + " | " + day.getMinute());
             cursor.moveToNext();
         }
         cursor.close();

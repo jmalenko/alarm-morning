@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 
@@ -41,7 +42,7 @@ public class RingActivity extends Activity {
     }
 
     private void updateContent() {
-        GregorianCalendar now = new GregorianCalendar();
+        Calendar now = new GregorianCalendar();
         String currentTimeString = Localization.timeToString(now.getTime(), this);
 
         TextView timeView = (TextView) findViewById(R.id.fullscreen_content);
@@ -54,9 +55,11 @@ public class RingActivity extends Activity {
     }
 
     private void startSound() {
+        final String VALUE_UNSET = "";
+
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        String ringtonePreference = preferences.getString("pref_ringtone", "");
-        Uri ringtoneUri = ringtonePreference == "" ? RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM) : Uri.parse(ringtonePreference);
+        String ringtonePreference = preferences.getString("pref_ringtone", VALUE_UNSET);
+        Uri ringtoneUri = ringtonePreference.equals(VALUE_UNSET) ? RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM) : Uri.parse(ringtonePreference);
 
         try {
             mediaPlayer = new MediaPlayer();
