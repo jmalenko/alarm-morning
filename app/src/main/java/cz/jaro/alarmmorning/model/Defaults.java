@@ -63,4 +63,8 @@ public class Defaults {
     public void setMinutes(int minutes) {
         this.minutes = minutes;
     }
+
+    public boolean isEnabled() {
+        return state == AlarmDataSource.DEFAULT_STATE_SET;
+    }
 }

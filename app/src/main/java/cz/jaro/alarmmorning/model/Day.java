@@ -1,6 +1,9 @@
 package cz.jaro.alarmmorning.model;
 
+import java.util.Calendar;
 import java.util.GregorianCalendar;
+
+import cz.jaro.alarmmorning.Localization;
 
 /**
  * Created by jmalenko on 18.12.2015.
@@ -70,6 +73,44 @@ public class Day {
 
     public void setDefaults(Defaults defaults) {
         this.defaults = defaults;
+    }
+
+    public boolean isPassed() {
+        Calendar now = new GregorianCalendar();
+        if (isEnabled()) {
+            if (getDateTime().before(now)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isEnabled() {
+        return state == AlarmDataSource.DAY_STATE_SET ||
+                (state == AlarmDataSource.DAY_STATE_DEFAULT && defaults.isEnabled());
+    }
+
+    private int getHoursX() {
+        if (hours == AlarmDataSource.VALUE_UNSET)
+            return defaults.getHours();
+        else
+            return hours;
+    }
+
+    private int getMinutesX() {
+        if (minutes == AlarmDataSource.VALUE_UNSET)
+            return defaults.getMinutes();
+        else
+            return minutes;
+    }
+
+    private Calendar getDateTime() {
+        Calendar alarm = (Calendar) date.clone();
+
+        alarm.set(Calendar.HOUR, getHoursX());
+        alarm.set(Calendar.MINUTE, getMinutesX());
+
+        return alarm;
     }
 
 }

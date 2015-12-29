@@ -95,13 +95,17 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         viewHolder.getTextTime().setText(timeText);
 
         String stateText;
-        switch (day.getState()) {
-            case AlarmDataSource.DAY_STATE_DEFAULT:
-                stateText = "";
-                break;
-            default:
-                stateText = calendarActivity.getResources().getString(R.string.alarm_state_changed);
-                break;
+        if (day.isPassed()) {
+            stateText = calendarActivity.getResources().getString(R.string.alarm_state_passed);
+        } else {
+            switch (day.getState()) {
+                case AlarmDataSource.DAY_STATE_DEFAULT:
+                    stateText = "";
+                    break;
+                default:
+                    stateText = calendarActivity.getResources().getString(R.string.alarm_state_changed);
+                    break;
+            }
         }
         viewHolder.getTextState().setText(stateText);
 
