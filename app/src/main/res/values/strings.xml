@@ -43,9 +43,6 @@
         <item>Scheduled alarms</item>
         <item>Default alarms</item>
         <item>Settings</item>
-        <item>Ring alarm now</item>
-        <item>When is next alarm?</item>
-        <item>Clean up database</item>
     </string-array>
 
 </resources>
