@@ -33,6 +33,7 @@ import android.os.Handler;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -49,7 +50,6 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 import cz.jaro.alarmmorning.graphics.SimpleDividerItemDecoration;
-import cz.jaro.alarmmorning.graphics.NoAnimationItemAnimator;
 import cz.jaro.alarmmorning.model.AlarmDataSource;
 import cz.jaro.alarmmorning.model.AlarmDbHelper;
 import cz.jaro.alarmmorning.receivers.AlarmReceiver;
@@ -287,7 +287,9 @@ public class CalendarActivity extends Activity {
             recyclerView.addItemDecoration(new SimpleDividerItemDecoration(getActivity()));
 
             // for disabling the animation on update
-            recyclerView.setItemAnimator(new NoAnimationItemAnimator());
+            DefaultItemAnimator animator = new DefaultItemAnimator();
+            animator.setSupportsChangeAnimations(false);
+            recyclerView.setItemAnimator(animator);
 
             // handler for refreshing the content
             handler.postDelayed(runnable, 1000);
