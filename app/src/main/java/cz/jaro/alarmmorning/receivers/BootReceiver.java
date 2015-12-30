@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import cz.jaro.alarmmorning.SystemAlarm;
+import cz.jaro.alarmmorning.WakeLocker;
 
 /**
  * Created by jmalenko on 21.12.2015.
@@ -13,8 +14,12 @@ public class BootReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        WakeLocker.acquire(context);
+
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
         systemAlarm.setAlarm();
+
+        WakeLocker.release();
     }
 
 }

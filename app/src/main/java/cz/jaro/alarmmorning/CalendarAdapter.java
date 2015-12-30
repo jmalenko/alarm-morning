@@ -32,6 +32,10 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
 
     private Day changingDay;
 
+    private int positionNextAlarm;
+
+    private static final int POSITION_UNSET = -1;
+
     /**
      * Initialize the Adapter.
      */
@@ -40,11 +44,14 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         datasource.open();
 
         this.calendarActivity = calendarActivity;
+
+        today = new GregorianCalendar();
+        positionNextAlarm = POSITION_UNSET;
     }
 
     public void onSystemTimeChange() {
-        today = new GregorianCalendar();
-        notifyDataSetChanged();
+        if (positionNextAlarm != POSITION_UNSET)
+            notifyItemChanged(positionNextAlarm);
     }
 
     /**
@@ -81,6 +88,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
             timeText = res.getString(R.string.alarm_unset);
         }
         viewHolder.getTextTime().setText(timeText);
+        viewHolder.getTextTime().setEnabled(!day.isPassed());
 
         String stateText;
         if (day.isPassed()) {
@@ -111,6 +119,8 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
             } else {
                 messageText = String.format(res.getString(R.string.time_to_ring_message_minutes), timeDifference.minutes, timeDifference.seconds);
             }
+
+            positionNextAlarm = position;
         } else {
             messageText = "";
         }
@@ -190,7 +200,8 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
                 } else {
                     toastText = String.format(res.getString(R.string.time_to_ring_toast_minutes), timeDifference.minutes, timeDifference.seconds);
                 }
-            }        }
+            }
+        }
         return toastText;
     }
 

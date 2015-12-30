@@ -10,29 +10,31 @@
         android:background="@color/calendar_day"
         android:gravity="center"
         android:textSize="@dimen/text_size_day_of_week"
+        android:paddingTop="@dimen/margin_tiny"
         />
 
     <TextView
         android:id="@+id/textTimeCal"
         android:layout_width="wrap_content"
-        android:layout_height="64dp"
+        android:layout_height="72dp"
         android:layout_marginLeft="@dimen/margin_medium"
         android:layout_marginRight="@dimen/margin_tiny"
         android:layout_toRightOf="@id/textDayOfWeekCal"
+        android:gravity="center_vertical"
         android:textSize="@dimen/text_size_time"
         />
 
     <TextView
         android:id="@+id/textDate"
         android:layout_width="100dp"
-        android:layout_height="24dp"
+        android:layout_height="32dp"
         android:layout_below="@id/textDayOfWeekCal"
         android:layout_toLeftOf="@id/textTimeCal"
         android:background="@color/calendar_day"
         android:gravity="center"
         android:textSize="@dimen/text_size_date"
+        android:paddingBottom="@dimen/margin_tiny"
         />
-
 
     <TextView
         android:id="@+id/textState"
@@ -43,6 +45,10 @@
         android:layout_toRightOf="@id/textTimeCal"
         android:gravity="end"
         android:textAlignment="textEnd"
+        android:paddingTop="@dimen/margin_small"
+        android:textColor="@color/state_text"
+        android:singleLine="true"
+        android:ellipsize="end"
         />
 
     <TextView
@@ -56,6 +62,10 @@
         android:layout_alignParentBottom="true"
         android:gravity="end"
         android:textAlignment="textEnd"
+        android:paddingBottom="@dimen/margin_small"
+        android:textColor="@color/state_text"
+        android:singleLine="true"
+        android:ellipsize="end"
         />
 
 </RelativeLayout>
