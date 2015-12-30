@@ -88,6 +88,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
             timeText = res.getString(R.string.alarm_unset);
         }
         viewHolder.getTextTime().setText(timeText);
+        viewHolder.getTextTime().setEnabled(!day.isPassed());
 
         String stateText;
         if (day.isPassed()) {
