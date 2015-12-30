@@ -5,19 +5,16 @@
 
     <color name="dark_gray">#66666666</color>
 
-    <!-- Logical colors -->
-
-    <!--CalendarActivity-->
+    <!-- CalendarActivity , DefaultActivity -->
 
     <color name="calendar_day">@color/material_blue_200</color>
+    <color name="state_text">@color/secondary_text_default_material_light</color>
 
     <!-- RingingActivity -->
 
+
+    <!-- Others -->
+
     <color name="drawer_overlay">#66000000</color>
 
-
-    <!--TODO Testing-->
-    <color name="red">#66ff0000</color>
-    <color name="green">#6600ff00</color>
-    <color name="blue">#660000ff</color>
 </resources>
