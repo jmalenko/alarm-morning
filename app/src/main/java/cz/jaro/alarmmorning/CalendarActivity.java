@@ -49,6 +49,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 import cz.jaro.alarmmorning.graphics.SimpleDividerItemDecoration;
+import cz.jaro.alarmmorning.graphics.NoAnimationItemAnimator;
 import cz.jaro.alarmmorning.model.AlarmDataSource;
 import cz.jaro.alarmmorning.model.AlarmDbHelper;
 import cz.jaro.alarmmorning.receivers.AlarmReceiver;
@@ -284,6 +285,9 @@ public class CalendarActivity extends Activity {
 
             // item separator
             recyclerView.addItemDecoration(new SimpleDividerItemDecoration(getActivity()));
+
+            // for disabling the animation on update
+            recyclerView.setItemAnimator(new NoAnimationItemAnimator());
 
             // handler for refreshing the content
             handler.postDelayed(runnable, 1000);
