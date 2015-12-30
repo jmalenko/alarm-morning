@@ -93,6 +93,9 @@ public class RingActivity extends Activity {
     public void dismissRing(View view) {
         stopSound();
 
+        // allow device sleep
+        WakeLocker.release();
+
         finish();
     }
 }

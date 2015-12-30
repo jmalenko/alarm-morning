@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import cz.jaro.alarmmorning.SystemAlarm;
+import cz.jaro.alarmmorning.WakeLocker;
 
 /**
  * This receiver os called by the operating system when the alarm should fire.
@@ -13,6 +14,9 @@ public class AlarmReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        // Prevent device sleep
+        WakeLocker.acquire(context);
+
         // Register next alarm
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
         systemAlarm.setAlarm();
