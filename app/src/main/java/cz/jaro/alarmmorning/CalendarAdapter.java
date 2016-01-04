@@ -47,7 +47,6 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         this.calendarActivity = calendarActivity;
 
         today = new GregorianCalendar();
-        today.roll(Calendar.DAY_OF_MONTH, -2);
         today.set(Calendar.HOUR_OF_DAY, 0);
         today.set(Calendar.MINUTE, 0);
         today.set(Calendar.SECOND, 0);
