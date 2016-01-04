@@ -173,7 +173,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
 
     public static Calendar addDays(Calendar today, int numberOfDays) {
         Calendar date = (Calendar) today.clone();
-        date.add(Calendar.DATE, numberOfDays);
+        date.add(Calendar.DAY_OF_MONTH, numberOfDays);
         return date;
     }
 
