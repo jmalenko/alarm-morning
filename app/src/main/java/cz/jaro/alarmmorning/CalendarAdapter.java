@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,12 +47,45 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         this.calendarActivity = calendarActivity;
 
         today = new GregorianCalendar();
+        today.roll(Calendar.DAY_OF_MONTH, -2);
+        today.set(Calendar.HOUR_OF_DAY, 0);
+        today.set(Calendar.MINUTE, 0);
+        today.set(Calendar.SECOND, 0);
+        today.set(Calendar.MILLISECOND, 0);
+
         positionNextAlarm = POSITION_UNSET;
     }
 
     public void onSystemTimeChange() {
+        // Update time to next alarm
         if (positionNextAlarm != POSITION_UNSET)
             notifyItemChanged(positionNextAlarm);
+
+        // Shift items when date changes
+        Calendar today2 = new GregorianCalendar();
+        today2.set(Calendar.HOUR_OF_DAY, 0);
+        today2.set(Calendar.MINUTE, 0);
+        today2.set(Calendar.SECOND, 0);
+        today2.set(Calendar.MILLISECOND, 0);
+
+        if (!today.equals(today2)) {
+            int diffInDays = -1;
+            for (int i = 1; i < AlarmDataSource.HORIZON_DAYS; i++) {
+                Calendar date = addDays(today, i);
+                if (today2.equals(date)) {
+                    diffInDays = i;
+                    break;
+                }
+            }
+
+            today = today2;
+
+            if (diffInDays != -1) {
+                notifyItemRangeRemoved(0, diffInDays);
+            } else {
+                notifyDataSetChanged();
+            }
+        }
     }
 
     /**
