@@ -46,7 +46,6 @@
         android:gravity="end"
         android:textAlignment="textEnd"
         android:paddingTop="@dimen/margin_small"
-        android:textColor="@color/state_text"
         android:singleLine="true"
         android:ellipsize="end"
         />
@@ -63,7 +62,6 @@
         android:gravity="end"
         android:textAlignment="textEnd"
         android:paddingBottom="@dimen/margin_small"
-        android:textColor="@color/state_text"
         android:singleLine="true"
         android:ellipsize="end"
         />

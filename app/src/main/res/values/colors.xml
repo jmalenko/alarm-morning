@@ -1,15 +1,23 @@
 <resources>
     <!-- Colors -->
+    <color name="material_indigo_900">#ff1a237e</color>
+
     <color name="material_blue_200">#ff90caf9</color>
+    <color name="material_blue_800">#ff1565c0</color>
     <color name="material_blue_900">#ff0d47a1</color>
 
+    <color name="material_deep_orange_900">#ffbf360c</color>
+
+    <color name="material_blue_grey_400">#ff78909c</color>
+    <color name="material_blue_grey_500">#ff607d8b</color>
+    <color name="material_blue_grey_600">#ff546e7a</color>
     <color name="material_blue_grey_900">#ff263238</color>
 
     <color name="dark_gray">#66666666</color>
 
     <!-- CalendarActivity , DefaultActivity -->
 
-    <color name="calendar_day">@color/material_blue_200</color>
+    <color name="calendar_day">@color/material_blue_grey_500</color>
     <color name="state_text">@color/secondary_text_default_material_light</color>
 
     <!-- RingingActivity -->
