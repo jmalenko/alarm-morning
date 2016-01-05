@@ -3,6 +3,8 @@
     <color name="material_blue_200">#ff90caf9</color>
     <color name="material_blue_900">#ff0d47a1</color>
 
+    <color name="material_blue_grey_900">#ff263238</color>
+
     <color name="dark_gray">#66666666</color>
 
     <!-- CalendarActivity , DefaultActivity -->
@@ -14,6 +16,7 @@
 
 
     <!-- Others -->
+    <color name="drawer_background">@color/material_blue_grey_900</color>
 
     <color name="drawer_overlay">#66000000</color>
 

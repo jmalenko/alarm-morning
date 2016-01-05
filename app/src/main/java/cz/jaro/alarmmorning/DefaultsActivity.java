@@ -1,5 +1,6 @@
 package cz.jaro.alarmmorning;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -19,7 +20,9 @@ public class DefaultsActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_defaults);
 
-        getActionBar().setDisplayHomeAsUpEnabled(true);
+        ActionBar ab = getActionBar();
+        ab.setDisplayHomeAsUpEnabled(true);
+        ab.setDisplayShowHomeEnabled(false);
 
         recyclerView = (RecyclerView) findViewById(R.id.defaults_recycler_view);
 
