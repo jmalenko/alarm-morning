@@ -1,5 +1,6 @@
 <resources>
     <!-- Colors -->
+
     <color name="material_indigo_900">#ff1a237e</color>
 
     <color name="material_blue_200">#ff90caf9</color>
@@ -21,10 +22,6 @@
     <color name="state_text">@color/secondary_text_default_material_light</color>
 
     <!-- RingingActivity -->
-
-
-    <!-- Others -->
-    <color name="drawer_background">@color/material_blue_grey_900</color>
 
     <color name="drawer_overlay">#66000000</color>
 
