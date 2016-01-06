@@ -43,10 +43,8 @@ import cz.jaro.alarmmorning.graphics.SimpleDividerItemDecoration;
 
 public class CalendarActivity extends Activity {
 
-    private String[] menuItems;
     private DrawerLayout drawerLayout;
     private ListView drawerList;
-
     private ActionBarDrawerToggle drawerToggle;
 
     @Override
@@ -54,11 +52,11 @@ public class CalendarActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_calendar);
 
-        menuItems = getResources().getStringArray(R.array.menu_items_array);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawerList = (ListView) findViewById(R.id.left_drawer);
 
         // set up the drawer's list view with items and click listener
+        String[] menuItems = getResources().getStringArray(R.array.menu_items_array);
         drawerList.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item, menuItems));
         drawerList.setOnItemClickListener(new DrawerItemClickListener());
 
