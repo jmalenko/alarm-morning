@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,17 +24,12 @@ import cz.jaro.alarmmorning.model.Day;
  */
 public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.CalendarViewHolder> implements TimePickerDialog.OnTimeSetListener {
 
-    private CalendarActivity calendarActivity;
-
-    private Calendar today;
-
-    private AlarmDataSource datasource;
-
-    private Day changingDay;
-
-    private int positionNextAlarm;
-
     private static final int POSITION_UNSET = -1;
+    private CalendarActivity calendarActivity;
+    private Calendar today;
+    private AlarmDataSource datasource;
+    private Day changingDay;
+    private int positionNextAlarm;
 
     /**
      * Initialize the Adapter.
@@ -46,13 +40,23 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
 
         this.calendarActivity = calendarActivity;
 
-        today = new GregorianCalendar();
-        today.set(Calendar.HOUR_OF_DAY, 0);
-        today.set(Calendar.MINUTE, 0);
-        today.set(Calendar.SECOND, 0);
-        today.set(Calendar.MILLISECOND, 0);
+        today = getToday();
 
         positionNextAlarm = POSITION_UNSET;
+    }
+
+    public static Calendar addDays(Calendar today, int numberOfDays) {
+        Calendar date = (Calendar) today.clone();
+        date.add(Calendar.DAY_OF_MONTH, numberOfDays);
+        return date;
+    }
+
+    public void onResume() {
+        Calendar today2 = getToday();
+
+        if (!today.equals(today2)) {
+            today = today2;
+        }
     }
 
     public void onSystemTimeChange() {
@@ -61,11 +65,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
             notifyItemChanged(positionNextAlarm);
 
         // Shift items when date changes
-        Calendar today2 = new GregorianCalendar();
-        today2.set(Calendar.HOUR_OF_DAY, 0);
-        today2.set(Calendar.MINUTE, 0);
-        today2.set(Calendar.SECOND, 0);
-        today2.set(Calendar.MILLISECOND, 0);
+        Calendar today2 = getToday();
 
         if (!today.equals(today2)) {
             int diffInDays = -1;
@@ -170,10 +170,14 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         return AlarmDataSource.HORIZON_DAYS;
     }
 
-    public static Calendar addDays(Calendar today, int numberOfDays) {
-        Calendar date = (Calendar) today.clone();
-        date.add(Calendar.DAY_OF_MONTH, numberOfDays);
-        return date;
+    private Calendar getToday() {
+        Calendar today = new GregorianCalendar();
+        today.set(Calendar.HOUR_OF_DAY, 0);
+        today.set(Calendar.MINUTE, 0);
+        today.set(Calendar.SECOND, 0);
+        today.set(Calendar.MILLISECOND, 0);
+
+        return today;
     }
 
     public void setChangingDay(Day changingDay) {
@@ -244,14 +248,12 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
     public static class CalendarViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         private final FragmentManager fragmentManager;
         private final CalendarAdapter calendarAdapter;
-
-        private Day day;
-
         private final TextView textDayOfWeek;
         private final TextView textDate;
         private final TextView textTime;
         private final TextView textState;
         private final TextView textComment;
+        private Day day;
 
         public CalendarViewHolder(View view, final FragmentManager fragmentManager, CalendarAdapter calendarAdapter) {
             super(view);

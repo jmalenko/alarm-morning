@@ -90,27 +90,6 @@ public class CalendarActivity extends Activity {
         }
     }
 
-    private class DrawerItemClickListener implements ListView.OnItemClickListener {
-        @Override
-        public void onItemClick(AdapterView parent, View view, int position, long id) {
-            switch (position) {
-                case 0:
-                    drawerLayout.closeDrawer(drawerList);
-                    return;
-
-                case 1:
-                    Intent intent = new Intent(CalendarActivity.this, DefaultsActivity.class);
-                    startActivity(intent);
-                    return;
-
-                case 2:
-                    intent = new Intent(CalendarActivity.this, SettingsActivity.class);
-                    startActivity(intent);
-                    return;
-            }
-        }
-    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // The action bar home/up action should open or close the drawer.
@@ -150,6 +129,13 @@ public class CalendarActivity extends Activity {
         private RecyclerView.LayoutManager layoutManager;
 
         private Handler handler = new Handler();
+        private Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                adapter.onSystemTimeChange();
+                handler.postDelayed(this, 1000);
+            }
+        };
 
         public CalendarFragment() {
             // Empty constructor required for fragment subclasses
@@ -192,16 +178,29 @@ public class CalendarActivity extends Activity {
         @Override
         public void onResume() {
             super.onResume();
-            adapter.onSystemTimeChange();
+            adapter.onResume();
         }
+    }
 
-        private Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                adapter.onSystemTimeChange();
-                handler.postDelayed(this, 1000);
+    private class DrawerItemClickListener implements ListView.OnItemClickListener {
+        @Override
+        public void onItemClick(AdapterView parent, View view, int position, long id) {
+            switch (position) {
+                case 0:
+                    drawerLayout.closeDrawer(drawerList);
+                    return;
+
+                case 1:
+                    Intent intent = new Intent(CalendarActivity.this, DefaultsActivity.class);
+                    startActivity(intent);
+                    return;
+
+                case 2:
+                    intent = new Intent(CalendarActivity.this, SettingsActivity.class);
+                    startActivity(intent);
+                    return;
             }
-        };
+        }
     }
 
 }
