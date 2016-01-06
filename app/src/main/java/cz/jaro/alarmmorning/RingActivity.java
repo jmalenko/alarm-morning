@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
 
@@ -46,16 +47,33 @@ public class RingActivity extends Activity {
     protected void onResume() {
         super.onResume();
 
-        updateContent();
-
-        startSound();
+        startRinging();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
 
-        onDismiss();
+        stopRinging();
+    }
+
+    public void onDismiss(View view) {
+        stopRinging();
+
+        finish();
+    }
+
+    private void startRinging() {
+        updateContent();
+
+        startSound();
+    }
+
+    public void stopRinging() {
+        stopSound();
+
+        // allow device sleep
+        WakeLocker.release();
     }
 
     private void updateContent() {
@@ -107,12 +125,4 @@ public class RingActivity extends Activity {
         audioManager.setStreamVolume(AudioManager.STREAM_ALARM, previousVolume, 0);
     }
 
-    public void onDismiss() {
-        stopSound();
-
-        // allow device sleep
-        WakeLocker.release();
-
-        finish();
-    }
 }
