@@ -44,48 +44,6 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         positionNextAlarm = POSITION_UNSET;
     }
 
-    public static Calendar addDays(Calendar today, int numberOfDays) {
-        Calendar date = (Calendar) today.clone();
-        date.add(Calendar.DAY_OF_MONTH, numberOfDays);
-        return date;
-    }
-
-    public void onResume() {
-        Calendar today2 = getToday();
-
-        if (!today.equals(today2)) {
-            today = today2;
-        }
-    }
-
-    public void onSystemTimeChange() {
-        // Update time to next alarm
-        if (positionNextAlarm != POSITION_UNSET)
-            notifyItemChanged(positionNextAlarm);
-
-        // Shift items when date changes
-        Calendar today2 = getToday();
-
-        if (!today.equals(today2)) {
-            int diffInDays = -1;
-            for (int i = 1; i < AlarmDataSource.HORIZON_DAYS; i++) {
-                Calendar date = addDays(today, i);
-                if (today2.equals(date)) {
-                    diffInDays = i;
-                    break;
-                }
-            }
-
-            today = today2;
-
-            if (diffInDays != -1) {
-                notifyItemRangeRemoved(0, diffInDays);
-            } else {
-                notifyDataSetChanged();
-            }
-        }
-    }
-
     /**
      * Create new views (invoked by the layout manager)
      */
@@ -169,6 +127,42 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         return AlarmDataSource.HORIZON_DAYS;
     }
 
+    public void onResume() {
+        Calendar today2 = getToday();
+
+        if (!today.equals(today2)) {
+            today = today2;
+        }
+    }
+
+    public void onSystemTimeChange() {
+        // Update time to next alarm
+        if (positionNextAlarm != POSITION_UNSET)
+            notifyItemChanged(positionNextAlarm);
+
+        // Shift items when date changes
+        Calendar today2 = getToday();
+
+        if (!today.equals(today2)) {
+            int diffInDays = -1;
+            for (int i = 1; i < AlarmDataSource.HORIZON_DAYS; i++) {
+                Calendar date = addDays(today, i);
+                if (today2.equals(date)) {
+                    diffInDays = i;
+                    break;
+                }
+            }
+
+            today = today2;
+
+            if (diffInDays != -1) {
+                notifyItemRangeRemoved(0, diffInDays);
+            } else {
+                notifyDataSetChanged();
+            }
+        }
+    }
+
     @Override
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
         changingDay.setState(AlarmDataSource.DAY_STATE_ENABLED);
@@ -225,6 +219,12 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
             }
         }
         return toastText;
+    }
+
+    public static Calendar addDays(Calendar today, int numberOfDays) {
+        Calendar date = (Calendar) today.clone();
+        date.add(Calendar.DAY_OF_MONTH, numberOfDays);
+        return date;
     }
 
     private Calendar getToday() {
