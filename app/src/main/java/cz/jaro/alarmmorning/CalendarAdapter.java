@@ -41,7 +41,6 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         this.calendarActivity = calendarActivity;
 
         today = getToday();
-
         positionNextAlarm = POSITION_UNSET;
     }
 
@@ -170,20 +169,6 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         return AlarmDataSource.HORIZON_DAYS;
     }
 
-    private Calendar getToday() {
-        Calendar today = new GregorianCalendar();
-        today.set(Calendar.HOUR_OF_DAY, 0);
-        today.set(Calendar.MINUTE, 0);
-        today.set(Calendar.SECOND, 0);
-        today.set(Calendar.MILLISECOND, 0);
-
-        return today;
-    }
-
-    public void setChangingDay(Day changingDay) {
-        this.changingDay = changingDay;
-    }
-
     @Override
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
         changingDay.setState(AlarmDataSource.DAY_STATE_ENABLED);
@@ -240,6 +225,20 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
             }
         }
         return toastText;
+    }
+
+    private Calendar getToday() {
+        Calendar today = new GregorianCalendar();
+        today.set(Calendar.HOUR_OF_DAY, 0);
+        today.set(Calendar.MINUTE, 0);
+        today.set(Calendar.SECOND, 0);
+        today.set(Calendar.MILLISECOND, 0);
+
+        return today;
+    }
+
+    public void setChangingDay(Day changingDay) {
+        this.changingDay = changingDay;
     }
 
     /**

@@ -162,9 +162,6 @@ public class CalendarActivity extends Activity {
             animator.setSupportsChangeAnimations(false);
             recyclerView.setItemAnimator(animator);
 
-            // handler for refreshing the content
-            handler.postDelayed(runnable, 1000);
-
             return rootView;
         }
 
@@ -176,7 +173,18 @@ public class CalendarActivity extends Activity {
         @Override
         public void onResume() {
             super.onResume();
+
+            // handler for refreshing the content
+            handler.postDelayed(runnable, 1000);
+
             adapter.onResume();
+        }
+
+        @Override
+        public void onPause() {
+            super.onPause();
+
+            handler.removeCallbacks(runnable);
         }
     }
 
