@@ -31,9 +31,11 @@ public class RingActivity extends Activity {
     private MediaPlayer mediaPlayer;
     private AudioManager audioManager;
     private int previousVolume;
+    private boolean isRinging;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "onCreate()");
         super.onCreate(savedInstanceState);
 
         // skip keyguard
@@ -41,42 +43,48 @@ public class RingActivity extends Activity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED);
 
         setContentView(R.layout.activity_ring);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
 
         startRinging();
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-        stopRinging();
-    }
-
     public void onDismiss(View view) {
+        Log.d(TAG, "onDismiss()");
         stopRinging();
 
         finish();
     }
 
     private void startRinging() {
-        updateContent();
+        Log.d(TAG, "startRinging()");
 
-        startSound();
+        if (!isRinging) {
+            Log.i(TAG, "Start ringing");
+
+            isRinging = true;
+
+            updateContent();
+
+            startSound();
+        }
     }
 
     public void stopRinging() {
-        stopSound();
+        Log.d(TAG, "stopRinging()");
 
-        // allow device sleep
-        WakeLocker.release();
+        if (isRinging) {
+            Log.i(TAG, "Stop ringing");
+
+            isRinging = false;
+
+            stopSound();
+
+            // allow device sleep
+            WakeLocker.release();
+        }
     }
 
     private void updateContent() {
+        Log.d(TAG, "updateContent()");
         Calendar now = new GregorianCalendar();
         String currentTimeString = Localization.timeToString(now.getTime(), this);
 
@@ -85,19 +93,21 @@ public class RingActivity extends Activity {
     }
 
     private void startSoundAsRingtone(Uri ringtoneUri) {
+        Log.d(TAG, "startSoundAsRingtone()");
         ringtone = RingtoneManager.getRingtone(getApplicationContext(), ringtoneUri);
         ringtone.play();
     }
 
     private void startSound() {
+        Log.d(TAG, "startSound()");
         final String VALUE_UNSET = "";
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         String ringtonePreference = preferences.getString("pref_ringtone", VALUE_UNSET);
         Uri ringtoneUri = ringtonePreference.equals(VALUE_UNSET) ? RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM) : Uri.parse(ringtonePreference);
 
+        mediaPlayer = new MediaPlayer();
         try {
-            mediaPlayer = new MediaPlayer();
             mediaPlayer.setDataSource(this, ringtoneUri);
             audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
@@ -117,6 +127,7 @@ public class RingActivity extends Activity {
     }
 
     private void stopSound() {
+        Log.d(TAG, "stopSound()");
         if (ringtone != null) {
             ringtone.stop();
         }
