@@ -41,6 +41,7 @@ public class SystemAlarm {
 
 
     public void setAlarm() {
+        Log.d(TAG, "setAlarm()");
         AlarmDataSource datasource = new AlarmDataSource(context);
         datasource.open();
 
@@ -51,7 +52,7 @@ public class SystemAlarm {
 
         if (alarmTime == null) {
             if (operation != null) {
-                Log.i(TAG, "Cancelling previous alarm");
+                Log.i(TAG, "Cancelling current alarm");
                 operation.cancel();
             }
             Log.i(TAG, "No alarm scheduled");
@@ -63,7 +64,7 @@ public class SystemAlarm {
                 Log.i(TAG, "Scheduled alarm does not change at " + alarmTime.getTime().toString());
                 return;
             } else {
-                Log.i(TAG, "Cancelling previous alarm");
+                Log.i(TAG, "Cancelling current alarm");
                 operation.cancel();
             }
         }
