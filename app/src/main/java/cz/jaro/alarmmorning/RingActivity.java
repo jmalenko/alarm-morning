@@ -111,7 +111,7 @@ public class RingActivity extends Activity {
             Log.d(TAG, "Unable to play ringtone as media");
         }
 
-        if (soundMethod != 0) {
+        if (soundMethod == 0) {
             try {
                 startSoundAsRingtone(ringtoneUri);
                 soundMethod = 2;
