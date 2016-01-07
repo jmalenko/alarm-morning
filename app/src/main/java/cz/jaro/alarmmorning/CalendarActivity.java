@@ -93,20 +93,44 @@ public class CalendarActivity extends Activity {
         public void onItemClick(AdapterView parent, View view, int position, long id) {
             switch (position) {
                 case 0:
-                    drawerLayout.closeDrawer(drawerList);
+                    closeNavigationDrawer();
                     return;
 
                 case 1:
+                    drawerList.setItemChecked(0, true);
+                    closeNavigationDrawer();
+
                     Intent intent = new Intent(CalendarActivity.this, DefaultsActivity.class);
                     startActivity(intent);
                     return;
 
                 case 2:
+                    drawerList.setItemChecked(0, true);
+                    closeNavigationDrawer();
+
                     intent = new Intent(CalendarActivity.this, SettingsActivity.class);
                     startActivity(intent);
                     return;
             }
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (drawerLayout.isDrawerOpen(drawerList)) closeNavigationDrawer();
+        else super.onBackPressed();
+    }
+
+    public void closeNavigationDrawer() {
+        drawerLayout.closeDrawer(drawerList);
+    }
+
+    public void openNavigationDrawer() {
+        drawerLayout.openDrawer(drawerList);
+    }
+
+    public boolean isNavigationDrawerOpen() {
+        return drawerLayout.isDrawerOpen(drawerList);
     }
 
     @Override
