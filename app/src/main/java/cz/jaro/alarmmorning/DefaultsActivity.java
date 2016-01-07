@@ -3,8 +3,10 @@ package cz.jaro.alarmmorning;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.MenuItem;
 
 import cz.jaro.alarmmorning.graphics.SimpleDividerItemDecoration;
 
@@ -43,6 +45,18 @@ public class DefaultsActivity extends Activity {
         super.onDestroy();
 
         adapter.onDestroy();
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            // Respond to the action bar's Up/Home button
+            case android.R.id.home:
+                NavUtils.navigateUpFromSameTask(this);
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
 }
