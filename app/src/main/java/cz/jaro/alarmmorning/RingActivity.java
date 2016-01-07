@@ -32,6 +32,7 @@ public class RingActivity extends Activity {
     private AudioManager audioManager;
     private int previousVolume;
     private boolean isRinging;
+    private int soundMethod;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,48 +93,71 @@ public class RingActivity extends Activity {
         timeView.setText(currentTimeString);
     }
 
-    private void startSoundAsRingtone(Uri ringtoneUri) {
-        Log.d(TAG, "startSoundAsRingtone()");
-        ringtone = RingtoneManager.getRingtone(getApplicationContext(), ringtoneUri);
-        ringtone.play();
-    }
-
     private void startSound() {
         Log.d(TAG, "startSound()");
+
         final String VALUE_UNSET = "";
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         String ringtonePreference = preferences.getString("pref_ringtone", VALUE_UNSET);
         Uri ringtoneUri = ringtonePreference.equals(VALUE_UNSET) ? RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM) : Uri.parse(ringtonePreference);
 
-        mediaPlayer = new MediaPlayer();
+        soundMethod = 0;
+
         try {
-            mediaPlayer.setDataSource(this, ringtoneUri);
-            audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-
-            // set max volume
-            previousVolume = audioManager.getStreamVolume(AudioManager.STREAM_ALARM);
-            int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM);
-            audioManager.setStreamVolume(AudioManager.STREAM_ALARM, maxVolume, 0);
-
-            mediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
-            mediaPlayer.setLooping(true); // repeat sound
-            mediaPlayer.prepare();
-            mediaPlayer.start();
-        } catch (IOException e) {
-            Log.w(TAG, "Unable to play ringtone as media");
-            startSoundAsRingtone(ringtoneUri);
+            startSoundAsMedia(ringtoneUri);
+            soundMethod = 1;
+        } catch (Exception e) {
+            Log.d(TAG, "Unable to play ringtone as media");
         }
+
+        if (soundMethod != 0) {
+            try {
+                startSoundAsRingtone(ringtoneUri);
+                soundMethod = 2;
+            } catch (Exception e) {
+                Log.d(TAG, "Unable to play ringtone as ringtone");
+            }
+        }
+
+        if (soundMethod == 0) Log.e(TAG, "Unable to play ringtone");
+    }
+
+    private void startSoundAsRingtone(Uri ringtoneUri) {
+        Log.d(TAG, "startSoundAsRingtone()");
+        ringtone = RingtoneManager.getRingtone(getApplicationContext(), ringtoneUri);
+        ringtone.play();
+    }
+
+    private void startSoundAsMedia(Uri ringtoneUri) throws IOException {
+        Log.d(TAG, "startSoundAsMedia()");
+
+        mediaPlayer = new MediaPlayer();
+        mediaPlayer.setDataSource(this, ringtoneUri);
+        audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+
+        // set max volume
+        previousVolume = audioManager.getStreamVolume(AudioManager.STREAM_ALARM);
+        int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM);
+        audioManager.setStreamVolume(AudioManager.STREAM_ALARM, maxVolume, 0);
+
+        mediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
+        mediaPlayer.setLooping(true); // repeat sound
+        mediaPlayer.prepare();
+        mediaPlayer.start();
     }
 
     private void stopSound() {
         Log.d(TAG, "stopSound()");
-        if (ringtone != null) {
-            ringtone.stop();
+
+        switch (soundMethod) {
+            case 1:
+                mediaPlayer.stop();
+                audioManager.setStreamVolume(AudioManager.STREAM_ALARM, previousVolume, 0);
+                break;
+            case 2:
+                ringtone.stop();
+                break;
         }
-        mediaPlayer.stop();
-
-        audioManager.setStreamVolume(AudioManager.STREAM_ALARM, previousVolume, 0);
     }
-
 }
