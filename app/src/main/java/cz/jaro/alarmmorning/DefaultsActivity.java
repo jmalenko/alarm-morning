@@ -38,4 +38,11 @@ public class DefaultsActivity extends Activity {
         recyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        adapter.onDestroy();
+    }
+
 }

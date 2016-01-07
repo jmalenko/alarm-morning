@@ -135,6 +135,10 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         }
     }
 
+    public void onDestroy() {
+        datasource.close();
+    }
+
     public void onSystemTimeChange() {
         // Update time to next alarm
         if (positionNextAlarm != POSITION_UNSET)

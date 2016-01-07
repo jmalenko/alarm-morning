@@ -186,10 +186,10 @@ public class CalendarActivity extends Activity {
             return rootView;
         }
 
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-        }
+//        @Override
+//        public void onCreate(Bundle savedInstanceState) {
+//            super.onCreate(savedInstanceState);
+//        }
 
         @Override
         public void onResume() {
@@ -206,6 +206,13 @@ public class CalendarActivity extends Activity {
             super.onPause();
 
             handler.removeCallbacks(runnable);
+        }
+
+        @Override
+        public void onDestroy() {
+            super.onDestroy();
+
+            adapter.onDestroy();
         }
     }
 }

@@ -116,6 +116,10 @@ public class DefaultsAdapter extends RecyclerView.Adapter<DefaultsAdapter.Defaul
         systemAlarm.setAlarm();
     }
 
+    public void onDestroy() {
+        datasource.close();
+    }
+
     /**
      * Provide a reference to the type of views that you are using (custom ViewHolder)
      */
