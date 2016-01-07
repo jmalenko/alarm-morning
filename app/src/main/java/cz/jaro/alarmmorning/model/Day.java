@@ -5,8 +5,6 @@ import android.content.Context;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-import cz.jaro.alarmmorning.SystemAlarm;
-
 /**
  * Created by jmalenko on 18.12.2015.
  */
@@ -136,13 +134,7 @@ public class Day {
     public boolean isNextAlarm(Context context) {
         Calendar alarmTime1 = getDateTime();
 
-        AlarmDataSource datasource = new AlarmDataSource(context);
-        datasource.open();
-
-        Calendar now = new GregorianCalendar();
-        Calendar alarmTime2 = datasource.getNextAlarm(now);
-
-        datasource.close();
+        Calendar alarmTime2 = AlarmDataSource.getNextAlarm(context);
 
         return alarmTime1.equals(alarmTime2);
     }

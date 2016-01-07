@@ -146,6 +146,18 @@ public class AlarmDataSource {
         return null;
     }
 
+    public static Calendar getNextAlarm(Context context) {
+        AlarmDataSource datasource = new AlarmDataSource(context);
+        datasource.open();
+
+        Calendar now = new GregorianCalendar();
+        Calendar alarmTime = datasource.getNextAlarm(now);
+
+        datasource.close();
+
+        return alarmTime;
+    }
+
     private Defaults cursorToDefaults(Cursor cursor) {
         Defaults defaults = new Defaults();
         defaults.setId(cursor.getLong(0));
