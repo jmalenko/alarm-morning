@@ -1,31 +1,20 @@
 <resources>
-    <!-- Colors -->
-    <color name="material_indigo_900">#ff1a237e</color>
+    <!-- Blue grey + Amber -->
+    <color name="primary">#607D8B</color>
+    <color name="primary_dark">#455A64</color>
+    <color name="primary_light">#CFD8DC</color>
+    <color name="accent">#FFC107</color>
+    <color name="primary_text">#212121</color>
+    <color name="secondary_text">#727272</color>
+    <color name="icons">#FFFFFF</color>
+    <color name="divider">#66666666</color>
 
-    <color name="material_blue_200">#ff90caf9</color>
-    <color name="material_blue_800">#ff1565c0</color>
-    <color name="material_blue_900">#ff0d47a1</color>
-
-    <color name="material_deep_orange_900">#ffbf360c</color>
-
-    <color name="material_blue_grey_400">#ff78909c</color>
-    <color name="material_blue_grey_500">#ff607d8b</color>
-    <color name="material_blue_grey_600">#ff546e7a</color>
-    <color name="material_blue_grey_900">#ff263238</color>
-
-    <color name="dark_gray">#66666666</color>
-
-    <!-- CalendarActivity , DefaultActivity -->
-
-    <color name="calendar_day">@color/material_blue_grey_500</color>
-    <color name="state_text">@color/secondary_text_default_material_light</color>
+    <!--
+    In Light theme use
+    <color name="divider">#B6B6B6</color>
+    -->
 
     <!-- RingingActivity -->
-
-
-    <!-- Others -->
-    <color name="drawer_background">@color/material_blue_grey_900</color>
-
     <color name="drawer_overlay">#66000000</color>
 
 </resources>
