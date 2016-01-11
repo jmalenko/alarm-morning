@@ -3,7 +3,6 @@ package cz.jaro.alarmmorning.model;
 import android.content.Context;
 
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 /**
  * Created by jmalenko on 18.12.2015.
@@ -76,7 +75,7 @@ public class Day {
     }
 
     public boolean isPassed() {
-        Calendar now = new GregorianCalendar();
+        Calendar now = Calendar.getInstance();
         if (isEnabled()) {
             if (getDateTime().before(now)) {
                 return true;
@@ -141,7 +140,7 @@ public class Day {
 
     public long getTimeToRing() {
         Calendar alarmTime1 = getDateTime();
-        Calendar now = new GregorianCalendar();
+        Calendar now = Calendar.getInstance();
 
         return alarmTime1.getTimeInMillis() - now.getTimeInMillis();
     }

@@ -6,7 +6,6 @@ import android.text.format.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
 /**
  * Created by jmalenko on 17.12.2015.
@@ -14,7 +13,7 @@ import java.util.GregorianCalendar;
 public class Localization {
 
     public static String dayOfWeekToString(int dayOfWeek) {
-        Calendar date = new GregorianCalendar();
+        Calendar date = Calendar.getInstance();
         date.set(Calendar.DAY_OF_WEEK, dayOfWeek);
         SimpleDateFormat sdf = new SimpleDateFormat("E");
         sdf.setCalendar(date);
@@ -22,7 +21,7 @@ public class Localization {
     }
 
     public static String timeToString(int hours, int minutes, Activity activity) {
-        Calendar date = new GregorianCalendar();
+        Calendar date = Calendar.getInstance();
         date.set(Calendar.HOUR_OF_DAY, hours);
         date.set(Calendar.MINUTE, minutes);
         return timeToString(date.getTime(), activity);

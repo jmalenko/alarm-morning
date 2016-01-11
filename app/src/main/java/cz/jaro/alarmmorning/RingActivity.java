@@ -17,7 +17,6 @@ import android.widget.TextView;
 
 import java.io.IOException;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 
 /**
@@ -86,7 +85,7 @@ public class RingActivity extends Activity {
 
     private void updateContent() {
         Log.d(TAG, "updateContent()");
-        Calendar now = new GregorianCalendar();
+        Calendar now = Calendar.getInstance();
         String currentTimeString = Localization.timeToString(now.getTime(), this);
 
         TextView timeView = (TextView) findViewById(R.id.fullscreen_content);

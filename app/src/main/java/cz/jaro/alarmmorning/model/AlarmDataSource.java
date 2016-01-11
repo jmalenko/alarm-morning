@@ -11,7 +11,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 
 /**
  * Created by jmalenko on 16.12.2015.
@@ -114,7 +113,7 @@ public class AlarmDataSource {
     }
 
     private Calendar textToDate(String dateText) {
-        Calendar date = new GregorianCalendar();
+        Calendar date = Calendar.getInstance();
         try {
             Date date2 = iso8601Format.parse(dateText);
             date.setTimeInMillis(date2.getTime());
@@ -126,7 +125,7 @@ public class AlarmDataSource {
     }
 
     public Calendar getNextAlarm(Calendar now) {
-        Calendar date = new GregorianCalendar();
+        Calendar date = Calendar.getInstance();
 
         for (int daysInAdvance = 0; daysInAdvance < HORIZON_DAYS; daysInAdvance++, date.add(Calendar.DATE, 1)) {
             Day day = loadDay(date);
@@ -150,7 +149,7 @@ public class AlarmDataSource {
         AlarmDataSource datasource = new AlarmDataSource(context);
         datasource.open();
 
-        Calendar now = new GregorianCalendar();
+        Calendar now = Calendar.getInstance();
         Calendar alarmTime = datasource.getNextAlarm(now);
 
         datasource.close();
