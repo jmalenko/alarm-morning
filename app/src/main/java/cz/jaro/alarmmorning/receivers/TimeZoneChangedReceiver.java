@@ -9,18 +9,18 @@ import cz.jaro.alarmmorning.SystemAlarm;
 import cz.jaro.alarmmorning.WakeLocker;
 
 /**
- * Created by jmalenko on 21.12.2015.
+ * Created by jmalenko on 11.1.2016.
  */
-public class UpgradeReceiver extends BroadcastReceiver {
+public class TimeZoneChangedReceiver extends BroadcastReceiver {
 
-    private static final String TAG = UpgradeReceiver.class.getName();
+    private static final String TAG = TimeChangedReceiver.class.getName();
 
     @Override
     public void onReceive(Context context, Intent intent) {
         WakeLocker.acquire(context);
 
         Log.d(TAG, "onReceive()");
-        Log.i(TAG, "Setting alarm on update");
+        Log.i(TAG, "Setting alarm on time zone change");
 
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
         systemAlarm.setAlarm();

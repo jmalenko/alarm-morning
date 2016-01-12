@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +24,10 @@ import cz.jaro.alarmmorning.model.Day;
  */
 public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.CalendarViewHolder> implements TimePickerDialog.OnTimeSetListener {
 
+    private static final String TAG = CalendarAdapter.class.getName();
+
     private static final int POSITION_UNSET = -1;
+
     private CalendarActivity calendarActivity;
     private Calendar today;
     private AlarmDataSource datasource;
@@ -139,6 +143,8 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
     }
 
     public void onSystemTimeChange() {
+        Log.d(TAG, "onSystemTimeChange()");
+
         // Update time to next alarm
         if (positionNextAlarm != POSITION_UNSET)
             notifyItemChanged(positionNextAlarm);
@@ -164,6 +170,12 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
                 notifyDataSetChanged();
             }
         }
+    }
+
+    public void onTimeOrTimeZoneChange() {
+        Log.d(TAG, "onTimeOrTimeZoneChange()");
+        today = getToday();
+        notifyDataSetChanged();
     }
 
     @Override

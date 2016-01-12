@@ -21,7 +21,10 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
@@ -30,6 +33,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -43,9 +47,20 @@ import cz.jaro.alarmmorning.graphics.SimpleDividerItemDecoration;
 
 public class CalendarActivity extends Activity {
 
+    private static final String TAG = CalendarActivity.class.getName();
+
     private DrawerLayout drawerLayout;
     private ListView drawerList;
     private ActionBarDrawerToggle drawerToggle;
+    private CalendarFragment fragment;
+
+    private static final IntentFilter s_intentFilter;
+
+    static {
+        s_intentFilter = new IntentFilter();
+        s_intentFilter.addAction(Intent.ACTION_TIMEZONE_CHANGED);
+        s_intentFilter.addAction(Intent.ACTION_TIME_CHANGED);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,8 +93,11 @@ public class CalendarActivity extends Activity {
         };
         drawerLayout.setDrawerListener(drawerToggle);
 
+        // handler for time nad timezone change
+        registerReceiver(timeChangedReceiver, s_intentFilter);
+
         if (savedInstanceState == null) {
-            Fragment fragment = new CalendarFragment();
+            fragment = new CalendarFragment();
             // Insert the fragment by replacing any existing fragment
             FragmentManager fragmentManager = getFragmentManager();
             fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
@@ -132,6 +150,23 @@ public class CalendarActivity extends Activity {
     public boolean isNavigationDrawerOpen() {
         return drawerLayout.isDrawerOpen(drawerList);
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        unregisterReceiver(timeChangedReceiver);
+    }
+
+    private final BroadcastReceiver timeChangedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "onReceive()");
+            Log.i(TAG, "Refreshing view on time or timezone change");
+
+            fragment.adapter.onTimeOrTimeZoneChange();
+        }
+    };
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -209,11 +244,6 @@ public class CalendarActivity extends Activity {
 
             return rootView;
         }
-
-//        @Override
-//        public void onCreate(Bundle savedInstanceState) {
-//            super.onCreate(savedInstanceState);
-//        }
 
         @Override
         public void onResume() {
