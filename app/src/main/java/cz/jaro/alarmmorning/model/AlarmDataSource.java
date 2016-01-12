@@ -16,7 +16,7 @@ import java.util.Date;
  * Created by jmalenko on 16.12.2015.
  */
 public class AlarmDataSource {
-    private static final String TAG = AlarmDataSource.class.getName();
+    private static final String TAG = AlarmDataSource.class.getSimpleName();
 
     private final SimpleDateFormat iso8601Format = new SimpleDateFormat("yyyy-MM-dd");
 

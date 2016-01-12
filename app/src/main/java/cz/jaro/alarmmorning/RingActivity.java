@@ -24,7 +24,7 @@ import java.util.Calendar;
  */
 public class RingActivity extends Activity {
 
-    private static final String TAG = RingActivity.class.getName();
+    private static final String TAG = RingActivity.class.getSimpleName();
 
     private Ringtone ringtone;
     private MediaPlayer mediaPlayer;

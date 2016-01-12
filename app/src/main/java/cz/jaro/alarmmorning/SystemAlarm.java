@@ -16,7 +16,7 @@ import cz.jaro.alarmmorning.receivers.AlarmReceiver;
  */
 public class SystemAlarm {
 
-    private static final String TAG = SystemAlarm.class.getName();
+    private static final String TAG = SystemAlarm.class.getSimpleName();
 
     private static SystemAlarm instance;
 

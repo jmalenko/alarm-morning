@@ -13,7 +13,7 @@ import cz.jaro.alarmmorning.WakeLocker;
  */
 public class AlarmReceiver extends BroadcastReceiver {
 
-    private static final String TAG = AlarmReceiver.class.getName();
+    private static final String TAG = AlarmReceiver.class.getSimpleName();
 
     @Override
     public void onReceive(Context context, Intent intent) {

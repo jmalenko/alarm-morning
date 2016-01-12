@@ -24,7 +24,7 @@ import cz.jaro.alarmmorning.model.Day;
  */
 public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.CalendarViewHolder> implements TimePickerDialog.OnTimeSetListener {
 
-    private static final String TAG = CalendarAdapter.class.getName();
+    private static final String TAG = CalendarAdapter.class.getSimpleName();
 
     private static final int POSITION_UNSET = -1;
 

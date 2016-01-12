@@ -13,7 +13,7 @@ import cz.jaro.alarmmorning.WakeLocker;
  */
 public class TimeZoneChangedReceiver extends BroadcastReceiver {
 
-    private static final String TAG = TimeChangedReceiver.class.getName();
+    private static final String TAG = TimeChangedReceiver.class.getSimpleName();
 
     @Override
     public void onReceive(Context context, Intent intent) {

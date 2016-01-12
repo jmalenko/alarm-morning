@@ -47,7 +47,7 @@ import cz.jaro.alarmmorning.graphics.SimpleDividerItemDecoration;
 
 public class CalendarActivity extends Activity {
 
-    private static final String TAG = CalendarActivity.class.getName();
+    private static final String TAG = CalendarActivity.class.getSimpleName();
 
     private DrawerLayout drawerLayout;
     private ListView drawerList;

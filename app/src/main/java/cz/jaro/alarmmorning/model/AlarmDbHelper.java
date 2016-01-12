@@ -11,7 +11,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class AlarmDbHelper extends SQLiteOpenHelper {
 
-    private static final String TAG = AlarmDbHelper.class.getName();
+    private static final String TAG = AlarmDbHelper.class.getSimpleName();
 
     private static final String DATABASE_NAME = "alarms.db";
 
