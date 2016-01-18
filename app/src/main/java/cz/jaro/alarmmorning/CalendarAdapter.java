@@ -135,6 +135,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
 
         if (!today.equals(today2)) {
             today = today2;
+            notifyDataSetChanged();
         }
     }
 
@@ -143,7 +144,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
     }
 
     public void onSystemTimeChange() {
-        Log.d(TAG, "onSystemTimeChange()");
+        Log.v(TAG, "onSystemTimeChange()");
 
         // Update time to next alarm
         if (positionNextAlarm != POSITION_UNSET)
@@ -208,7 +209,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
 
         Context context = calendarActivity.getBaseContext();
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
-        systemAlarm.setAlarm();
+        systemAlarm.setSystemAlarm();
     }
 
     private String formatToastText(Day day) {
