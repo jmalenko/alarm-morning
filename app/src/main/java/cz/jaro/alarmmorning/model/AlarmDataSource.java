@@ -139,7 +139,7 @@ public class AlarmDataSource {
                 continue;
             }
 
-            Log.d(TAG, "Next alarm is at " + alarmTime.getTime().toString());
+            Log.v(TAG, "Next alarm is at " + alarmTime.getTime().toString());
             return alarmTime;
         }
         return null;
@@ -183,23 +183,23 @@ public class AlarmDataSource {
 
     private void printDB() {
         Cursor cursor = database.query(AlarmDbHelper.TABLE_DEFAULTS, allColumnsDefaults, null, null, null, null, null);
-        Log.d(TAG, "Table Defaults, rows " + cursor.getCount());
+        Log.v(TAG, "Table Defaults, rows " + cursor.getCount());
 
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             Defaults defaults = cursorToDefaults(cursor);
-            Log.d(TAG, " " + defaults.getId() + " | " + defaults.getDayOfWeek() + " | " + defaults.getState() + " | " + defaults.getHour() + " | " + defaults.getMinute());
+            Log.v(TAG, " " + defaults.getId() + " | " + defaults.getDayOfWeek() + " | " + defaults.getState() + " | " + defaults.getHour() + " | " + defaults.getMinute());
             cursor.moveToNext();
         }
         cursor.close();
 
         cursor = database.query(AlarmDbHelper.TABLE_DAY, allColumnsDay, null, null, null, null, null);
-        Log.d(TAG, "Table Day, rows " + cursor.getCount());
+        Log.v(TAG, "Table Day, rows " + cursor.getCount());
 
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             Day day = cursorToDay(cursor);
-            Log.d(TAG, " " + day.getId() + " | " + dateToText(day.getDate()) + " | " + day.getState() + " | " + day.getHour() + " | " + day.getMinute());
+            Log.v(TAG, " " + day.getId() + " | " + dateToText(day.getDate()) + " | " + day.getState() + " | " + day.getHour() + " | " + day.getMinute());
             cursor.moveToNext();
         }
         cursor.close();
