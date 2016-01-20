@@ -23,7 +23,7 @@ public class BootReceiver extends BroadcastReceiver {
         Log.i(TAG, "Setting alarm on boot");
 
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
-        systemAlarm.setAlarm();
+        systemAlarm.setSystemAlarm();
 
         WakeLocker.release();
     }

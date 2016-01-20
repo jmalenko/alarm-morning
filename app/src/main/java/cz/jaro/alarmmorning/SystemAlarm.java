@@ -4,6 +4,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import java.util.Calendar;
@@ -24,7 +25,23 @@ public class SystemAlarm {
     private AlarmManager alarmManager;
 
     private Long time;
+    private Intent intent;
     private PendingIntent operation;
+
+    /**
+     * Action meaning: Set system alarm for next action. (Currently, all alarm are unset in the next {@link AlarmDataSource#HORIZON_DAYS} days.)
+     */
+    static private String ACTION_SET_SYSTEM_ALARM = "SET_SYSTEM_ALARM";
+
+    /**
+     * Action meaning: Shout notification about the next alarm. (The next alarm time is in 2 hours.)
+     */
+    static private String ACTION_RING_IN_NEAR_FUTURE = "RING_IN_NEAR_FUTURE";
+
+    /**
+     * Action meaning: Start ringing.
+     */
+    static private String ACTION_RING = "RING";
 
     private SystemAlarm(Context context) {
         this.context = context;
@@ -39,47 +56,114 @@ public class SystemAlarm {
     }
 
 
-    public void setAlarm() {
-        Log.d(TAG, "setAlarm()");
+    protected void registerSystemAlarm(String action, Calendar time) {
+        Log.i(TAG, "Setting system alarm at " + time.getTime().toString());
+
+        this.time = time.getTimeInMillis();
+
+        intent = new Intent(context, AlarmReceiver.class);
+        intent.setAction(action);
+
+        operation = PendingIntent.getBroadcast(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        alarmManager.set(AlarmManager.RTC_WAKEUP, this.time, operation);
+    }
+
+    private void cancelSystemAlarm() {
+        if (operation != null) {
+            Log.d(TAG, "Cancelling current alarm");
+            operation.cancel();
+        }
+    }
+
+    private void initialize() {
+        Log.d(TAG, "initialize()");
 
         Calendar alarmTime = AlarmDataSource.getNextAlarm(context);
 
         if (alarmTime == null) {
-            if (operation != null) {
-                Log.i(TAG, "Cancelling current alarm");
-                operation.cancel();
-            }
-            Log.i(TAG, "No alarm scheduled");
-            return;
-        }
+            // TODO Fix: when no alarm is set [in the horizon]. This happens when a default time is set and all the days in calendar are changed to unset. This must me fixed everywhere AlarmDataSource.getNextAlarm() is called.
+            registerSystemAlarm(ACTION_SET_SYSTEM_ALARM, null);
+        } else {
+            Calendar now = Calendar.getInstance();
 
-        if (operation != null) {
-            if (time == alarmTime.getTimeInMillis()) {
-                Log.i(TAG, "Scheduled alarm does not change at " + alarmTime.getTime().toString());
-                return;
+            // TODO Create preference "Near future is X;Y before alarm time"
+            final int NEAR_FUTURE_HOUR = 0;
+            final int NEAR_FUTURE_MINUTE = 1;
+
+            Calendar nearFutureTime = subtractHour(alarmTime, NEAR_FUTURE_HOUR, NEAR_FUTURE_MINUTE);
+
+            if (now.before(nearFutureTime)) {
+                registerSystemAlarm(ACTION_RING_IN_NEAR_FUTURE, nearFutureTime);
             } else {
-                Log.i(TAG, "Cancelling current alarm");
-                operation.cancel();
+                alarmTime = AlarmDataSource.getNextAlarm(context);
+
+                registerSystemAlarm(ACTION_RING, alarmTime);
+
+                GlobalManager globalManager = new GlobalManager(context);
+                globalManager.onNearFuture();
             }
         }
-
-        Log.i(TAG, "Setting alarm at " + alarmTime.getTime().toString());
-
-        Intent ringIntent = new Intent(context, AlarmReceiver.class);
-
-        time = alarmTime.getTimeInMillis();
-        operation = PendingIntent.getBroadcast(context, 1, ringIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        alarmManager.set(AlarmManager.RTC_WAKEUP, time, operation);
-
-        // requires API level 21 or higher
-//        PendingIntent showIntent = PendingIntent.getBroadcast(context, 1, ringIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-//        AlarmManager.AlarmClockInfo alarmClockInfo = new AlarmManager.AlarmClockInfo(alarmTime.getTimeInMillis(), showIntent);
-//        alarmManager.setAlarmClock(alarmClockInfo, operation);
     }
 
-    public long getTime() {
-        return time;
+    public void setSystemAlarm() {
+        Log.d(TAG, "setSystemAlarm()");
+
+        cancelSystemAlarm();
+        initialize();
     }
+
+    private static Calendar subtractHour(Calendar time, int hour, int minute) {
+        Calendar date = (Calendar) time.clone();
+//        date.add(Calendar.HOUR_OF_DAY, -hour);
+//        date.add(Calendar.MINUTE, -minute);
+        // TODO remove after testing
+        date.add(Calendar.SECOND, -30);
+        return date;
+    }
+
+
+//    public void setAlarmOld() {
+//        Log.d(TAG, "setAlarmOld()");
+//
+//        Calendar alarmTime = AlarmDataSource.getNextAlarm(context);
+//
+//        if (alarmTime == null) {
+//            if (operation != null) {
+//                Log.i(TAG, "Cancelling current alarm");
+//                operation.cancel();
+//            }
+//            Log.i(TAG, "No alarm scheduled");
+//            return;
+//        }
+//
+//        if (operation != null) {
+//            if (time == alarmTime.getTimeInMillis()) {
+//                Log.i(TAG, "Scheduled alarm does not change at " + alarmTime.getTime().toString());
+//                return;
+//            } else {
+//                Log.i(TAG, "Cancelling current alarm");
+//                operation.cancel();
+//            }
+//        }
+//
+//        Log.i(TAG, "Setting alarm at " + alarmTime.getTime().toString());
+//
+//        Intent ringIntent = new Intent(context, AlarmReceiver.class);
+//
+//        time = alarmTime.getTimeInMillis();
+//        operation = PendingIntent.getBroadcast(context, 1, ringIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+//        alarmManager.set(AlarmManager.RTC_WAKEUP, time, operation);
+//
+//        // requires API level 21 or higher
+////        PendingIntent showIntent = PendingIntent.getBroadcast(context, 1, ringIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+////        AlarmManager.AlarmClockInfo alarmClockInfo = new AlarmManager.AlarmClockInfo(alarmTime.getTimeInMillis(), showIntent);
+////        alarmManager.setAlarmClock(alarmClockInfo, operation);
+//    }
+
+//    public long getTime() {
+//        return time;
+//    }
 
     //    // requires API level 21 or hi
 //    public static long getNextGlobalAlarm(Context context) {
@@ -88,5 +172,63 @@ public class SystemAlarm {
 //        long time = alarm.getTriggerTime();
 //        return time;
 //    }
+
+    public void onSystemAlarm(Context context, Intent intent) {
+        String action = intent.getAction();
+
+        Log.i(TAG, "Acting on system alarm. action=" + action);
+
+        if (action == ACTION_SET_SYSTEM_ALARM) {
+            initialize();
+
+            // switch today from "dismissed in future" to "passed"
+            Intent hideIntent = new Intent();
+            hideIntent.setClassName("cz.jaro.alarmmorning", "cz.jaro.alarmmorning.CalendarActivity");
+            hideIntent.setAction(CalendarActivity.ACTION_UPDATE_TODAY);
+            LocalBroadcastManager.getInstance(context).sendBroadcast(hideIntent);
+        } else if (action == ACTION_RING_IN_NEAR_FUTURE) {
+            Log.i(TAG, "Near future");
+
+            Calendar alarmTime = AlarmDataSource.getNextAlarm(context);
+            registerSystemAlarm(ACTION_RING, alarmTime);
+
+            GlobalManager globalManager = new GlobalManager(context);
+            globalManager.onNearFuture();
+        } else if (action == ACTION_RING) {
+            Log.i(TAG, "Ring");
+
+            initialize();
+
+            GlobalManager globalManager = new GlobalManager(context);
+            globalManager.onRing();
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    public void onDismissBeforeRinging() {
+        Log.d(TAG, "onDismissBeforeRinging()");
+
+        Calendar alarmTime = AlarmDataSource.getNextAlarm(context);
+
+        cancelSystemAlarm();
+        registerSystemAlarm(ACTION_SET_SYSTEM_ALARM, alarmTime);
+    }
+
+    public Calendar onSnooze() {
+        Log.d(TAG, "onSnooze()");
+        // TODO Create preference "Snooze for X minutes"
+        final int SNOOZE_MINUTE = 1;
+
+        Calendar ringAfterSnoozeTime = Calendar.getInstance();
+        ringAfterSnoozeTime.add(Calendar.MINUTE, SNOOZE_MINUTE);
+        ringAfterSnoozeTime.set(Calendar.SECOND, 0);
+        ringAfterSnoozeTime.set(Calendar.MILLISECOND, 0);
+
+        cancelSystemAlarm();
+        registerSystemAlarm(ACTION_RING, ringAfterSnoozeTime);
+
+        return ringAfterSnoozeTime;
+    }
 
 }

@@ -1,6 +1,6 @@
 package cz.jaro.alarmmorning;
 
-import android.app.Activity;
+import android.content.Context;
 import android.text.format.DateFormat;
 
 import java.text.SimpleDateFormat;
@@ -20,15 +20,15 @@ public class Localization {
         return sdf.format(date.getTime());
     }
 
-    public static String timeToString(int hours, int minutes, Activity activity) {
+    public static String timeToString(int hours, int minutes, Context context) {
         Calendar date = Calendar.getInstance();
         date.set(Calendar.HOUR_OF_DAY, hours);
         date.set(Calendar.MINUTE, minutes);
-        return timeToString(date.getTime(), activity);
+        return timeToString(date.getTime(), context);
     }
 
-    public static String timeToString(Date date, Activity activity) {
-        java.text.DateFormat dateFormat = DateFormat.getTimeFormat(activity);
+    public static String timeToString(Date date, Context context) {
+        java.text.DateFormat dateFormat = DateFormat.getTimeFormat(context);
         return dateFormat.format(date);
     }
 

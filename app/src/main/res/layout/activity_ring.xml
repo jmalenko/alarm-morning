@@ -39,7 +39,16 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:onClick="onDismiss"
-                android:text="@string/dismiss_button"/>
+                android:text="@string/action_dismiss" />
+
+            <Button
+                android:id="@+id/snooze_button"
+                style="?metaButtonBarButtonStyle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:onClick="onSnooze"
+                android:text="@string/action_snooze" />
 
         </LinearLayout>
     </FrameLayout>

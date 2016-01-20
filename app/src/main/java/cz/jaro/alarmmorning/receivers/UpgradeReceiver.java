@@ -23,7 +23,7 @@ public class UpgradeReceiver extends BroadcastReceiver {
         Log.i(TAG, "Setting alarm on update");
 
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
-        systemAlarm.setAlarm();
+        systemAlarm.setSystemAlarm();
 
         WakeLocker.release();
     }

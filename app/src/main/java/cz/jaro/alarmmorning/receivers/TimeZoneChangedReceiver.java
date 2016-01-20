@@ -23,7 +23,7 @@ public class TimeZoneChangedReceiver extends BroadcastReceiver {
         Log.i(TAG, "Setting alarm on time zone change");
 
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
-        systemAlarm.setAlarm();
+        systemAlarm.setSystemAlarm();
 
         WakeLocker.release();
     }

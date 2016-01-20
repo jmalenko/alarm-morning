@@ -34,6 +34,12 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
     private Day changingDay;
     private int positionNextAlarm;
 
+    // TODO Change time of ringing alarm
+
+    // TODO Show not dismissed alarms from previous days
+
+    // TODO Add menu item "Dismiss" in "near future" and when snoozed
+
     /**
      * Initialize the Adapter.
      */
@@ -44,7 +50,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         this.calendarActivity = calendarActivity;
 
         today = getToday();
-        positionNextAlarm = POSITION_UNSET;
+        updatePositionNextAlarm(0);
     }
 
     /**
@@ -81,11 +87,66 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
             timeText = res.getString(R.string.alarm_unset);
         }
         viewHolder.getTextTime().setText(timeText);
-        viewHolder.getTextTime().setEnabled(!day.isPassed());
+
+        boolean enabled = true;
+        if (position == 0) {
+            GlobalManager globalManager = new GlobalManager(calendarActivity);
+            if (globalManager.isValid()) {
+                int state = globalManager.getState();
+
+                if (state == GlobalManager.STATE_DISMISSED_BEFORE_RINGING || state == GlobalManager.STATE_DISMISSED) {
+                    enabled = false;
+                }
+            } else {
+                enabled = !day.isPassed();
+            }
+        }
+        viewHolder.getTextTime().setEnabled(enabled);
 
         String stateText;
-        if (day.isPassed()) {
-            stateText = res.getString(R.string.alarm_state_passed);
+        if (position == 0) {
+            GlobalManager globalManager = new GlobalManager(calendarActivity);
+            if (globalManager.isValid()) {
+                int state = globalManager.getState();
+
+                if (state == GlobalManager.STATE_FUTURE) {
+                    switch (day.getState()) {
+                        case AlarmDataSource.DAY_STATE_DEFAULT:
+                            stateText = "";
+                            break;
+                        default:
+                            stateText = res.getString(R.string.alarm_state_changed);
+                            break;
+                    }
+                } else if (state == GlobalManager.STATE_DISMISSED_BEFORE_RINGING) {
+                    if (day.isPassed())
+                        stateText = res.getString(R.string.alarm_state_passed);
+                    else
+                        stateText = res.getString(R.string.alarm_state_dismissed_before_ringing);
+                } else if (state == GlobalManager.STATE_RINGING) {
+                    stateText = res.getString(R.string.alarm_state_ringing);
+                } else if (state == GlobalManager.STATE_SNOOZED) {
+                    stateText = res.getString(R.string.alarm_state_snoozed);
+                } else if (state == GlobalManager.STATE_DISMISSED) {
+                    stateText = res.getString(R.string.alarm_state_passed);
+                } else {
+                    // This is generally an error, because the state should be properly set. However, when upgrading the app (and probably on boot), the activity may become visible BEFORE the receiver that sets the system alarm and state.
+                    stateText = "";
+                }
+            } else {
+                if (day.isPassed()) {
+                    stateText = res.getString(R.string.alarm_state_passed);
+                } else {
+                    switch (day.getState()) {
+                        case AlarmDataSource.DAY_STATE_DEFAULT:
+                            stateText = "";
+                            break;
+                        default:
+                            stateText = res.getString(R.string.alarm_state_changed);
+                            break;
+                    }
+                }
+            }
         } else {
             switch (day.getState()) {
                 case AlarmDataSource.DAY_STATE_DEFAULT:
@@ -99,8 +160,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         viewHolder.getTextState().setText(stateText);
 
         String messageText;
-        Context context = calendarActivity.getBaseContext();
-        if (day.isNextAlarm(context)) {
+        if (position == positionNextAlarm) {
             long diff = day.getTimeToRing();
 
             TimeDifference timeDifference = TimeDifference.getTimeUnits(diff);
@@ -112,14 +172,42 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
             } else {
                 messageText = String.format(res.getString(R.string.time_to_ring_message_minutes), timeDifference.minutes, timeDifference.seconds);
             }
-
-            positionNextAlarm = position;
         } else {
             messageText = "";
         }
         viewHolder.getTextComment().setText(messageText);
 
         viewHolder.setDay(day);
+    }
+
+    private void calcPositionNextAlarm(int initialPosition) {
+        for (int position = initialPosition; position < AlarmDataSource.HORIZON_DAYS; position++) {
+
+            Calendar date = addDays(today, position);
+
+            Day day = datasource.loadDay(date);
+
+            if (day.isEnabled()) {
+                positionNextAlarm = position;
+                return;
+            }
+        }
+        positionNextAlarm = POSITION_UNSET;
+        Log.d(TAG, "Next alarm is not displayed");
+    }
+
+    protected void updatePositionNextAlarm(int initialPosition) {
+        int oldPositionNextAlarm = positionNextAlarm;
+        calcPositionNextAlarm(initialPosition);
+
+        if (oldPositionNextAlarm != positionNextAlarm) {
+            Log.d(TAG, "Next alarm is at position " + positionNextAlarm);
+
+            if (oldPositionNextAlarm != POSITION_UNSET)
+                notifyItemChanged(oldPositionNextAlarm);
+            if (positionNextAlarm != POSITION_UNSET)
+                notifyItemChanged(positionNextAlarm);
+        }
     }
 
     /**
@@ -136,6 +224,8 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         if (!today.equals(today2)) {
             today = today2;
             notifyDataSetChanged();
+        } else {
+            notifyItemChanged(positionNextAlarm);
         }
     }
 
@@ -205,7 +295,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
     }
 
     private void refresh() {
-        notifyDataSetChanged();
+        updatePositionNextAlarm(0);
 
         Context context = calendarActivity.getBaseContext();
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
@@ -243,7 +333,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         return date;
     }
 
-    private Calendar getToday() {
+    public static Calendar getToday() {
         Calendar today = Calendar.getInstance();
         today.set(Calendar.HOUR_OF_DAY, 0);
         today.set(Calendar.MINUTE, 0);

@@ -1,7 +1,10 @@
 package cz.jaro.alarmmorning;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -10,6 +13,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -26,12 +30,36 @@ public class RingActivity extends Activity {
 
     private static final String TAG = RingActivity.class.getSimpleName();
 
+    public static final String ACTION_HIDE_ACTIVITY = "cz.jaro.alarmmorning.intent.action.HIDE_ACTIVITY";
+
     private Ringtone ringtone;
     private MediaPlayer mediaPlayer;
     private AudioManager audioManager;
     private int previousVolume;
     private boolean isRinging;
     private int soundMethod;
+
+    LocalBroadcastManager bManager;
+    private static IntentFilter b_intentFilter;
+
+    static {
+        b_intentFilter = new IntentFilter();
+        b_intentFilter.addAction(ACTION_HIDE_ACTIVITY);
+    }
+
+    private BroadcastReceiver bReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            Log.d(TAG, "onReceive() action=" + action);
+
+            if (action.equals(ACTION_HIDE_ACTIVITY)) {
+                stopRinging();
+
+                finish();
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,12 +72,41 @@ public class RingActivity extends Activity {
 
         setContentView(R.layout.activity_ring);
 
+        bManager = LocalBroadcastManager.getInstance(this);
+        bManager.registerReceiver(bReceiver, b_intentFilter);
+
         startRinging();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        bManager.unregisterReceiver(bReceiver);
     }
 
     public void onDismiss(View view) {
         Log.d(TAG, "onDismiss()");
+        Log.i(TAG, "Dismiss");
+
         stopRinging();
+
+        Context context = view.getContext();
+        GlobalManager globalManager = new GlobalManager(context);
+        globalManager.onDismiss();
+
+        finish();
+    }
+
+    public void onSnooze(View view) {
+        Log.d(TAG, "onSnooze()");
+        Log.i(TAG, "Snooze");
+
+        stopRinging();
+
+        Context context = view.getContext();
+        GlobalManager globalManager = new GlobalManager(context);
+        globalManager.onSnooze();
 
         finish();
     }
@@ -98,7 +155,7 @@ public class RingActivity extends Activity {
         final String VALUE_UNSET = "";
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        String ringtonePreference = preferences.getString("pref_ringtone", VALUE_UNSET);
+        String ringtonePreference = preferences.getString(SettingsActivity.PREF_RINGTONE, VALUE_UNSET);
         Uri ringtoneUri = ringtonePreference.equals(VALUE_UNSET) ? RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM) : Uri.parse(ringtonePreference);
 
         soundMethod = 0;
@@ -152,7 +209,7 @@ public class RingActivity extends Activity {
         switch (soundMethod) {
             case 1:
                 mediaPlayer.stop();
-                audioManager.setStreamVolume(AudioManager.STREAM_ALARM, previousVolume, 0);
+                audioManager.setStreamVolume(AudioManager.STREAM_ALARM, previousVolume, 0); // TODO Restore volume when using for method 2
                 break;
             case 2:
                 ringtone.stop();

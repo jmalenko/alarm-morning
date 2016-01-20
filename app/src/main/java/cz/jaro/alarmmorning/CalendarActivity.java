@@ -28,6 +28,7 @@ import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -49,6 +50,9 @@ public class CalendarActivity extends Activity {
 
     private static final String TAG = CalendarActivity.class.getSimpleName();
 
+    public static final String ACTION_DISMISS_BEFORE_RINGING = "DISMISS_BEFORE_RINGING";
+    public static final String ACTION_UPDATE_TODAY = "UPDATE_TODAY";
+
     private DrawerLayout drawerLayout;
     private ListView drawerList;
     private ActionBarDrawerToggle drawerToggle;
@@ -56,11 +60,32 @@ public class CalendarActivity extends Activity {
 
     private static final IntentFilter s_intentFilter;
 
+    LocalBroadcastManager bManager;
+    private static IntentFilter b_intentFilter;
+
     static {
         s_intentFilter = new IntentFilter();
         s_intentFilter.addAction(Intent.ACTION_TIMEZONE_CHANGED);
         s_intentFilter.addAction(Intent.ACTION_TIME_CHANGED);
+
+        b_intentFilter = new IntentFilter();
+        b_intentFilter.addAction(ACTION_DISMISS_BEFORE_RINGING);
+        b_intentFilter.addAction(ACTION_UPDATE_TODAY);
     }
+
+    private BroadcastReceiver bReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            Log.d(TAG, "onReceive() action=" + action);
+
+            if (action.equals(ACTION_DISMISS_BEFORE_RINGING)) {
+                fragment.onDismissBeforeRinging();
+            } else if (action.equals(ACTION_UPDATE_TODAY)) {
+                fragment.onAlarmTimeOfEarlyDismissedAlarm();
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,6 +120,10 @@ public class CalendarActivity extends Activity {
 
         // handler for time nad timezone change
         registerReceiver(timeChangedReceiver, s_intentFilter);
+
+        // handler for local events
+        bManager = LocalBroadcastManager.getInstance(this);
+        bManager.registerReceiver(bReceiver, b_intentFilter);
 
         if (savedInstanceState == null) {
             fragment = new CalendarFragment();
@@ -156,6 +185,7 @@ public class CalendarActivity extends Activity {
         super.onDestroy();
 
         unregisterReceiver(timeChangedReceiver);
+        bManager.unregisterReceiver(bReceiver);
     }
 
     private final BroadcastReceiver timeChangedReceiver = new BroadcastReceiver() {
@@ -268,5 +298,17 @@ public class CalendarActivity extends Activity {
 
             adapter.onDestroy();
         }
+
+        public void onAlarmTimeOfEarlyDismissedAlarm() {
+            Log.d(TAG, "onAlarmTimeOfEarlyDismissedAlarm()");
+            adapter.notifyItemChanged(0);
+        }
+
+        public void onDismissBeforeRinging() {
+            Log.d(TAG, "onDismissBeforeRinging()");
+            adapter.updatePositionNextAlarm(1);
+            //adapter.notifyDataSetChanged();
+        }
+
     }
 }

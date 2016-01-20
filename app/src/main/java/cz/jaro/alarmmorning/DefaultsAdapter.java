@@ -113,7 +113,7 @@ public class DefaultsAdapter extends RecyclerView.Adapter<DefaultsAdapter.Defaul
 
         Context context = defaultsActivity.getBaseContext();
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
-        systemAlarm.setAlarm();
+        systemAlarm.setSystemAlarm();
     }
 
     public void onDestroy() {

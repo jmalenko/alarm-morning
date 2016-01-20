@@ -16,6 +16,8 @@ import android.view.MenuItem;
 
 public class SettingsActivity extends PreferenceActivity {
 
+    public static final String PREF_RINGTONE = "pref_ringtone";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,7 +97,7 @@ public class SettingsActivity extends PreferenceActivity {
             // Load the preferences from an XML resource
             addPreferencesFromResource(R.xml.preferences);
 
-            bindPreferenceSummaryToValue(findPreference("pref_ringtone"));
+            bindPreferenceSummaryToValue(findPreference(PREF_RINGTONE));
         }
     }
 

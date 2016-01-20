@@ -9,7 +9,7 @@ import cz.jaro.alarmmorning.SystemAlarm;
 import cz.jaro.alarmmorning.WakeLocker;
 
 /**
- * Hanfdles situations when time changes (time was explicitly set) or time zone changes.
+ * Handles situations when time changes (time was explicitly set) or time zone changes.
  */
 public class TimeChangedReceiver extends BroadcastReceiver {
 
@@ -23,7 +23,7 @@ public class TimeChangedReceiver extends BroadcastReceiver {
         Log.i(TAG, "Setting alarm on time change");
 
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
-        systemAlarm.setAlarm();
+        systemAlarm.setSystemAlarm();
 
         WakeLocker.release();
     }

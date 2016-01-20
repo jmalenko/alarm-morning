@@ -9,7 +9,7 @@ import cz.jaro.alarmmorning.SystemAlarm;
 import cz.jaro.alarmmorning.WakeLocker;
 
 /**
- * This receiver os called by the operating system when the alarm should fire.
+ * This receiver is called by the operating system on the system alarm.
  */
 public class AlarmReceiver extends BroadcastReceiver {
 
@@ -22,17 +22,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         Log.d(TAG, "onReceive()");
 
-        // Register next alarm
-        Log.i(TAG, "Setting next alarm");
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
-        systemAlarm.setAlarm();
-
-        // Display this alarm
-        Log.i(TAG, "Showing ring activity");
-        Intent ringIntent = new Intent();
-        ringIntent.setClassName("cz.jaro.alarmmorning", "cz.jaro.alarmmorning.RingActivity");
-        ringIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        context.startActivity(ringIntent);
+        systemAlarm.onSystemAlarm(context, intent);
     }
-
 }

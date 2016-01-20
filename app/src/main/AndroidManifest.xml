@@ -8,7 +8,7 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
 
@@ -65,6 +65,12 @@
         <receiver android:name=".receivers.TimeZoneChangedReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".receivers.NotificationReceiver">
+            <intent-filter>
+                <action android:name="cz.jaro.alarmmorning.intent.action.DISMISS_ALARM" />
+                <action android:name="cz.jaro.alarmmorning.intent.action.SNOOZE_ALARM" />
             </intent-filter>
         </receiver>
     </application>

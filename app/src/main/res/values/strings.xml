@@ -14,15 +14,25 @@
 
     <string name="alarm_unset">Off</string>
 
-    <!-- Ring activity-->
+    <!-- Ring activity -->
     <string name="title_activity_ring">Alarm</string>
 
-    <string name="dismiss_button">Dismiss</string>
+    <!-- Notification -->
+    <string name="notification_title">Alarm at %1$s</string>
+    <string name="notification_text_future">Touch to view all alarms</string>
+    <string name="notification_text_ringing">Ringing</string>
+    <string name="notification_text_snoozed">Snoozed till %1$s</string>
 
+    <string name="action_dismiss">Dismiss</string>
+    <string name="action_snooze">Snooze</string>
+    <string name="action_change">Change</string>
 
     <!-- Common -->
     <string name="alarm_state_changed">Changed</string>
     <string name="alarm_state_passed">Passed</string>
+    <string name="alarm_state_ringing">Ringing</string>
+    <string name="alarm_state_snoozed">Snoozed</string>
+    <string name="alarm_state_dismissed_before_ringing">Dismissed before ringing</string>
 
     <string name="time_to_ring_toast_days">This alarm is set for %1$d days, %2$d hours and %3$d minutes from now</string>
     <string name="time_to_ring_toast_hours">This alarm is set for %1$d hours and %2$d minutes from now</string>
