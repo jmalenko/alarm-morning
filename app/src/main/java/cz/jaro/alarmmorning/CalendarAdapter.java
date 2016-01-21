@@ -50,7 +50,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         this.calendarActivity = calendarActivity;
 
         today = getToday();
-        updatePositionNextAlarm(0);
+        updatePositionNextAlarm();
     }
 
     /**
@@ -180,28 +180,28 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         viewHolder.setDay(day);
     }
 
-    private void calcPositionNextAlarm(int initialPosition) {
-        for (int position = initialPosition; position < AlarmDataSource.HORIZON_DAYS; position++) {
+    private int calcPositionNextAlarm() {
+        for (int position = 0; position < AlarmDataSource.HORIZON_DAYS; position++) {
 
             Calendar date = addDays(today, position);
 
             Day day = datasource.loadDay(date);
 
-            if (day.isEnabled()) {
-                positionNextAlarm = position;
-                return;
+            if (day.isEnabled() && !day.isPassed()) {
+                return position;
             }
         }
-        positionNextAlarm = POSITION_UNSET;
-        Log.d(TAG, "Next alarm is not displayed");
+        return POSITION_UNSET;
     }
 
-    protected void updatePositionNextAlarm(int initialPosition) {
-        int oldPositionNextAlarm = positionNextAlarm;
-        calcPositionNextAlarm(initialPosition);
+    protected void updatePositionNextAlarm() {
+        int newPositionNextAlarm = calcPositionNextAlarm();
 
-        if (oldPositionNextAlarm != positionNextAlarm) {
-            Log.d(TAG, "Next alarm is at position " + positionNextAlarm);
+        if (positionNextAlarm != newPositionNextAlarm) {
+            Log.d(TAG, "Next alarm is at position " + newPositionNextAlarm);
+
+            int oldPositionNextAlarm = positionNextAlarm;
+            positionNextAlarm = newPositionNextAlarm;
 
             if (oldPositionNextAlarm != POSITION_UNSET)
                 notifyItemChanged(oldPositionNextAlarm);
@@ -295,7 +295,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
     }
 
     private void refresh() {
-        updatePositionNextAlarm(0);
+        updatePositionNextAlarm();
 
         Context context = calendarActivity.getBaseContext();
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);

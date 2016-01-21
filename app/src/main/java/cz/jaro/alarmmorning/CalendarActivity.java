@@ -306,7 +306,7 @@ public class CalendarActivity extends Activity {
 
         public void onDismissBeforeRinging() {
             Log.d(TAG, "onDismissBeforeRinging()");
-            adapter.updatePositionNextAlarm(1);
+            adapter.updatePositionNextAlarm();
             //adapter.notifyDataSetChanged();
         }
 
