@@ -32,6 +32,8 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
     private Calendar today;
     private AlarmDataSource datasource;
     private Day changingDay;
+    private int changingItem;
+
     private int positionNextAlarm;
 
     // TODO Change time of ringing alarm
@@ -178,6 +180,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         viewHolder.getTextComment().setText(messageText);
 
         viewHolder.setDay(day);
+        viewHolder.setPosition(position);
     }
 
     private int calcPositionNextAlarm() {
@@ -295,6 +298,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
     }
 
     private void refresh() {
+        notifyItemChanged(changingItem);
         updatePositionNextAlarm();
 
         Context context = calendarActivity.getBaseContext();
@@ -343,8 +347,9 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         return today;
     }
 
-    public void setChangingDay(Day changingDay) {
+    public void setChangingDay(Day changingDay, int changingItem) {
         this.changingDay = changingDay;
+        this.changingItem = changingItem;
     }
 
     /**
@@ -359,6 +364,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         private final TextView textState;
         private final TextView textComment;
         private Day day;
+        private int position;
 
         public CalendarViewHolder(View view, final FragmentManager fragmentManager, CalendarAdapter calendarAdapter) {
             super(view);
@@ -401,9 +407,13 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
             this.day = day;
         }
 
+        public void setPosition(int position) {
+            this.position = position;
+        }
+
         @Override
         public void onClick(View view) {
-            calendarAdapter.setChangingDay(day);
+            calendarAdapter.setChangingDay(day, position);
 
             TimePickerFragment fragment = new TimePickerFragment();
 
@@ -420,7 +430,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
 
         @Override
         public boolean onLongClick(View view) {
-            calendarAdapter.setChangingDay(day);
+            calendarAdapter.setChangingDay(day, position);
             calendarAdapter.onLongClick();
             return true;
         }
