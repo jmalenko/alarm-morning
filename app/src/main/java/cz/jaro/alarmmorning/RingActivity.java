@@ -215,6 +215,11 @@ public class RingActivity extends Activity {
         ringtone.play();
     }
 
+    private void stopSoundAsRingtone() {
+        Log.d(TAG, "stopSoundAsRingtone()");
+        ringtone.stop();
+    }
+
     private void startSoundAsMedia(Uri ringtoneUri) throws IOException {
         Log.d(TAG, "startSoundAsMedia()");
 
@@ -227,6 +232,11 @@ public class RingActivity extends Activity {
         mediaPlayer.start();
     }
 
+    private void stopSoundAsMedia() {
+        Log.d(TAG, "stopSoundAsMedia()");
+        mediaPlayer.stop();
+    }
+
     private void stopSound() {
         Log.d(TAG, "stopSound()");
 
@@ -235,10 +245,10 @@ public class RingActivity extends Activity {
 
             switch (soundMethod) {
                 case 1:
-                    mediaPlayer.stop();
+                    stopSoundAsMedia();
                     break;
                 case 2:
-                    ringtone.stop();
+                    stopSoundAsRingtone();
                     break;
             }
 
