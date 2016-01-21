@@ -41,7 +41,6 @@ public class RingActivity extends Activity {
     private boolean isPlaying;
     private int soundMethod;
 
-    private boolean volumeSet;
     private int previousVolume;
 
     LocalBroadcastManager bManager;
@@ -182,6 +181,8 @@ public class RingActivity extends Activity {
         if (playSound()) {
             isPlaying = true;
 
+            startVolume();
+
             Uri ringtoneUri = getRingtoneUri();
 
             soundMethod = 0;
@@ -217,17 +218,8 @@ public class RingActivity extends Activity {
     private void startSoundAsMedia(Uri ringtoneUri) throws IOException {
         Log.d(TAG, "startSoundAsMedia()");
 
-        volumeSet = false;
-
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setDataSource(this, ringtoneUri);
-        audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-
-        // set max volume
-        previousVolume = audioManager.getStreamVolume(AudioManager.STREAM_ALARM);
-        int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM);
-        audioManager.setStreamVolume(AudioManager.STREAM_ALARM, maxVolume, 0);
-        volumeSet = true;
 
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
         mediaPlayer.setLooping(true); // repeat sound
@@ -250,10 +242,25 @@ public class RingActivity extends Activity {
                     break;
             }
 
-            if (volumeSet) {
-                audioManager.setStreamVolume(AudioManager.STREAM_ALARM, previousVolume, 0);
-            }
+            stopVolume();
         }
     }
 
+    private void startVolume() {
+        Log.d(TAG, "startVolume()");
+
+        audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+
+        previousVolume = audioManager.getStreamVolume(AudioManager.STREAM_ALARM);
+
+        // set max volume
+        int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM);
+        audioManager.setStreamVolume(AudioManager.STREAM_ALARM, maxVolume, 0);
+    }
+
+    private void stopVolume() {
+        Log.d(TAG, "stopVolume()");
+
+        audioManager.setStreamVolume(AudioManager.STREAM_ALARM, previousVolume, 0);
+    }
 }
