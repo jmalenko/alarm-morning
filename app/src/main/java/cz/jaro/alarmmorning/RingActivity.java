@@ -35,10 +35,14 @@ public class RingActivity extends Activity {
     private Ringtone ringtone;
     private MediaPlayer mediaPlayer;
     private AudioManager audioManager;
+
+    private boolean isRinging;
+
+    private boolean isPlaying;
+    private int soundMethod;
+
     private boolean volumeSet;
     private int previousVolume;
-    private boolean isRinging;
-    private int soundMethod;
 
     LocalBroadcastManager bManager;
     private static IntentFilter b_intentFilter;
@@ -55,7 +59,7 @@ public class RingActivity extends Activity {
             Log.d(TAG, "onReceive() action=" + action);
 
             if (action.equals(ACTION_HIDE_ACTIVITY)) {
-                stopRinging();
+                stopAll();
 
                 finish();
             }
@@ -76,7 +80,7 @@ public class RingActivity extends Activity {
         bManager = LocalBroadcastManager.getInstance(this);
         bManager.registerReceiver(bReceiver, b_intentFilter);
 
-        startRinging();
+        startAll();
     }
 
     @Override
@@ -90,7 +94,7 @@ public class RingActivity extends Activity {
         Log.d(TAG, "onDismiss()");
         Log.i(TAG, "Dismiss");
 
-        stopRinging();
+        stopAll();
 
         Context context = view.getContext();
         GlobalManager globalManager = new GlobalManager(context);
@@ -103,7 +107,7 @@ public class RingActivity extends Activity {
         Log.d(TAG, "onSnooze()");
         Log.i(TAG, "Snooze");
 
-        stopRinging();
+        stopAll();
 
         Context context = view.getContext();
         GlobalManager globalManager = new GlobalManager(context);
@@ -112,8 +116,8 @@ public class RingActivity extends Activity {
         finish();
     }
 
-    private void startRinging() {
-        Log.d(TAG, "startRinging()");
+    private void startAll() {
+        Log.d(TAG, "startAll()");
 
         if (!isRinging) {
             Log.i(TAG, "Start ringing");
@@ -126,8 +130,8 @@ public class RingActivity extends Activity {
         }
     }
 
-    public void stopRinging() {
-        Log.d(TAG, "stopRinging()");
+    public void stopAll() {
+        Log.d(TAG, "stopAll()");
 
         if (isRinging) {
             Log.i(TAG, "Stop ringing");
@@ -150,34 +154,58 @@ public class RingActivity extends Activity {
         timeView.setText(currentTimeString);
     }
 
+    private Uri getRingtoneUri() {
+        Uri ringtoneUri;
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+
+        if (preferences.contains(SettingsActivity.PREF_RINGTONE)) {
+            final String VALUE_UNSET = "";
+            String ringtonePreference = preferences.getString(SettingsActivity.PREF_RINGTONE, VALUE_UNSET);
+            ringtoneUri = ringtonePreference.equals(VALUE_UNSET) ? null : Uri.parse(ringtonePreference);
+        } else {
+            ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+        }
+
+        return ringtoneUri;
+    }
+
+    private boolean playSound() {
+        Uri ringtoneUri = getRingtoneUri();
+        return ringtoneUri != null;
+    }
+
     private void startSound() {
         Log.d(TAG, "startSound()");
 
-        final String VALUE_UNSET = "";
+        isPlaying = false;
 
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        String ringtonePreference = preferences.getString(SettingsActivity.PREF_RINGTONE, VALUE_UNSET);
-        Uri ringtoneUri = ringtonePreference.equals(VALUE_UNSET) ? RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM) : Uri.parse(ringtonePreference);
+        if (playSound()) {
+            isPlaying = true;
 
-        soundMethod = 0;
+            Uri ringtoneUri = getRingtoneUri();
 
-        try {
-            startSoundAsMedia(ringtoneUri);
-            soundMethod = 1;
-        } catch (Exception e) {
-            Log.d(TAG, "Unable to play ringtone as media");
-        }
+            soundMethod = 0;
 
-        if (soundMethod == 0) {
             try {
-                startSoundAsRingtone(ringtoneUri);
-                soundMethod = 2;
+                startSoundAsMedia(ringtoneUri);
+                soundMethod = 1;
             } catch (Exception e) {
-                Log.d(TAG, "Unable to play ringtone as ringtone");
+                Log.d(TAG, "Unable to play ringtone as media");
             }
-        }
 
-        if (soundMethod == 0) Log.e(TAG, "Unable to play ringtone");
+            if (soundMethod == 0) {
+                try {
+                    startSoundAsRingtone(ringtoneUri);
+                    soundMethod = 2;
+                } catch (Exception e) {
+                    Log.d(TAG, "Unable to play ringtone as ringtone");
+                }
+            }
+
+            if (soundMethod == 0) Log.e(TAG, "Unable to play ringtone");
+        } else {
+            Log.w(TAG, "Sound is intentionally not playing");
+        }
     }
 
     private void startSoundAsRingtone(Uri ringtoneUri) {
@@ -210,17 +238,22 @@ public class RingActivity extends Activity {
     private void stopSound() {
         Log.d(TAG, "stopSound()");
 
-        switch (soundMethod) {
-            case 1:
-                mediaPlayer.stop();
-                break;
-            case 2:
-                ringtone.stop();
-                break;
-        }
+        if (isPlaying) {
+            isPlaying = false;
 
-        if (volumeSet) {
-            audioManager.setStreamVolume(AudioManager.STREAM_ALARM, previousVolume, 0);
+            switch (soundMethod) {
+                case 1:
+                    mediaPlayer.stop();
+                    break;
+                case 2:
+                    ringtone.stop();
+                    break;
+            }
+
+            if (volumeSet) {
+                audioManager.setStreamVolume(AudioManager.STREAM_ALARM, previousVolume, 0);
+            }
         }
     }
+
 }
