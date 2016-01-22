@@ -158,9 +158,8 @@ public class RingActivity extends Activity {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 
         if (preferences.contains(SettingsActivity.PREF_RINGTONE)) {
-            final String VALUE_UNSET = "";
-            String ringtonePreference = preferences.getString(SettingsActivity.PREF_RINGTONE, VALUE_UNSET);
-            ringtoneUri = ringtonePreference.equals(VALUE_UNSET) ? null : Uri.parse(ringtonePreference);
+            String ringtonePreference = preferences.getString(SettingsActivity.PREF_RINGTONE, SettingsActivity.PREF_RINGTONE_DEFAULT);
+            ringtoneUri = ringtonePreference.equals(SettingsActivity.PREF_RINGTONE_DEFAULT) ? null : Uri.parse(ringtonePreference);
         } else {
             ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
         }
@@ -259,13 +258,14 @@ public class RingActivity extends Activity {
     private void startVolume() {
         Log.d(TAG, "startVolume()");
 
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        int volumePreference = preferences.getInt(SettingsActivity.PREF_VOLUME, SettingsActivity.PREF_VOLUME_DEFAULT);
+
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
         previousVolume = audioManager.getStreamVolume(AudioManager.STREAM_ALARM);
 
-        // set max volume
-        int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM);
-        audioManager.setStreamVolume(AudioManager.STREAM_ALARM, maxVolume, 0);
+        audioManager.setStreamVolume(AudioManager.STREAM_ALARM, volumePreference, 0);
     }
 
     private void stopVolume() {

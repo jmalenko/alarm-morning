@@ -1,6 +1,7 @@
 package cz.jaro.alarmmorning;
 
 import android.app.ActionBar;
+import android.content.SharedPreferences;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -17,6 +18,10 @@ import android.view.MenuItem;
 public class SettingsActivity extends PreferenceActivity {
 
     public static final String PREF_RINGTONE = "pref_ringtone";
+    public static final String PREF_VOLUME = "pref_volume";
+
+    public static final String PREF_RINGTONE_DEFAULT = "";
+    public static final int PREF_VOLUME_DEFAULT = 80;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +53,7 @@ public class SettingsActivity extends PreferenceActivity {
         @Override
         public boolean onPreferenceChange(Preference preference, Object value) {
             String stringValue = value.toString();
+            String key = preference.getKey();
 
             if (preference instanceof RingtonePreference) {
                 // For ringtone preferences, look up the correct display value using RingtoneManager.
@@ -66,6 +72,8 @@ public class SettingsActivity extends PreferenceActivity {
                         preference.setSummary(name);
                     }
                 }
+            } else if (key.equals(PREF_VOLUME)) {
+                preference.setSummary(stringValue + "%");
             } else {
                 // For all other preferences, set the summary to the value's simple string representation.
                 preference.setSummary(stringValue);
@@ -86,7 +94,17 @@ public class SettingsActivity extends PreferenceActivity {
         preference.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
 
         // Trigger the listener immediately with the preference's current value.
-        sBindPreferenceSummaryToValueListener.onPreferenceChange(preference, PreferenceManager.getDefaultSharedPreferences(preference.getContext()).getString(preference.getKey(), ""));
+        String key = preference.getKey();
+        SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(preference.getContext());
+        Object newValue;
+        if (key.equals(PREF_RINGTONE)) {
+            newValue = defaultSharedPreferences.getString(preference.getKey(), PREF_RINGTONE_DEFAULT);
+        } else if (key.equals(PREF_VOLUME)) {
+            newValue = defaultSharedPreferences.getInt(preference.getKey(), PREF_VOLUME_DEFAULT);
+        } else {
+            throw new IllegalArgumentException();
+        }
+        sBindPreferenceSummaryToValueListener.onPreferenceChange(preference, newValue);
     }
 
     public static class SettingsFragment extends PreferenceFragment {
@@ -98,6 +116,7 @@ public class SettingsActivity extends PreferenceActivity {
             addPreferencesFromResource(R.xml.preferences);
 
             bindPreferenceSummaryToValue(findPreference(PREF_RINGTONE));
+            bindPreferenceSummaryToValue(findPreference(PREF_VOLUME));
         }
     }
 

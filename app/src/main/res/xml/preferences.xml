@@ -1,9 +1,18 @@
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res-auto">
 
     <RingtonePreference
         android:key="pref_ringtone"
         android:title="@string/pref_title_ringtone"
         android:ringtoneType="alarm"
         android:defaultValue="content://settings/system/notification_sound"/>
+
+    <cz.jaro.alarmmorning.graphics.IntegerPreference
+        android:key="pref_volume"
+        android:title="@string/pref_title_volume"
+        android:numeric="integer"
+        android:defaultValue="80"
+        custom:minValue="0"
+        custom:maxValue="100" />
 
 </PreferenceScreen>
