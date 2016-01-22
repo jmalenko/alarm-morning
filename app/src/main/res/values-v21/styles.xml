@@ -7,8 +7,13 @@
         <item name="android:colorAccent">@color/accent</item>
 
         <item name="android:navigationBarColor">@color/primary_dark</item>
+
+        <item name="android:timePickerDialogTheme">@style/MyDialogTheme</item>
     </style>
 
+    <style name="MyDialogTheme" parent="android:Theme.Material.Dialog">
+        <item name="android:colorAccent">@color/accent</item>
+    </style>
 
     <style name="FullscreenActionBarStyle" parent="android:Widget.ActionBar">
         <item name="android:background">@color/black_overlay</item>
