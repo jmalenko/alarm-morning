@@ -1,7 +1,9 @@
 package cz.jaro.alarmmorning;
 
 import android.app.ActionBar;
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -17,11 +19,24 @@ import android.view.MenuItem;
 
 public class SettingsActivity extends PreferenceActivity {
 
+    /**
+     * Value is ringtone URI.
+     */
     public static final String PREF_RINGTONE = "pref_ringtone";
+
+    /**
+     * Value is 0 .. PREF_VOLUME_MAX.
+     */
     public static final String PREF_VOLUME = "pref_volume";
+
+    /**
+     * Value is in minutes.
+     */
+    public static final String PREF_SNOOZE_TIME = "pref_snooze_time";
 
     public static final String PREF_RINGTONE_DEFAULT = "";
     public static final int PREF_VOLUME_DEFAULT = 8;
+    public static final int PREF_SNOOZE_TIME_DEFAULT = 10;
 
     public static final int PREF_VOLUME_MAX = 10;
 
@@ -78,6 +93,14 @@ public class SettingsActivity extends PreferenceActivity {
                 int intValue = (int) value;
                 int volume = getRealVolume(intValue, 100);
                 preference.setSummary(volume + "%");
+            } else if (key.equals(PREF_SNOOZE_TIME)) {
+                int intValue = (int) value;
+
+                Context context = preference.getContext();
+                Resources res = context.getResources();
+                String summaryText = String.format(res.getString(R.string.pref_summary_snooze_time), intValue);
+
+                preference.setSummary(summaryText);
             } else {
                 // For all other preferences, set the summary to the value's simple string representation.
                 preference.setSummary(stringValue);
@@ -109,6 +132,8 @@ public class SettingsActivity extends PreferenceActivity {
             newValue = defaultSharedPreferences.getString(preference.getKey(), PREF_RINGTONE_DEFAULT);
         } else if (key.equals(PREF_VOLUME)) {
             newValue = defaultSharedPreferences.getInt(preference.getKey(), PREF_VOLUME_DEFAULT);
+        } else if (key.equals(PREF_SNOOZE_TIME)) {
+            newValue = defaultSharedPreferences.getInt(preference.getKey(), PREF_SNOOZE_TIME_DEFAULT);
         } else {
             throw new IllegalArgumentException();
         }
@@ -125,6 +150,7 @@ public class SettingsActivity extends PreferenceActivity {
 
             bindPreferenceSummaryToValue(findPreference(PREF_RINGTONE));
             bindPreferenceSummaryToValue(findPreference(PREF_VOLUME));
+            bindPreferenceSummaryToValue(findPreference(PREF_SNOOZE_TIME));
         }
     }
 

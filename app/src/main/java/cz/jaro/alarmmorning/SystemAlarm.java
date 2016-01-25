@@ -4,6 +4,8 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -217,11 +219,12 @@ public class SystemAlarm {
 
     public Calendar onSnooze() {
         Log.d(TAG, "onSnooze()");
-        // TODO Create preference "Snooze for X minutes"
-        final int SNOOZE_MINUTE = 1;
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        int snoozeTime = preferences.getInt(SettingsActivity.PREF_SNOOZE_TIME, SettingsActivity.PREF_SNOOZE_TIME_DEFAULT);
 
         Calendar ringAfterSnoozeTime = Calendar.getInstance();
-        ringAfterSnoozeTime.add(Calendar.MINUTE, SNOOZE_MINUTE);
+        ringAfterSnoozeTime.add(Calendar.MINUTE, snoozeTime);
         ringAfterSnoozeTime.set(Calendar.SECOND, 0);
         ringAfterSnoozeTime.set(Calendar.MILLISECOND, 0);
 

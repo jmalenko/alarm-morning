@@ -14,4 +14,10 @@
         android:defaultValue="8"
         custom:maxValue="10" />
 
+    <cz.jaro.alarmmorning.graphics.IntegerPreference
+        android:key="pref_snooze_time"
+        android:title="@string/pref_title_snooze_time"
+        android:defaultValue="10"
+        custom:minValue="1"
+        custom:maxValue="60" />
 </PreferenceScreen>
