@@ -26,6 +26,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -41,8 +42,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
+
+import java.util.ArrayList;
 
 import cz.jaro.alarmmorning.graphics.SimpleDividerItemDecoration;
 
@@ -93,12 +95,16 @@ public class CalendarActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_calendar);
 
-        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawerList = (ListView) findViewById(R.id.left_drawer);
+        ArrayList<NavItem> mNavItems = new ArrayList<>();
+        Resources res = getBaseContext().getResources();
+        mNavItems.add(new NavItem(res.getString(R.string.menu_calendar_title), res.getString(R.string.menu_calendar_subtitle), R.drawable.ic_border_all));
+        mNavItems.add(new NavItem(res.getString(R.string.menu_defaults_title), res.getString(R.string.menu_defaults_subtitle), R.drawable.ic_border_clear));
+        mNavItems.add(new NavItem(res.getString(R.string.menu_settings_title), res.getString(R.string.menu_settings_subtitle), R.drawable.ic_settings));
+        mNavItems.add(new NavItem(res.getString(R.string.menu_website_title), res.getString(R.string.menu_website_subtitle), R.drawable.ic_info_outline));
+        DrawerListAdapter adapter = new DrawerListAdapter(this, mNavItems);
 
-        // set up the drawer's list view with items and click listener
-        String[] menuItems = getResources().getStringArray(R.array.menu_items_array);
-        drawerList.setAdapter(new ArrayAdapter<String>(this, R.layout.drawer_list_item, menuItems));
+        drawerList = (ListView) findViewById(R.id.left_drawer);
+        drawerList.setAdapter(adapter);
         drawerList.setOnItemClickListener(new DrawerItemClickListener());
 
         ActionBar ab = getActionBar();
@@ -106,6 +112,7 @@ public class CalendarActivity extends Activity {
         ab.setDisplayShowHomeEnabled(false);
         ab.setHomeButtonEnabled(true);
 
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.drawer_open, R.string.drawer_close) {
             @Override
             public void onDrawerClosed(View view) {
@@ -320,5 +327,17 @@ public class CalendarActivity extends Activity {
             //adapter.notifyDataSetChanged();
         }
 
+    }
+}
+
+class NavItem {
+    String mTitle;
+    String mSubtitle;
+    int mIcon;
+
+    public NavItem(String title, String subtitle, int icon) {
+        mTitle = title;
+        mSubtitle = subtitle;
+        mIcon = icon;
     }
 }

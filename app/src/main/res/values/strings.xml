@@ -49,11 +49,12 @@
     <string name="drawer_close">Close navigation drawer</string>
 
     <!-- Menu (left drawer) -->
-    <string-array name="menu_items_array">
-        <item>Scheduled alarms</item>
-        <item>Default alarms</item>
-        <item>Settings</item>
-        <item>Website</item>
-    </string-array>
-
+    <string name="menu_calendar_title">Scheduled alarms</string>
+    <string name="menu_calendar_subtitle">Calendar days</string>
+    <string name="menu_defaults_title">Default alarms</string>
+    <string name="menu_defaults_subtitle">Rules for evevey weekday</string>
+    <string name="menu_settings_title">Settings</string>
+    <string name="menu_settings_subtitle">Change appearance</string>
+    <string name="menu_website_title">Website</string>
+    <string name="menu_website_subtitle">Wiki</string>
 </resources>
