@@ -28,6 +28,12 @@ public class SettingsActivity extends PreferenceActivity {
      * Value is 0 .. PREF_VOLUME_MAX. Percents of max volume.
      */
     public static final String PREF_VOLUME = "pref_volume";
+
+    /**
+     * Increase volume by 1% every second, until the volume is reached.
+     */
+    public static final String PREF_VOLUME_INCREASING = "pref_volume_increasing";
+
     /**
      * Vibrate.
      */
@@ -42,11 +48,6 @@ public class SettingsActivity extends PreferenceActivity {
      * Value is in minutes.
      */
     public static final String PREF_NEAR_FUTURE_TIME = "pref_near_future_time";
-
-    /**
-     * Increase volume by 1% every second, until the volume is reached.
-     */
-    public static final String PREF_VOLUME_INCREASING = "pref_volume_increasing";
 
     public static final String PREF_RINGTONE_DEFAULT = "";
     public static final int PREF_VOLUME_DEFAULT = 8;

@@ -5,7 +5,7 @@
         android:key="pref_ringtone"
         android:title="@string/pref_title_ringtone"
         android:ringtoneType="alarm"
-        android:defaultValue="content://settings/system/notification_sound"/>
+        android:defaultValue="content://settings/system/notification_sound" />
 
     <cz.jaro.alarmmorning.graphics.VolumePreference
         android:key="pref_volume"
