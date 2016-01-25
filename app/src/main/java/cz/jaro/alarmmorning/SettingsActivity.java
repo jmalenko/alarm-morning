@@ -92,7 +92,12 @@ public class SettingsActivity extends PreferenceActivity {
             } else if (key.equals(PREF_VOLUME)) {
                 int intValue = (int) value;
                 int volume = getRealVolume(intValue, 100);
-                preference.setSummary(volume + "%");
+
+                Context context = preference.getContext();
+                Resources res = context.getResources();
+                String summaryText = String.format(res.getString(R.string.pref_summary_volume), volume);
+
+                preference.setSummary(summaryText);
             } else if (key.equals(PREF_SNOOZE_TIME)) {
                 int intValue = (int) value;
 

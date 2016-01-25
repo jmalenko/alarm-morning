@@ -3,7 +3,7 @@
     <string name="pref_ringtone_silent">Silent</string>
 
     <string name="pref_title_volume">Volume</string>
-    <!--<string name="pref_summary_volume">Ringtone volume</string>-->
+    <string name="pref_summary_volume">%1$d%%</string>
 
     <string name="pref_title_snooze_time">Snooze time</string>
     <string name="pref_summary_snooze_time">%1$d minutes</string>
