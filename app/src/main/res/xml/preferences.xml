@@ -21,6 +21,13 @@
         android:summaryOn="@string/pref_summaryon_volume_increasing"
         android:defaultValue="true" />
 
+    <CheckBoxPreference
+        android:key="pref_vibrate"
+        android:title="@string/pref_title_vibrate"
+        android:summaryOff="@string/pref_summaryoff_vibrate"
+        android:summaryOn="@string/pref_summaryon_vibrate"
+        android:defaultValue="true" />
+
     <cz.jaro.alarmmorning.graphics.IntegerPreference
         android:key="pref_snooze_time"
         android:title="@string/pref_title_snooze_time"

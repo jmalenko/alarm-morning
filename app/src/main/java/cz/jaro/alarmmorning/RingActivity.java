@@ -13,6 +13,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -46,6 +47,9 @@ public class RingActivity extends Activity {
     private int volume;
     private int maxVolume;
     private int increasingVolumePercentage;
+
+    private Vibrator vibrator;
+    private boolean isVibrating;
 
     LocalBroadcastManager bManager;
     private static IntentFilter b_intentFilter;
@@ -130,6 +134,7 @@ public class RingActivity extends Activity {
             updateContent();
 
             startSound();
+            startVibrate();
         }
     }
 
@@ -141,6 +146,7 @@ public class RingActivity extends Activity {
 
             isRinging = false;
 
+            stopVibrate();
             stopSound();
 
             // allow device sleep
@@ -329,4 +335,36 @@ public class RingActivity extends Activity {
 
         audioManager.setStreamVolume(AudioManager.STREAM_ALARM, previousVolume, 0);
     }
+
+    private void startVibrate() {
+        Log.d(TAG, "startVibrate()");
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        boolean vibratePreference = preferences.getBoolean(SettingsActivity.PREF_VIBRATE, SettingsActivity.PREF_VIBRATE_DEFAULT);
+
+        isVibrating = false;
+
+        if (vibratePreference) {
+            vibrator = (Vibrator) getBaseContext().getSystemService(Context.VIBRATOR_SERVICE);
+
+            if (vibrator.hasVibrator()) {
+                isVibrating = true;
+
+                long[] pattern = {0, 500, 1000};
+
+                vibrator.vibrate(pattern, 0);
+            } else {
+                Log.w(TAG, "The device cannot vibrate");
+            }
+        }
+    }
+
+    private void stopVibrate() {
+        Log.d(TAG, "stopVibrate()");
+
+        if (isVibrating) {
+            vibrator.cancel();
+        }
+    }
+
 }
