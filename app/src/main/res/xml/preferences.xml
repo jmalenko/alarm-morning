@@ -20,4 +20,11 @@
         android:defaultValue="10"
         custom:minValue="1"
         custom:maxValue="60" />
+
+    <cz.jaro.alarmmorning.graphics.RelativeTimePreference
+        android:key="pref_near_future_time"
+        android:title="@string/pref_title_near_future_time"
+        android:defaultValue="120"
+        custom:maxHour="12" />
+
 </PreferenceScreen>

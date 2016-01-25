@@ -15,4 +15,8 @@
         <attr name="wrapSelectorWheel" format="boolean" />
     </declare-styleable>
 
+    <declare-styleable name="RelativeTimePreference">
+        <attr name="maxHour" format="integer" />
+    </declare-styleable>
+
 </resources>

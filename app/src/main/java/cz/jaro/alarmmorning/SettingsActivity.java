@@ -34,9 +34,15 @@ public class SettingsActivity extends PreferenceActivity {
      */
     public static final String PREF_SNOOZE_TIME = "pref_snooze_time";
 
+    /**
+     * Value is in minutes.
+     */
+    public static final String PREF_NEAR_FUTURE_TIME = "pref_near_future_time";
+
     public static final String PREF_RINGTONE_DEFAULT = "";
     public static final int PREF_VOLUME_DEFAULT = 8;
     public static final int PREF_SNOOZE_TIME_DEFAULT = 10;
+    public static final int PREF_NEAR_FUTURE_TIME_DEFAULT = 120;
 
     public static final int PREF_VOLUME_MAX = 10;
 
@@ -106,6 +112,16 @@ public class SettingsActivity extends PreferenceActivity {
                 String summaryText = String.format(res.getString(R.string.pref_summary_snooze_time), intValue);
 
                 preference.setSummary(summaryText);
+            } else if (key.equals(PREF_NEAR_FUTURE_TIME)) {
+                int intValue = (int) value;
+                int hours = minutesToHour(intValue);
+                int minutes = minutesToMinute(intValue);
+
+                Context context = preference.getContext();
+                Resources res = context.getResources();
+                String summaryText = String.format(res.getString(R.string.pref_summary_near_future_time), hours, minutes);
+
+                preference.setSummary(summaryText);
             } else {
                 // For all other preferences, set the summary to the value's simple string representation.
                 preference.setSummary(stringValue);
@@ -113,6 +129,18 @@ public class SettingsActivity extends PreferenceActivity {
             return true;
         }
     };
+
+    private static int minutesToHour(int minutes) {
+        return minutes / 60;
+    }
+
+    private static int minutesToMinute(int minutes) {
+        return minutes % 60;
+    }
+
+    private static int hourAndMinuteToMinutes(int hour, int minute) {
+        return 60 * hour + minute;
+    }
 
     public static int getRealVolume(double volumePreference, int maxVolume) {
         return (int) Math.ceil(((volumePreference / SettingsActivity.PREF_VOLUME_MAX) * maxVolume));
@@ -139,6 +167,8 @@ public class SettingsActivity extends PreferenceActivity {
             newValue = defaultSharedPreferences.getInt(preference.getKey(), PREF_VOLUME_DEFAULT);
         } else if (key.equals(PREF_SNOOZE_TIME)) {
             newValue = defaultSharedPreferences.getInt(preference.getKey(), PREF_SNOOZE_TIME_DEFAULT);
+        } else if (key.equals(PREF_NEAR_FUTURE_TIME)) {
+            newValue = defaultSharedPreferences.getInt(preference.getKey(), PREF_NEAR_FUTURE_TIME_DEFAULT);
         } else {
             throw new IllegalArgumentException();
         }
@@ -156,6 +186,7 @@ public class SettingsActivity extends PreferenceActivity {
             bindPreferenceSummaryToValue(findPreference(PREF_RINGTONE));
             bindPreferenceSummaryToValue(findPreference(PREF_VOLUME));
             bindPreferenceSummaryToValue(findPreference(PREF_SNOOZE_TIME));
+            bindPreferenceSummaryToValue(findPreference(PREF_NEAR_FUTURE_TIME));
         }
     }
 

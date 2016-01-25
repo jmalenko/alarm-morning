@@ -93,7 +93,10 @@ public class SystemAlarm {
             final int NEAR_FUTURE_HOUR = 0;
             final int NEAR_FUTURE_MINUTE = 1;
 
-            Calendar nearFutureTime = subtractHour(alarmTime, NEAR_FUTURE_HOUR, NEAR_FUTURE_MINUTE);
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+            int nearFutureMinutes = preferences.getInt(SettingsActivity.PREF_NEAR_FUTURE_TIME, SettingsActivity.PREF_NEAR_FUTURE_TIME_DEFAULT);
+
+            Calendar nearFutureTime = subtractHour(alarmTime, nearFutureMinutes);
 
             if (now.before(nearFutureTime)) {
                 registerSystemAlarm(ACTION_RING_IN_NEAR_FUTURE, nearFutureTime);
@@ -115,12 +118,9 @@ public class SystemAlarm {
         initialize();
     }
 
-    private static Calendar subtractHour(Calendar time, int hour, int minute) {
+    private static Calendar subtractHour(Calendar time, int minute) {
         Calendar date = (Calendar) time.clone();
-//        date.add(Calendar.HOUR_OF_DAY, -hour);
-//        date.add(Calendar.MINUTE, -minute);
-        // TODO remove after testing
-        date.add(Calendar.SECOND, -30);
+        date.add(Calendar.MINUTE, -minute);
         return date;
     }
 
