@@ -112,14 +112,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
                 int state = globalManager.getState();
 
                 if (state == GlobalManager.STATE_FUTURE) {
-                    switch (day.getState()) {
-                        case AlarmDataSource.DAY_STATE_DEFAULT:
-                            stateText = "";
-                            break;
-                        default:
-                            stateText = res.getString(R.string.alarm_state_changed);
-                            break;
-                    }
+                    stateText = day.sameAsDefault() ? "" : res.getString(R.string.alarm_state_changed);
                 } else if (state == GlobalManager.STATE_DISMISSED_BEFORE_RINGING) {
                     if (day.isPassed())
                         stateText = res.getString(R.string.alarm_state_passed);
@@ -139,25 +132,11 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
                 if (day.isPassed()) {
                     stateText = res.getString(R.string.alarm_state_passed);
                 } else {
-                    switch (day.getState()) {
-                        case AlarmDataSource.DAY_STATE_DEFAULT:
-                            stateText = "";
-                            break;
-                        default:
-                            stateText = res.getString(R.string.alarm_state_changed);
-                            break;
-                    }
+                    stateText = day.sameAsDefault() ? "" : res.getString(R.string.alarm_state_changed);
                 }
             }
         } else {
-            switch (day.getState()) {
-                case AlarmDataSource.DAY_STATE_DEFAULT:
-                    stateText = "";
-                    break;
-                default:
-                    stateText = res.getString(R.string.alarm_state_changed);
-                    break;
-            }
+            stateText = day.sameAsDefault() ? "" : res.getString(R.string.alarm_state_changed);
         }
         viewHolder.getTextState().setText(stateText);
 

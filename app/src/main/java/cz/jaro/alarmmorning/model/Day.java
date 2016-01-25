@@ -144,4 +144,10 @@ public class Day {
 
         return alarmTime1.getTimeInMillis() - now.getTimeInMillis();
     }
+
+    public boolean sameAsDefault() {
+        return (state == AlarmDataSource.DAY_STATE_ENABLED && getDefaults().getState() == AlarmDataSource.DEFAULT_STATE_ENABLED && hour == defaults.getHour() && minute == defaults.getMinute()) ||
+                (state == AlarmDataSource.DAY_STATE_DISABLED && getDefaults().getState() == AlarmDataSource.DEFAULT_STATE_DISABLED) ||
+                state == AlarmDataSource.DAY_STATE_DEFAULT;
+    }
 }
