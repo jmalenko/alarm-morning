@@ -26,6 +26,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.content.LocalBroadcastManager;
@@ -157,6 +158,15 @@ public class CalendarActivity extends Activity {
 
                     intent = new Intent(CalendarActivity.this, SettingsActivity.class);
                     startActivity(intent);
+                    return;
+
+                case 3:
+                    drawerList.setItemChecked(0, true);
+                    closeNavigationDrawer();
+
+                    String url = "https://github.com/jmalenko/alarm-morning/wiki";
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                    startActivity(browserIntent);
                     return;
             }
         }
