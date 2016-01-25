@@ -21,9 +21,9 @@ public class SettingsActivity extends PreferenceActivity {
     public static final String PREF_VOLUME = "pref_volume";
 
     public static final String PREF_RINGTONE_DEFAULT = "";
-    public static final int PREF_VOLUME_DEFAULT = 80;
+    public static final int PREF_VOLUME_DEFAULT = 8;
 
-    public static final int PREF_VOLUME_MAX = 100;
+    public static final int PREF_VOLUME_MAX = 10;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +75,9 @@ public class SettingsActivity extends PreferenceActivity {
                     }
                 }
             } else if (key.equals(PREF_VOLUME)) {
-                preference.setSummary(stringValue + "%");
+                int intValue = (int) value;
+                int volume = getRealVolume(intValue, 100);
+                preference.setSummary(volume + "%");
             } else {
                 // For all other preferences, set the summary to the value's simple string representation.
                 preference.setSummary(stringValue);
@@ -83,6 +85,10 @@ public class SettingsActivity extends PreferenceActivity {
             return true;
         }
     };
+
+    public static int getRealVolume(double volumePreference, int maxVolume) {
+        return (int) Math.ceil(((volumePreference / SettingsActivity.PREF_VOLUME_MAX) * maxVolume));
+    }
 
     /**
      * Binds a preference's summary to its value. More specifically, when the preference's value is changed, its summary (line of text below the preference
