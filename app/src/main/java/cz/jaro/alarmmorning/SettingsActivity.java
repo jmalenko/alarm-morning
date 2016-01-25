@@ -23,6 +23,8 @@ public class SettingsActivity extends PreferenceActivity {
     public static final String PREF_RINGTONE_DEFAULT = "";
     public static final int PREF_VOLUME_DEFAULT = 80;
 
+    public static final int PREF_VOLUME_MAX = 100;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

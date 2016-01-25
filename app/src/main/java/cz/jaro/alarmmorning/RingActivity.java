@@ -262,10 +262,18 @@ public class RingActivity extends Activity {
         int volumePreference = preferences.getInt(SettingsActivity.PREF_VOLUME, SettingsActivity.PREF_VOLUME_DEFAULT);
 
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM);
 
         previousVolume = audioManager.getStreamVolume(AudioManager.STREAM_ALARM);
+        Log.v(TAG, "previous volume= " + previousVolume);
 
-        audioManager.setStreamVolume(AudioManager.STREAM_ALARM, volumePreference, 0);
+        int volume = (int) Math.ceil((((double) volumePreference / SettingsActivity.PREF_VOLUME_MAX) * maxVolume));
+
+        Log.v(TAG, "preference volume = " + volumePreference);
+        Log.v(TAG, "max volume= " + maxVolume);
+        Log.v(TAG, "volume = " + volume);
+
+        audioManager.setStreamVolume(AudioManager.STREAM_ALARM, volume, 0);
     }
 
     private void stopVolume() {
