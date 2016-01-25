@@ -25,7 +25,7 @@ public class SettingsActivity extends PreferenceActivity {
     public static final String PREF_RINGTONE = "pref_ringtone";
 
     /**
-     * Value is 0 .. PREF_VOLUME_MAX.
+     * Value is 0 .. PREF_VOLUME_MAX. Percents of max volume.
      */
     public static final String PREF_VOLUME = "pref_volume";
 
@@ -39,8 +39,14 @@ public class SettingsActivity extends PreferenceActivity {
      */
     public static final String PREF_NEAR_FUTURE_TIME = "pref_near_future_time";
 
+    /**
+     * Increase volume by 1% every second, until the volume is reached.
+     */
+    public static final String PREF_VOLUME_INCREASING = "pref_volume_increasing";
+
     public static final String PREF_RINGTONE_DEFAULT = "";
     public static final int PREF_VOLUME_DEFAULT = 8;
+    public static final boolean PREF_VOLUME_INCREASING_DEFAULT = true;
     public static final int PREF_SNOOZE_TIME_DEFAULT = 10;
     public static final int PREF_NEAR_FUTURE_TIME_DEFAULT = 120;
 

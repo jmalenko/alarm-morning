@@ -14,6 +14,13 @@
         android:defaultValue="8"
         custom:maxValue="10" />
 
+    <CheckBoxPreference
+        android:key="pref_volume_increasing"
+        android:title="@string/pref_title_volume_increasing"
+        android:summaryOff="@string/pref_summaryoff_volume_increasing"
+        android:summaryOn="@string/pref_summaryon_volume_increasing"
+        android:defaultValue="true" />
+
     <cz.jaro.alarmmorning.graphics.IntegerPreference
         android:key="pref_snooze_time"
         android:title="@string/pref_title_snooze_time"

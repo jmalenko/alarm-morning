@@ -12,6 +12,7 @@ import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -42,6 +43,9 @@ public class RingActivity extends Activity {
     private int soundMethod;
 
     private int previousVolume;
+    private int volume;
+    private int maxVolume;
+    private int increasingVolumePercentage;
 
     LocalBroadcastManager bManager;
     private static IntentFilter b_intentFilter;
@@ -265,19 +269,60 @@ public class RingActivity extends Activity {
             Log.w(TAG, "Volume is set to 0");
 
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM);
+        maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM);
 
         previousVolume = audioManager.getStreamVolume(AudioManager.STREAM_ALARM);
         Log.v(TAG, "previous volume= " + previousVolume);
 
-        int volume = SettingsActivity.getRealVolume(volumePreference, maxVolume);
+        volume = SettingsActivity.getRealVolume(volumePreference, maxVolume);
 
         Log.v(TAG, "preference volume = " + volumePreference);
         Log.v(TAG, "max volume= " + maxVolume);
         Log.v(TAG, "volume = " + volume);
 
-        audioManager.setStreamVolume(AudioManager.STREAM_ALARM, volume, 0);
+        boolean increasing = preferences.getBoolean(SettingsActivity.PREF_VOLUME_INCREASING, SettingsActivity.PREF_VOLUME_INCREASING_DEFAULT);
+
+        if (increasing) {
+            increasingVolumePercentage = 0;
+            runnable.run();
+        } else {
+            audioManager.setStreamVolume(AudioManager.STREAM_ALARM, volume, 0);
+        }
     }
+
+    /**
+     * @return Whether the increasing reached the final volume.
+     */
+    private boolean updateIncreasingVolume() {
+        Log.v(TAG, "increasing volume");
+
+        increasingVolumePercentage++;
+        Log.v(TAG, "volume percentage = " + increasingVolumePercentage);
+        float ratio = (float) increasingVolumePercentage / 100;
+        int tempVolume = (int) Math.ceil(ratio * maxVolume);
+        Log.v(TAG, "current volume = " + tempVolume);
+
+        if (volume <= tempVolume) {
+            Log.v(TAG, "reached final volume");
+            audioManager.setStreamVolume(AudioManager.STREAM_ALARM, volume, 0);
+            return true;
+        } else {
+            audioManager.setStreamVolume(AudioManager.STREAM_ALARM, tempVolume, 0);
+            return false;
+        }
+    }
+
+    private Handler handler = new Handler();
+    private Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+            boolean end = updateIncreasingVolume();
+
+            if (!end) {
+                handler.postDelayed(this, 1000);
+            }
+        }
+    };
 
     private void stopVolume() {
         Log.d(TAG, "stopVolume()");
