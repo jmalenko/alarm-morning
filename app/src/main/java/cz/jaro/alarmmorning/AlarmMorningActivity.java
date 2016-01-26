@@ -52,6 +52,7 @@ public class AlarmMorningActivity extends AppCompatActivity implements ActivityI
     private Fragment mFragment;
 
     CharSequence fragmentTitle;
+    private MenuItem lastMenuItem;
 
     private static final IntentFilter s_intentFilter;
 
@@ -126,6 +127,10 @@ public class AlarmMorningActivity extends AppCompatActivity implements ActivityI
         if (savedInstanceState == null) {
             mFragment = new CalendarFragment();
             getFragmentManager().beginTransaction().replace(R.id.content_frame, mFragment).commit();
+
+            // Highlight the menu item
+            MenuItem calendarMenu = mNavigationView.getMenu().findItem(R.id.navigation_calendar);
+            highlightMenuItem(calendarMenu);
         }
     }
 
@@ -173,10 +178,21 @@ public class AlarmMorningActivity extends AppCompatActivity implements ActivityI
         getFragmentManager().beginTransaction().replace(R.id.content_frame, fragment2).commit();
 
         // Highlight the selected item, update the title, and close the drawer
-        menuItem.setChecked(true); // TODO Uncheck previous menu item
+        highlightMenuItem(menuItem);
         setTitleX(menuItem.getTitle());
         closeNavigationDrawer();
     }
+
+    private void highlightMenuItem(MenuItem menuItem) {
+        if (lastMenuItem != null)
+            lastMenuItem.setChecked(false);
+
+        lastMenuItem = menuItem;
+
+        lastMenuItem.setChecked(true);
+
+    }
+
 
     private void setTitleX(CharSequence fragmentTitle) {
         this.fragmentTitle = fragmentTitle;

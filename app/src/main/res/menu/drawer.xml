@@ -2,7 +2,6 @@
     <group android:id="@+id/group1">
         <item
             android:id="@+id/navigation_calendar"
-            android:checked="true"
             android:icon="@drawable/ic_border_all"
             android:title="@string/menu_calendar_title" />
 
