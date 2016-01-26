@@ -89,10 +89,6 @@ public class SystemAlarm {
         } else {
             Calendar now = Calendar.getInstance();
 
-            // TODO Create preference "Near future is X;Y before alarm time"
-            final int NEAR_FUTURE_HOUR = 0;
-            final int NEAR_FUTURE_MINUTE = 1;
-
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
             int nearFutureMinutes = preferences.getInt(SettingsFragment.PREF_NEAR_FUTURE_TIME, SettingsFragment.PREF_NEAR_FUTURE_TIME_DEFAULT);
 

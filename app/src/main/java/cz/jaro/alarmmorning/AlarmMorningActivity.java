@@ -246,8 +246,6 @@ public class AlarmMorningActivity extends AppCompatActivity implements ActivityI
         return super.onOptionsItemSelected(item);
     }
 
-    // TODO Item for Settings remains black when going toSettings and then to Calendar
-
     // When using the ActionBarDrawerToggle, you must call it during onPostCreate() and onConfigurationChanged()...
 
     @Override
