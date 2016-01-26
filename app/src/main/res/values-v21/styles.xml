@@ -22,8 +22,8 @@
         <item name="android:layout_marginTop">-32dp</item>
     </style>
 
-    <style name="FullscreenActionBarStyle" parent="android:Widget.ActionBar">
-        <item name="android:background">@color/black_overlay</item>
-    </style>
+    <!--<style name="FullscreenActionBarStyle" parent="android:Widget.ActionBar">-->
+    <!--<item name="android:background">@color/black_overlay</item>-->
+    <!--</style>-->
 
 </resources>

@@ -11,6 +11,7 @@ import android.media.MediaPlayer;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Vibrator;
@@ -87,7 +88,46 @@ public class RingActivity extends Activity {
         bManager = LocalBroadcastManager.getInstance(this);
         bManager.registerReceiver(bReceiver, b_intentFilter);
 
+        // This work only for android 4.4+
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            final int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+            getWindow().getDecorView().setSystemUiVisibility(flags);
+
+            // Code below is to handle presses of Volume up or Volume down.
+            // Without this, after pressing volume buttons, the navigation bar will show up and won't hide.
+            final View decorView = getWindow().getDecorView();
+            decorView
+                    .setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
+                        @Override
+                        public void onSystemUiVisibilityChange(int visibility) {
+                            if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
+                                decorView.setSystemUiVisibility(flags);
+                            }
+                        }
+                    });
+        }
+
         startAll();
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        // The seetings must be reset after the user interacts with UI
+        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && hasFocus) {
+            final int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+            getWindow().getDecorView().setSystemUiVisibility(flags);
+        }
     }
 
     @Override

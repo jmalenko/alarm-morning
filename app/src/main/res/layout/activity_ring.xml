@@ -16,12 +16,6 @@
         android:textSize="70sp"
         android:textStyle="bold"/>
 
-    <!-- This FrameLayout insets its children based on system windows using android:fitsSystemWindows. -->
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fitsSystemWindows="true">
-
         <LinearLayout
             android:id="@+id/fullscreen_content_controls"
             style="?metaButtonBarStyle"
@@ -51,6 +45,4 @@
                 android:text="@string/action_snooze" />
 
         </LinearLayout>
-    </FrameLayout>
-
 </FrameLayout>
