@@ -17,49 +17,39 @@
  */
 package cz.jaro.alarmmorning;
 
-import android.app.ActionBar;
-import android.app.Activity;
 import android.app.Fragment;
-import android.app.FragmentManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
+import android.support.design.widget.NavigationView;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ListView;
-
-import java.util.ArrayList;
-
-import cz.jaro.alarmmorning.graphics.SimpleDividerItemDecoration;
 
 
-public class CalendarActivity extends Activity {
+public class CalendarActivity extends AppCompatActivity {
 
     private static final String TAG = CalendarActivity.class.getSimpleName();
 
     public static final String ACTION_DISMISS_BEFORE_RINGING = "DISMISS_BEFORE_RINGING";
     public static final String ACTION_UPDATE_TODAY = "UPDATE_TODAY";
 
-    private DrawerLayout drawerLayout;
-    private ListView drawerList;
-    private ActionBarDrawerToggle drawerToggle;
-    private CalendarFragment fragment;
+    private DrawerLayout mDrawerLayout;
+    private NavigationView mNavigationView;
+    private ActionBarDrawerToggle mDrawerToggle;
+    private Fragment mFragment;
+
+    CharSequence fragmentTitle;
 
     private static final IntentFilter s_intentFilter;
 
@@ -82,10 +72,13 @@ public class CalendarActivity extends Activity {
             String action = intent.getAction();
             Log.d(TAG, "onReceive() action=" + action);
 
-            if (action.equals(ACTION_DISMISS_BEFORE_RINGING)) {
-                fragment.onDismissBeforeRinging();
-            } else if (action.equals(ACTION_UPDATE_TODAY)) {
-                fragment.onAlarmTimeOfEarlyDismissedAlarm();
+            if (mFragment instanceof CalendarFragment) {
+                CalendarFragment calendarFragment = (CalendarFragment) mFragment;
+                if (action.equals(ACTION_DISMISS_BEFORE_RINGING)) {
+                    calendarFragment.onDismissBeforeRinging();
+                } else if (action.equals(ACTION_UPDATE_TODAY)) {
+                    calendarFragment.onAlarmTimeOfEarlyDismissedAlarm();
+                }
             }
         }
     };
@@ -95,36 +88,31 @@ public class CalendarActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_calendar);
 
-        ArrayList<NavItem> mNavItems = new ArrayList<>();
-        Resources res = getBaseContext().getResources();
-        mNavItems.add(new NavItem(res.getString(R.string.menu_calendar_title), res.getString(R.string.menu_calendar_subtitle), R.drawable.ic_border_all));
-        mNavItems.add(new NavItem(res.getString(R.string.menu_defaults_title), res.getString(R.string.menu_defaults_subtitle), R.drawable.ic_border_clear));
-        mNavItems.add(new NavItem(res.getString(R.string.menu_settings_title), res.getString(R.string.menu_settings_subtitle), R.drawable.ic_settings));
-        mNavItems.add(new NavItem(res.getString(R.string.menu_website_title), res.getString(R.string.menu_website_subtitle), R.drawable.ic_info_outline));
-        DrawerListAdapter adapter = new DrawerListAdapter(this, mNavItems);
+        // Set a Toolbar to replace the ActionBar.
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
-        drawerList = (ListView) findViewById(R.id.left_drawer);
-        drawerList.setAdapter(adapter);
-        drawerList.setOnItemClickListener(new DrawerItemClickListener());
-
-        ActionBar ab = getActionBar();
+        ActionBar ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
         ab.setDisplayShowHomeEnabled(false);
         ab.setHomeButtonEnabled(true);
 
-        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.drawer_open, R.string.drawer_close) {
+        mNavigationView = (NavigationView) findViewById(R.id.left_drawer);
+        setupDrawerContent(mNavigationView);
+
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.drawer_open, R.string.drawer_close) {
             @Override
             public void onDrawerClosed(View view) {
-                getActionBar().setTitle(R.string.title_activity_calendar);
+                getSupportActionBar().setTitle(fragmentTitle);
             }
 
             @Override
             public void onDrawerOpened(View drawerView) {
-                getActionBar().setTitle(R.string.app_name);
+                getSupportActionBar().setTitle(R.string.app_name);
             }
         };
-        drawerLayout.setDrawerListener(drawerToggle);
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
 
         // handler for time nad timezone change
         registerReceiver(timeChangedReceiver, s_intentFilter);
@@ -134,67 +122,84 @@ public class CalendarActivity extends Activity {
         bManager.registerReceiver(bReceiver, b_intentFilter);
 
         if (savedInstanceState == null) {
-            fragment = new CalendarFragment();
-            // Insert the fragment by replacing any existing fragment
-            FragmentManager fragmentManager = getFragmentManager();
-            fragmentManager.beginTransaction().replace(R.id.content_frame, fragment).commit();
-
-            drawerList.setItemChecked(0, true);
+            mFragment = new CalendarFragment();
+            getFragmentManager().beginTransaction().replace(R.id.content_frame, mFragment).commit();
         }
     }
 
-    private class DrawerItemClickListener implements ListView.OnItemClickListener {
-        @Override
-        public void onItemClick(AdapterView parent, View view, int position, long id) {
-            switch (position) {
-                case 0:
-                    closeNavigationDrawer();
-                    return;
+    private void setupDrawerContent(NavigationView navigationView) {
+        navigationView.setNavigationItemSelectedListener(
+                new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+                        selectDrawerItem(menuItem);
+                        return true;
+                    }
+                });
+    }
 
-                case 1:
-                    drawerList.setItemChecked(0, true);
-                    closeNavigationDrawer();
+    public void selectDrawerItem(MenuItem menuItem) {
+        android.app.Fragment fragment2 = null;
+        Class fragmentClass;
 
-                    Intent intent = new Intent(CalendarActivity.this, DefaultsActivity.class);
-                    startActivity(intent);
-                    return;
-
-                case 2:
-                    drawerList.setItemChecked(0, true);
-                    closeNavigationDrawer();
-
-                    intent = new Intent(CalendarActivity.this, SettingsActivity.class);
-                    startActivity(intent);
-                    return;
-
-                case 3:
-                    drawerList.setItemChecked(0, true);
-                    closeNavigationDrawer();
-
-                    String url = "https://github.com/jmalenko/alarm-morning/wiki";
-                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                    startActivity(browserIntent);
-                    return;
-            }
+        switch (menuItem.getItemId()) {
+            case R.id.navigation_calendar:
+                fragmentClass = CalendarFragment.class;
+                break;
+            case R.id.navigation_defaults:
+                fragmentClass = DefaultsFragment.class;
+                break;
+            case R.id.navigation_settings:
+                fragmentClass = SettingsFragment.class;
+                break;
+            case R.id.navigation_website:
+                String url = "https://github.com/jmalenko/alarm-morning/wiki";
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                startActivity(browserIntent);
+                return;
+            default:
+                throw new IllegalArgumentException();
         }
+
+        try {
+            fragment2 = (android.app.Fragment) fragmentClass.newInstance();
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+
+        // Insert the mFragment by replacing any existing mFragment
+        getFragmentManager().beginTransaction().replace(R.id.content_frame, fragment2).commit();
+
+        // Highlight the selected item, update the title, and close the drawer
+        menuItem.setChecked(true);
+        setTitleX(menuItem.getTitle());
+        closeNavigationDrawer();
+    }
+
+    private void setTitleX(CharSequence fragmentTitle) {
+        this.fragmentTitle = fragmentTitle;
+        getSupportActionBar().setTitle(fragmentTitle);
     }
 
     @Override
     public void onBackPressed() {
-        if (drawerLayout.isDrawerOpen(drawerList)) closeNavigationDrawer();
-        else super.onBackPressed();
+        if (isNavigationDrawerOpen())
+            closeNavigationDrawer();
+        else
+            super.onBackPressed();
     }
 
     public void closeNavigationDrawer() {
-        drawerLayout.closeDrawer(drawerList);
+        mDrawerLayout.closeDrawer(mNavigationView);
     }
 
     public void openNavigationDrawer() {
-        drawerLayout.openDrawer(drawerList);
+        mDrawerLayout.openDrawer(mNavigationView);
     }
 
     public boolean isNavigationDrawerOpen() {
-        return drawerLayout.isDrawerOpen(drawerList);
+        return mDrawerLayout.isDrawerOpen(mNavigationView);
+
     }
 
     @Override
@@ -211,133 +216,44 @@ public class CalendarActivity extends Activity {
             Log.d(TAG, "onReceive()");
             Log.i(TAG, "Refreshing view on time or timezone change");
 
-            fragment.adapter.onTimeOrTimeZoneChange();
+            if (mFragment instanceof CalendarFragment) {
+                CalendarFragment calendarFragment = (CalendarFragment) mFragment;
+                calendarFragment.adapter.onTimeOrTimeZoneChange();
+            }
+
         }
     };
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // The action bar home/up action should open or close the drawer.
-        // ActionBarDrawerToggle will take care of this.
-        if (drawerToggle.onOptionsItemSelected(item)) {
-            return true;
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                // The action bar home/up action should open or close the drawer.
+                if (isNavigationDrawerOpen())
+                    closeNavigationDrawer();
+                else
+                    openNavigationDrawer();
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * When using the ActionBarDrawerToggle, you must call it during onPostCreate() and onConfigurationChanged()...
-     */
+    // TODO Item for Settings remains black when going toSettings and then to Calendar
+
+    // When using the ActionBarDrawerToggle, you must call it during onPostCreate() and onConfigurationChanged()...
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         // Sync the toggle state after onRestoreInstanceState has occurred.
-        drawerToggle.syncState();
+        mDrawerToggle.syncState();
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         // Pass any configuration change to the drawer toggls
-        drawerToggle.onConfigurationChanged(newConfig);
-    }
-
-    /**
-     * Fragment that appears in the "content_frame"
-     */
-    public static class CalendarFragment extends Fragment {
-
-        private RecyclerView recyclerView;
-        private CalendarAdapter adapter;
-        private RecyclerView.LayoutManager layoutManager;
-
-        private Handler handler = new Handler();
-        private Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                adapter.onSystemTimeChange();
-                handler.postDelayed(this, 1000);
-            }
-        };
-
-        public CalendarFragment() {
-            // Empty constructor required for fragment subclasses
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_calendar, container, false);
-
-            recyclerView = (RecyclerView) rootView.findViewById(R.id.calendar_recycler_view);
-
-            // use a linear layout manager
-            layoutManager = new LinearLayoutManager(getActivity());
-            recyclerView.setLayoutManager(layoutManager);
-
-            // specify an adapter
-            CalendarActivity calendarActivity = (CalendarActivity) getActivity();
-            adapter = new CalendarAdapter(calendarActivity);
-            recyclerView.setAdapter(adapter);
-
-            // item separator
-            recyclerView.addItemDecoration(new SimpleDividerItemDecoration(getActivity()));
-
-            // for disabling the animation on update
-            DefaultItemAnimator animator = new DefaultItemAnimator();
-            animator.setSupportsChangeAnimations(false);
-            recyclerView.setItemAnimator(animator);
-
-            return rootView;
-        }
-
-        @Override
-        public void onResume() {
-            super.onResume();
-
-            // handler for refreshing the content
-            handler.postDelayed(runnable, 1000);
-
-            adapter.onResume();
-        }
-
-        @Override
-        public void onPause() {
-            super.onPause();
-
-            handler.removeCallbacks(runnable);
-        }
-
-        @Override
-        public void onDestroy() {
-            super.onDestroy();
-
-            adapter.onDestroy();
-        }
-
-        public void onAlarmTimeOfEarlyDismissedAlarm() {
-            Log.d(TAG, "onAlarmTimeOfEarlyDismissedAlarm()");
-            adapter.notifyItemChanged(0);
-        }
-
-        public void onDismissBeforeRinging() {
-            Log.d(TAG, "onDismissBeforeRinging()");
-            adapter.updatePositionNextAlarm();
-            //adapter.notifyDataSetChanged();
-        }
-
-    }
-}
-
-class NavItem {
-    String mTitle;
-    String mSubtitle;
-    int mIcon;
-
-    public NavItem(String title, String subtitle, int icon) {
-        mTitle = title;
-        mSubtitle = subtitle;
-        mIcon = icon;
+        mDrawerToggle.onConfigurationChanged(newConfig);
     }
 }
