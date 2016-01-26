@@ -1,18 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="AppTheme" parent="android:Theme.Material">
-        <item name="android:colorPrimary">@color/primary</item>
-        <item name="android:colorPrimaryDark">@color/primary_dark</item>
-        <item name="android:colorAccent">@color/accent</item>
+    <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
 
-        <item name="android:navigationBarColor">@color/primary_dark</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowTranslucentStatus">true</item>
 
         <item name="android:timePickerDialogTheme">@style/MyDialogTheme</item>
     </style>
 
     <style name="MyDialogTheme" parent="android:Theme.Material.Dialog">
         <item name="android:colorAccent">@color/accent</item>
+    </style>
+
+    <!-- Hack for removing the top margin -->
+    <style name="MyNavigationView">
+        <item name="android:layout_marginTop">-32dp</item>
     </style>
 
     <style name="FullscreenActionBarStyle" parent="android:Widget.ActionBar">

@@ -22,24 +22,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".DefaultsActivity"
-            android:label="@string/title_activity_defaults"
-            android:parentActivityName=".CalendarActivity">
-            <!-- Parent activity meta-data to support 4.0 and lower -->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".CalendarActivity" />
-        </activity>
-        <activity
-            android:name=".SettingsActivity"
-            android:label="@string/title_activity_settings"
-            android:parentActivityName=".CalendarActivity">
-            <!-- Parent activity meta-data to support 4.0 and lower -->
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".CalendarActivity" />
-        </activity>
-        <activity
             android:name=".RingActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_ring"

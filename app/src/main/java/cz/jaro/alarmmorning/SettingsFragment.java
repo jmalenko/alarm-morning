@@ -1,6 +1,5 @@
 package cz.jaro.alarmmorning;
 
-import android.app.ActionBar;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -9,15 +8,12 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.Preference;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
-import android.support.v4.app.NavUtils;
 import android.text.TextUtils;
-import android.view.MenuItem;
 
-public class SettingsActivity extends PreferenceActivity {
+public class SettingsFragment extends PreferenceFragment {
 
     /**
      * Value is ringtone URI.
@@ -59,26 +55,16 @@ public class SettingsActivity extends PreferenceActivity {
     public static final int PREF_VOLUME_MAX = 10;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ActionBar ab = getActionBar();
-        ab.setDisplayHomeAsUpEnabled(true);
-        ab.setDisplayShowHomeEnabled(false);
+        // Load the preferences from an XML resource
+        addPreferencesFromResource(R.xml.preferences);
 
-        getFragmentManager().beginTransaction().replace(android.R.id.content, new SettingsFragment()).commit();
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            // Respond to the action bar's Up/Home button
-            case android.R.id.home:
-                NavUtils.navigateUpFromSameTask(this);
-                return true;
-        }
-
-        return super.onOptionsItemSelected(item);
+        bindPreferenceSummaryToValue(findPreference(PREF_RINGTONE));
+        bindPreferenceSummaryToValue(findPreference(PREF_VOLUME));
+        bindPreferenceSummaryToValue(findPreference(PREF_SNOOZE_TIME));
+        bindPreferenceSummaryToValue(findPreference(PREF_NEAR_FUTURE_TIME));
     }
 
     /**
@@ -155,7 +141,7 @@ public class SettingsActivity extends PreferenceActivity {
     }
 
     public static int getRealVolume(double volumePreference, int maxVolume) {
-        return (int) Math.ceil(((volumePreference / SettingsActivity.PREF_VOLUME_MAX) * maxVolume));
+        return (int) Math.ceil(((volumePreference / SettingsFragment.PREF_VOLUME_MAX) * maxVolume));
     }
 
     /**
@@ -185,21 +171,6 @@ public class SettingsActivity extends PreferenceActivity {
             throw new IllegalArgumentException();
         }
         sBindPreferenceSummaryToValueListener.onPreferenceChange(preference, newValue);
-    }
-
-    public static class SettingsFragment extends PreferenceFragment {
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-
-            // Load the preferences from an XML resource
-            addPreferencesFromResource(R.xml.preferences);
-
-            bindPreferenceSummaryToValue(findPreference(PREF_RINGTONE));
-            bindPreferenceSummaryToValue(findPreference(PREF_VOLUME));
-            bindPreferenceSummaryToValue(findPreference(PREF_SNOOZE_TIME));
-            bindPreferenceSummaryToValue(findPreference(PREF_NEAR_FUTURE_TIME));
-        }
     }
 
 }

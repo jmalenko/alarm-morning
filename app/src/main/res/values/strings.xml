@@ -50,11 +50,7 @@
 
     <!-- Menu (left drawer) -->
     <string name="menu_calendar_title">Scheduled alarms</string>
-    <string name="menu_calendar_subtitle">Calendar days</string>
     <string name="menu_defaults_title">Default alarms</string>
-    <string name="menu_defaults_subtitle">Rules for evevey weekday</string>
     <string name="menu_settings_title">Settings</string>
-    <string name="menu_settings_subtitle">Change appearance</string>
     <string name="menu_website_title">Website</string>
-    <string name="menu_website_subtitle"></string>
 </resources>

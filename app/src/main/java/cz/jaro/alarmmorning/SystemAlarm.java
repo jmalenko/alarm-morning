@@ -94,7 +94,7 @@ public class SystemAlarm {
             final int NEAR_FUTURE_MINUTE = 1;
 
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-            int nearFutureMinutes = preferences.getInt(SettingsActivity.PREF_NEAR_FUTURE_TIME, SettingsActivity.PREF_NEAR_FUTURE_TIME_DEFAULT);
+            int nearFutureMinutes = preferences.getInt(SettingsFragment.PREF_NEAR_FUTURE_TIME, SettingsFragment.PREF_NEAR_FUTURE_TIME_DEFAULT);
 
             Calendar nearFutureTime = subtractHour(alarmTime, nearFutureMinutes);
 
@@ -221,7 +221,7 @@ public class SystemAlarm {
         Log.d(TAG, "onSnooze()");
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        int snoozeTime = preferences.getInt(SettingsActivity.PREF_SNOOZE_TIME, SettingsActivity.PREF_SNOOZE_TIME_DEFAULT);
+        int snoozeTime = preferences.getInt(SettingsFragment.PREF_SNOOZE_TIME, SettingsFragment.PREF_SNOOZE_TIME_DEFAULT);
 
         Calendar ringAfterSnoozeTime = Calendar.getInstance();
         ringAfterSnoozeTime.add(Calendar.MINUTE, snoozeTime);
