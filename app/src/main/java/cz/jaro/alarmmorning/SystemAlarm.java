@@ -185,8 +185,8 @@ public class SystemAlarm {
 
             // switch today from "dismissed in future" to "passed"
             Intent hideIntent = new Intent();
-            hideIntent.setClassName("cz.jaro.alarmmorning", "cz.jaro.alarmmorning.CalendarActivity");
-            hideIntent.setAction(CalendarActivity.ACTION_UPDATE_TODAY);
+            hideIntent.setClassName("cz.jaro.alarmmorning", "cz.jaro.alarmmorning.AlarmMorningActivity");
+            hideIntent.setAction(AlarmMorningActivity.ACTION_UPDATE_TODAY);
             LocalBroadcastManager.getInstance(context).sendBroadcast(hideIntent);
         } else if (action == ACTION_RING_IN_NEAR_FUTURE) {
             Log.i(TAG, "Near future");

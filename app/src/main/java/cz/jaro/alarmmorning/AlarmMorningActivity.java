@@ -18,11 +18,13 @@
 package cz.jaro.alarmmorning;
 
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -37,9 +39,9 @@ import android.view.MenuItem;
 import android.view.View;
 
 
-public class CalendarActivity extends AppCompatActivity {
+public class AlarmMorningActivity extends AppCompatActivity implements ActivityInterface {
 
-    private static final String TAG = CalendarActivity.class.getSimpleName();
+    private static final String TAG = AlarmMorningActivity.class.getSimpleName();
 
     public static final String ACTION_DISMISS_BEFORE_RINGING = "DISMISS_BEFORE_RINGING";
     public static final String ACTION_UPDATE_TODAY = "UPDATE_TODAY";
@@ -171,7 +173,7 @@ public class CalendarActivity extends AppCompatActivity {
         getFragmentManager().beginTransaction().replace(R.id.content_frame, fragment2).commit();
 
         // Highlight the selected item, update the title, and close the drawer
-        menuItem.setChecked(true);
+        menuItem.setChecked(true); // TODO Uncheck previous menu item
         setTitleX(menuItem.getTitle());
         closeNavigationDrawer();
     }
@@ -256,4 +258,29 @@ public class CalendarActivity extends AppCompatActivity {
         // Pass any configuration change to the drawer toggls
         mDrawerToggle.onConfigurationChanged(newConfig);
     }
+
+    @Override
+    public Context getContextI() {
+        return this;
+    }
+
+    @Override
+    public FragmentManager getFragmentManagerI() {
+        return getFragmentManager();
+    }
+
+    @Override
+    public Resources getResourcesI() {
+        return getResources();
+    }
+}
+
+interface ActivityInterface {
+
+    Context getContextI();
+
+    FragmentManager getFragmentManagerI();
+
+    Resources getResourcesI();
+
 }

@@ -187,8 +187,8 @@ public class GlobalManager {
         Log.d(TAG, "updateCalendarActivity()");
 
         Intent hideIntent = new Intent();
-        hideIntent.setClassName("cz.jaro.alarmmorning", "cz.jaro.alarmmorning.CalendarActivity");
-        hideIntent.setAction(CalendarActivity.ACTION_DISMISS_BEFORE_RINGING);
+        hideIntent.setClassName("cz.jaro.alarmmorning", "cz.jaro.alarmmorning.AlarmMorningActivity");
+        hideIntent.setAction(AlarmMorningActivity.ACTION_DISMISS_BEFORE_RINGING);
         LocalBroadcastManager.getInstance(context).sendBroadcast(hideIntent);
     }
 

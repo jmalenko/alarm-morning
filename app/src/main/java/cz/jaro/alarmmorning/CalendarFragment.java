@@ -52,8 +52,8 @@ public class CalendarFragment extends Fragment {
         recyclerView.setLayoutManager(layoutManager);
 
         // specify an adapter
-        CalendarActivity calendarActivity = (CalendarActivity) getActivity();
-        adapter = new CalendarAdapter(calendarActivity);
+        ActivityInterface activityInterface = (ActivityInterface) getActivity();
+        adapter = new CalendarAdapter(activityInterface);
         recyclerView.setAdapter(adapter);
 
         // item separator

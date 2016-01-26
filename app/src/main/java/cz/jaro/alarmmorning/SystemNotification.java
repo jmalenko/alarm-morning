@@ -58,7 +58,7 @@ public class SystemNotification {
         String contentText = res.getString(R.string.notification_text_future);
         mBuilder.setContentText(contentText);
 
-        Intent intent = new Intent(context, CalendarActivity.class);
+        Intent intent = new Intent(context, AlarmMorningActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.setContentIntent(pendingIntent);
 
@@ -115,7 +115,7 @@ public class SystemNotification {
         String contentText = String.format(res.getString(R.string.notification_text_snoozed), ringAfterSnoozeTimeText);
         mBuilder.setContentText(contentText);
 
-        Intent intent = new Intent(context, CalendarActivity.class);
+        Intent intent = new Intent(context, AlarmMorningActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.setContentIntent(pendingIntent);
 

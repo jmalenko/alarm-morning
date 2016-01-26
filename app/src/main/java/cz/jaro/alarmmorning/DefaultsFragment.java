@@ -27,7 +27,8 @@ public class DefaultsFragment extends Fragment {
         recyclerView.setLayoutManager(layoutManager);
 
         // specify an adapter
-        DefaultsAdapter adapter = new DefaultsAdapter(getActivity());
+        ActivityInterface activityInterface = (ActivityInterface) getActivity();
+        DefaultsAdapter adapter = new DefaultsAdapter(activityInterface);
         recyclerView.setAdapter(adapter);
 
         // item separator

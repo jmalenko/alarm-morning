@@ -28,7 +28,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
 
     private static final int POSITION_UNSET = -1;
 
-    private CalendarActivity calendarActivity;
+    private ActivityInterface activityInterface;
     private Calendar today;
     private AlarmDataSource datasource;
     private Day changingDay;
@@ -44,12 +44,13 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
 
     /**
      * Initialize the Adapter.
+     * @param activityInterface
      */
-    public CalendarAdapter(CalendarActivity calendarActivity) {
-        datasource = new AlarmDataSource(calendarActivity);
-        datasource.open();
+    public CalendarAdapter(ActivityInterface activityInterface) {
+        this.activityInterface = activityInterface;
 
-        this.calendarActivity = calendarActivity;
+        datasource = new AlarmDataSource(activityInterface.getContextI());
+        datasource.open();
 
         today = getToday();
         updatePositionNextAlarm();
@@ -62,7 +63,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
     public CalendarViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.calendar_row_item, viewGroup, false);
 
-        return new CalendarViewHolder(v, calendarActivity.getFragmentManager(), this);
+        return new CalendarViewHolder(v, activityInterface.getFragmentManagerI(), this);
     }
 
     /**
@@ -72,7 +73,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
     public void onBindViewHolder(CalendarViewHolder viewHolder, final int position) {
         Calendar date = addDays(today, position);
 
-        Resources res = calendarActivity.getResources();
+        Resources res = activityInterface.getResourcesI();
 
         int dayOfWeek = date.get(Calendar.DAY_OF_WEEK);
         String dayOfWeekText = Localization.dayOfWeekToString(dayOfWeek);
@@ -84,7 +85,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         Day day = datasource.loadDay(date);
         String timeText;
         if (day.isEnabled()) {
-            timeText = Localization.timeToString(day.getHourX(), day.getMinuteX(), calendarActivity);
+            timeText = Localization.timeToString(day.getHourX(), day.getMinuteX(), activityInterface.getContextI());
         } else {
             timeText = res.getString(R.string.alarm_unset);
         }
@@ -92,7 +93,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
 
         boolean enabled = true;
         if (position == 0) {
-            GlobalManager globalManager = new GlobalManager(calendarActivity);
+            GlobalManager globalManager = new GlobalManager(activityInterface.getContextI());
             if (globalManager.isValid()) {
                 int state = globalManager.getState();
 
@@ -107,7 +108,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
 
         String stateText;
         if (position == 0) {
-            GlobalManager globalManager = new GlobalManager(calendarActivity);
+            GlobalManager globalManager = new GlobalManager(activityInterface.getContextI());
             if (globalManager.isValid()) {
                 int state = globalManager.getState();
 
@@ -272,7 +273,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         refresh();
 
         String toastText = formatToastText(day);
-        Context context = calendarActivity.getBaseContext();
+        Context context = activityInterface.getContextI();
         Toast.makeText(context, toastText, Toast.LENGTH_LONG).show();
     }
 
@@ -280,13 +281,13 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         notifyItemChanged(changingItem);
         updatePositionNextAlarm();
 
-        Context context = calendarActivity.getBaseContext();
+        Context context = activityInterface.getContextI();
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
         systemAlarm.setSystemAlarm();
     }
 
     private String formatToastText(Day day) {
-        Resources res = calendarActivity.getResources();
+        Resources res = activityInterface.getResourcesI();
         String toastText;
 
         if (!day.isEnabled()) {

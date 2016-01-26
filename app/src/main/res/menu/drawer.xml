@@ -1,5 +1,5 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <group android:checkableBehavior="single">
+    <group android:id="@+id/group1">
         <item
             android:id="@+id/navigation_calendar"
             android:checked="true"
@@ -10,16 +10,16 @@
             android:id="@+id/navigation_defaults"
             android:icon="@drawable/ic_border_clear"
             android:title="@string/menu_defaults_title" />
+    </group>
 
-        <group android:id="@+id/group2">
-            <item
-                android:id="@+id/navigation_settings"
-                android:icon="@drawable/ic_settings"
-                android:title="@string/menu_settings_title" />
-            <item
-                android:id="@+id/navigation_website"
-                android:icon="@drawable/ic_info_outline"
-                android:title="@string/menu_website_title" />
-        </group>
+    <group android:id="@+id/group2">
+        <item
+            android:id="@+id/navigation_settings"
+            android:icon="@drawable/ic_settings"
+            android:title="@string/menu_settings_title" />
+        <item
+            android:id="@+id/navigation_website"
+            android:icon="@drawable/ic_info_outline"
+            android:title="@string/menu_website_title" />
     </group>
 </menu>

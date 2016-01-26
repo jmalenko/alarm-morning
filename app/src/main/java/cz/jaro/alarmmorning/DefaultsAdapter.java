@@ -1,6 +1,5 @@
 package cz.jaro.alarmmorning;
 
-import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.TimePickerDialog;
 import android.content.Context;
@@ -20,7 +19,7 @@ import cz.jaro.alarmmorning.model.Defaults;
  */
 public class DefaultsAdapter extends RecyclerView.Adapter<DefaultsAdapter.DefaultViewHolder> implements TimePickerDialog.OnTimeSetListener {
 
-    private final Activity activity;
+    private final ActivityInterface activityInterface;
 
     private Defaults changingDefaults;
 
@@ -29,11 +28,12 @@ public class DefaultsAdapter extends RecyclerView.Adapter<DefaultsAdapter.Defaul
     /**
      * Initialize the Adapter.
      *
+     * @param activityInterface
      */
-    public DefaultsAdapter(Activity activity) {
-        this.activity = activity;
+    public DefaultsAdapter(ActivityInterface activityInterface) {
+        this.activityInterface = activityInterface;
 
-        datasource = new AlarmDataSource(activity);
+        datasource = new AlarmDataSource(activityInterface.getContextI());
         datasource.open();
     }
 
@@ -44,7 +44,7 @@ public class DefaultsAdapter extends RecyclerView.Adapter<DefaultsAdapter.Defaul
     public DefaultViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.defaults_row_item, viewGroup, false);
 
-        return new DefaultViewHolder(view, activity.getFragmentManager(), this);
+        return new DefaultViewHolder(view, activityInterface.getFragmentManagerI(), this);
     }
 
     /**
@@ -63,9 +63,9 @@ public class DefaultsAdapter extends RecyclerView.Adapter<DefaultsAdapter.Defaul
 
         String timeText;
         if (defaults.isEnabled()) {
-            timeText = Localization.timeToString(defaults.getHour(), defaults.getMinute(), activity);
+            timeText = Localization.timeToString(defaults.getHour(), defaults.getMinute(), activityInterface.getContextI());
         } else {
-            timeText = activity.getResources().getString(R.string.alarm_unset);
+            timeText = activityInterface.getResourcesI().getString(R.string.alarm_unset);
         }
         viewHolder.getTextTime().setText(timeText);
 
@@ -112,7 +112,7 @@ public class DefaultsAdapter extends RecyclerView.Adapter<DefaultsAdapter.Defaul
     private void refresh() {
         notifyDataSetChanged();
 
-        Context context = activity.getBaseContext();
+        Context context = activityInterface.getContextI();
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
         systemAlarm.setSystemAlarm();
     }
