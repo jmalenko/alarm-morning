@@ -146,18 +146,15 @@ public class AlarmMorningActivity extends AppCompatActivity implements ActivityI
     }
 
     public void selectDrawerItem(MenuItem menuItem) {
-        android.app.Fragment fragment2 = null;
-        Class fragmentClass;
-
         switch (menuItem.getItemId()) {
             case R.id.navigation_calendar:
-                fragmentClass = CalendarFragment.class;
+                mFragment = new CalendarFragment();
                 break;
             case R.id.navigation_defaults:
-                fragmentClass = DefaultsFragment.class;
+                mFragment = new DefaultsFragment();
                 break;
             case R.id.navigation_settings:
-                fragmentClass = SettingsFragment.class;
+                mFragment = new SettingsFragment();
                 break;
             case R.id.navigation_website:
                 String url = "https://github.com/jmalenko/alarm-morning/wiki";
@@ -168,18 +165,12 @@ public class AlarmMorningActivity extends AppCompatActivity implements ActivityI
                 throw new IllegalArgumentException();
         }
 
-        try {
-            fragment2 = (android.app.Fragment) fragmentClass.newInstance();
-        } catch (Exception e) {
-            throw new IllegalStateException(e);
-        }
-
         // Insert the mFragment by replacing any existing mFragment
-        getFragmentManager().beginTransaction().replace(R.id.content_frame, fragment2).commit();
+        getFragmentManager().beginTransaction().replace(R.id.content_frame, mFragment).commit();
 
         // Highlight the selected item, update the title, and close the drawer
         highlightMenuItem(menuItem);
-        setTitleX(menuItem.getTitle());
+        setFragmentTitle(menuItem.getTitle());
         closeNavigationDrawer();
     }
 
@@ -190,11 +181,9 @@ public class AlarmMorningActivity extends AppCompatActivity implements ActivityI
         lastMenuItem = menuItem;
 
         lastMenuItem.setChecked(true);
-
     }
 
-
-    private void setTitleX(CharSequence fragmentTitle) {
+    private void setFragmentTitle(CharSequence fragmentTitle) {
         this.fragmentTitle = fragmentTitle;
         getSupportActionBar().setTitle(fragmentTitle);
     }
