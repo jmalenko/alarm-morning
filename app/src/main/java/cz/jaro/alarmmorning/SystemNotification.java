@@ -31,7 +31,7 @@ public class SystemNotification {
         String contentTitle = String.format(res.getString(R.string.notification_title), timeText);
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
-                .setSmallIcon(R.drawable.ic_alarm_on_white)
+                .setSmallIcon(R.drawable.ic_alarm_white)
                 .setContentTitle(contentTitle);
 
         return mBuilder;
