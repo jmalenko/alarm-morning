@@ -17,4 +17,7 @@
     <!-- RingingActivity -->
     <color name="black_overlay">#66000000</color>
 
+    <!-- Menu -->
+    <color name="white_overlay">#66ffffff</color>
+
 </resources>

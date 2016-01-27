@@ -38,10 +38,7 @@
             android:layout_gravity="start"
             android:background="@color/primary_dark"
             style="@style/MyNavigationView"
+            app:itemBackground="@drawable/activated_background"
             app:menu="@menu/drawer" />
-
-        <!--android:layout_marginTop="-32dp"-->
-
     </android.support.v4.widget.DrawerLayout>
-
 </LinearLayout>

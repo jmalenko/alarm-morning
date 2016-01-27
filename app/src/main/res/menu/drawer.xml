@@ -1,5 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <group android:id="@+id/group1">
+    <group
+        android:id="@+id/group1"
+        android:checkableBehavior="all">
         <item
             android:id="@+id/navigation_calendar"
             android:icon="@drawable/ic_border_all"
@@ -11,7 +13,9 @@
             android:title="@string/menu_defaults_title" />
     </group>
 
-    <group android:id="@+id/group2">
+    <group
+        android:id="@+id/group2"
+        android:checkableBehavior="all">
         <item
             android:id="@+id/navigation_settings"
             android:icon="@drawable/ic_settings"
