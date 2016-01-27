@@ -46,6 +46,8 @@ public class AlarmMorningActivity extends AppCompatActivity implements ActivityI
     public static final String ACTION_DISMISS_BEFORE_RINGING = "DISMISS_BEFORE_RINGING";
     public static final String ACTION_UPDATE_TODAY = "UPDATE_TODAY";
 
+    private final static String url = "https://github.com/jmalenko/alarm-morning/wiki";
+
     private DrawerLayout mDrawerLayout;
     private NavigationView mNavigationView;
     private ActionBarDrawerToggle mDrawerToggle;
@@ -157,7 +159,8 @@ public class AlarmMorningActivity extends AppCompatActivity implements ActivityI
                 mFragment = new SettingsFragment();
                 break;
             case R.id.navigation_website:
-                String url = "https://github.com/jmalenko/alarm-morning/wiki";
+                closeNavigationDrawer();
+
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                 startActivity(browserIntent);
                 return;
