@@ -5,13 +5,21 @@ import android.content.Context;
 import java.util.Calendar;
 
 /**
- * Created by jmalenko on 18.12.2015.
+ * Represents the alarm clock setting for a particular date. The default values are inherited from {@link #defaults}, but can be changed (and stored here).
+ * All methods are ment "with respect to the particulat date".
+ * <p/>
+ * Terminology: We use a slightly different terminology than standard English.<br>
+ * We use "Alarm", while English uses "alarm clock".<br>
+ * We use "Alarm is enabled", while English uses "alarm is on".<br>
+ * We use "Alarm rings", while English uses "alarm goes off".
+ * <p/>
+ * The alarm time is a combination of {@link #getDate()}, {@link #getHourX()} and {@link #getMinuteX()}. For convenience, the method {@link #getDateTime()} combines al three items together and returns the alarm time..
  */
 public class Day {
 
     private long id;
 
-    Calendar date;
+    private Calendar date;
 
     /**
      * 0 = as default
@@ -74,6 +82,7 @@ public class Day {
         this.defaults = defaults;
     }
 
+    // TODO test
     public boolean isPassed() {
         Calendar now = Calendar.getInstance();
         if (isEnabled()) {
@@ -84,11 +93,23 @@ public class Day {
         return false;
     }
 
+    /**
+     * Check if the alarm is enabled on this date.
+     *
+     * @return true if the alarm is enabled
+     */
     public boolean isEnabled() {
         return state == AlarmDataSource.DAY_STATE_ENABLED ||
                 (state == AlarmDataSource.DAY_STATE_DEFAULT && defaults.isEnabled());
     }
 
+    /**
+     * Return the hour of the alarm.
+     * <p/>
+     * If the alarm is enabled, then use this method to get the hour of alarm time.
+     *
+     * @return hour of the alarm (that should be used if the alarm is enabled)
+     */
     public int getHourX() {
         if (hour == AlarmDataSource.VALUE_UNSET || state == AlarmDataSource.DAY_STATE_DEFAULT)
             return defaults.getHour();
@@ -96,6 +117,13 @@ public class Day {
             return hour;
     }
 
+    /**
+     * Return the hour of the alarm.
+     * <p/>
+     * If the alarm is enabled, then use this method to get the hour of alarm time.
+     *
+     * @return minute of the alarm
+     */
     public int getMinuteX() {
         if (minute == AlarmDataSource.VALUE_UNSET || state == AlarmDataSource.DAY_STATE_DEFAULT)
             return defaults.getMinute();
@@ -103,6 +131,13 @@ public class Day {
             return minute;
     }
 
+    /**
+     * Return the alarm time.
+     * <p/>
+     * If the alarm is enabled, then use this method to get the minute of alarm time.
+     *
+     * @return alarm time
+     */
     public Calendar getDateTime() {
         Calendar alarmTime = (Calendar) date.clone();
 
@@ -114,6 +149,10 @@ public class Day {
         return alarmTime;
     }
 
+    /**
+     * Switches the alarm:<br> If it's enabled, then it's set to disabled.<br> If it's disabled, then it's set to enabled.<br> If it's set to default and the
+     * default is enabled, then it's set to disabled.<br> If it's set to default and the default is disabled, then it's set to enabled.
+     */
     public void reverse() {
         switch (getState()) {
             case AlarmDataSource.DAY_STATE_DEFAULT:
@@ -130,6 +169,7 @@ public class Day {
         }
     }
 
+    // TODO test
     public boolean isNextAlarm(Context context) {
         Calendar alarmTime1 = getDateTime();
 
@@ -138,6 +178,7 @@ public class Day {
         return alarmTime1.equals(alarmTime2);
     }
 
+    // TODO test
     public long getTimeToRing() {
         Calendar alarmTime1 = getDateTime();
         Calendar now = Calendar.getInstance();
@@ -145,6 +186,16 @@ public class Day {
         return alarmTime1.getTimeInMillis() - now.getTimeInMillis();
     }
 
+    /**
+     * Check if the alarm was changed on this date.
+     * <p/>
+     * Note that only the (enabled/disabled) state and time (hour and minute) is compared between with default.<br> Technically, if 1. the default is enabled
+     * and 2. the day state uses the time from default (the state is {@link AlarmDataSource#DAY_STATE_DEFAULT}) and 3. the day is changed to disabled and 4.
+     * back to enabled (to {@link AlarmDataSource#DAY_STATE_ENABLED}), then this method returns true. On technical it could be argued that the alarm is changed
+     * since the state is {@link AlarmDataSource#DAY_STATE_ENABLED} and not {@link AlarmDataSource#DAY_STATE_DEFAULT}.
+     *
+     * @return false if the alarm time on this date is changed (compared to default)
+     */
     public boolean sameAsDefault() {
         return (state == AlarmDataSource.DAY_STATE_ENABLED && getDefaults().getState() == AlarmDataSource.DEFAULT_STATE_ENABLED && hour == defaults.getHour() && minute == defaults.getMinute()) ||
                 (state == AlarmDataSource.DAY_STATE_DISABLED && getDefaults().getState() == AlarmDataSource.DEFAULT_STATE_DISABLED) ||

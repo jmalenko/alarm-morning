@@ -1,7 +1,7 @@
 package cz.jaro.alarmmorning.model;
 
 /**
- * Created by jmalenko on 16.12.2015.
+ * Represents the alarm clock setting for a particular weekday.
  */
 public class Defaults {
 
@@ -14,9 +14,7 @@ public class Defaults {
     private int state;
 
     /**
-     * The dey of week is represented by the same number as in Calendar.
-     *
-     * @see java.util.Calendar
+     * The dey of week is represented by the same number as in {@link java.util.Calendar}. Specifically, the identifier of Monday is {@link java.util.Calendar#MONDAY}
      */
     private int dayOfWeek;
 
@@ -64,10 +62,18 @@ public class Defaults {
         this.minute = minute;
     }
 
+    /**
+     * Check if the alarm is enabled on this weekday.
+     *
+     * @return true if alarm is enabled
+     */
     public boolean isEnabled() {
         return state == AlarmDataSource.DEFAULT_STATE_ENABLED;
     }
 
+    /**
+     * Switches the alarm: if it's enabled, then it's set to disabled. And vice versa.
+     */
     public void reverse() {
         if (isEnabled()) {
             setState(AlarmDataSource.DEFAULT_STATE_DISABLED);
