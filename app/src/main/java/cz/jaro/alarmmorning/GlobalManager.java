@@ -15,7 +15,27 @@ import cz.jaro.alarmmorning.model.AlarmDataSource;
 import cz.jaro.alarmmorning.model.Day;
 
 /**
- * Created by jmalenko on 19.1.2016.
+ * The GlobalManager keeps the state of the application and communicates with the application components.
+ * <p/>
+ * The <b>state of the application</b> must be kept somewhere. Reasons:<br>
+ * 1. After booting, only the  receiver of next {@link SystemAlarm} is registered. This is the "minimal state of interaction with operating system" and the
+ * operating system / user may bring the app to this state (e.g. operating system by destroying the activity if it is in the background, user cancelling the
+ * notification).<br>
+ * 2. There is no way to get the alarm broadcast registered by this app (in the minimal state described above). Therefore, the reference must be kept here (to
+ * allow its cancellation when user set earlier alarm). That is realized by methods {@link #getAlarmTime()} and {@link #setAlarmTime(long)} which use the value
+ * stored in {@code SharedPreferences}.
+ * <p/>
+ * The <b>communication among application components</b> must communicate.<br>
+ * Then the user makes an action in one component, the other components must act accordingly. Also, the time events must be handled (alarm rings till next
+ * alarm; if there are no alarm until horizon (because the user disabled all the alarms), check again just before the horizon (as the defaults may make an alarm
+ * appear).
+ * <p/>
+ * The <b>components of the application</b> are:<br>
+ * 1. State of the alarm ("was it dimissed?")<br>
+ * 2. The registered System alarm<br>
+ * 3. Notification<br>
+ * 4. Ring activity (when alarm is ringing)<br>
+ * 5. App activity<br>
  */
 public class GlobalManager {
 
@@ -41,6 +61,11 @@ public class GlobalManager {
     public GlobalManager(Context context) {
         this.context = context;
     }
+
+    /*
+     * State of the app
+     * ================
+     */
 
     public int getState() {
         Log.v(TAG, "getState()");
@@ -114,7 +139,10 @@ public class GlobalManager {
         return day;
     }
 
-    /**
+    /*
+     * Events
+     * ======
+     *
      * Do the following on each event:
      * 1. Set state
      * 2. Register next system alarm
@@ -122,6 +150,7 @@ public class GlobalManager {
      * 4. Handle ring activity
      * 5. Handle calendar activity
      */
+
     public void onNearFuture() {
         Log.d(TAG, "onNearFuture()");
 
@@ -176,6 +205,11 @@ public class GlobalManager {
 
         hideRingingActivity(context);
     }
+
+    /*
+     * Actions
+     * =======
+     */
 
     private void startRingingActivity(Context context) {
         Log.d(TAG, "startRingingActivity()");
