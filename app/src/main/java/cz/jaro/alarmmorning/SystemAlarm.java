@@ -10,6 +10,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.clock.SystemClock;
@@ -86,8 +87,12 @@ public class SystemAlarm {
         Calendar alarmTime = AlarmDataSource.getNextAlarm(context, clock);
 
         if (alarmTime == null) {
-            // TODO Fix: when no alarm is set [in the horizon]. This happens when a default time is set and all the days in calendar are changed to unset. This must me fixed everywhere AlarmDataSource.getNextAlarm() is called.
-            registerSystemAlarm(ACTION_SET_SYSTEM_ALARM, null);
+            Calendar now = new SystemClock().now();
+
+            Calendar resetTime = new GregorianCalendar(now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH));
+            resetTime.add(Calendar.DAY_OF_MONTH, AlarmDataSource.HORIZON_DAYS - 1);
+
+            registerSystemAlarm(ACTION_SET_SYSTEM_ALARM, resetTime);
         } else {
             Calendar now = clock.now();
 
@@ -99,8 +104,6 @@ public class SystemAlarm {
             if (now.before(nearFutureTime)) {
                 registerSystemAlarm(ACTION_RING_IN_NEAR_FUTURE, nearFutureTime);
             } else {
-                alarmTime = AlarmDataSource.getNextAlarm(context, clock);
-
                 registerSystemAlarm(ACTION_RING, alarmTime);
 
                 GlobalManager globalManager = new GlobalManager(context);
@@ -180,7 +183,7 @@ public class SystemAlarm {
 
         Log.i(TAG, "Acting on system alarm. action=" + action);
 
-        if (action == ACTION_SET_SYSTEM_ALARM) {
+        if (action.equals(ACTION_SET_SYSTEM_ALARM)) {
             Clock clock = new SystemClock(); // TODO change
             initialize(clock);
 
@@ -189,16 +192,18 @@ public class SystemAlarm {
             hideIntent.setClassName("cz.jaro.alarmmorning", "cz.jaro.alarmmorning.AlarmMorningActivity");
             hideIntent.setAction(AlarmMorningActivity.ACTION_UPDATE_TODAY);
             LocalBroadcastManager.getInstance(context).sendBroadcast(hideIntent);
-        } else if (action == ACTION_RING_IN_NEAR_FUTURE) {
+        } else if (action.equals(ACTION_RING_IN_NEAR_FUTURE)) {
             Log.i(TAG, "Near future");
 
             Clock clock = new SystemClock(); // TODO change
             Calendar alarmTime = AlarmDataSource.getNextAlarm(context, clock);
+            assert alarmTime != null;
+
             registerSystemAlarm(ACTION_RING, alarmTime);
 
             GlobalManager globalManager = new GlobalManager(context);
             globalManager.onNearFuture();
-        } else if (action == ACTION_RING) {
+        } else if (action.equals(ACTION_RING)) {
             Log.i(TAG, "Ring");
 
             Clock clock = new SystemClock(); // TODO change
@@ -218,7 +223,9 @@ public class SystemAlarm {
         Calendar alarmTime = AlarmDataSource.getNextAlarm(context, clock);
 
         cancelSystemAlarm();
-        registerSystemAlarm(ACTION_SET_SYSTEM_ALARM, alarmTime);
+        if (alarmTime != null) {
+            registerSystemAlarm(ACTION_SET_SYSTEM_ALARM, alarmTime);
+        }
     }
 
     public Calendar onSnooze(Clock clock) {

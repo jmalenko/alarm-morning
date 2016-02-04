@@ -61,7 +61,9 @@ public class GlobalManager {
 
         Clock clock = new SystemClock(); // TODO change
         Calendar alarmTime = AlarmDataSource.getNextAlarm(context, clock);
-        setAlarmTime(alarmTime.getTimeInMillis());
+        if (alarmTime != null) {
+            setAlarmTime(alarmTime.getTimeInMillis());
+        }
     }
 
     private long getAlarmTime() {
@@ -82,12 +84,17 @@ public class GlobalManager {
 
     public boolean isValid() {
         Clock clock = new SystemClock(); // TODO change
+
+        long alarmTime1 = getAlarmTime();
+
         Calendar alarmTime = AlarmDataSource.getNextAlarm(context, clock);
-        long alarmTime1 = alarmTime.getTimeInMillis();
+        if (alarmTime == null) {
+            return alarmTime1 == TIME_UNDEFINED;
+        } else {
+            long alarmTime2 = alarmTime.getTimeInMillis();
 
-        long alarmTime2 = getAlarmTime();
-
-        return alarmTime1 == alarmTime2;
+            return alarmTime1 == alarmTime2;
+        }
     }
 
     // TODO Fix: when ringing continues to next day
