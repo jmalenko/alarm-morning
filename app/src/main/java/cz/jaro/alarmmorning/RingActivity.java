@@ -173,7 +173,7 @@ public class RingActivity extends Activity {
 
             isRinging = true;
 
-            updateContent();
+            startContent();
 
             startSound();
             startVibrate();
@@ -191,9 +191,33 @@ public class RingActivity extends Activity {
             stopVibrate();
             stopSound();
 
+            stopContent();
+
             // allow device sleep
             WakeLocker.release();
         }
+    }
+
+    private void startContent() {
+        Log.d(TAG, "startContent()");
+
+        runnableContent.run();
+    }
+
+    private Handler handlerContent = new Handler();
+    private Runnable runnableContent = new Runnable() {
+        @Override
+        public void run() {
+            updateContent();
+
+            handlerContent.postDelayed(this, 60000);
+        }
+    };
+
+    private void stopContent() {
+        Log.d(TAG, "stopContent()");
+
+        handlerContent.removeCallbacks(runnableContent);
     }
 
     private void updateContent() {
@@ -332,7 +356,7 @@ public class RingActivity extends Activity {
 
         if (increasing) {
             increasingVolumePercentage = 0;
-            runnable.run();
+            runnableVolume.run();
         } else {
             audioManager.setStreamVolume(AudioManager.STREAM_ALARM, volume, 0);
         }
@@ -360,14 +384,14 @@ public class RingActivity extends Activity {
         }
     }
 
-    private Handler handler = new Handler();
-    private Runnable runnable = new Runnable() {
+    private Handler handlerVolume = new Handler();
+    private Runnable runnableVolume = new Runnable() {
         @Override
         public void run() {
             boolean end = updateIncreasingVolume();
 
             if (!end) {
-                handler.postDelayed(this, 1000);
+                handlerVolume.postDelayed(this, 1000);
             }
         }
     };
