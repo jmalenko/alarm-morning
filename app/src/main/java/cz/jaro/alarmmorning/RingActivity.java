@@ -49,6 +49,7 @@ public class RingActivity extends Activity {
     private int previousVolume;
     private int volume;
     private int maxVolume;
+    private boolean increasing;
     private int increasingVolumePercentage;
 
     private Vibrator vibrator;
@@ -352,7 +353,7 @@ public class RingActivity extends Activity {
         Log.v(TAG, "max volume= " + maxVolume);
         Log.v(TAG, "volume = " + volume);
 
-        boolean increasing = preferences.getBoolean(SettingsFragment.PREF_VOLUME_INCREASING, SettingsFragment.PREF_VOLUME_INCREASING_DEFAULT);
+        increasing = preferences.getBoolean(SettingsFragment.PREF_VOLUME_INCREASING, SettingsFragment.PREF_VOLUME_INCREASING_DEFAULT);
 
         if (increasing) {
             increasingVolumePercentage = 0;
@@ -366,7 +367,7 @@ public class RingActivity extends Activity {
      * @return Whether the increasing reached the final volume.
      */
     private boolean updateIncreasingVolume() {
-        Log.v(TAG, "increasing volume");
+        Log.v(TAG, "updateIncreasingVolume");
 
         increasingVolumePercentage++;
         Log.v(TAG, "volume percentage = " + increasingVolumePercentage);
@@ -398,6 +399,10 @@ public class RingActivity extends Activity {
 
     private void stopVolume() {
         Log.d(TAG, "stopVolume()");
+
+        if (increasing) {
+            handlerVolume.removeCallbacks(runnableVolume);
+        }
 
         audioManager.setStreamVolume(AudioManager.STREAM_ALARM, previousVolume, 0);
     }
