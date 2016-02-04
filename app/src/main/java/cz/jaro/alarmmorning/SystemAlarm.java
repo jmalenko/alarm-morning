@@ -11,6 +11,8 @@ import android.util.Log;
 
 import java.util.Calendar;
 
+import cz.jaro.alarmmorning.clock.Clock;
+import cz.jaro.alarmmorning.clock.SystemClock;
 import cz.jaro.alarmmorning.model.AlarmDataSource;
 import cz.jaro.alarmmorning.receivers.AlarmReceiver;
 
@@ -73,21 +75,21 @@ public class SystemAlarm {
 
     private void cancelSystemAlarm() {
         if (operation != null) {
-            Log.d(TAG, "Cancelling current alarm");
+            Log.d(TAG, "Cancelling current system alarm");
             operation.cancel();
         }
     }
 
-    private void initialize() {
+    private void initialize(Clock clock) {
         Log.d(TAG, "initialize()");
 
-        Calendar alarmTime = AlarmDataSource.getNextAlarm(context);
+        Calendar alarmTime = AlarmDataSource.getNextAlarm(context, clock);
 
         if (alarmTime == null) {
             // TODO Fix: when no alarm is set [in the horizon]. This happens when a default time is set and all the days in calendar are changed to unset. This must me fixed everywhere AlarmDataSource.getNextAlarm() is called.
             registerSystemAlarm(ACTION_SET_SYSTEM_ALARM, null);
         } else {
-            Calendar now = Calendar.getInstance();
+            Calendar now = clock.now();
 
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
             int nearFutureMinutes = preferences.getInt(SettingsFragment.PREF_NEAR_FUTURE_TIME, SettingsFragment.PREF_NEAR_FUTURE_TIME_DEFAULT);
@@ -97,7 +99,7 @@ public class SystemAlarm {
             if (now.before(nearFutureTime)) {
                 registerSystemAlarm(ACTION_RING_IN_NEAR_FUTURE, nearFutureTime);
             } else {
-                alarmTime = AlarmDataSource.getNextAlarm(context);
+                alarmTime = AlarmDataSource.getNextAlarm(context, clock);
 
                 registerSystemAlarm(ACTION_RING, alarmTime);
 
@@ -111,7 +113,9 @@ public class SystemAlarm {
         Log.d(TAG, "setSystemAlarm()");
 
         cancelSystemAlarm();
-        initialize();
+
+        Clock clock = new SystemClock(); // TODO change
+        initialize(clock);
     }
 
     private static Calendar subtractHour(Calendar time, int minute) {
@@ -177,7 +181,8 @@ public class SystemAlarm {
         Log.i(TAG, "Acting on system alarm. action=" + action);
 
         if (action == ACTION_SET_SYSTEM_ALARM) {
-            initialize();
+            Clock clock = new SystemClock(); // TODO change
+            initialize(clock);
 
             // switch today from "dismissed in future" to "passed"
             Intent hideIntent = new Intent();
@@ -187,7 +192,8 @@ public class SystemAlarm {
         } else if (action == ACTION_RING_IN_NEAR_FUTURE) {
             Log.i(TAG, "Near future");
 
-            Calendar alarmTime = AlarmDataSource.getNextAlarm(context);
+            Clock clock = new SystemClock(); // TODO change
+            Calendar alarmTime = AlarmDataSource.getNextAlarm(context, clock);
             registerSystemAlarm(ACTION_RING, alarmTime);
 
             GlobalManager globalManager = new GlobalManager(context);
@@ -195,7 +201,8 @@ public class SystemAlarm {
         } else if (action == ACTION_RING) {
             Log.i(TAG, "Ring");
 
-            initialize();
+            Clock clock = new SystemClock(); // TODO change
+            initialize(clock);
 
             GlobalManager globalManager = new GlobalManager(context);
             globalManager.onRing();
@@ -207,19 +214,20 @@ public class SystemAlarm {
     public void onDismissBeforeRinging() {
         Log.d(TAG, "onDismissBeforeRinging()");
 
-        Calendar alarmTime = AlarmDataSource.getNextAlarm(context);
+        Clock clock = new SystemClock(); // TODO change
+        Calendar alarmTime = AlarmDataSource.getNextAlarm(context, clock);
 
         cancelSystemAlarm();
         registerSystemAlarm(ACTION_SET_SYSTEM_ALARM, alarmTime);
     }
 
-    public Calendar onSnooze() {
+    public Calendar onSnooze(Clock clock) {
         Log.d(TAG, "onSnooze()");
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         int snoozeTime = preferences.getInt(SettingsFragment.PREF_SNOOZE_TIME, SettingsFragment.PREF_SNOOZE_TIME_DEFAULT);
 
-        Calendar ringAfterSnoozeTime = Calendar.getInstance();
+        Calendar ringAfterSnoozeTime = clock.now();
         ringAfterSnoozeTime.add(Calendar.MINUTE, snoozeTime);
         ringAfterSnoozeTime.set(Calendar.SECOND, 0);
         ringAfterSnoozeTime.set(Calendar.MILLISECOND, 0);

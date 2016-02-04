@@ -1,7 +1,18 @@
 package cz.jaro.alarmmorning.clock;
 
+import java.util.Calendar;
+
 /**
- * Created by ext93831 on 1.2.2016.
+ * Represents current system time. Each call of {@link #now()} returns the (non-decreasing) system time.
  */
-public class SystemClock {
+public class SystemClock implements Clock {
+
+    /**
+     * @return current system clock (date and time)
+     */
+    @Override
+    public Calendar now() {
+        return Calendar.getInstance();
+    }
+
 }

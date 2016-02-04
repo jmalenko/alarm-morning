@@ -1,7 +1,17 @@
 package cz.jaro.alarmmorning.clock;
 
+import java.util.Calendar;
+
 /**
- * Created by ext93831 on 1.2.2016.
+ * Interface for getting current clock (date and time).
+ * <p/>
+ * This interface exists to support unit testing.
  */
-public class Clock {
+public interface Clock {
+
+    /**
+     * @return current clock (date and time)
+     */
+    Calendar now();
+
 }

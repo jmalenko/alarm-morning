@@ -25,6 +25,8 @@ import android.widget.TextView;
 import java.io.IOException;
 import java.util.Calendar;
 
+import cz.jaro.alarmmorning.clock.SystemClock;
+
 
 /**
  * Activity that is displayed while the alarm fires.
@@ -196,7 +198,7 @@ public class RingActivity extends Activity {
 
     private void updateContent() {
         Log.d(TAG, "updateContent()");
-        Calendar now = Calendar.getInstance();
+        Calendar now = clock();
         String currentTimeString = Localization.timeToString(now.getTime(), this);
 
         TextView timeView = (TextView) findViewById(R.id.fullscreen_content);
@@ -407,4 +409,7 @@ public class RingActivity extends Activity {
         }
     }
 
+    public Calendar clock() {
+        return new SystemClock().now();
+    }
 }

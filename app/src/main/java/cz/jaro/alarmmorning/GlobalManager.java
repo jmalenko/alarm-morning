@@ -9,6 +9,8 @@ import android.util.Log;
 
 import java.util.Calendar;
 
+import cz.jaro.alarmmorning.clock.Clock;
+import cz.jaro.alarmmorning.clock.SystemClock;
 import cz.jaro.alarmmorning.model.AlarmDataSource;
 import cz.jaro.alarmmorning.model.Day;
 
@@ -57,7 +59,8 @@ public class GlobalManager {
         editor.putInt(TODAY_ALARM_STATE, state);
         editor.commit();
 
-        Calendar alarmTime = AlarmDataSource.getNextAlarm(context);
+        Clock clock = new SystemClock(); // TODO change
+        Calendar alarmTime = AlarmDataSource.getNextAlarm(context, clock);
         setAlarmTime(alarmTime.getTimeInMillis());
     }
 
@@ -78,7 +81,8 @@ public class GlobalManager {
     }
 
     public boolean isValid() {
-        Calendar alarmTime = AlarmDataSource.getNextAlarm(context);
+        Clock clock = new SystemClock(); // TODO change
+        Calendar alarmTime = AlarmDataSource.getNextAlarm(context, clock);
         long alarmTime1 = alarmTime.getTimeInMillis();
 
         long alarmTime2 = getAlarmTime();
@@ -91,13 +95,14 @@ public class GlobalManager {
 
     public Day getDay() {
         Log.d(TAG, "getDay()");
-        AlarmDataSource datasource = new AlarmDataSource(context);
-        datasource.open();
+        AlarmDataSource dataSource = new AlarmDataSource(context);
+        dataSource.open();
 
-        Calendar date = CalendarAdapter.getToday();
-        Day day = datasource.loadDay(date);
+        Clock clock = new SystemClock();
+        Calendar date = CalendarAdapter.getToday(clock);
+        Day day = dataSource.loadDayDeep(date);
 
-        datasource.close();
+        dataSource.close();
 
         return day;
     }
@@ -157,7 +162,8 @@ public class GlobalManager {
         setState(STATE_SNOOZED);
 
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
-        Calendar ringAfterSnoozeTime = systemAlarm.onSnooze();
+        Clock clock = new SystemClock();
+        Calendar ringAfterSnoozeTime = systemAlarm.onSnooze(clock);
 
         SystemNotification.onSnooze(context, ringAfterSnoozeTime);
 

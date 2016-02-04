@@ -6,9 +6,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 /**
- * Created by jmalenko on 16.12.2015.
+ * Represent changes of the database model.
+ * <p>
+ * The changes are represented as a difference (forward and backward patches) between two subsequent versions.
+ * Invariant: the database version V has applied exactly the patches 0..V.
  */
-
 public class AlarmDbHelper extends SQLiteOpenHelper {
 
     private static final String TAG = AlarmDbHelper.class.getSimpleName();
@@ -54,12 +56,29 @@ public class AlarmDbHelper extends SQLiteOpenHelper {
         }
     }
 
+    /**
+     * Represents changes of database model.
+     */
     private abstract static class Patch {
+
+        /**
+         * Change the database forward.
+         *
+         * @param db database
+         */
         public abstract void apply(SQLiteDatabase db);
 
+        /**
+         * Change the database backward.
+         *
+         * @param db database
+         */
         public abstract void revert(SQLiteDatabase db);
     }
 
+    /**
+     * Set of patches.
+     */
     private static final Patch[] PATCHES = new Patch[]{new Patch() {
         public void apply(SQLiteDatabase database) {
             String DATABASE_CREATE_TABLE_DEFAULTS = "create table " + TABLE_DEFAULTS + "(" +

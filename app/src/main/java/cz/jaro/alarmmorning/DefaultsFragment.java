@@ -12,6 +12,8 @@ import cz.jaro.alarmmorning.graphics.SimpleDividerItemDecoration;
 
 public class DefaultsFragment extends Fragment {
 
+    DefaultsAdapter adapter;
+
     public DefaultsFragment() {
         // Empty constructor required for fragment subclasses
     }
@@ -28,7 +30,7 @@ public class DefaultsFragment extends Fragment {
 
         // specify an adapter
         ActivityInterface activityInterface = (ActivityInterface) getActivity();
-        DefaultsAdapter adapter = new DefaultsAdapter(activityInterface);
+        adapter = new DefaultsAdapter(activityInterface);
         recyclerView.setAdapter(adapter);
 
         // item separator
@@ -36,4 +38,12 @@ public class DefaultsFragment extends Fragment {
 
         return rootView;
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        adapter.onDestroy();
+    }
+
 }

@@ -10,6 +10,8 @@ import android.util.Log;
 
 import java.util.Calendar;
 
+import cz.jaro.alarmmorning.clock.Clock;
+import cz.jaro.alarmmorning.clock.SystemClock;
 import cz.jaro.alarmmorning.model.Day;
 import cz.jaro.alarmmorning.receivers.NotificationReceiver;
 
@@ -27,7 +29,8 @@ public class SystemNotification {
         Day day = globalManager.getDay();
 
         Resources res = context.getResources();
-        String timeText = Localization.timeToString(day.getHourX(), day.getMinuteX(), context);
+        Clock clock = new SystemClock(); // TODO change
+        String timeText = Localization.timeToString(day.getHourX(), day.getMinuteX(), context, clock);
         String contentTitle = String.format(res.getString(R.string.notification_title), timeText);
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
@@ -111,7 +114,8 @@ public class SystemNotification {
         NotificationCompat.Builder mBuilder = buildNotification(context);
 
         Resources res = context.getResources();
-        String ringAfterSnoozeTimeText = Localization.timeToString(ringAfterSnoozeTime.get(Calendar.HOUR_OF_DAY), ringAfterSnoozeTime.get(Calendar.MINUTE), context);
+        Clock clock = new SystemClock(); // TODO change
+        String ringAfterSnoozeTimeText = Localization.timeToString(ringAfterSnoozeTime.get(Calendar.HOUR_OF_DAY), ringAfterSnoozeTime.get(Calendar.MINUTE), context, clock);
         String contentText = String.format(res.getString(R.string.notification_text_snoozed), ringAfterSnoozeTimeText);
         mBuilder.setContentText(contentText);
 

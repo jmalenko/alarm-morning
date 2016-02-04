@@ -11,6 +11,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import cz.jaro.alarmmorning.clock.Clock;
+import cz.jaro.alarmmorning.clock.SystemClock;
 import cz.jaro.alarmmorning.model.AlarmDataSource;
 import cz.jaro.alarmmorning.model.Defaults;
 
@@ -23,7 +25,7 @@ public class DefaultsAdapter extends RecyclerView.Adapter<DefaultsAdapter.Defaul
 
     private Defaults changingDefaults;
 
-    private AlarmDataSource datasource;
+    private AlarmDataSource dataSource;
 
     /**
      * Initialize the Adapter.
@@ -33,8 +35,8 @@ public class DefaultsAdapter extends RecyclerView.Adapter<DefaultsAdapter.Defaul
     public DefaultsAdapter(ActivityInterface activityInterface) {
         this.activityInterface = activityInterface;
 
-        datasource = new AlarmDataSource(activityInterface.getContextI());
-        datasource.open();
+        dataSource = new AlarmDataSource(activityInterface.getContextI());
+        dataSource.open();
     }
 
     /**
@@ -54,16 +56,17 @@ public class DefaultsAdapter extends RecyclerView.Adapter<DefaultsAdapter.Defaul
     public void onBindViewHolder(DefaultViewHolder viewHolder, final int position) {
         int dayOfWeek = positionToDayOfWeek(position);
 
-        Defaults defaults = datasource.loadDefault(dayOfWeek);
+        Defaults defaults = dataSource.loadDefault(dayOfWeek);
 
         // Show current alarm
 
-        String dayOfWeekText = Localization.dayOfWeekToString(defaults.getDayOfWeek());
+        Clock clock = new SystemClock();
+        String dayOfWeekText = Localization.dayOfWeekToString(defaults.getDayOfWeek(), clock);
         viewHolder.getTextDayOfWeek().setText(dayOfWeekText);
 
         String timeText;
         if (defaults.isEnabled()) {
-            timeText = Localization.timeToString(defaults.getHour(), defaults.getMinute(), activityInterface.getContextI());
+            timeText = Localization.timeToString(defaults.getHour(), defaults.getMinute(), activityInterface.getContextI(), clock);
         } else {
             timeText = activityInterface.getResourcesI().getString(R.string.alarm_unset);
         }
@@ -104,7 +107,7 @@ public class DefaultsAdapter extends RecyclerView.Adapter<DefaultsAdapter.Defaul
     }
 
     private void save(Defaults defaults) {
-        datasource.saveDefault(defaults);
+        dataSource.saveDefault(defaults);
 
         refresh();
     }
@@ -118,7 +121,7 @@ public class DefaultsAdapter extends RecyclerView.Adapter<DefaultsAdapter.Defaul
     }
 
     public void onDestroy() {
-        datasource.close();
+        dataSource.close();
     }
 
     /**

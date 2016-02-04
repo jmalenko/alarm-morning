@@ -6,25 +6,21 @@ import android.test.RenamingDelegatingContext;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+import cz.jaro.alarmmorning.clock.FixedClock;
+
+import static cz.jaro.alarmmorning.model.AlarmDataSourceTest.DAY;
+import static cz.jaro.alarmmorning.model.AlarmDataSourceTest.HOUR_DAY;
+import static cz.jaro.alarmmorning.model.AlarmDataSourceTest.MINUTE_DAY;
+import static cz.jaro.alarmmorning.model.AlarmDataSourceTest.MONTH;
+import static cz.jaro.alarmmorning.model.AlarmDataSourceTest.YEAR;
+
 public class AlarmDataSource2Test extends AndroidTestCase {
 
-    // February 2016 starts with Monday
-    public static final int YEAR = 2016;
-    public static final int MONTH = 2;
-    public static final int DAY = 1;
-    public static final int DAY_OF_WEEK = Calendar.MONDAY;
-
-    public static final int HOUR_DAY = 8;
-    public static final int MINUTE_DAY = 1;
-
-    public static final int HOUR_DEFAULT = 7;
-    public static final int MINUTE_DEFAULT = 0;
-
     private AlarmDataSource dataSource;
-    private Defaults defaults;
-    private Day day;
 
-    // TODO remove the testing hack from build.gradle
+    private Day day0;
+    private Day day1;
+    private Day day2;
 
     @Override
     public void setUp() throws Exception {
@@ -33,18 +29,28 @@ public class AlarmDataSource2Test extends AndroidTestCase {
         dataSource = new AlarmDataSource(context);
         dataSource.open();
 
-        defaults = new Defaults();
-        defaults.setState(AlarmDataSource.DEFAULT_STATE_ENABLED);
-        defaults.setDayOfWeek(DAY_OF_WEEK);
-        defaults.setHour(HOUR_DEFAULT);
-        defaults.setMinute(MINUTE_DEFAULT);
+        day0 = new Day();
+        day0.setState(AlarmDataSource.DAY_STATE_ENABLED);
+        day0.setDate(new GregorianCalendar(YEAR, MONTH, DAY));
+        day0.setHour(HOUR_DAY);
+        day0.setMinute(MINUTE_DAY);
+        dataSource.saveDay(day0);
 
-        day = new Day();
-        day.setState(AlarmDataSource.DAY_STATE_ENABLED);
-        day.setDate(new GregorianCalendar(YEAR, MONTH, DAY));
-        day.setHour(HOUR_DAY);
-        day.setMinute(MINUTE_DAY);
-        day.setDefaults(defaults);
+        // day1 = day0 + 8 days
+        day1 = new Day();
+        day1.setState(AlarmDataSource.DAY_STATE_ENABLED);
+        day1.setDate(new GregorianCalendar(YEAR, MONTH, DAY + 8));
+        day1.setHour(HOUR_DAY + 1);
+        day1.setMinute(MINUTE_DAY + 1);
+        dataSource.saveDay(day1);
+
+        // day2 = day0 + 8 days
+        day2 = new Day();
+        day2.setState(AlarmDataSource.DAY_STATE_ENABLED);
+        day2.setDate(new GregorianCalendar(YEAR, MONTH, DAY + 16));
+        day2.setHour(HOUR_DAY + 2);
+        day2.setMinute(MINUTE_DAY + 2);
+        dataSource.saveDay(day2);
     }
 
     @Override
@@ -55,109 +61,94 @@ public class AlarmDataSource2Test extends AndroidTestCase {
 
     public void testPreConditions() {
         assertNotNull(dataSource);
+        assertTrue("", 8 <= AlarmDataSource.HORIZON_DAYS);
     }
 
-    public void test_Defaults_2writes() {
-        // save 1st object
+    public void test_before0() {
+        FixedClock clock = new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DAY, MINUTE_DAY)).addMinute(-1);
+        Calendar nextAlarm = dataSource.getNextAlarm(clock);
 
-        Defaults defaults1a = new Defaults();
-        defaults1a.setState(AlarmDataSource.DEFAULT_STATE_ENABLED);
-        defaults1a.setDayOfWeek(DAY_OF_WEEK);
-        defaults1a.setHour(HOUR_DEFAULT);
-        defaults1a.setMinute(MINUTE_DEFAULT);
-
-        dataSource.saveDefault(defaults1a);
-
-        Defaults defaults1b = dataSource.loadDefault(defaults1a.getDayOfWeek());
-
-        assertEquals(defaults1a.getState(), defaults1b.getState());
-        assertEquals(defaults1a.getDayOfWeek(), defaults1b.getDayOfWeek());
-        assertEquals(defaults1a.getHour(), defaults1b.getHour());
-        assertEquals(defaults1a.getMinute(), defaults1b.getMinute());
-
-        // save 2nd object
-
-        Defaults defaults2a = new Defaults();
-        defaults2a.setState(AlarmDataSource.DEFAULT_STATE_DISABLED);
-        defaults2a.setDayOfWeek(DAY_OF_WEEK + 1);
-        defaults2a.setHour(HOUR_DEFAULT + 1);
-        defaults2a.setMinute(MINUTE_DEFAULT + 1);
-
-        dataSource.saveDefault(defaults2a);
-
-        Defaults defaults2b = dataSource.loadDefault(defaults2a.getDayOfWeek());
-
-        assertEquals(defaults2a.getState(), defaults2b.getState());
-        assertEquals(defaults2a.getDayOfWeek(), defaults2b.getDayOfWeek());
-        assertEquals(defaults2a.getHour(), defaults2b.getHour());
-        assertEquals(defaults2a.getMinute(), defaults2b.getMinute());
+        assertEquals("next alarm on " + clock.now().getTime().toString(), day0.getDateTime().getTime().toString(), nextAlarm.getTime().toString());
+        assertEquals(YEAR, nextAlarm.get(Calendar.YEAR));
+        assertEquals(MONTH, nextAlarm.get(Calendar.MONTH));
+        assertEquals(DAY, nextAlarm.get(Calendar.DAY_OF_MONTH));
+        assertEquals(HOUR_DAY, nextAlarm.get(Calendar.HOUR_OF_DAY));
+        assertEquals(MINUTE_DAY, nextAlarm.get(Calendar.MINUTE));
+        assertEquals(0, nextAlarm.get(Calendar.SECOND));
+        assertEquals(0, nextAlarm.get(Calendar.MILLISECOND));
     }
 
-    public void test_Day_2writes() {
-        // save 1st object
+    public void test_after0() {
+        FixedClock clock = new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DAY, MINUTE_DAY)).addMinute(1);
+        Calendar nextAlarm = dataSource.getNextAlarm(clock);
 
-        Day day1a = new Day();
-        day1a.setState(AlarmDataSource.DEFAULT_STATE_ENABLED);
-        day1a.setDate(new GregorianCalendar(YEAR, MONTH, DAY));
-        day1a.setHour(HOUR_DEFAULT);
-        day1a.setMinute(MINUTE_DEFAULT);
-
-        dataSource.saveDay(day1a);
-
-        Day day1b = dataSource.loadDayDeep(day1a.getDate());
-
-        assertEquals(day1a.getState(), day1b.getState());
-        assertEquals(day1a.getDate(), day1b.getDate());
-        assertEquals(day1a.getHour(), day1b.getHour());
-        assertEquals(day1a.getMinute(), day1b.getMinute());
-        assertNotNull(day1b.getDefaults());
-
-        // save 2nd object
-
-        Day day2a = new Day();
-        day2a.setState(AlarmDataSource.DEFAULT_STATE_DISABLED);
-        day2a.setDate(new GregorianCalendar(YEAR, MONTH, DAY+1));
-        day2a.setHour(HOUR_DEFAULT + 1);
-        day2a.setMinute(MINUTE_DEFAULT + 1);
-
-        dataSource.saveDay(day2a);
-
-        Day day2b = dataSource.loadDayDeep(day2a.getDate());
-
-        assertEquals(day2a.getState(), day2b.getState());
-        assertEquals(day2a.getDate(), day2b.getDate());
-        assertEquals(day2a.getHour(), day2b.getHour());
-        assertEquals(day2a.getMinute(), day2b.getMinute());
-        assertNotNull(day2b.getDefaults());
+        assertEquals("next alarm on " + clock.now().getTime().toString(), day1.getDateTime().getTime().toString(), nextAlarm.getTime().toString());
+        assertEquals(YEAR, nextAlarm.get(Calendar.YEAR));
+        assertEquals(MONTH, nextAlarm.get(Calendar.MONTH));
+        assertEquals(DAY + 8, nextAlarm.get(Calendar.DAY_OF_MONTH));
+        assertEquals(HOUR_DAY + 1, nextAlarm.get(Calendar.HOUR_OF_DAY));
+        assertEquals(MINUTE_DAY + 1, nextAlarm.get(Calendar.MINUTE));
+        assertEquals(0, nextAlarm.get(Calendar.SECOND));
+        assertEquals(0, nextAlarm.get(Calendar.MILLISECOND));
     }
 
-    public void test_Day_load_notStored() {
-        Calendar dateWithoutRecord = new GregorianCalendar(YEAR - 1, MONTH, DAY);
-        Day day = dataSource.loadDayDeep(dateWithoutRecord);
+    public void test_before1() {
+        FixedClock clock = new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY + 8, HOUR_DAY + 1, MINUTE_DAY + 1)).addMinute(-1);
+        Calendar nextAlarm = dataSource.getNextAlarm(clock);
 
-        assertEquals(AlarmDataSource.DAY_STATE_DEFAULT, day.getState());
-        assertEquals(dateWithoutRecord, day.getDate());
-        assertEquals(AlarmDataSource.VALUE_UNSET, day.getHour());
-        assertEquals(AlarmDataSource.VALUE_UNSET, day.getMinute());
-        assertNotNull(day.getDefaults());
+        assertEquals("next alarm on " + clock.now().getTime().toString(), day1.getDateTime().getTime().toString(), nextAlarm.getTime().toString());
+        assertEquals(YEAR, nextAlarm.get(Calendar.YEAR));
+        assertEquals(MONTH, nextAlarm.get(Calendar.MONTH));
+        assertEquals(DAY + 8, nextAlarm.get(Calendar.DAY_OF_MONTH));
+        assertEquals(HOUR_DAY + 1, nextAlarm.get(Calendar.HOUR_OF_DAY));
+        assertEquals(MINUTE_DAY + 1, nextAlarm.get(Calendar.MINUTE));
+        assertEquals(0, nextAlarm.get(Calendar.SECOND));
+        assertEquals(0, nextAlarm.get(Calendar.MILLISECOND));
     }
 
+    public void test_after1() {
+        FixedClock clock = new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY + 8, HOUR_DAY + 1, MINUTE_DAY + 1)).addMinute(1);
+        Calendar nextAlarm = dataSource.getNextAlarm(clock);
 
-    public void test_getNextAlarm_noAlarm() {
-        // TODO 2 overloads
-
-        clock = new FixedClock(new GregorianCalendar()); // clock is set in each test
-
-        day0 = new Day(clock);
-        day0.setState(AlarmDataSource.DAY_STATE_ENABLED);
-        day0.setDate(new GregorianCalendar(YEAR, MONTH, DAY-1));
-        day0.setHour(HOUR_DAY);
-        day0.setMinute(MINUTE_DAY);
+        assertEquals("next alarm on " + clock.now().getTime().toString(), day2.getDateTime().getTime().toString(), nextAlarm.getTime().toString());
+        assertEquals(YEAR, nextAlarm.get(Calendar.YEAR));
+        assertEquals(MONTH, nextAlarm.get(Calendar.MONTH));
+        assertEquals(DAY + 16, nextAlarm.get(Calendar.DAY_OF_MONTH));
+        assertEquals(HOUR_DAY + 2, nextAlarm.get(Calendar.HOUR_OF_DAY));
+        assertEquals(MINUTE_DAY + 2, nextAlarm.get(Calendar.MINUTE));
+        assertEquals(0, nextAlarm.get(Calendar.SECOND));
+        assertEquals(0, nextAlarm.get(Calendar.MILLISECOND));
     }
 
-    public void test_getNextAlarm_oneAlarm() {
+    public void test_before2() {
+        FixedClock clock = new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY + 16, HOUR_DAY + 2, MINUTE_DAY + 2)).addMinute(-1);
+        Calendar nextAlarm = dataSource.getNextAlarm(clock);
+
+        assertEquals("next alarm on " + clock.now().getTime().toString(), day2.getDateTime().getTime().toString(), nextAlarm.getTime().toString());
+        assertEquals(YEAR, nextAlarm.get(Calendar.YEAR));
+        assertEquals(MONTH, nextAlarm.get(Calendar.MONTH));
+        assertEquals(DAY + 16, nextAlarm.get(Calendar.DAY_OF_MONTH));
+        assertEquals(HOUR_DAY + 2, nextAlarm.get(Calendar.HOUR_OF_DAY));
+        assertEquals(MINUTE_DAY + 2, nextAlarm.get(Calendar.MINUTE));
+        assertEquals(0, nextAlarm.get(Calendar.SECOND));
+        assertEquals(0, nextAlarm.get(Calendar.MILLISECOND));
     }
 
-    public void test_getNextAlarm_twoAlarms() {
+    public void test_after2() {
+        // set all defaults to disabled
+        for (int dayOfWeek : AlarmDataSource.allDaysOfWeek) {
+            Defaults defaults = new Defaults();
+            defaults.setDayOfWeek(dayOfWeek);
+            defaults.setState(AlarmDataSource.DEFAULT_STATE_DISABLED);
+            defaults.setHour(1);
+            defaults.setMinute(2);
+            dataSource.saveDefault(defaults);
+        }
+
+        FixedClock clock = new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY + 16, HOUR_DAY + 2, MINUTE_DAY + 2)).addMinute(1);
+        Calendar nextAlarm = dataSource.getNextAlarm(clock);
+
+        assertNull(nextAlarm);
     }
+
 }

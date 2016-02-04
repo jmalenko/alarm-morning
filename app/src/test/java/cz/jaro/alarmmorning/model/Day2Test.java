@@ -3,129 +3,54 @@ package cz.jaro.alarmmorning.model;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.clock.FixedClock;
 
+import static cz.jaro.alarmmorning.model.DayTest.*;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
+/**
+ * This tests depend on {@link Clock}.
+ */
 public class Day2Test {
 
-    private Defaults defaults;
     private Day day;
+    private FixedClock clock;
 
     @Before
     public void before() {
-        defaults = new Defaults();
-        defaults.setDayOfWeek(Calendar.MONDAY);
-        defaults.setHour(7);
-        defaults.setMinute(0);
+        clock = new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DAY, MINUTE_DAY));
 
-//        day = new Day();
-        Clock clock = new FixedClock(new GregorianCalendar(2016, 2, 1, 8, 1));
-        day = new Day(clock);
-        day.setDate(new GregorianCalendar(2016, 2, 1)); // February 2016 starts with Monday
-        day.setHour(8);
-        day.setMinute(1);
-        day.setDefaults(defaults);
-    }
-
-    @Test
-    public void DefaultDisabledDayDefault() {
-        defaults.setState(AlarmDataSource.DEFAULT_STATE_DISABLED);
-        day.setState(AlarmDataSource.DAY_STATE_DEFAULT);
-
-        assertThat(day.isEnabled(), is(false));
-        assertThat(day.getHourX(), is(7));
-        assertThat(day.getMinuteX(), is(0));
-        assertThat(day.sameAsDefault(), is(true));
-
-        day.reverse();
-        assertThat(day.getState(), is(AlarmDataSource.DAY_STATE_ENABLED));
-
-        // isPassed
-        // isNextAlarm
-        // getTimeToRing
-    }
-
-    @Test
-    public void DefaultDisabledDayEnabled() {
-        defaults.setState(AlarmDataSource.DEFAULT_STATE_DISABLED);
+        day = new Day();
         day.setState(AlarmDataSource.DAY_STATE_ENABLED);
-
-        assertThat(day.isEnabled(), is(true));
-        assertThat(day.getHourX(), is(8));
-        assertThat(day.getMinuteX(), is(1));
-        assertThat(day.sameAsDefault(), is(false));
-
-        day.reverse();
-        assertThat(day.getState(), is(AlarmDataSource.DAY_STATE_DISABLED));
+        day.setDate(new GregorianCalendar(YEAR, MONTH, DAY));
+        day.setHour(HOUR_DAY);
+        day.setMinute(MINUTE_DAY);
     }
 
     @Test
-    public void DefaultDisabledDayDisabled() {
-        defaults.setState(AlarmDataSource.DEFAULT_STATE_DISABLED);
-        day.setState(AlarmDataSource.DAY_STATE_DISABLED);
+    public void beforeX() {
+        clock.addMinute(-1);
 
-        assertThat(day.isEnabled(), is(false));
-        assertThat(day.getHourX(), is(8));
-        assertThat(day.getMinuteX(), is(1));
-        assertThat(day.sameAsDefault(), is(true));
-
-        day.reverse();
-        assertThat(day.getState(), is(AlarmDataSource.DAY_STATE_ENABLED));
+        assertThat(day.isPassed(clock), is(false));
+        assertThat(day.getTimeToRing(clock), is(60000L));
     }
 
     @Test
-    public void DefaultEnabledDayDefault() {
-        defaults.setState(AlarmDataSource.DEFAULT_STATE_ENABLED);
-        day.setState(AlarmDataSource.DAY_STATE_DEFAULT);
-
-        assertThat(day.isEnabled(), is(true));
-        assertThat(day.getHourX(), is(7));
-        assertThat(day.getMinuteX(), is(0));
-        assertThat(day.sameAsDefault(), is(true));
-
-        day.reverse();
-        assertThat(day.getState(), is(AlarmDataSource.DAY_STATE_DISABLED));
+    public void on() {
+        assertThat(day.isPassed(clock), is(false));
+        assertThat(day.getTimeToRing(clock), is(0L));
     }
 
     @Test
-    public void DefaultEnabledDayEnabled() {
-        defaults.setState(AlarmDataSource.DEFAULT_STATE_ENABLED);
-        day.setState(AlarmDataSource.DAY_STATE_ENABLED);
+    public void after() {
+        clock.addMinute(1);
 
-        assertThat(day.isEnabled(), is(true));
-        assertThat(day.getHourX(), is(8));
-        assertThat(day.getMinuteX(), is(1));
-        assertThat(day.sameAsDefault(), is(false));
-
-        day.reverse();
-        assertThat(day.getState(), is(AlarmDataSource.DAY_STATE_DISABLED));
-    }
-
-    @Test
-    public void DefaultEnabledDayDisabled() {
-        defaults.setState(AlarmDataSource.DEFAULT_STATE_ENABLED);
-        day.setState(AlarmDataSource.DAY_STATE_DISABLED);
-
-        assertThat(day.isEnabled(), is(false));
-        assertThat(day.getHourX(), is(8));
-        assertThat(day.getMinuteX(), is(1));
-        assertThat(day.sameAsDefault(), is(false));
-
-        day.reverse();
-        assertThat(day.getState(), is(AlarmDataSource.DAY_STATE_ENABLED));
-    }
-
-    @Test
-    public void isPsssed() {
-        day.setState(AlarmDataSource.DAY_STATE_ENABLED);
-
-        assertThat(day.day.isPassed(), is(true));
+        assertThat(day.isPassed(clock), is(true));
+        assertThat(day.getTimeToRing(clock), is(-60000L));
     }
 
 }
