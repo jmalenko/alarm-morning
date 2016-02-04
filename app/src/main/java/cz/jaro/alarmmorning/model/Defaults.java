@@ -5,11 +5,24 @@ package cz.jaro.alarmmorning.model;
  */
 public class Defaults {
 
+    /**
+     * Value of the {@code state} field indicating the disabled state.
+     */
+    public static final int STATE_DISABLED = 0;
+
+    /**
+     * Value of the {@code state} field indicating the enabled state.
+     */
+    public static final int STATE_ENABLED = 1;
+
     private long id;
 
     /**
-     * 0 = unset
-     * 1 = set (to particular time)
+     * The state of the default.
+     * <p/>
+     * The states are:<br/>
+     * {@link #STATE_DISABLED} = unset<br>
+     * {@link #STATE_ENABLED} = set (to particular time)
      */
     private int state;
 
@@ -68,7 +81,7 @@ public class Defaults {
      * @return true if alarm is enabled
      */
     public boolean isEnabled() {
-        return state == AlarmDataSource.DEFAULT_STATE_ENABLED;
+        return state == STATE_ENABLED;
     }
 
     /**
@@ -76,9 +89,9 @@ public class Defaults {
      */
     public void reverse() {
         if (isEnabled()) {
-            setState(AlarmDataSource.DEFAULT_STATE_DISABLED);
+            setState(STATE_DISABLED);
         } else {
-            setState(AlarmDataSource.DEFAULT_STATE_ENABLED);
+            setState(STATE_ENABLED);
         }
     }
 }

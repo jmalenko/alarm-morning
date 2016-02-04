@@ -25,7 +25,7 @@ public class Day2Test {
         clock = new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DAY, MINUTE_DAY));
 
         day = new Day();
-        day.setState(AlarmDataSource.DAY_STATE_ENABLED);
+        day.setState(Day.STATE_ENABLED);
         day.setDate(new GregorianCalendar(YEAR, MONTH, DAY));
         day.setHour(HOUR_DAY);
         day.setMinute(MINUTE_DAY);

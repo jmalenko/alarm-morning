@@ -22,35 +22,35 @@ public class DefaultsTest {
 
     @Test
     public void reverse_fromDisabled() {
-        defaults.setState(AlarmDataSource.DEFAULT_STATE_DISABLED);
+        defaults.setState(Defaults.STATE_DISABLED);
 
         defaults.reverse();
 
-        assertThat(defaults.getState(), is(AlarmDataSource.DEFAULT_STATE_ENABLED));
+        assertThat(defaults.getState(), is(Defaults.STATE_ENABLED));
 
         defaults.reverse();
 
-        assertThat(defaults.getState(), is(AlarmDataSource.DEFAULT_STATE_DISABLED));
+        assertThat(defaults.getState(), is(Defaults.STATE_DISABLED));
     }
 
     @Test
     public void reverse_fromEnabled() {
-        defaults.setState(AlarmDataSource.DEFAULT_STATE_ENABLED);
+        defaults.setState(Defaults.STATE_ENABLED);
 
         defaults.reverse();
 
-        assertThat(defaults.getState(), is(AlarmDataSource.DEFAULT_STATE_DISABLED));
+        assertThat(defaults.getState(), is(Defaults.STATE_DISABLED));
     }
 
     @Test
     public void reverse_multiple() {
         Defaults defaults = new Defaults();
-        defaults.setState(AlarmDataSource.DEFAULT_STATE_ENABLED);
+        defaults.setState(Defaults.STATE_ENABLED);
 
         defaults.reverse();
         defaults.reverse();
 
-        assertThat(defaults.getState(), is(AlarmDataSource.DEFAULT_STATE_ENABLED));
+        assertThat(defaults.getState(), is(Defaults.STATE_ENABLED));
     }
 
 }

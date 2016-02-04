@@ -102,7 +102,7 @@ public class AlarmDbHelper extends SQLiteOpenHelper {
 
             // Initialize
             ContentValues values = new ContentValues();
-            values.put(COLUMN_DEFAULTS_STATE, AlarmDataSource.DEFAULT_STATE_DISABLED);
+            values.put(COLUMN_DEFAULTS_STATE, Defaults.STATE_DISABLED);
             values.put(COLUMN_DEFAULTS_HOUR, 7);
             values.put(COLUMN_DEFAULTS_MINUTE, 0);
             for (int dayOfWeek : AlarmDataSource.allDaysOfWeek) {

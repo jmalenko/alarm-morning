@@ -93,7 +93,7 @@ public class DefaultsAdapter extends RecyclerView.Adapter<DefaultsAdapter.Defaul
 
     @Override
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-        changingDefaults.setState(AlarmDataSource.DEFAULT_STATE_ENABLED);
+        changingDefaults.setState(Defaults.STATE_ENABLED);
         changingDefaults.setHour(hourOfDay);
         changingDefaults.setMinute(minute);
 

@@ -261,7 +261,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
 
     @Override
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-        changingDay.setState(AlarmDataSource.DAY_STATE_ENABLED);
+        changingDay.setState(Day.STATE_ENABLED);
         changingDay.setHour(hourOfDay);
         changingDay.setMinute(minute);
 

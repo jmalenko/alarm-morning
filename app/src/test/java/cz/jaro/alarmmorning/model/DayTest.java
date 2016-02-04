@@ -48,8 +48,8 @@ public class DayTest {
 
     @Test
     public void DefaultDisabledDayDefault() {
-        defaults.setState(AlarmDataSource.DEFAULT_STATE_DISABLED);
-        day.setState(AlarmDataSource.DAY_STATE_DEFAULT);
+        defaults.setState(Defaults.STATE_DISABLED);
+        day.setState(Day.STATE_DEFAULT);
 
         assertThat(day.isEnabled(), is(false));
         assertThat(day.getHourX(), is(HOUR_DEFAULT));
@@ -57,13 +57,13 @@ public class DayTest {
         assertThat(day.sameAsDefault(), is(true));
 
         day.reverse();
-        assertThat(day.getState(), is(AlarmDataSource.DAY_STATE_ENABLED));
+        assertThat(day.getState(), is(Day.STATE_ENABLED));
     }
 
     @Test
     public void DefaultDisabledDayEnabled() {
-        defaults.setState(AlarmDataSource.DEFAULT_STATE_DISABLED);
-        day.setState(AlarmDataSource.DAY_STATE_ENABLED);
+        defaults.setState(Defaults.STATE_DISABLED);
+        day.setState(Day.STATE_ENABLED);
 
         assertThat(day.isEnabled(), is(true));
         assertThat(day.getHourX(), is(HOUR_DAY));
@@ -71,13 +71,13 @@ public class DayTest {
         assertThat(day.sameAsDefault(), is(false));
 
         day.reverse();
-        assertThat(day.getState(), is(AlarmDataSource.DAY_STATE_DISABLED));
+        assertThat(day.getState(), is(Day.STATE_DISABLED));
     }
 
     @Test
     public void DefaultDisabledDayDisabled() {
-        defaults.setState(AlarmDataSource.DEFAULT_STATE_DISABLED);
-        day.setState(AlarmDataSource.DAY_STATE_DISABLED);
+        defaults.setState(Defaults.STATE_DISABLED);
+        day.setState(Day.STATE_DISABLED);
 
         assertThat(day.isEnabled(), is(false));
         assertThat(day.getHourX(), is(HOUR_DAY));
@@ -85,13 +85,13 @@ public class DayTest {
         assertThat(day.sameAsDefault(), is(true));
 
         day.reverse();
-        assertThat(day.getState(), is(AlarmDataSource.DAY_STATE_ENABLED));
+        assertThat(day.getState(), is(Day.STATE_ENABLED));
     }
 
     @Test
     public void DefaultEnabledDayDefault() {
-        defaults.setState(AlarmDataSource.DEFAULT_STATE_ENABLED);
-        day.setState(AlarmDataSource.DAY_STATE_DEFAULT);
+        defaults.setState(Defaults.STATE_ENABLED);
+        day.setState(Day.STATE_DEFAULT);
 
         assertThat(day.isEnabled(), is(true));
         assertThat(day.getHourX(), is(HOUR_DEFAULT));
@@ -99,13 +99,13 @@ public class DayTest {
         assertThat(day.sameAsDefault(), is(true));
 
         day.reverse();
-        assertThat(day.getState(), is(AlarmDataSource.DAY_STATE_DISABLED));
+        assertThat(day.getState(), is(Day.STATE_DISABLED));
     }
 
     @Test
     public void DefaultEnabledDayEnabled() {
-        defaults.setState(AlarmDataSource.DEFAULT_STATE_ENABLED);
-        day.setState(AlarmDataSource.DAY_STATE_ENABLED);
+        defaults.setState(Defaults.STATE_ENABLED);
+        day.setState(Day.STATE_ENABLED);
 
         assertThat(day.isEnabled(), is(true));
         assertThat(day.getHourX(), is(HOUR_DAY));
@@ -113,13 +113,13 @@ public class DayTest {
         assertThat(day.sameAsDefault(), is(false));
 
         day.reverse();
-        assertThat(day.getState(), is(AlarmDataSource.DAY_STATE_DISABLED));
+        assertThat(day.getState(), is(Day.STATE_DISABLED));
     }
 
     @Test
     public void DefaultEnabledDayDisabled() {
-        defaults.setState(AlarmDataSource.DEFAULT_STATE_ENABLED);
-        day.setState(AlarmDataSource.DAY_STATE_DISABLED);
+        defaults.setState(Defaults.STATE_ENABLED);
+        day.setState(Day.STATE_DISABLED);
 
         assertThat(day.isEnabled(), is(false));
         assertThat(day.getHourX(), is(HOUR_DAY));
@@ -127,7 +127,7 @@ public class DayTest {
         assertThat(day.sameAsDefault(), is(false));
 
         day.reverse();
-        assertThat(day.getState(), is(AlarmDataSource.DAY_STATE_ENABLED));
+        assertThat(day.getState(), is(Day.STATE_ENABLED));
     }
 
 }

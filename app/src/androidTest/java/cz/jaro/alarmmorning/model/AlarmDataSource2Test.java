@@ -30,7 +30,7 @@ public class AlarmDataSource2Test extends AndroidTestCase {
         dataSource.open();
 
         day0 = new Day();
-        day0.setState(AlarmDataSource.DAY_STATE_ENABLED);
+        day0.setState(Day.STATE_ENABLED);
         day0.setDate(new GregorianCalendar(YEAR, MONTH, DAY));
         day0.setHour(HOUR_DAY);
         day0.setMinute(MINUTE_DAY);
@@ -38,7 +38,7 @@ public class AlarmDataSource2Test extends AndroidTestCase {
 
         // day1 = day0 + 8 days
         day1 = new Day();
-        day1.setState(AlarmDataSource.DAY_STATE_ENABLED);
+        day1.setState(Day.STATE_ENABLED);
         day1.setDate(new GregorianCalendar(YEAR, MONTH, DAY + 8));
         day1.setHour(HOUR_DAY + 1);
         day1.setMinute(MINUTE_DAY + 1);
@@ -46,7 +46,7 @@ public class AlarmDataSource2Test extends AndroidTestCase {
 
         // day2 = day0 + 8 days
         day2 = new Day();
-        day2.setState(AlarmDataSource.DAY_STATE_ENABLED);
+        day2.setState(Day.STATE_ENABLED);
         day2.setDate(new GregorianCalendar(YEAR, MONTH, DAY + 16));
         day2.setHour(HOUR_DAY + 2);
         day2.setMinute(MINUTE_DAY + 2);
@@ -139,7 +139,7 @@ public class AlarmDataSource2Test extends AndroidTestCase {
         for (int dayOfWeek : AlarmDataSource.allDaysOfWeek) {
             Defaults defaults = new Defaults();
             defaults.setDayOfWeek(dayOfWeek);
-            defaults.setState(AlarmDataSource.DEFAULT_STATE_DISABLED);
+            defaults.setState(Defaults.STATE_DISABLED);
             defaults.setHour(1);
             defaults.setMinute(2);
             dataSource.saveDefault(defaults);

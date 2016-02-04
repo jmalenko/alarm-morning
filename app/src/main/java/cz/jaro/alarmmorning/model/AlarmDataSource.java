@@ -33,15 +33,6 @@ public class AlarmDataSource {
 
     public static final int[] allDaysOfWeek = new int[]{Calendar.SUNDAY, Calendar.MONDAY, Calendar.TUESDAY, Calendar.WEDNESDAY, Calendar.THURSDAY, Calendar.FRIDAY, Calendar.SATURDAY};
 
-    public static final int DEFAULT_STATE_DISABLED = 0;
-    public static final int DEFAULT_STATE_ENABLED = 1;
-
-    public static final int DAY_STATE_DISABLED = 0;
-    public static final int DAY_STATE_ENABLED = 1;
-    public static final int DAY_STATE_DEFAULT = 2;
-
-    public static final int VALUE_UNSET = -1;
-
     public static final int HORIZON_DAYS = 30;
 
     /**
@@ -112,9 +103,9 @@ public class AlarmDataSource {
         if (day == null) {
             day = new Day();
             day.setDate(new GregorianCalendar(date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DAY_OF_MONTH)));
-            day.setState(DAY_STATE_DEFAULT);
-            day.setHour(VALUE_UNSET);
-            day.setMinute(VALUE_UNSET);
+            day.setState(Day.STATE_DEFAULT);
+            day.setHour(Day.VALUE_UNSET);
+            day.setMinute(Day.VALUE_UNSET);
         }
 
         int dayOfWeek = date.get(Calendar.DAY_OF_WEEK);

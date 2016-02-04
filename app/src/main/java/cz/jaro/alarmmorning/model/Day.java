@@ -22,14 +22,36 @@ import cz.jaro.alarmmorning.clock.Clock;
  */
 public class Day {
 
+    /**
+     * Value of the {@code state} field indicating the disabled state.
+     */
+    public static final int STATE_DISABLED = 0;
+
+    /**
+     * Value of the {@code state} field indicating the enabled state.
+     */
+    public static final int STATE_ENABLED = 1;
+
+    /**
+     * Value of the {@code state} field indicating the default state.
+     */
+    public static final int STATE_DEFAULT = 2;
+
+    /**
+     * Value of the {@code hour} and {@code minute} fields indicating "value was not set".
+     */
+    public static final int VALUE_UNSET = -1;
+
     private long id;
 
     private Calendar date;
-
     /**
-     * 0 = as default
-     * 1 = set (to particular time)
-     * 2 = unset (disabled)
+     * The state of the default.
+     * <p/>
+     * The states are:<br/>
+     * {@link #STATE_DISABLED} = as default<br/>
+     * {@link #STATE_ENABLED} = set (to particular time)<br/>
+     * {@link #STATE_DEFAULT} = unset (disabled)<br/>
      */
     private int state;
 
@@ -108,8 +130,8 @@ public class Day {
      * @return true if the alarm is enabled
      */
     public boolean isEnabled() {
-        return state == AlarmDataSource.DAY_STATE_ENABLED ||
-                (state == AlarmDataSource.DAY_STATE_DEFAULT && defaults.isEnabled());
+        return state == STATE_ENABLED ||
+                (state == STATE_DEFAULT && defaults.isEnabled());
     }
 
     /**
@@ -120,7 +142,7 @@ public class Day {
      * @return hour of the alarm (that should be used if the alarm is enabled)
      */
     public int getHourX() {
-        if (!isValid() || state == AlarmDataSource.DAY_STATE_DEFAULT)
+        if (!isValid() || state == STATE_DEFAULT)
             return defaults.getHour();
         else
             return hour;
@@ -134,7 +156,7 @@ public class Day {
      * @return minute of the alarm
      */
     public int getMinuteX() {
-        if (!isValid() || state == AlarmDataSource.DAY_STATE_DEFAULT)
+        if (!isValid() || state == STATE_DEFAULT)
             return defaults.getMinute();
         else
             return minute;
@@ -146,7 +168,7 @@ public class Day {
      * @return true if the object was populated by data from a database. If false then use the data from {@code defaults}.
      */
     private boolean isValid() {
-        return hour != AlarmDataSource.VALUE_UNSET;
+        return hour != VALUE_UNSET;
     }
 
     /**
@@ -177,16 +199,16 @@ public class Day {
      */
     public void reverse() {
         switch (getState()) {
-            case AlarmDataSource.DAY_STATE_DEFAULT:
-                setState(defaults.isEnabled() ? AlarmDataSource.DAY_STATE_DISABLED : AlarmDataSource.DAY_STATE_ENABLED);
+            case STATE_DEFAULT:
+                setState(defaults.isEnabled() ? STATE_DISABLED : STATE_ENABLED);
                 break;
 
-            case AlarmDataSource.DAY_STATE_ENABLED:
-                setState(AlarmDataSource.DAY_STATE_DISABLED);
+            case STATE_ENABLED:
+                setState(STATE_DISABLED);
                 break;
 
-            case AlarmDataSource.DAY_STATE_DISABLED:
-                setState(AlarmDataSource.DAY_STATE_ENABLED);
+            case STATE_DISABLED:
+                setState(STATE_ENABLED);
                 break;
         }
     }
@@ -229,17 +251,17 @@ public class Day {
      * <p/>
      * Technically, if 1. the default is enabled
      * and 2. the day state uses the time from default (the state is {@link
-     * AlarmDataSource#DAY_STATE_DEFAULT}) and 3. the day is changed to disabled and 4.
-     * back to enabled (to {@link AlarmDataSource#DAY_STATE_ENABLED}), then this method returns
+     * Day#STATE_DEFAULT}) and 3. the day is changed to disabled and 4.
+     * back to enabled (to {@link Day#STATE_ENABLED}), then this method returns
      * true. On technical it could be argued that the alarm is changed
-     * since the state is {@link AlarmDataSource#DAY_STATE_ENABLED} and not {@link
-     * AlarmDataSource#DAY_STATE_DEFAULT}.
+     * since the state is {@link Day#STATE_ENABLED} and not {@link
+     * Day#STATE_DEFAULT}.
      *
      * @return false if the alarm time on this date is changed (compared to default)
      */
     public boolean sameAsDefault() {
-        return (state == AlarmDataSource.DAY_STATE_ENABLED && getDefaults().getState() == AlarmDataSource.DEFAULT_STATE_ENABLED && hour == defaults.getHour() && minute == defaults.getMinute()) ||
-                (state == AlarmDataSource.DAY_STATE_DISABLED && getDefaults().getState() == AlarmDataSource.DEFAULT_STATE_DISABLED) ||
-                state == AlarmDataSource.DAY_STATE_DEFAULT;
+        return (state == STATE_ENABLED && getDefaults().getState() == Defaults.STATE_ENABLED && hour == defaults.getHour() && minute == defaults.getMinute()) ||
+                (state == STATE_DISABLED && getDefaults().getState() == Defaults.STATE_DISABLED) ||
+                state == STATE_DEFAULT;
     }
 }

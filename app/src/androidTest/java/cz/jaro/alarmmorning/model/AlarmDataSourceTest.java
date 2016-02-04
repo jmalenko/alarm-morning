@@ -32,13 +32,13 @@ public class AlarmDataSourceTest extends AndroidTestCase {
         dataSource.open();
 
         defaults = new Defaults();
-        defaults.setState(AlarmDataSource.DEFAULT_STATE_ENABLED);
+        defaults.setState(Defaults.STATE_ENABLED);
         defaults.setDayOfWeek(DAY_OF_WEEK);
         defaults.setHour(HOUR_DEFAULT);
         defaults.setMinute(MINUTE_DEFAULT);
 
         day = new Day();
-        day.setState(AlarmDataSource.DAY_STATE_ENABLED);
+        day.setState(Day.STATE_ENABLED);
         day.setDate(new GregorianCalendar(YEAR, MONTH, DAY));
         day.setHour(HOUR_DAY);
         day.setMinute(MINUTE_DAY);
@@ -59,7 +59,7 @@ public class AlarmDataSourceTest extends AndroidTestCase {
         // save 1st object
 
         Defaults defaults1a = new Defaults();
-        defaults1a.setState(AlarmDataSource.DEFAULT_STATE_ENABLED);
+        defaults1a.setState(Defaults.STATE_ENABLED);
         defaults1a.setDayOfWeek(DAY_OF_WEEK);
         defaults1a.setHour(HOUR_DEFAULT);
         defaults1a.setMinute(MINUTE_DEFAULT);
@@ -76,7 +76,7 @@ public class AlarmDataSourceTest extends AndroidTestCase {
         // save 2nd object
 
         Defaults defaults2a = new Defaults();
-        defaults2a.setState(AlarmDataSource.DEFAULT_STATE_DISABLED);
+        defaults2a.setState(Defaults.STATE_DISABLED);
         defaults2a.setDayOfWeek(DAY_OF_WEEK + 1);
         defaults2a.setHour(HOUR_DEFAULT + 1);
         defaults2a.setMinute(MINUTE_DEFAULT + 1);
@@ -95,7 +95,7 @@ public class AlarmDataSourceTest extends AndroidTestCase {
         // save 1st object
 
         Day day1a = new Day();
-        day1a.setState(AlarmDataSource.DEFAULT_STATE_ENABLED);
+        day1a.setState(Defaults.STATE_ENABLED);
         day1a.setDate(new GregorianCalendar(YEAR, MONTH, DAY));
         day1a.setHour(HOUR_DEFAULT);
         day1a.setMinute(MINUTE_DEFAULT);
@@ -113,7 +113,7 @@ public class AlarmDataSourceTest extends AndroidTestCase {
         // save 2nd object
 
         Day day2a = new Day();
-        day2a.setState(AlarmDataSource.DEFAULT_STATE_DISABLED);
+        day2a.setState(Defaults.STATE_DISABLED);
         day2a.setDate(new GregorianCalendar(YEAR, MONTH, DAY + 1));
         day2a.setHour(HOUR_DEFAULT + 1);
         day2a.setMinute(MINUTE_DEFAULT + 1);
@@ -133,11 +133,11 @@ public class AlarmDataSourceTest extends AndroidTestCase {
         Calendar dateWithoutRecord = new GregorianCalendar(YEAR - 1, MONTH, DAY);
         Day day = dataSource.loadDayDeep(dateWithoutRecord);
 
-        assertEquals(AlarmDataSource.DAY_STATE_DEFAULT, day.getState());
+        assertEquals(Day.STATE_DEFAULT, day.getState());
         assertEquals(dateWithoutRecord.getTime().toString(), day.getDate().getTime().toString());
         assertEquals(dateWithoutRecord, day.getDate());
-        assertEquals(AlarmDataSource.VALUE_UNSET, day.getHour());
-        assertEquals(AlarmDataSource.VALUE_UNSET, day.getMinute());
+        assertEquals(Day.VALUE_UNSET, day.getHour());
+        assertEquals(Day.VALUE_UNSET, day.getMinute());
         assertNotNull(day.getDefaults());
     }
 }
