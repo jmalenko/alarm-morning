@@ -9,7 +9,7 @@ import cz.jaro.alarmmorning.SystemAlarm;
 import cz.jaro.alarmmorning.WakeLocker;
 
 /**
- * This receiver is called by the operating system on the system alarm.
+ * This receiver is called on the system alarm.
  */
 public class AlarmReceiver extends BroadcastReceiver {
 

@@ -27,7 +27,8 @@ import cz.jaro.alarmmorning.model.Day;
  * <p/>
  * The <b>communication among application components</b> must communicate.<br>
  * Then the user makes an action in one component, the other components must act accordingly. Also, the time events must be handled (alarm rings till next
- * alarm; if there are no alarm until horizon (because the user disabled all the alarms), check again just before the horizon (as the defaults may make an alarm
+ * alarm; if there are no alarm until horizon (because the user disabled all the alarms), check again just before the horizon (as the defaults may make an
+ * alarm
  * appear).
  * <p/>
  * The <b>components of the application</b> are:<br>
@@ -38,6 +39,16 @@ import cz.jaro.alarmmorning.model.Day;
  * 5. App activity<br>
  */
 public class GlobalManager {
+
+    /*
+     * Technical information
+     * =====================
+     *
+     * The GlobalManager keeps the following atributes by storing them in SharedPreferences:
+     * 1. State of the alarm. Typically, this is the "state of the today's alarm", but if the alarm keeps ringing until the alarm time of the next alarm (on the
+     * next (or later) day), this is the state of such an alarm.
+     * 2. Time of next system alarm. This is used for cancelling the system alarm.
+     */
 
     private static final String TAG = GlobalManager.class.getSimpleName();
 
@@ -151,12 +162,30 @@ public class GlobalManager {
      * 5. Handle calendar activity
      */
 
+    /**
+     * This event is triggered when the user sets the alarm. This change may be on any day and may or may not change the next alarm time. This also includes
+     * disabling an alarm.
+     */
+    public void onAlarmSet() {
+        Log.d(TAG, "onAlarmSet()");
+
+        SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
+        systemAlarm.onAlarmSet();
+
+        SystemNotification systemNotification = SystemNotification.getInstance(context);
+        systemNotification.onAlarmSet(context);
+    }
+
     public void onNearFuture() {
         Log.d(TAG, "onNearFuture()");
 
         setState(STATE_FUTURE);
 
-        SystemNotification.onNearFuture(context);
+        SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
+        systemAlarm.onNearFuture();
+
+        SystemNotification systemNotification = SystemNotification.getInstance(context);
+        systemNotification.onNearFuture(context);
     }
 
     public void onDismissBeforeRinging() {
@@ -167,9 +196,19 @@ public class GlobalManager {
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
         systemAlarm.onDismissBeforeRinging();
 
-        SystemNotification.onDismissBeforeRinging(context);
+        SystemNotification systemNotification = SystemNotification.getInstance(context);
+        systemNotification.onDismissBeforeRinging(context);
 
         updateCalendarActivityOnDismissBeforeChange(context);
+    }
+
+    public void onAlarmTimeOfEarlyDismissedAlarm() {
+        Log.d(TAG, "onAlarmTimeOfEarlyDismissedAlarm()");
+
+        SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
+        systemAlarm.onAlarmTimeOfEarlyDismissedAlarm();
+
+        updateCalendarActivityOnAlarmTimeOfEarlyDismissedAlarm(context);
     }
 
     public void onRing() {
@@ -177,7 +216,11 @@ public class GlobalManager {
 
         setState(STATE_RINGING);
 
-        SystemNotification.onRing(context);
+        SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
+        systemAlarm.onRing();
+
+        SystemNotification systemNotification = SystemNotification.getInstance(context);
+        systemNotification.onRing(context);
 
         startRingingActivity(context);
     }
@@ -187,7 +230,8 @@ public class GlobalManager {
 
         setState(STATE_DISMISSED);
 
-        SystemNotification.onDismiss(context);
+        SystemNotification systemNotification = SystemNotification.getInstance(context);
+        systemNotification.onDismiss(context);
 
         hideRingingActivity(context);
     }
@@ -197,11 +241,13 @@ public class GlobalManager {
 
         setState(STATE_SNOOZED);
 
-        SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
-        Clock clock = new SystemClock();
-        Calendar ringAfterSnoozeTime = systemAlarm.onSnooze(clock);
+        Calendar ringAfterSnoozeTime = ringAfterSnoozeTime();
 
-        SystemNotification.onSnooze(context, ringAfterSnoozeTime);
+        SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
+        systemAlarm.onSnooze(ringAfterSnoozeTime);
+
+        SystemNotification systemNotification = SystemNotification.getInstance(context);
+        systemNotification.onSnooze(context, ringAfterSnoozeTime);
 
         hideRingingActivity(context);
     }
@@ -210,6 +256,21 @@ public class GlobalManager {
      * Actions
      * =======
      */
+
+    public Calendar ringAfterSnoozeTime() {
+        Log.d(TAG, "ringAfterSnoozeTime()");
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        int snoozeTime = preferences.getInt(SettingsFragment.PREF_SNOOZE_TIME, SettingsFragment.PREF_SNOOZE_TIME_DEFAULT);
+
+        Clock clock = new SystemClock(); // TODO change
+        Calendar ringAfterSnoozeTime = clock.now();
+        ringAfterSnoozeTime.add(Calendar.MINUTE, snoozeTime);
+        ringAfterSnoozeTime.set(Calendar.SECOND, 0);
+        ringAfterSnoozeTime.set(Calendar.MILLISECOND, 0);
+
+        return ringAfterSnoozeTime;
+    }
 
     private void startRingingActivity(Context context) {
         Log.d(TAG, "startRingingActivity()");
@@ -230,8 +291,17 @@ public class GlobalManager {
         LocalBroadcastManager.getInstance(context).sendBroadcast(hideIntent);
     }
 
+    private void updateCalendarActivityOnAlarmTimeOfEarlyDismissedAlarm(Context context) {
+        Log.d(TAG, "updateCalendarActivityOnAlarmTimeOfEarlyDismissedAlarm()");
+
+        Intent hideIntent = new Intent();
+        hideIntent.setClassName("cz.jaro.alarmmorning", "cz.jaro.alarmmorning.AlarmMorningActivity");
+        hideIntent.setAction(AlarmMorningActivity.ACTION_ALARM_TIME_OF_EARLY_DISMEISSED_ALARM);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(hideIntent);
+    }
+
     private void updateCalendarActivityOnDismissBeforeChange(Context context) {
-        Log.d(TAG, "updateCalendarActivity()");
+        Log.d(TAG, "updateCalendarActivityOnDismissBeforeChange()");
 
         Intent hideIntent = new Intent();
         hideIntent.setClassName("cz.jaro.alarmmorning", "cz.jaro.alarmmorning.AlarmMorningActivity");

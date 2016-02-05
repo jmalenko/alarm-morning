@@ -9,7 +9,7 @@ import cz.jaro.alarmmorning.SystemAlarm;
 import cz.jaro.alarmmorning.WakeLocker;
 
 /**
- * Created by jmalenko on 21.12.2015.
+ * This receiver is called by the operating system on the app upgrade.
  */
 public class UpgradeReceiver extends BroadcastReceiver {
 

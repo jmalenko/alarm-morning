@@ -116,8 +116,8 @@ public class DefaultsAdapter extends RecyclerView.Adapter<DefaultsAdapter.Defaul
         notifyDataSetChanged();
 
         Context context = activityInterface.getContextI();
-        SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
-        systemAlarm.setSystemAlarm();
+        GlobalManager globalManager = new GlobalManager(context);
+        globalManager.onAlarmSet();
     }
 
     public void onDestroy() {

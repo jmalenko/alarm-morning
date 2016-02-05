@@ -289,8 +289,8 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         updatePositionNextAlarm();
 
         Context context = activityInterface.getContextI();
-        SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
-        systemAlarm.setSystemAlarm();
+        GlobalManager globalManager = new GlobalManager(context);
+        globalManager.onAlarmSet();
     }
 
     private String formatToastText(Day day) {

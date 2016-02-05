@@ -13,7 +13,11 @@ import android.widget.NumberPicker;
 import cz.jaro.alarmmorning.R;
 
 /**
- * Created by jmalenko on 22.1.2016.
+ * The Preference representing an integer (a natural number).
+ * <p>
+ * The user uses a NumberPicker to set the volume..
+ * <p>
+ * The value is stored as an integer.
  */
 public class IntegerPreference extends DialogPreference {
     private static final int MIN_VALUE = 0;

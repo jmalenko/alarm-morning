@@ -13,7 +13,11 @@ import android.widget.SeekBar;
 import cz.jaro.alarmmorning.R;
 
 /**
- * Created by jmalenko on 22.1.2016.
+ * The Preference representing volume level.
+ * <p>
+ * The user uses a SeekBar to set the volume..
+ * <p>
+ * The value is stored as an integer between 0 and 100 (including borders)
  */
 public class VolumePreference extends DialogPreference {
     private static final int MAX_VALUE = 100;

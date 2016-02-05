@@ -9,7 +9,7 @@ import cz.jaro.alarmmorning.SystemAlarm;
 import cz.jaro.alarmmorning.WakeLocker;
 
 /**
- * Created by jmalenko on 11.1.2016.
+ * This receiver is called by the operating system on time zone change.
  */
 public class TimeZoneChangedReceiver extends BroadcastReceiver {
 

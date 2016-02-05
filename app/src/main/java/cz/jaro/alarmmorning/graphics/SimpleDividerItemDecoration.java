@@ -9,7 +9,7 @@ import android.view.View;
 import cz.jaro.alarmmorning.R;
 
 /**
- * Created by jmalenko on 14.12.2015.
+ * A divider with a border on bottom.
  */
 public class SimpleDividerItemDecoration extends RecyclerView.ItemDecoration {
     private Drawable divider;

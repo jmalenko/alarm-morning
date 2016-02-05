@@ -8,12 +8,14 @@ import android.util.Log;
 import cz.jaro.alarmmorning.GlobalManager;
 
 /**
- * Handles the actions in notification.
+ * This receiver handles the actions with the notification.
  */
 public class NotificationReceiver extends BroadcastReceiver {
 
     private static final String TAG = NotificationReceiver.class.getSimpleName();
 
+    public static final String ACTION_DELETE_NOTIFICATION = "cz.jaro.alarmmorning.intent.action.DELETE_NOTIFICATION";
+    public static final String ACTION_DISMISS_BEFORE_RINGING = "cz.jaro.alarmmorning.intent.action.DISMISS_ALARM_BEFORE_RINGING";
     public static final String ACTION_DISMISS = "cz.jaro.alarmmorning.intent.action.DISMISS_ALARM";
     public static final String ACTION_SNOOZE = "cz.jaro.alarmmorning.intent.action.SNOOZE_ALARM";
 
@@ -23,41 +25,24 @@ public class NotificationReceiver extends BroadcastReceiver {
 
         Log.d(TAG, "onReceive() action=" + action);
 
-        if (action == ACTION_DISMISS) {
-            dissmissFromNotification(context);
+        if (action == ACTION_DELETE_NOTIFICATION) {
+            deleteNotification(context);
+        }
+        if (action == ACTION_DISMISS_BEFORE_RINGING) {
+            GlobalManager globalManager = new GlobalManager(context);
+            globalManager.onDismissBeforeRinging();
+        } else if (action == ACTION_DISMISS) {
+            GlobalManager globalManager = new GlobalManager(context);
+            globalManager.onDismiss();
         } else if (action == ACTION_SNOOZE) {
-            snoozeFromNotification(context);
-        }
-
-    }
-
-    private void dissmissFromNotification(Context context) {
-        Log.d(TAG, "dissmissFromNotification()");
-        Log.i(TAG, "Dismiss");
-
-        GlobalManager globalManager = new GlobalManager(context);
-        if (globalManager.isValid()) {
-            int state = globalManager.getState();
-
-            if (state == GlobalManager.STATE_FUTURE) {
-                globalManager.setState(GlobalManager.STATE_DISMISSED_BEFORE_RINGING);
-                globalManager.onDismissBeforeRinging();
-            } else if (state == GlobalManager.STATE_RINGING || state == GlobalManager.STATE_SNOOZED) {
-                globalManager.setState(GlobalManager.STATE_DISMISSED);
-                globalManager.onDismiss();
-            } else {
-                throw new IllegalArgumentException();
-            }
-        } else {
-            throw new IllegalArgumentException();
+            GlobalManager globalManager = new GlobalManager(context);
+            globalManager.onSnooze();
         }
     }
 
-    private void snoozeFromNotification(Context context) {
-        Log.d(TAG, "snoozeFromNotification()");
-        Log.i(TAG, "Snooze");
-
-        GlobalManager globalManager = new GlobalManager(context);
-        globalManager.onSnooze();
+    private void deleteNotification(Context context) {
+        Log.d(TAG, "deleteNotification()");
+        Log.i(TAG, "Delete notification");
     }
+
 }

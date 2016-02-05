@@ -44,7 +44,7 @@ public class AlarmMorningActivity extends AppCompatActivity implements ActivityI
     private static final String TAG = AlarmMorningActivity.class.getSimpleName();
 
     public static final String ACTION_DISMISS_BEFORE_RINGING = "DISMISS_BEFORE_RINGING";
-    public static final String ACTION_UPDATE_TODAY = "UPDATE_TODAY";
+    public static final String ACTION_ALARM_TIME_OF_EARLY_DISMEISSED_ALARM = "ACTION_ALARM_TIME_OF_EARLY_DISMEISSED_ALARM";
 
     private final static String url = "https://github.com/jmalenko/alarm-morning/wiki";
 
@@ -68,7 +68,7 @@ public class AlarmMorningActivity extends AppCompatActivity implements ActivityI
 
         b_intentFilter = new IntentFilter();
         b_intentFilter.addAction(ACTION_DISMISS_BEFORE_RINGING);
-        b_intentFilter.addAction(ACTION_UPDATE_TODAY);
+        b_intentFilter.addAction(ACTION_ALARM_TIME_OF_EARLY_DISMEISSED_ALARM);
     }
 
     private BroadcastReceiver bReceiver = new BroadcastReceiver() {
@@ -81,7 +81,7 @@ public class AlarmMorningActivity extends AppCompatActivity implements ActivityI
                 CalendarFragment calendarFragment = (CalendarFragment) mFragment;
                 if (action.equals(ACTION_DISMISS_BEFORE_RINGING)) {
                     calendarFragment.onDismissBeforeRinging();
-                } else if (action.equals(ACTION_UPDATE_TODAY)) {
+                } else if (action.equals(ACTION_ALARM_TIME_OF_EARLY_DISMEISSED_ALARM)) {
                     calendarFragment.onAlarmTimeOfEarlyDismissedAlarm();
                 }
             }

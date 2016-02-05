@@ -22,9 +22,23 @@ public class SystemNotification {
 
     private static final String TAG = SystemNotification.class.getSimpleName();
 
+    private static SystemNotification instance;
+    private Context context;
+
     private static final int NOTIFICATION_ID = 0;
 
-    private static NotificationCompat.Builder buildNotification(Context context) {
+    private SystemNotification(Context context) {
+        this.context = context;
+    }
+
+    public static SystemNotification getInstance(Context context) {
+        if (instance == null) {
+            instance = new SystemNotification(context);
+        }
+        return instance;
+    }
+
+    private NotificationCompat.Builder buildNotification(Context context) {
         GlobalManager globalManager = new GlobalManager(context);
         Day day = globalManager.getDay();
 
@@ -37,22 +51,38 @@ public class SystemNotification {
                 .setSmallIcon(R.drawable.ic_alarm_white)
                 .setContentTitle(contentTitle);
 
+        Intent deleteIntent = new Intent(context, NotificationReceiver.class);
+        deleteIntent.setAction(NotificationReceiver.ACTION_DELETE_NOTIFICATION);
+        PendingIntent deletePendingIntent = PendingIntent.getBroadcast(context, 1, deleteIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        mBuilder.setDeleteIntent(deletePendingIntent);
+
         return mBuilder;
     }
 
-    private static void showNotification(Context context, NotificationCompat.Builder mBuilder) {
+    private void showNotification(Context context, NotificationCompat.Builder mBuilder) {
         Log.d(TAG, "showNotification()");
         NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
     }
 
-    private static void hideNotification(Context context) {
+    private void hideNotification(Context context) {
         Log.d(TAG, "hideNotification()");
         NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.cancel(NOTIFICATION_ID);
     }
 
-    protected static void onNearFuture(Context context) {
+    /*
+     * Events
+     * ======
+     */
+
+    public void onAlarmSet(Context context) {
+        Log.d(TAG, "onAlarmSet()");
+
+        hideNotification(context);
+    }
+
+    protected void onNearFuture(Context context) {
         Log.d(TAG, "onNearFuture()");
 
         NotificationCompat.Builder mBuilder = buildNotification(context);
@@ -67,20 +97,20 @@ public class SystemNotification {
 
         String dismissText = res.getString(R.string.action_dismiss);
         Intent dismissIntent = new Intent(context, NotificationReceiver.class);
-        dismissIntent.setAction(NotificationReceiver.ACTION_DISMISS);
+        dismissIntent.setAction(NotificationReceiver.ACTION_DISMISS_BEFORE_RINGING);
         PendingIntent dismissPendingIntent = PendingIntent.getBroadcast(context, 1, dismissIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.addAction(R.drawable.ic_alarm_off_white, dismissText, dismissPendingIntent);
 
         showNotification(context, mBuilder);
     }
 
-    public static void onDismissBeforeRinging(Context context) {
+    public void onDismissBeforeRinging(Context context) {
         Log.d(TAG, "onDismissBeforeRinging()");
 
         hideNotification(context);
     }
 
-    protected static void onRing(Context context) {
+    protected void onRing(Context context) {
         Log.d(TAG, "onRing()");
 
         NotificationCompat.Builder mBuilder = buildNotification(context);
@@ -108,7 +138,13 @@ public class SystemNotification {
         showNotification(context, mBuilder);
     }
 
-    protected static void onSnooze(Context context, Calendar ringAfterSnoozeTime) {
+    public void onDismiss(Context context) {
+        Log.d(TAG, "onDismiss()");
+
+        hideNotification(context);
+    }
+
+    public void onSnooze(Context context, Calendar ringAfterSnoozeTime) {
         Log.d(TAG, "onSnooze()");
 
         NotificationCompat.Builder mBuilder = buildNotification(context);
@@ -130,13 +166,6 @@ public class SystemNotification {
         mBuilder.addAction(R.drawable.ic_alarm_off_white, dismissText, dismissPendingIntent);
 
         showNotification(context, mBuilder);
-    }
-
-
-    public static void onDismiss(Context context) {
-        Log.d(TAG, "onDismiss()");
-
-        hideNotification(context);
     }
 
 }

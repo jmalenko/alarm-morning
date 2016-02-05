@@ -10,9 +10,11 @@ import android.widget.NumberPicker;
 import cz.jaro.alarmmorning.R;
 
 /**
- * Created by jmalenko on 22.1.2016.
- * Stores value in minutes.
- * Default value is 0.
+ * The Preference representing a time difference.
+ * <p>
+ * The user uses two number pickers: one for hours and send for minutes.
+ * <p>
+ * The value is stored in minutes. Default value is 0.
  */
 public class RelativeTimePreference extends DialogPreference {
     private static final int MAX_HOUR = 24;

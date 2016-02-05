@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import java.util.Calendar;
@@ -60,7 +59,6 @@ public class SystemAlarm {
         return instance;
     }
 
-
     protected void registerSystemAlarm(String action, Calendar time) {
         Log.i(TAG, "Setting system alarm at " + time.getTime().toString());
 
@@ -76,13 +74,25 @@ public class SystemAlarm {
 
     private void cancelSystemAlarm() {
         if (operation != null) {
+            // Method 1: standard
             Log.d(TAG, "Cancelling current system alarm");
             operation.cancel();
         }
+        /* else { // TODO recreate the operation
+            // method 2: try to recreate the operation
+            Intent intent2 = new Intent(context, AlarmReceiver.class);
+            intent2.setAction(action);
+            PendingIntent operation2 = PendingIntent.getBroadcast(context, 1, intent2, PendingIntent.FLAG_NO_CREATE);
+            if (operation2 != null) {
+                operation2.cancel();
+            }
+        }*/
     }
 
-    private void initialize(Clock clock) {
+    private void initialize() {
         Log.d(TAG, "initialize()");
+
+        Clock clock = new SystemClock(); // TODO change
 
         Calendar alarmTime = AlarmDataSource.getNextAlarm(context, clock);
 
@@ -94,12 +104,13 @@ public class SystemAlarm {
 
             registerSystemAlarm(ACTION_SET_SYSTEM_ALARM, resetTime);
         } else {
-            Calendar now = clock.now();
-
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
             int nearFutureMinutes = preferences.getInt(SettingsFragment.PREF_NEAR_FUTURE_TIME, SettingsFragment.PREF_NEAR_FUTURE_TIME_DEFAULT);
 
-            Calendar nearFutureTime = subtractHour(alarmTime, nearFutureMinutes);
+            Calendar nearFutureTime = (Calendar) alarmTime.clone();
+            nearFutureTime.add(Calendar.MINUTE, -nearFutureMinutes);
+
+            Calendar now = clock.now();
 
             if (now.before(nearFutureTime)) {
                 registerSystemAlarm(ACTION_RING_IN_NEAR_FUTURE, nearFutureTime);
@@ -112,21 +123,32 @@ public class SystemAlarm {
         }
     }
 
+//    public void setSystemAlarm() {
+//        Log.d(TAG, "setSystemAlarm()");
+//
+//        Clock clock = new SystemClock(); // TODO change
+//        Calendar alarmTime = AlarmDataSource.getNextAlarm(context, clock);
+//        if (alarmTime.getTimeInMillis() != time) {
+//            GlobalManager globalManager = new GlobalManager(context);
+//            globalManager.onAlarmSet();
+//        }
+//    }
+
+    /**
+     * This method registers system alarm. If a system alarm is registered, it is canceled first.
+     * <p/>
+     * This method should be called on external events. Such events are application start after booting or upgrading, time (and time zone) change.
+     * <p/>
+     * This method should NOT be called when user sets the alarm time. Instead, call {@link GlobalManager#onAlarmSet()}.
+     */
     public void setSystemAlarm() {
         Log.d(TAG, "setSystemAlarm()");
 
+        // there may be a registered alarm when this method is called from TimeChangedReceiver or TimeZoneChangedReceiver.
         cancelSystemAlarm();
 
-        Clock clock = new SystemClock(); // TODO change
-        initialize(clock);
+        initialize();
     }
-
-    private static Calendar subtractHour(Calendar time, int minute) {
-        Calendar date = (Calendar) time.clone();
-        date.add(Calendar.MINUTE, -minute);
-        return date;
-    }
-
 
 //    public void setAlarmOld() {
 //        Log.d(TAG, "setAlarmOld()");
@@ -183,66 +205,72 @@ public class SystemAlarm {
 
         Log.i(TAG, "Acting on system alarm. action=" + action);
 
+        GlobalManager globalManager = new GlobalManager(context);
+
         if (action.equals(ACTION_SET_SYSTEM_ALARM)) {
-            Clock clock = new SystemClock(); // TODO change
-            initialize(clock);
-
-            // switch today from "dismissed in future" to "passed"
-            Intent hideIntent = new Intent();
-            hideIntent.setClassName("cz.jaro.alarmmorning", "cz.jaro.alarmmorning.AlarmMorningActivity");
-            hideIntent.setAction(AlarmMorningActivity.ACTION_UPDATE_TODAY);
-            LocalBroadcastManager.getInstance(context).sendBroadcast(hideIntent);
+            globalManager.onAlarmTimeOfEarlyDismissedAlarm();
         } else if (action.equals(ACTION_RING_IN_NEAR_FUTURE)) {
-            Log.i(TAG, "Near future");
-
-            Clock clock = new SystemClock(); // TODO change
-            Calendar alarmTime = AlarmDataSource.getNextAlarm(context, clock);
-            assert alarmTime != null;
-
-            registerSystemAlarm(ACTION_RING, alarmTime);
-
-            GlobalManager globalManager = new GlobalManager(context);
             globalManager.onNearFuture();
         } else if (action.equals(ACTION_RING)) {
-            Log.i(TAG, "Ring");
-
-            Clock clock = new SystemClock(); // TODO change
-            initialize(clock);
-
-            GlobalManager globalManager = new GlobalManager(context);
             globalManager.onRing();
         } else {
             throw new IllegalArgumentException();
         }
     }
 
-    public void onDismissBeforeRinging() {
-        Log.d(TAG, "onDismissBeforeRinging()");
+    /*
+     * Events
+     * ======
+     */
+
+    public void onAlarmSet() {
+        Log.d(TAG, "onAlarmSet()");
 
         Clock clock = new SystemClock(); // TODO change
         Calendar alarmTime = AlarmDataSource.getNextAlarm(context, clock);
+        if (alarmTime.getTimeInMillis() != time) {
+            cancelSystemAlarm();
 
-        cancelSystemAlarm();
-        if (alarmTime != null) {
-            registerSystemAlarm(ACTION_SET_SYSTEM_ALARM, alarmTime);
+            initialize();
         }
     }
 
-    public Calendar onSnooze(Clock clock) {
+    public void onNearFuture() {
+        Log.d(TAG, "onNearFuture()");
+
+        Clock clock = new SystemClock(); // TODO change
+        Calendar alarmTime = AlarmDataSource.getNextAlarm(context, clock);
+        assert alarmTime != null;
+        registerSystemAlarm(ACTION_RING, alarmTime);
+    }
+
+    public void onDismissBeforeRinging() {
+        Log.d(TAG, "onDismissBeforeRinging()");
+
+        initialize();
+    }
+
+    public void onAlarmTimeOfEarlyDismissedAlarm() {
+        Log.d(TAG, "onAlarmTimeOfEarlyDismissedAlarm()");
+
+        initialize();
+    }
+
+    public void onRing() {
+        Log.d(TAG, "onRing()");
+
+        initialize();
+    }
+
+    public void onDismiss() {
+        Log.d(TAG, "onDismiss()");
+    }
+
+    public void onSnooze(Calendar ringAfterSnoozeTime) {
         Log.d(TAG, "onSnooze()");
-
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        int snoozeTime = preferences.getInt(SettingsFragment.PREF_SNOOZE_TIME, SettingsFragment.PREF_SNOOZE_TIME_DEFAULT);
-
-        Calendar ringAfterSnoozeTime = clock.now();
-        ringAfterSnoozeTime.add(Calendar.MINUTE, snoozeTime);
-        ringAfterSnoozeTime.set(Calendar.SECOND, 0);
-        ringAfterSnoozeTime.set(Calendar.MILLISECOND, 0);
 
         cancelSystemAlarm();
         registerSystemAlarm(ACTION_RING, ringAfterSnoozeTime);
-
-        return ringAfterSnoozeTime;
     }
 
 }
