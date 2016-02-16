@@ -1,9 +1,11 @@
+# Set Date to Monday, time to 5:59
+
 # Parameters
 
 # Paths are relative to the path of this script
 PATH_APK = '../../../app/build/outputs/apk/app-debug.apk'
 PATH_IMAGE = '../../../artifact/screenshots/'
-PATH_IMAGE_REFERENCE = '../../../artifact/screenshots/v0.2/'
+PATH_IMAGE_REFERENCE = '../../../artifact/screenshots/v0.21/'
 
 DELAY = 5
 
@@ -16,7 +18,7 @@ screenshotNumber = 0
 screenshotErrors = 0
 device = 0
 
-from com.android.monkeyrunner import MonkeyRunner, MonkeyDevice, MonkeyImage
+from com.android.monkeyrunner import MonkeyRunner, MonkeyDevice
 import os
 
 def main():
@@ -68,7 +70,7 @@ def runScenario():
 
 	print "Starting activity Calendar..."
 	package = 'cz.jaro.alarmmorning'
-	activity = 'cz.jaro.alarmmorning.CalendarActivity'
+	activity = 'cz.jaro.alarmmorning.AlarmMorningActivity'
 	runComponent = package + '/' + activity
 	device.startActivity(component=runComponent)
 
