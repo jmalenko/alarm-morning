@@ -12,9 +12,11 @@ import cz.jaro.alarmmorning.clock.Clock;
  * All methods are ment "with respect to the particulat date".
  * <p/>
  * Terminology: We use a slightly different terminology than standard English.<br>
- * We use "Alarm", while English uses "alarm clock".<br>
- * We use "Alarm is enabled", while English uses "alarm is on".<br>
- * We use "Alarm rings", while English uses "alarm goes off".
+ * We use "alarm", while English uses "alarm clock".<br>
+ * We use "alarm is enabled", while English uses "alarm is on".<br>
+ * We use "set alarm at 7:30", while English uses "set alarm for 7:30".
+ * We use "alarm rings at 7:30", while English uses "alarm goes off at 7:30".
+ * We use "ring the alarm", while English uses "raised the alarm".
  * <p/>
  * The alarm time is a combination of {@link #getDate()}, {@link #getHourX()} and {@link
  * #getMinuteX()}. For convenience, the method {@link #getDateTime()} combines al three items

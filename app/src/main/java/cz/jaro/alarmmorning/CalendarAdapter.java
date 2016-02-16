@@ -74,6 +74,8 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
      */
     @Override
     public void onBindViewHolder(CalendarViewHolder viewHolder, final int position) {
+        Log.v(TAG, "Replacing position " + position);
+
         Calendar date = addDays(today, position);
 
         Resources res = activityInterface.getResourcesI();
@@ -97,12 +99,9 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         boolean enabled = true;
         if (position == 0) {
             GlobalManager globalManager = new GlobalManager(activityInterface.getContextI());
-            if (globalManager.isValid()) {
-                int state = globalManager.getState();
-
-                if (state == GlobalManager.STATE_DISMISSED_BEFORE_RINGING || state == GlobalManager.STATE_DISMISSED) {
-                    enabled = false;
-                }
+            int state = globalManager.getState(day.getDateTime());
+            if (state != GlobalManager.STATE_UNDEFINED) {
+                enabled = state != GlobalManager.STATE_DISMISSED_BEFORE_RINGING && state != GlobalManager.STATE_DISMISSED;
             } else {
                 enabled = !day.isPassed(clock());
             }
@@ -112,9 +111,8 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         String stateText;
         if (position == 0) {
             GlobalManager globalManager = new GlobalManager(activityInterface.getContextI());
-            if (globalManager.isValid()) {
-                int state = globalManager.getState();
-
+            int state = globalManager.getState(day.getDateTime());
+            if (state != GlobalManager.STATE_UNDEFINED) {
                 if (state == GlobalManager.STATE_FUTURE) {
                     stateText = day.sameAsDefault() ? "" : res.getString(R.string.alarm_state_changed);
                 } else if (state == GlobalManager.STATE_DISMISSED_BEFORE_RINGING) {
@@ -129,8 +127,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
                 } else if (state == GlobalManager.STATE_DISMISSED) {
                     stateText = res.getString(R.string.alarm_state_passed);
                 } else {
-                    // This is generally an error, because the state should be properly set. However, when upgrading the app (and probably on boot), the activity may become visible BEFORE the receiver that sets the system alarm and state.
-                    stateText = "";
+                    throw new IllegalArgumentException("Unexpected argument " + state);
                 }
             } else {
                 if (day.isPassed(clock())) {
@@ -166,6 +163,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         viewHolder.setPosition(position);
     }
 
+    // TODO Solve dependency on clock
     private Clock clock() {
         return new SystemClock();
     }
@@ -178,7 +176,16 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
             Day day = dataSource.loadDayDeep(date);
 
             if (day.isEnabled() && !day.isPassed(clock())) {
-                return position;
+                // TODO At one time point, there may be up to two early dismissed alarm. At Monday 23:00, the user can early dismiss  te alarm on Monday 23:30 and Tuesday 0:30.
+                GlobalManager globalManager = new GlobalManager(activityInterface.getContextI());
+                int state = globalManager.getState(day.getDateTime());
+                if (state != GlobalManager.STATE_UNDEFINED) {
+                    if (state != GlobalManager.STATE_DISMISSED_BEFORE_RINGING && state != GlobalManager.STATE_DISMISSED) {
+                        return position;
+                    }
+                } else {
+                    return position;
+                }
             }
         }
         return POSITION_UNSET;

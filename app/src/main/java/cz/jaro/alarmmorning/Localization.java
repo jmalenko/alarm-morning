@@ -21,6 +21,7 @@ public class Localization {
      * @return the name of the day of week
      */
     public static String dayOfWeekToString(int dayOfWeek, Clock clock) {
+        // TODO Remove dependency on clock
         Calendar date = clock.now();
         date.set(Calendar.DAY_OF_WEEK, dayOfWeek);
         SimpleDateFormat sdf = new SimpleDateFormat("E");

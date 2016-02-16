@@ -43,8 +43,12 @@ public class AlarmMorningActivity extends AppCompatActivity implements ActivityI
 
     private static final String TAG = AlarmMorningActivity.class.getSimpleName();
 
+    public static final String ACTION_ALARM_SET = "ALARM_SET";
     public static final String ACTION_DISMISS_BEFORE_RINGING = "DISMISS_BEFORE_RINGING";
-    public static final String ACTION_ALARM_TIME_OF_EARLY_DISMEISSED_ALARM = "ACTION_ALARM_TIME_OF_EARLY_DISMEISSED_ALARM";
+    public static final String ACTION_ALARM_TIME_OF_EARLY_DISMISSED_ALARM = "ACTION_ALARM_TIME_OF_EARLY_DISMISSED_ALARM";
+    public static final String ACTION_RING = "RING";
+    public static final String ACTION_DISMISS = "DISMISS";
+    public static final String ACTION_SNOOZE = "SNOOZE";
 
     private final static String url = "https://github.com/jmalenko/alarm-morning/wiki";
 
@@ -67,22 +71,47 @@ public class AlarmMorningActivity extends AppCompatActivity implements ActivityI
         s_intentFilter.addAction(Intent.ACTION_TIME_CHANGED);
 
         b_intentFilter = new IntentFilter();
+        b_intentFilter.addAction(ACTION_ALARM_SET);
         b_intentFilter.addAction(ACTION_DISMISS_BEFORE_RINGING);
-        b_intentFilter.addAction(ACTION_ALARM_TIME_OF_EARLY_DISMEISSED_ALARM);
+        b_intentFilter.addAction(ACTION_ALARM_TIME_OF_EARLY_DISMISSED_ALARM);
+        b_intentFilter.addAction(ACTION_RING);
+        b_intentFilter.addAction(ACTION_DISMISS);
+        b_intentFilter.addAction(ACTION_SNOOZE);
     }
+
+    private final BroadcastReceiver timeChangedReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "onReceive()");
+            Log.i(TAG, "Refreshing view on time or timezone change");
+
+            if (mFragment instanceof CalendarFragment) {
+                CalendarFragment calendarFragment = (CalendarFragment) mFragment;
+                calendarFragment.adapter.onTimeOrTimeZoneChange();
+            }
+        }
+    };
 
     private BroadcastReceiver bReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            Log.d(TAG, "onReceive() action=" + action);
+            Log.d(TAG, "onReceive(action=" + action + ")");
 
             if (mFragment instanceof CalendarFragment) {
                 CalendarFragment calendarFragment = (CalendarFragment) mFragment;
-                if (action.equals(ACTION_DISMISS_BEFORE_RINGING)) {
+                if (action.equals(ACTION_ALARM_SET)) {
+                    calendarFragment.onAlarmSet();
+                } else if (action.equals(ACTION_DISMISS_BEFORE_RINGING)) {
                     calendarFragment.onDismissBeforeRinging();
-                } else if (action.equals(ACTION_ALARM_TIME_OF_EARLY_DISMEISSED_ALARM)) {
+                } else if (action.equals(ACTION_ALARM_TIME_OF_EARLY_DISMISSED_ALARM)) {
                     calendarFragment.onAlarmTimeOfEarlyDismissedAlarm();
+                } else if (action.equals(ACTION_RING)) {
+                    calendarFragment.onRing();
+                } else if (action.equals(ACTION_DISMISS)) {
+                    calendarFragment.onDismiss();
+                } else if (action.equals(ACTION_SNOOZE)) {
+                    calendarFragment.onSnooze();
                 }
             }
         }
@@ -165,7 +194,7 @@ public class AlarmMorningActivity extends AppCompatActivity implements ActivityI
                 startActivity(browserIntent);
                 return;
             default:
-                throw new IllegalArgumentException();
+                throw new IllegalArgumentException("Unexpected argument " + menuItem.getItemId());
         }
 
         // Insert the mFragment by replacing any existing mFragment
@@ -219,20 +248,6 @@ public class AlarmMorningActivity extends AppCompatActivity implements ActivityI
         unregisterReceiver(timeChangedReceiver);
         bManager.unregisterReceiver(bReceiver);
     }
-
-    private final BroadcastReceiver timeChangedReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "onReceive()");
-            Log.i(TAG, "Refreshing view on time or timezone change");
-
-            if (mFragment instanceof CalendarFragment) {
-                CalendarFragment calendarFragment = (CalendarFragment) mFragment;
-                calendarFragment.adapter.onTimeOrTimeZoneChange();
-            }
-
-        }
-    };
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

@@ -8,6 +8,8 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 
 import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.clock.SystemClock;
@@ -21,9 +23,9 @@ import cz.jaro.alarmmorning.model.Day;
  * 1. After booting, only the  receiver of next {@link SystemAlarm} is registered. This is the "minimal state of interaction with operating system" and the
  * operating system / user may bring the app to this state (e.g. operating system by destroying the activity if it is in the background, user cancelling the
  * notification).<br>
- * 2. There is no way to get the alarm broadcast registered by this app (in the minimal state described above). Therefore, the reference must be kept here (to
- * allow its cancellation when user set earlier alarm). That is realized by methods {@link #getAlarmTime()} and {@link #setAlarmTime(long)} which use the value
- * stored in {@code SharedPreferences}.
+ * 2. There is no way to get the system alarm broadcast registered by this app (in the minimal state described above). Therefore, the reference must be kept
+ * here (to allow its cancellation when user set earlier alarm). That is realized by methods {@link #getAlarmTime()} and {@link
+ * #setNextAction(NextAction)} which use the value stored in {@code SharedPreferences}.
  * <p/>
  * The <b>communication among application components</b> must communicate.<br>
  * Then the user makes an action in one component, the other components must act accordingly. Also, the time events must be handled (alarm rings till next
@@ -48,12 +50,16 @@ public class GlobalManager {
      * 1. State of the alarm. Typically, this is the "state of the today's alarm", but if the alarm keeps ringing until the alarm time of the next alarm (on the
      * next (or later) day), this is the state of such an alarm.
      * 2. Time of next system alarm. This is used for cancelling the system alarm.
+     *
+     * Communication with mdules
+     * =========================
+     *
+     * Activities (both AlarmMorningActivity and RingActivity)
+     * Everything the activities need to persist is persisted in GlobalManager.
+     * Reason: the BroadcastReceiver (an persistence at the module level) cannot be used since the activity may not be running.
      */
 
     private static final String TAG = GlobalManager.class.getSimpleName();
-
-    public static final String TODAY_ALARM_STATE = "today_alarm_state";
-    private static final String TODAY_ALARM_TIME = "today_alarm_time";
 
     public static final int STATE_UNDEFINED = 0;
     public static final int STATE_FUTURE = 1;
@@ -62,92 +68,136 @@ public class GlobalManager {
     public static final int STATE_DISMISSED = 4;
     public static final int STATE_DISMISSED_BEFORE_RINGING = 5;
 
-    private static final long TIME_UNDEFINED = -1;
-
     private Context context;
 
     // TODO Resume ringing if the app was upgraded while ringing
     // TODO Resume ringing if the operating system restarted while ringing
+    // TODO User early dimisses the alarm and then sets the alarm to the same day and time => fix time to next alarm and other things
+    // TODO Fix: when ringing continues to next day
+    // TODO Fix: when ringing overlaps with next alarm
+
 
     public GlobalManager(Context context) {
         this.context = context;
     }
 
-    /*
-     * State of the app
-     * ================
-     */
-
-    public int getState() {
-        Log.v(TAG, "getState()");
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        int state = preferences.getInt(TODAY_ALARM_STATE, STATE_UNDEFINED);
-
-        Log.v(TAG, "   state=" + state);
-        return state;
-    }
-
-    public void setState(int state) {
-        Log.d(TAG, "setState(state=" + state + ")");
-
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt(TODAY_ALARM_STATE, state);
-        editor.commit();
-
-        Clock clock = new SystemClock(); // TODO change
-        Calendar alarmTime = AlarmDataSource.getNextAlarm(context, clock);
-        if (alarmTime != null) {
-            setAlarmTime(alarmTime.getTimeInMillis());
-        }
-    }
-
-    private long getAlarmTime() {
-        Log.v(TAG, "getAlarmTime()");
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        long alarmTime = preferences.getLong(TODAY_ALARM_TIME, TIME_UNDEFINED);
-
-        return alarmTime;
-    }
-
-    private void setAlarmTime(long alarmTime) {
-        Log.d(TAG, "setAlarmTime(alarmTime=" + alarmTime + ")");
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putLong(TODAY_ALARM_TIME, alarmTime);
-        editor.commit();
-    }
-
-    public boolean isValid() {
-        Clock clock = new SystemClock(); // TODO change
-
-        long alarmTime1 = getAlarmTime();
-
-        Calendar alarmTime = AlarmDataSource.getNextAlarm(context, clock);
-        if (alarmTime == null) {
-            return alarmTime1 == TIME_UNDEFINED;
-        } else {
-            long alarmTime2 = alarmTime.getTimeInMillis();
-
-            return alarmTime1 == alarmTime2;
-        }
-    }
-
-    // TODO Fix: when ringing continues to next day
-    // TODO Fix: when ringing overlaps with next alarm
-
-    public Day getDay() {
-        Log.d(TAG, "getDay()");
+    public Day getDayWithNextAlarm() {
+        Log.d(TAG, "getDayWithNextAlarm()");
         AlarmDataSource dataSource = new AlarmDataSource(context);
         dataSource.open();
 
         Clock clock = new SystemClock();
-        Calendar date = CalendarAdapter.getToday(clock);
-        Day day = dataSource.loadDayDeep(date);
+        Calendar today = CalendarAdapter.getToday(clock);
+        Day day = dataSource.loadDayDeep(today);
 
         dataSource.close();
 
         return day;
+    }
+
+    /**
+     * This method registers system alarm. If a system alarm is registered, it is canceled first.
+     * <p/>
+     * This method should be called on external events. Such events are application start after booting or upgrading, time (and time zone) change.
+     * <p/>
+     * This method should NOT be called when user sets the alarm time. Instead, call {@link #onAlarmSet()}.
+     */
+    public void forceSetAlarm() {
+        Log.d(TAG, "forceSetAlarm()");
+
+        onAlarmSet();
+    }
+
+    /*
+     * Persistence
+     * ===========
+     */
+
+    private static final String PERSIST_ACTION = "persist_system_alarm_action";
+    private static final String PERSIST_TIME = "persist_system_alarm_time";
+    private static final String PERSIST_ALARM_TIME = "persist_alarm_time";
+
+    private static final String PERSIST_STATE = "persist_state";
+    private static final String PERSIST_STATE_OF_ALARM_TIME = "persist_state_of_alarm_time";
+
+    private static final String ACTION_UNDEFINED = "";
+    private static final long TIME_UNDEFINED = -1;
+
+    private NextAction getNextAction() {
+        Log.v(TAG, "getNextAction()");
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String action = preferences.getString(PERSIST_ACTION, ACTION_UNDEFINED);
+        long timeInMS = preferences.getLong(PERSIST_TIME, TIME_UNDEFINED);
+        long alarmTimeInMS = preferences.getLong(PERSIST_ALARM_TIME, TIME_UNDEFINED);
+
+        Calendar time = new GregorianCalendar();
+        time.setTime(new Date(timeInMS));
+
+        Calendar alarmTime = new GregorianCalendar();
+        alarmTime.setTime(new Date(alarmTimeInMS));
+
+        NextAction nextAction = new NextAction(action, time, alarmTime);
+        return nextAction;
+    }
+
+    public void setNextAction(NextAction nextAction) {
+        Log.v(TAG, "setNextAction(action=" + nextAction.action + ", time=" + nextAction.time.getTime() + ", alarmTime=" + nextAction.alarmTime.getTime() + ")");
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = preferences.edit();
+
+        editor.putString(PERSIST_ACTION, nextAction.action);
+        editor.putLong(PERSIST_TIME, nextAction.time.getTimeInMillis());
+        editor.putLong(PERSIST_ALARM_TIME, nextAction.time.getTimeInMillis());
+
+        editor.commit();
+    }
+
+    public int getState(Calendar date) {
+        Log.v(TAG, "getState()");
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+
+        long stateAlarmTimeInMS = preferences.getLong(PERSIST_STATE_OF_ALARM_TIME, TIME_UNDEFINED);
+        Calendar stateAlarmTime = new GregorianCalendar();
+        stateAlarmTime.setTime(new Date(stateAlarmTimeInMS));
+
+        Log.d(TAG, "   comparing state alarm time " + stateAlarmTime.getTime() + " with " + date.getTime());
+
+        if (stateAlarmTime.equals(date)) {
+            int state = preferences.getInt(PERSIST_STATE, STATE_UNDEFINED);
+
+            Log.d(TAG, "   state=" + state);
+            return state;
+        } else {
+            Log.d(TAG, "   state=" + STATE_UNDEFINED + " because the persisted day is for another alarm time");
+            return STATE_UNDEFINED;
+        }
+    }
+
+    public Calendar getAlarmTimeOfRingingAlarm() {
+        Log.v(TAG, "getAlarmTimeOfRingingAlarm()");
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+
+        long stateAlarmTimeInMS = preferences.getLong(PERSIST_STATE_OF_ALARM_TIME, TIME_UNDEFINED);
+        Calendar stateAlarmTime = new GregorianCalendar();
+        stateAlarmTime.setTime(new Date(stateAlarmTimeInMS));
+
+        return stateAlarmTime;
+    }
+
+    public void setState(int state, Calendar alarmTime) {
+        Log.v(TAG, "setState(state=" + state + ", alarmTime=" + alarmTime.getTime() + ")");
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = preferences.edit();
+
+        editor.putInt(PERSIST_STATE, state);
+        editor.putLong(PERSIST_STATE_OF_ALARM_TIME, alarmTime.getTimeInMillis());
+
+        editor.commit();
     }
 
     /*
@@ -170,19 +220,46 @@ public class GlobalManager {
         Log.d(TAG, "onAlarmSet()");
 
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
-        systemAlarm.onAlarmSet();
+        NextAction nextAction = systemAlarm.nextAction();
 
-        SystemNotification systemNotification = SystemNotification.getInstance(context);
-        systemNotification.onAlarmSet(context);
+        Log.d(TAG, "next action is action=" + nextAction.action + ", time=" + nextAction.time.getTime().toString());
+
+        if (systemAlarm.nextActionShouldChange(nextAction)) {
+            // cancel the current alarm
+            onAlarmCancel();
+
+            // register next system alarm
+            systemAlarm.onAlarmSet();
+
+            if (nextAction.action.equals(SystemAlarm.ACTION_SET_SYSTEM_ALARM)) {
+                // nothing
+            } else if (nextAction.action.equals(SystemAlarm.ACTION_RING_IN_NEAR_FUTURE)) {
+                // nothing
+            } else if (nextAction.action.equals(SystemAlarm.ACTION_RING)) {
+                onNearFuture(false);
+            } else {
+                throw new IllegalArgumentException("Unexpected argument " + nextAction);
+            }
+
+            updateCalendarActivity(context, AlarmMorningActivity.ACTION_ALARM_SET);
+        }
     }
 
     public void onNearFuture() {
         Log.d(TAG, "onNearFuture()");
 
-        setState(STATE_FUTURE);
+        onNearFuture(true);
+    }
 
-        SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
-        systemAlarm.onNearFuture();
+    private void onNearFuture(boolean callSystemAlarm) {
+        Log.d(TAG, "onNearFuture(callSystemAlarm=" + callSystemAlarm + ")");
+
+        setState(STATE_FUTURE, getNextAction().alarmTime);
+
+        if (callSystemAlarm) {
+            SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
+            systemAlarm.onNearFuture();
+        }
 
         SystemNotification systemNotification = SystemNotification.getInstance(context);
         systemNotification.onNearFuture(context);
@@ -191,7 +268,7 @@ public class GlobalManager {
     public void onDismissBeforeRinging() {
         Log.d(TAG, "onDismissBeforeRinging()");
 
-        setState(STATE_DISMISSED_BEFORE_RINGING);
+        setState(STATE_DISMISSED_BEFORE_RINGING, getAlarmTimeOfRingingAlarm());
 
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
         systemAlarm.onDismissBeforeRinging();
@@ -199,7 +276,7 @@ public class GlobalManager {
         SystemNotification systemNotification = SystemNotification.getInstance(context);
         systemNotification.onDismissBeforeRinging(context);
 
-        updateCalendarActivityOnDismissBeforeChange(context);
+        updateCalendarActivity(context, AlarmMorningActivity.ACTION_DISMISS_BEFORE_RINGING);
     }
 
     public void onAlarmTimeOfEarlyDismissedAlarm() {
@@ -208,13 +285,13 @@ public class GlobalManager {
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
         systemAlarm.onAlarmTimeOfEarlyDismissedAlarm();
 
-        updateCalendarActivityOnAlarmTimeOfEarlyDismissedAlarm(context);
+        updateCalendarActivity(context, AlarmMorningActivity.ACTION_ALARM_TIME_OF_EARLY_DISMISSED_ALARM);
     }
 
     public void onRing() {
         Log.d(TAG, "onRing()");
 
-        setState(STATE_RINGING);
+        setState(STATE_RINGING, getAlarmTimeOfRingingAlarm());
 
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
         systemAlarm.onRing();
@@ -223,33 +300,51 @@ public class GlobalManager {
         systemNotification.onRing(context);
 
         startRingingActivity(context);
+
+        updateCalendarActivity(context, AlarmMorningActivity.ACTION_RING);
     }
 
     public void onDismiss() {
         Log.d(TAG, "onDismiss()");
 
-        setState(STATE_DISMISSED);
+        setState(STATE_DISMISSED, getAlarmTimeOfRingingAlarm());
 
         SystemNotification systemNotification = SystemNotification.getInstance(context);
         systemNotification.onDismiss(context);
 
-        hideRingingActivity(context);
+        updateRingingActivity(context, RingActivity.ACTION_HIDE_ACTIVITY);
+
+        updateCalendarActivity(context, AlarmMorningActivity.ACTION_DISMISS);
     }
 
     public void onSnooze() {
         Log.d(TAG, "onSnooze()");
 
-        setState(STATE_SNOOZED);
+        setState(STATE_SNOOZED, getAlarmTimeOfRingingAlarm());
 
-        Calendar ringAfterSnoozeTime = ringAfterSnoozeTime();
+        Clock clock = new SystemClock(); // TODO Solve dependency on clock
+        Calendar ringAfterSnoozeTime = getRingAfterSnoozeTime(clock);
 
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
-        systemAlarm.onSnooze(ringAfterSnoozeTime);
+        systemAlarm.onSnooze(ringAfterSnoozeTime, getAlarmTimeOfRingingAlarm());
 
         SystemNotification systemNotification = SystemNotification.getInstance(context);
         systemNotification.onSnooze(context, ringAfterSnoozeTime);
 
-        hideRingingActivity(context);
+        updateRingingActivity(context, RingActivity.ACTION_HIDE_ACTIVITY);
+
+        updateCalendarActivity(context, AlarmMorningActivity.ACTION_SNOOZE);
+    }
+
+    /**
+     * This event occurs when there is an alarm with state after {@link #STATE_FUTURE} and before state {@link #STATE_DISMISSED} (or {@link
+     * #STATE_DISMISSED_BEFORE_RINGING}), that has to be cancelled because an earlier alarm was set by the user.
+     */
+    public void onAlarmCancel() {
+        Log.d(TAG, "onAlarmCancel()");
+
+        SystemNotification systemNotification = SystemNotification.getInstance(context);
+        systemNotification.onAlarmCancel(context);
     }
 
     /*
@@ -257,13 +352,12 @@ public class GlobalManager {
      * =======
      */
 
-    public Calendar ringAfterSnoozeTime() {
-        Log.d(TAG, "ringAfterSnoozeTime()");
+    public Calendar getRingAfterSnoozeTime(Clock clock) {
+        Log.d(TAG, "getRingAfterSnoozeTime()");
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         int snoozeTime = preferences.getInt(SettingsFragment.PREF_SNOOZE_TIME, SettingsFragment.PREF_SNOOZE_TIME_DEFAULT);
 
-        Clock clock = new SystemClock(); // TODO change
         Calendar ringAfterSnoozeTime = clock.now();
         ringAfterSnoozeTime.add(Calendar.MINUTE, snoozeTime);
         ringAfterSnoozeTime.set(Calendar.SECOND, 0);
@@ -282,31 +376,22 @@ public class GlobalManager {
         context.startActivity(ringIntent);
     }
 
-    private void hideRingingActivity(Context context) {
-        Log.d(TAG, "hideRingingActivity()");
+    private void updateRingingActivity(Context context, String action) {
+        Log.d(TAG, "updateRingingActivity(action=" + action + ")");
 
         Intent hideIntent = new Intent();
         hideIntent.setClassName("cz.jaro.alarmmorning", "cz.jaro.alarmmorning.RingActivity");
-        hideIntent.setAction(RingActivity.ACTION_HIDE_ACTIVITY);
+        hideIntent.setAction(action);
         LocalBroadcastManager.getInstance(context).sendBroadcast(hideIntent);
     }
 
-    private void updateCalendarActivityOnAlarmTimeOfEarlyDismissedAlarm(Context context) {
-        Log.d(TAG, "updateCalendarActivityOnAlarmTimeOfEarlyDismissedAlarm()");
+    private void updateCalendarActivity(Context context, String action) {
+        Log.d(TAG, "updateCalendarActivity(action=" + action + ")");
 
-        Intent hideIntent = new Intent();
-        hideIntent.setClassName("cz.jaro.alarmmorning", "cz.jaro.alarmmorning.AlarmMorningActivity");
-        hideIntent.setAction(AlarmMorningActivity.ACTION_ALARM_TIME_OF_EARLY_DISMEISSED_ALARM);
-        LocalBroadcastManager.getInstance(context).sendBroadcast(hideIntent);
-    }
-
-    private void updateCalendarActivityOnDismissBeforeChange(Context context) {
-        Log.d(TAG, "updateCalendarActivityOnDismissBeforeChange()");
-
-        Intent hideIntent = new Intent();
-        hideIntent.setClassName("cz.jaro.alarmmorning", "cz.jaro.alarmmorning.AlarmMorningActivity");
-        hideIntent.setAction(AlarmMorningActivity.ACTION_DISMISS_BEFORE_RINGING);
-        LocalBroadcastManager.getInstance(context).sendBroadcast(hideIntent);
+        Intent intent = new Intent();
+        intent.setClassName("cz.jaro.alarmmorning", "cz.jaro.alarmmorning.AlarmMorningActivity");
+        intent.setAction(action);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
 }

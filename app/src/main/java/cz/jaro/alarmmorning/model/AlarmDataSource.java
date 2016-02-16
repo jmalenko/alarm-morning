@@ -13,7 +13,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import cz.jaro.alarmmorning.Localization;
 import cz.jaro.alarmmorning.clock.Clock;
+import cz.jaro.alarmmorning.clock.SystemClock;
 
 /**
  * Store objects to a database.
@@ -82,6 +84,13 @@ public class AlarmDataSource {
      * @param defaults object to be stored
      */
     public void saveDefault(Defaults defaults) {
+        Clock clock = new SystemClock(); // TODO Solve dependency on clock
+        String dayOfWeekText = Localization.dayOfWeekToString(defaults.getDayOfWeek(), clock);
+        if (defaults.getState() == Defaults.STATE_ENABLED)
+            Log.i(TAG, "Set alarm at " + defaults.getHour() + ":" + defaults.getMinute() + " on " + dayOfWeekText);
+        else
+            Log.i(TAG, "Disabling alarm on " + dayOfWeekText);
+
         ContentValues values = new ContentValues();
         values.put(AlarmDbHelper.COLUMN_DEFAULTS_DAY_OF_WEEK, defaults.getDayOfWeek());//
         values.put(AlarmDbHelper.COLUMN_DEFAULTS_STATE, defaults.getState());
@@ -147,6 +156,13 @@ public class AlarmDataSource {
      * @param day object to be stored
      */
     public void saveDay(Day day) {
+        if (day.getState() == Day.STATE_DISABLED)
+            Log.i(TAG, "Disable alarm on " + day.getDateTime().getTime());
+        else if (day.getState() == Day.STATE_ENABLED)
+            Log.i(TAG, "Set alarm on " + day.getDateTime().getTime());
+        else
+            Log.i(TAG, "Reverting alarm to default on " + day.getDateTime().getTime());
+
         String dateText = dateToText(day.getDate());
 
         ContentValues values = new ContentValues();
@@ -169,15 +185,15 @@ public class AlarmDataSource {
             date.setTimeInMillis(date2.getTime());
             return date;
         } catch (ParseException e) {
-            Log.w(TAG, "Unable to parse date from string: " + dateText);
+            Log.e(TAG, "Unable to parse date from string: " + dateText);
             throw new RuntimeException("Invalid date format", e);
         }
     }
 
     /**
-     * Returns the alarm time of the next alarm.
+     * Return the alarm time.
      *
-     * @param clock
+     * @param clock clock
      * @return next alarm time
      */
     public Calendar getNextAlarm(Clock clock) {
@@ -203,6 +219,15 @@ public class AlarmDataSource {
         return null;
     }
 
+    /**
+     * Return the alarm time of the next alarm.
+     * <p/>
+     * This is a helper method that opens the database.
+     *
+     * @param context context
+     * @param clock   clock
+     * @return next alarm time
+     */
     public static Calendar getNextAlarm(Context context, Clock clock) {
         AlarmDataSource datasource = new AlarmDataSource(context);
         datasource.open();
@@ -238,7 +263,7 @@ public class AlarmDataSource {
         return day;
     }
 
-    private String printDB() {
+    private String DBtoString() {
         StringBuffer str = new StringBuffer();
 
         Cursor cursor = database.query(AlarmDbHelper.TABLE_DEFAULTS, allColumnsDefaults, null, null, null, null, null);
@@ -267,7 +292,6 @@ public class AlarmDataSource {
         }
         cursor.close();
 
-        Log.v(TAG, str.toString());
         return str.toString();
     }
 }

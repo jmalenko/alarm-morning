@@ -91,14 +91,40 @@ public class CalendarFragment extends Fragment {
         adapter.onDestroy();
     }
 
+    /*
+     * Events
+     * ======
+     */
+
+    public void onAlarmSet() {
+        Log.d(TAG, "onAlarmSet()");
+        adapter.notifyItemChanged(0);
+    }
+
     public void onDismissBeforeRinging() {
         Log.d(TAG, "onDismissBeforeRinging()");
+        adapter.notifyItemChanged(0);
         adapter.updatePositionNextAlarm();
-        //adapter.notifyDataSetChanged();
     }
 
     public void onAlarmTimeOfEarlyDismissedAlarm() {
         Log.d(TAG, "onAlarmTimeOfEarlyDismissedAlarm()");
+        adapter.notifyItemChanged(0);
+    }
+
+    public void onRing() {
+        Log.d(TAG, "onRing()");
+        adapter.notifyItemChanged(0);
+    }
+
+    public void onDismiss() {
+        Log.d(TAG, "onDismiss()");
+        adapter.notifyItemChanged(0);
+        adapter.updatePositionNextAlarm();
+    }
+
+    public void onSnooze() {
+        Log.d(TAG, "onSnooze()");
         adapter.notifyItemChanged(0);
     }
 

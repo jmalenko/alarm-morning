@@ -23,25 +23,28 @@ public class NotificationReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
 
-        Log.d(TAG, "onReceive() action=" + action);
+        Log.v(TAG, "onReceive() action=" + action);
 
         if (action == ACTION_DELETE_NOTIFICATION) {
             deleteNotification(context);
         }
         if (action == ACTION_DISMISS_BEFORE_RINGING) {
+            Log.i(TAG, "Dismiss");
             GlobalManager globalManager = new GlobalManager(context);
             globalManager.onDismissBeforeRinging();
         } else if (action == ACTION_DISMISS) {
+            Log.i(TAG, "Dismiss");
             GlobalManager globalManager = new GlobalManager(context);
             globalManager.onDismiss();
         } else if (action == ACTION_SNOOZE) {
+            Log.i(TAG, "Snooze");
             GlobalManager globalManager = new GlobalManager(context);
             globalManager.onSnooze();
         }
     }
 
     private void deleteNotification(Context context) {
-        Log.d(TAG, "deleteNotification()");
+        Log.v(TAG, "deleteNotification()");
         Log.i(TAG, "Delete notification");
     }
 

@@ -15,6 +15,9 @@ import android.text.TextUtils;
 
 public class SettingsFragment extends PreferenceFragment {
 
+    // TODO Reregister system alarm if the preference for future time changes
+    // TODO Reregister system alarm if the alarm is snoozed and the preference for snooze time changes
+
     /**
      * Value is ringtone URI.
      */
@@ -168,7 +171,7 @@ public class SettingsFragment extends PreferenceFragment {
         } else if (key.equals(PREF_NEAR_FUTURE_TIME)) {
             newValue = defaultSharedPreferences.getInt(preference.getKey(), PREF_NEAR_FUTURE_TIME_DEFAULT);
         } else {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Unexpected argument " + key);
         }
         sBindPreferenceSummaryToValueListener.onPreferenceChange(preference, newValue);
     }

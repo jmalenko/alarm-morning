@@ -20,7 +20,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         // Prevent device sleep
         WakeLocker.acquire(context);
 
-        Log.d(TAG, "onReceive()");
+        Log.v(TAG, "onReceive()");
 
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
         systemAlarm.onSystemAlarm(context, intent);
