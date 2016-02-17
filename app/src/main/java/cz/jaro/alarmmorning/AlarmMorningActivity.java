@@ -238,7 +238,6 @@ public class AlarmMorningActivity extends AppCompatActivity implements ActivityI
 
     public boolean isNavigationDrawerOpen() {
         return mDrawerLayout.isDrawerOpen(mNavigationView);
-
     }
 
     @Override
@@ -294,6 +293,11 @@ public class AlarmMorningActivity extends AppCompatActivity implements ActivityI
     public Resources getResourcesI() {
         return getResources();
     }
+
+//    public String getTestString() {
+//        return getString(R.string.app_name);
+//    }
+
 }
 
 interface ActivityInterface {
