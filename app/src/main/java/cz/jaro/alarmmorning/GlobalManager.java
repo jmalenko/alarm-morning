@@ -123,7 +123,7 @@ public class GlobalManager {
     private static final String ACTION_UNDEFINED = "";
     private static final long TIME_UNDEFINED = -1;
 
-    private NextAction getNextAction() {
+    protected NextAction getNextAction() {
         Log.v(TAG, "getNextAction()");
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);

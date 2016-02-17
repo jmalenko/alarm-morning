@@ -28,7 +28,6 @@ public class SystemAlarm {
     private Context context;
     private AlarmManager alarmManager;
 
-    private NextAction nextAction;
     private Intent intent;
     private PendingIntent operation;
 
@@ -80,28 +79,34 @@ public class SystemAlarm {
     private void saveNextAction(String action, Calendar time, Calendar alarmTime) {
         Log.d(TAG, "setNextAction()");
 
-        nextAction = new NextAction(action, time, alarmTime);
+        NextAction nextAction = new NextAction(action, time, alarmTime);
 
         GlobalManager globalManager = new GlobalManager(context);
         globalManager.setNextAction(nextAction);
     }
 
     private void cancelSystemAlarm() {
+        Log.d(TAG, "cancelSystemAlarm()");
         if (operation != null) {
             // Method 1: standard
             Log.d(TAG, "Cancelling current system alarm");
             operation.cancel();
-        }
-        // TODO Use persisted info about next alarm (in GlobalManager)
-        /* else {
-            // method 2: try to recreate the operation
+        } else {
+            // Method 2: try to recreate the operation
+            Log.d(TAG, "Recreating operation when cancelling system alarm");
+
+            GlobalManager globalManager = new GlobalManager(context);
+            NextAction nextAction2 = globalManager.getNextAction();
+
             Intent intent2 = new Intent(context, AlarmReceiver.class);
-            intent2.setAction(action);
+            intent2.setAction(nextAction2.action);
+
             PendingIntent operation2 = PendingIntent.getBroadcast(context, 1, intent2, PendingIntent.FLAG_NO_CREATE);
+
             if (operation2 != null) {
                 operation2.cancel();
             }
-        }*/
+        }
     }
 
     /*
@@ -143,7 +148,10 @@ public class SystemAlarm {
     }
 
     protected boolean nextActionShouldChange(NextAction nextAction) {
-        return this.nextAction == null || !this.nextAction.equals(nextAction);
+        GlobalManager globalManager = new GlobalManager(context);
+        NextAction nextActionPersisted = globalManager.getNextAction();
+
+        return !nextActionPersisted.equals(nextAction);
     }
 
     private Calendar getResetTime(Calendar now) {
