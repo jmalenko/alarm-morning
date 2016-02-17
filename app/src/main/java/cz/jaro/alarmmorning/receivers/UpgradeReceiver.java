@@ -3,9 +3,11 @@ package cz.jaro.alarmmorning.receivers;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import cz.jaro.alarmmorning.GlobalManager;
+import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.WakeLocker;
 
 /**
@@ -20,6 +22,10 @@ public class UpgradeReceiver extends BroadcastReceiver {
         WakeLocker.acquire(context);
 
         Log.v(TAG, "onReceive()");
+
+        // Update default values of preferences
+        PreferenceManager.setDefaultValues(context, R.xml.preferences, false);
+
         Log.i(TAG, "Setting alarm on update");
 
         GlobalManager globalManager = new GlobalManager(context);

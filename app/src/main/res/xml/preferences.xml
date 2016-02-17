@@ -41,4 +41,44 @@
         android:defaultValue="120"
         custom:maxHour="12" />
 
+    <PreferenceCategory
+        android:title="@string/pref_ring_actions_title"
+        android:key="pref_ring_actions">
+
+        <ListPreference
+            android:key="pref_action_on_button"
+            android:title="@string/pref_title_action_on_button"
+            android:defaultValue="0"
+            android:entries="@array/actionArray"
+            android:entryValues="@array/actionValues"/>
+
+        <ListPreference
+            android:key="pref_action_on_move"
+            android:title="@string/pref_title_action_on_move"
+            android:defaultValue="0"
+            android:entries="@array/actionArray"
+            android:entryValues="@array/actionValues"/>
+
+        <ListPreference
+            android:key="pref_action_on_flip"
+            android:title="@string/pref_title_action_on_flip"
+            android:defaultValue="0"
+            android:entries="@array/actionArray"
+            android:entryValues="@array/actionValues"/>
+
+        <ListPreference
+            android:key="pref_action_on_shake"
+            android:title="@string/pref_title_action_on_shake"
+            android:defaultValue="0"
+            android:entries="@array/actionArray"
+            android:entryValues="@array/actionValues"/>
+
+        <ListPreference
+            android:key="pref_action_on_proximity"
+            android:title="@string/pref_title_action_on_proximity"
+            android:defaultValue="0"
+            android:entries="@array/actionArray"
+            android:entryValues="@array/actionValues"/>
+
+    </PreferenceCategory>
 </PreferenceScreen>

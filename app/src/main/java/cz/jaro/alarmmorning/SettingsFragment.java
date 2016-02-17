@@ -48,12 +48,24 @@ public class SettingsFragment extends PreferenceFragment {
      */
     public static final String PREF_NEAR_FUTURE_TIME = "pref_near_future_time";
 
+    public static final String PREF_ACTION_ON_BUTTON = "pref_action_on_button";
+    public static final String PREF_ACTION_ON_MOVE = "pref_action_on_move";
+    public static final String PREF_ACTION_ON_FLIP = "pref_action_on_flip";
+    public static final String PREF_ACTION_ON_SHAKE = "pref_action_on_shake";
+    public static final String PREF_ACTION_ON_PROXIMITY = "pref_action_on_proximity";
+
+    public static final String PREF_ACTION_NOTHING = "0";
+    public static final String PREF_ACTION_MUTE = "1";
+    public static final String PREF_ACTION_SNOOZE = "2";
+    public static final String PREF_ACTION_DISMISS = "3";
+
     public static final String PREF_RINGTONE_DEFAULT = "";
     public static final int PREF_VOLUME_DEFAULT = 8;
     public static final boolean PREF_VOLUME_INCREASING_DEFAULT = true;
     public static final boolean PREF_VIBRATE_DEFAULT = true;
     public static final int PREF_SNOOZE_TIME_DEFAULT = 10;
     public static final int PREF_NEAR_FUTURE_TIME_DEFAULT = 120;
+    public static final String PREF_ACTION_DEFAULT = PREF_ACTION_NOTHING;
 
     public static final int PREF_VOLUME_MAX = 10;
 
@@ -68,6 +80,11 @@ public class SettingsFragment extends PreferenceFragment {
         bindPreferenceSummaryToValue(findPreference(PREF_VOLUME));
         bindPreferenceSummaryToValue(findPreference(PREF_SNOOZE_TIME));
         bindPreferenceSummaryToValue(findPreference(PREF_NEAR_FUTURE_TIME));
+        bindPreferenceSummaryToValue(findPreference(PREF_ACTION_ON_BUTTON));
+        bindPreferenceSummaryToValue(findPreference(PREF_ACTION_ON_MOVE));
+        bindPreferenceSummaryToValue(findPreference(PREF_ACTION_ON_FLIP));
+        bindPreferenceSummaryToValue(findPreference(PREF_ACTION_ON_SHAKE));
+        bindPreferenceSummaryToValue(findPreference(PREF_ACTION_ON_PROXIMITY));
     }
 
     /**
@@ -123,6 +140,14 @@ public class SettingsFragment extends PreferenceFragment {
                 String summaryText = String.format(res.getString(R.string.pref_summary_near_future_time), hours, minutes);
 
                 preference.setSummary(summaryText);
+            } else if (key.equals(PREF_ACTION_ON_BUTTON) || key.equals(PREF_ACTION_ON_MOVE) || key.equals(PREF_ACTION_ON_FLIP) || key.equals(PREF_ACTION_ON_SHAKE) || key.equals(PREF_ACTION_ON_PROXIMITY)) {
+                int intValue = new Integer(stringValue);
+
+                Context context = preference.getContext();
+                Resources res = context.getResources();
+                CharSequence summaryText = res.getTextArray(R.array.actionArray)[intValue];
+
+                preference.setSummary(summaryText);
             } else {
                 // For all other preferences, set the summary to the value's simple string representation.
                 preference.setSummary(stringValue);
@@ -170,6 +195,8 @@ public class SettingsFragment extends PreferenceFragment {
             newValue = defaultSharedPreferences.getInt(preference.getKey(), PREF_SNOOZE_TIME_DEFAULT);
         } else if (key.equals(PREF_NEAR_FUTURE_TIME)) {
             newValue = defaultSharedPreferences.getInt(preference.getKey(), PREF_NEAR_FUTURE_TIME_DEFAULT);
+        } else if (key.equals(PREF_ACTION_ON_BUTTON) || key.equals(PREF_ACTION_ON_MOVE) || key.equals(PREF_ACTION_ON_FLIP) || key.equals(PREF_ACTION_ON_SHAKE) || key.equals(PREF_ACTION_ON_PROXIMITY)) {
+            newValue = defaultSharedPreferences.getString(preference.getKey(), PREF_ACTION_DEFAULT);
         } else {
             throw new IllegalArgumentException("Unexpected argument " + key);
         }
