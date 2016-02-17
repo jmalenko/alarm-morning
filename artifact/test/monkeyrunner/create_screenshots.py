@@ -1,5 +1,3 @@
-# Set Date to Monday, time to 5:59
-
 # Parameters
 
 # Paths are relative to the path of this script
