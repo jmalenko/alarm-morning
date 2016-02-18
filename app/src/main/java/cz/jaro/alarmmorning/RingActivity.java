@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.Ringtone;
@@ -18,6 +19,7 @@ import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
@@ -37,6 +39,10 @@ public class RingActivity extends Activity {
 
     public static final String ACTION_HIDE_ACTIVITY = "cz.jaro.alarmmorning.intent.action.HIDE_ACTIVITY";
 
+    public static final String ALARM_TIME = "ALARM_TIME";
+
+    private Calendar alarmTime;
+
     private Ringtone ringtone;
     private MediaPlayer mediaPlayer;
     private AudioManager audioManager;
@@ -54,6 +60,12 @@ public class RingActivity extends Activity {
 
     private Vibrator vibrator;
     private boolean isVibrating;
+
+    private TextView mutedTextView;
+    private boolean isMuted;
+    private boolean mutedInPast;
+    private int mutedSecondsLeft;
+    public static final int MUTE_SECONDS = 10;
 
     LocalBroadcastManager bManager;
     private static IntentFilter b_intentFilter;
@@ -115,6 +127,8 @@ public class RingActivity extends Activity {
                     });
         }
 
+        alarmTime = (Calendar) getIntent().getSerializableExtra(ALARM_TIME);
+
         startAll();
     }
 
@@ -141,29 +155,113 @@ public class RingActivity extends Activity {
     }
 
     public void onDismiss(View view) {
-        Log.d(TAG, "onDismiss()");
         Log.i(TAG, "Dismiss");
+        doDismiss(view.getContext());
+    }
+
+    public void onSnooze(View view) {
+        Log.i(TAG, "Snooze");
+        doSnooze(view.getContext());
+    }
+
+    public void doDismiss(Context context) {
+        Log.d(TAG, "doDismiss()");
 
         stopAll();
 
-        Context context = view.getContext();
         GlobalManager globalManager = new GlobalManager(context);
         globalManager.onDismiss();
 
         finish();
     }
 
-    public void onSnooze(View view) {
-        Log.d(TAG, "onSnooze()");
-        Log.i(TAG, "Snooze");
+    public void doSnooze(Context context) {
+        Log.d(TAG, "doSnooze()");
 
         stopAll();
 
-        Context context = view.getContext();
         GlobalManager globalManager = new GlobalManager(context);
         globalManager.onSnooze();
 
         finish();
+    }
+
+    public void doMute() {
+        Log.d(TAG, "doMute()");
+
+        if (muteAvailable()) {
+            Log.i(TAG, "Mute");
+            startMute();
+        } else {
+            Log.d(TAG, "Not muting because it had been mutedTextView");
+        }
+    }
+
+    private void initMute() {
+        mutedTextView = (TextView) findViewById(R.id.muted);
+
+        mutedInPast = false;
+    }
+
+    public boolean muteAvailable() {
+        Log.d(TAG, "muteAvailable()");
+        return !mutedInPast;
+    }
+
+    private void startMute() {
+        Log.d(TAG, "startMute()");
+
+        isMuted = true;
+        mutedInPast = true;
+        mutedSecondsLeft = MUTE_SECONDS + 1;
+
+        muteSound();
+
+        mutedTextView.setVisibility(View.VISIBLE);
+        updateMute();
+
+        runnableMute.run();
+    }
+
+    private Handler handlerMute = new Handler();
+    private Runnable runnableMute = new Runnable() {
+        @Override
+        public void run() {
+            Log.d(TAG, "run()");
+
+            mutedSecondsLeft--;
+            if (mutedSecondsLeft > 0) {
+                updateMute();
+
+                handlerContent.postDelayed(this, 1000);
+            } else {
+                stopMute();
+            }
+        }
+    };
+
+    private void updateMute() {
+        Log.d(TAG, "updateMute()");
+
+        Resources res = getResources();
+        String muteText = String.format(res.getString(R.string.muted), mutedSecondsLeft);
+
+        mutedTextView.setText(muteText);
+    }
+
+    private void stopMute() {
+        Log.d(TAG, "stopMute()");
+
+        if (isMuted) {
+            Log.i(TAG, "Unmute");
+            isMuted = false;
+
+            unmuteSound();
+
+            mutedTextView.setVisibility(View.INVISIBLE);
+
+            handlerMute.removeCallbacks(runnableMute);
+        }
     }
 
     private void startAll() {
@@ -178,6 +276,8 @@ public class RingActivity extends Activity {
 
             startSound();
             startVibrate();
+
+            initMute();
         }
     }
 
@@ -193,6 +293,8 @@ public class RingActivity extends Activity {
             stopSound();
 
             stopContent();
+
+            stopMute();
 
             // allow device sleep
             WakeLocker.release();
@@ -224,10 +326,43 @@ public class RingActivity extends Activity {
     private void updateContent() {
         Log.d(TAG, "updateContent()");
         Calendar now = clock();
-        String currentTimeString = Localization.timeToString(now.getTime(), this);
 
-        TextView timeView = (TextView) findViewById(R.id.fullscreen_content);
+        String currentDateString = Localization.dateToStringFull(now.getTime());
+        TextView dateView = (TextView) findViewById(R.id.date);
+        dateView.setText(currentDateString);
+
+        String currentTimeString = Localization.timeToString(now.getTime(), this);
+        TextView timeView = (TextView) findViewById(R.id.time);
         timeView.setText(currentTimeString);
+
+        TextView alarmTimeView = (TextView) findViewById(R.id.alarmTime);
+        if (onTheSameMinute(alarmTime, now)) {
+            alarmTimeView.setVisibility(View.INVISIBLE);
+        } else {
+            Resources res = getResources();
+            String alarmTimeText;
+            String timeStr = Localization.timeToString(alarmTime.getTime(), getBaseContext());
+            if (onTheSameDate(alarmTime, now)) {
+                alarmTimeText = String.format(res.getString(R.string.alarm_was_set_to_today), timeStr);
+            } else {
+                String dateStr = Localization.dateToStringFull(alarmTime.getTime());
+                alarmTimeText = String.format(res.getString(R.string.alarm_was_set_to_nontoday), timeStr, dateStr);
+            }
+            alarmTimeView.setText(alarmTimeText);
+            alarmTimeView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private boolean onTheSameDate(Calendar cal1, Calendar cal2) {
+        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
+                cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR);
+    }
+
+    private boolean onTheSameMinute(Calendar cal1, Calendar cal2) {
+        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
+                cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR) &&
+                cal1.get(Calendar.HOUR_OF_DAY) == cal2.get(Calendar.HOUR_OF_DAY) &&
+                cal1.get(Calendar.MINUTE) == cal2.get(Calendar.MINUTE);
     }
 
     private Uri getRingtoneUri() {
@@ -296,6 +431,16 @@ public class RingActivity extends Activity {
         ringtone.stop();
     }
 
+    private void pauseSoundAsRingtone() {
+        Log.d(TAG, "pauseSoundAsRingtone()");
+        ringtone.stop();
+    }
+
+    private void resumeSoundAsRingtone() {
+        Log.d(TAG, "resumeSoundAsRingtone()");
+        ringtone.play();
+    }
+
     private void startSoundAsMedia(Uri ringtoneUri) throws IOException {
         Log.d(TAG, "startSoundAsMedia()");
 
@@ -311,6 +456,16 @@ public class RingActivity extends Activity {
     private void stopSoundAsMedia() {
         Log.d(TAG, "stopSoundAsMedia()");
         mediaPlayer.stop();
+    }
+
+    private void pauseSoundAsMedia() {
+        Log.d(TAG, "pauseSoundAsMedia()");
+        mediaPlayer.pause();
+    }
+
+    private void resumeSoundAsMedia() {
+        Log.d(TAG, "resumeSoundAsMedia()");
+        mediaPlayer.start();
     }
 
     private void stopSound() {
@@ -329,6 +484,36 @@ public class RingActivity extends Activity {
             }
 
             stopVolume();
+        }
+    }
+
+    private void muteSound() {
+        Log.d(TAG, "muteSound()");
+
+        if (isPlaying) {
+            switch (soundMethod) {
+                case 1:
+                    pauseSoundAsMedia();
+                    break;
+                case 2:
+                    pauseSoundAsRingtone();
+                    break;
+            }
+        }
+    }
+
+    private void unmuteSound() {
+        Log.d(TAG, "unmuteSound()");
+
+        if (isPlaying) {
+            switch (soundMethod) {
+                case 1:
+                    resumeSoundAsMedia();
+                    break;
+                case 2:
+                    resumeSoundAsRingtone();
+                    break;
+            }
         }
     }
 
@@ -369,11 +554,14 @@ public class RingActivity extends Activity {
     private boolean updateIncreasingVolume() {
         Log.v(TAG, "updateIncreasingVolume");
 
+        if (isMuted)
+            return false;
+
         increasingVolumePercentage++;
-        Log.v(TAG, "volume percentage = " + increasingVolumePercentage);
+        Log.v(TAG, "   volume percentage = " + increasingVolumePercentage);
         float ratio = (float) increasingVolumePercentage / 100;
         int tempVolume = (int) Math.ceil(ratio * maxVolume);
-        Log.v(TAG, "current volume = " + tempVolume);
+        Log.v(TAG, "   current volume = " + tempVolume);
 
         if (volume <= tempVolume) {
             Log.v(TAG, "reached final volume");
@@ -435,6 +623,37 @@ public class RingActivity extends Activity {
 
         if (isVibrating) {
             vibrator.cancel();
+        }
+    }
+
+    @Override
+    public boolean onKeyDown(int keycode, KeyEvent e) {
+        Log.d(TAG, "onKeyDown(keycode=" + keycode + ")");
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        String buttonActionPreference = preferences.getString(SettingsFragment.PREF_ACTION_ON_BUTTON, SettingsFragment.PREF_ACTION_DEFAULT);
+
+        switch (buttonActionPreference) {
+            case SettingsFragment.PREF_ACTION_DEFAULT:
+                Log.d(TAG, "Doing nothing");
+                return super.onKeyDown(keycode, e);
+
+            case SettingsFragment.PREF_ACTION_MUTE:
+                doMute();
+                return true;
+
+            case SettingsFragment.PREF_ACTION_SNOOZE:
+                Log.i(TAG, "Snooze");
+                doSnooze(getBaseContext());
+                return true;
+
+            case SettingsFragment.PREF_ACTION_DISMISS:
+                Log.i(TAG, "Dismiss");
+                doDismiss(getBaseContext());
+                return true;
+
+            default:
+                throw new IllegalArgumentException("Unexpected argument " + buttonActionPreference);
         }
     }
 

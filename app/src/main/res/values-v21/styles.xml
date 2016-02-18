@@ -8,10 +8,6 @@
 
         <item name="android:navigationBarColor">@color/primary</item>
 
-        <!--<item name="android:windowDrawsSystemBarBackgrounds">true</item>-->
-        <!--<item name="android:statusBarColor">@android:color/transparent</item>-->
-        <!--<item name="android:windowTranslucentStatus">true</item>-->
-
         <item name="android:timePickerDialogTheme">@style/MyDialogTheme</item>
     </style>
 
@@ -23,9 +19,5 @@
     <style name="MyNavigationView">
         <item name="android:layout_marginTop">-32dp</item>
     </style>
-
-    <!--<style name="FullscreenActionBarStyle" parent="android:Widget.ActionBar">-->
-    <!--<item name="android:background">@color/black_overlay</item>-->
-    <!--</style>-->
 
 </resources>

@@ -24,7 +24,7 @@ import cz.jaro.alarmmorning.model.Day;
  * operating system / user may bring the app to this state (e.g. operating system by destroying the activity if it is in the background, user cancelling the
  * notification).<br>
  * 2. There is no way to get the system alarm broadcast registered by this app (in the minimal state described above). Therefore, the reference must be kept
- * here (to allow its cancellation when user set earlier alarm). That is realized by methods {@link #getAlarmTime()} and {@link
+ * here (to allow its cancellation when user set earlier alarm). That is realized by methods {@link #getNextAction()}} and {@link
  * #setNextAction(NextAction)} which use the value stored in {@code SharedPreferences}.
  * <p/>
  * The <b>communication among application components</b> must communicate.<br>
@@ -373,6 +373,7 @@ public class GlobalManager {
         ringIntent.setClassName("cz.jaro.alarmmorning", "cz.jaro.alarmmorning.RingActivity");
 //        ringIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         ringIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        ringIntent.putExtra(RingActivity.ALARM_TIME, getNextAction().alarmTime);
         context.startActivity(ringIntent);
     }
 

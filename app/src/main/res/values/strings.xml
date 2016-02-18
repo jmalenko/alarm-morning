@@ -17,6 +17,10 @@
     <!-- Ring activity -->
     <string name="title_activity_ring">Alarm</string>
 
+    <string name="alarm_was_set_to_today">Alarm was set to %1$s</string>
+    <string name="alarm_was_set_to_nontoday">Alarm was set to %1$s on %2$s</string>
+    <string name="muted">Muted for %1$d seconds</string>
+
     <!-- Notification -->
     <string name="notification_title">Alarm at %1$s</string>
     <string name="notification_text_future">Touch to view all alarms</string>

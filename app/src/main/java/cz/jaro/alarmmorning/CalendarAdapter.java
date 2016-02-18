@@ -47,7 +47,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
     /**
      * Initialize the Adapter.
      *
-     * @param activityInterface
+     * @param activityInterface interface to fields accessible in Activity
      */
     public CalendarAdapter(ActivityInterface activityInterface) {
         this.activityInterface = activityInterface;
@@ -84,7 +84,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         String dayOfWeekText = Localization.dayOfWeekToString(dayOfWeek, clock());
         viewHolder.getTextDayOfWeek().setText(dayOfWeekText);
 
-        String dateText = Localization.dateToString(date.getTime());
+        String dateText = Localization.dateToStringVeryShort(date.getTime());
         viewHolder.getTextDate().setText(dateText);
 
         Day day = dataSource.loadDayDeep(date);

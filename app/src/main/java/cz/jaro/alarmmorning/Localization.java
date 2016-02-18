@@ -2,6 +2,7 @@ package cz.jaro.alarmmorning;
 
 import android.content.Context;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -58,15 +59,26 @@ public class Localization {
     }
 
     /**
-     * Converts the date to text.
+     * Converts a date to text in <i>very</i> short format.
      *
      * @param date date
      * @return the date as string
      */
-    public static String dateToString(Date date) {
+    public static String dateToStringVeryShort(Date date) {
         SimpleDateFormat dateFormat = (SimpleDateFormat) java.text.DateFormat.getDateInstance(java.text.DateFormat.SHORT);
         // Trick: use regex to trim off all y's and any non-alphabetic characters before and after
         dateFormat.applyPattern(dateFormat.toPattern().replaceAll("[^\\p{Alpha}]*y+[^\\p{Alpha}]*", ""));
+        return dateFormat.format(date);
+    }
+
+    /**
+     * Converts a date to text in full format.
+     *
+     * @param date date
+     * @return the date as string
+     */
+    public static String dateToStringFull(Date date) {
+        SimpleDateFormat dateFormat = (SimpleDateFormat) java.text.DateFormat.getDateInstance(DateFormat.FULL);
         return dateFormat.format(date);
     }
 

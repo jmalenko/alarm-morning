@@ -1,21 +1,92 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#0099cc"
-    tools:context="cz.jaro.alarmmorning.RingActivity">
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent"
+             tools:context="cz.jaro.alarmmorning.RingActivity">
 
-    <!-- The primary full-screen view. -->
-    <TextView
-        android:id="@+id/fullscreen_content"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center"
         android:keepScreenOn="true"
-        android:textColor="#33b5e5"
-        android:textSize="70sp"
-        android:textStyle="bold"/>
+        android:orientation="vertical">
 
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="0dip"
+            android:layout_weight="1"/>
+
+        <TextView
+            android:id="@+id/date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="Monday, February 15"
+            />
+
+        <TextView
+            android:id="@+id/time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="10dp"
+            android:text="12:34"
+            android:textColor="@color/accent"
+            android:textSize="70sp"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/alarmTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="Alarm was set to 7:15"
+            />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="0dip"
+            android:layout_weight="1"
+            />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="bottom"
+            android:orientation="vertical">
+
+            <ImageButton
+                android:id="@+id/snoozeButton"
+                android:layout_width="128dp"
+                android:layout_height="128dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="32dp"
+                android:contentDescription="Snooze button"
+                />
+
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+
+            <TextView
+                android:id="@+id/muted"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="Muted for 9 seconds"
+                android:visibility="invisible"
+                />
+
+            <SeekBar
+                android:id="@+id/dismissSeekBar"
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="@dimen/margin_medium"
+                android:layout_marginLeft="@dimen/margin_medium"
+                android:layout_marginRight="@dimen/margin_medium"
+                />
+        </LinearLayout>
+
+        <!-- Buttons -->
         <LinearLayout
             android:id="@+id/fullscreen_content_controls"
             style="?metaButtonBarStyle"
@@ -33,7 +104,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:onClick="onDismiss"
-                android:text="@string/action_dismiss" />
+                android:text="@string/action_dismiss"/>
 
             <Button
                 android:id="@+id/snooze_button"
@@ -42,7 +113,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:onClick="onSnooze"
-                android:text="@string/action_snooze" />
+                android:text="@string/action_snooze"/>
 
         </LinearLayout>
+    </LinearLayout>
 </FrameLayout>
