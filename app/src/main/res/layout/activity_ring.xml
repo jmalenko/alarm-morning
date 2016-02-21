@@ -56,15 +56,15 @@
 
             <ImageButton
                 android:id="@+id/snoozeButton"
-                android:layout_width="128dp"
-                android:layout_height="128dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginBottom="32dp"
                 android:contentDescription="Snooze button"
+                android:onClick="onSnoozeImage"
+                android:src="@drawable/snooze_button"
+                android:text="@string/action_snooze"
                 />
-
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
 
             <TextView
                 android:id="@+id/muted"
@@ -75,14 +75,19 @@
                 android:visibility="invisible"
                 />
 
-            <SeekBar
-                android:id="@+id/dismissSeekBar"
+            <cz.jaro.alarmmorning.graphics.SlideButton
+                android:id="@+id/dismissButton"
                 android:layout_width="match_parent"
-                android:layout_height="64dp"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginBottom="@dimen/margin_medium"
                 android:layout_marginLeft="@dimen/margin_medium"
                 android:layout_marginRight="@dimen/margin_medium"
+                android:clickable="false"
+                android:max="100"
+                android:background="@drawable/slidebutton_background"
+                android:progressDrawable="@android:color/transparent"
+                android:thumb="@drawable/slidebutton_thumb"
                 />
         </LinearLayout>
 
