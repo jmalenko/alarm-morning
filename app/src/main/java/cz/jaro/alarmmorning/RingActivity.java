@@ -719,11 +719,6 @@ public class RingActivity extends Activity implements RingInterface {
     }
 
     @Override
-    public View findViewByIdI(int id) {
-        return findViewByIdI(id);
-    }
-
-    @Override
     public void actOnEvent(String action) {
         switch (action) {
             case SettingsFragment.PREF_ACTION_DEFAULT:
