@@ -76,24 +76,6 @@ public class SlideButton extends SeekBar {
         return thumb;
     }
 
-//    @Override
-//    public boolean onTouchEvent(MotionEvent event) {
-//        if (event.getAction() == MotionEvent.ACTION_DOWN) {
-//            if (thumb.getBounds().contains((int) event.getX(), (int) event.getY())) {
-//                super.onTouchEvent(event);
-//            } else
-//                return false;
-//        } else if (event.getAction() == MotionEvent.ACTION_UP) {
-//            if (getProgress() > 70)
-//                handleSlide();
-//
-//            setProgress(0);
-//        } else
-//            super.onTouchEvent(event);
-//
-//        return true;
-//    }
-
     private void handleSlide() {
         listener.onClick(this);
     }
