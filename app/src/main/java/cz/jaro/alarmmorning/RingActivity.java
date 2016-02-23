@@ -41,7 +41,7 @@ import cz.jaro.alarmmorning.sensor.Shake;
 /**
  * Activity that is displayed while the alarm fires.
  */
-public class RingActivity extends Activity {
+public class RingActivity extends Activity implements RingInterface {
 
     private static final String TAG = RingActivity.class.getSimpleName();
 
@@ -128,8 +128,7 @@ public class RingActivity extends Activity {
             // Code below is to handle presses of Volume up or Volume down.
             // Without this, after pressing volume buttons, the navigation bar will show up and won't hide.
             final View decorView = getWindow().getDecorView();
-            decorView
-                    .setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
+            decorView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
                         @Override
                         public void onSystemUiVisibilityChange(int visibility) {
                             if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
@@ -140,6 +139,14 @@ public class RingActivity extends Activity {
         }
 
         alarmTime = (Calendar) getIntent().getSerializableExtra(ALARM_TIME);
+
+        dismissButton = (SlideButton) findViewById(R.id.dismissButton);
+        dismissButton.setSlideButtonListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onDismiss(view);
+            }
+        });
 
         startAll();
     }
@@ -228,6 +235,7 @@ public class RingActivity extends Activity {
         mutedSecondsLeft = MUTE_SECONDS + 1;
 
         muteSound();
+        muteVibrate();
 
         mutedTextView.setVisibility(View.VISIBLE);
         updateMute();
@@ -268,6 +276,7 @@ public class RingActivity extends Activity {
             Log.i(TAG, "Unmute");
             isMuted = false;
 
+            unmuteVibrate();
             unmuteSound();
 
             mutedTextView.setVisibility(View.INVISIBLE);
@@ -290,6 +299,7 @@ public class RingActivity extends Activity {
             startVibrate();
 
             initMute();
+            startSensors();
         }
     }
 
@@ -300,6 +310,9 @@ public class RingActivity extends Activity {
             Log.i(TAG, "Stop ringing");
 
             isRinging = false;
+
+            stopSensors();
+            stopMute();
 
             stopVibrate();
             stopSound();
@@ -638,6 +651,24 @@ public class RingActivity extends Activity {
         }
     }
 
+    private void muteVibrate() {
+        Log.d(TAG, "muteVibrate()");
+
+        if (isVibrating) {
+            vibrator.cancel();
+        }
+    }
+
+    private void unmuteVibrate() {
+        Log.d(TAG, "unmuteVibrate()");
+
+        if (isVibrating) {
+            long[] pattern = {0, 500, 1000};
+
+            vibrator.vibrate(pattern, 0);
+        }
+    }
+
     @Override
     public boolean onKeyDown(int keycode, KeyEvent e) {
         Log.d(TAG, "onKeyDown(keycode=" + keycode + ")");
@@ -650,22 +681,9 @@ public class RingActivity extends Activity {
                 Log.d(TAG, "Doing nothing");
                 return super.onKeyDown(keycode, e);
 
-            case SettingsFragment.PREF_ACTION_MUTE:
-                doMute();
-                return true;
-
-            case SettingsFragment.PREF_ACTION_SNOOZE:
-                Log.i(TAG, "Snooze");
-                doSnooze(getBaseContext());
-                return true;
-
-            case SettingsFragment.PREF_ACTION_DISMISS:
-                Log.i(TAG, "Dismiss");
-                doDismiss(getBaseContext());
-                return true;
-
             default:
-                throw new IllegalArgumentException("Unexpected argument " + buttonActionPreference);
+                actOnEvent(buttonActionPreference);
+                return true;
         }
     }
 
@@ -695,6 +713,41 @@ public class RingActivity extends Activity {
         return new SystemClock().now();
     }
 
+    @Override
+    public Context getContextI() {
+        return this;
+    }
+
+    @Override
+    public View findViewByIdI(int id) {
+        return findViewByIdI(id);
+    }
+
+    @Override
+    public void actOnEvent(String action) {
+        switch (action) {
+            case SettingsFragment.PREF_ACTION_DEFAULT:
+                Log.d(TAG, "Doing nothing");
+                return;
+
+            case SettingsFragment.PREF_ACTION_MUTE:
+                doMute();
+                return;
+
+            case SettingsFragment.PREF_ACTION_SNOOZE:
+                Log.i(TAG, "Snooze");
+                doSnooze(getBaseContext());
+                return;
+
+            case SettingsFragment.PREF_ACTION_DISMISS:
+                Log.i(TAG, "Dismiss");
+                doDismiss(getBaseContext());
+                return;
+
+            default:
+                throw new IllegalArgumentException("Unexpected argument " + action);
+        }
+    }
 }
 
 

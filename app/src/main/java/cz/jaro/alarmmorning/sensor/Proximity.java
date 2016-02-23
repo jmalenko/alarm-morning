@@ -3,11 +3,9 @@ package cz.jaro.alarmmorning.sensor;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.util.Log;
-import android.widget.TextView;
 
 import java.util.Arrays;
 
-import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.RingInterface;
 import cz.jaro.alarmmorning.SettingsFragment;
 
@@ -18,6 +16,11 @@ public class Proximity extends SensorEventDetector {
 
     private static final String TAG = Proximity.class.getSimpleName();
 
+    public static final double DIFF_MIN = 0.5;
+
+    private boolean mInitialized;
+    private float mMax;
+
     public Proximity(RingInterface ringInterface) {
         super(ringInterface, "proximity", Sensor.TYPE_PROXIMITY, SettingsFragment.PREF_ACTION_ON_PROXIMITY);
     }
@@ -27,11 +30,16 @@ public class Proximity extends SensorEventDetector {
 
         float distance = event.values[0];
 
-        boolean result = distance < mSensor.getMaximumRange();
+        boolean result = false;
 
-        TextView textView = (TextView) ringInterface.findViewByIdI(R.id.proximity);
-        textView.setText("Proximity is " + String.format("%.2f", distance) + "." + (result ? " NEAR" : ""));
-
+        if (!mInitialized) {
+            mInitialized = true;
+            mMax = distance;
+        } else {
+            mMax = Math.max(mMax, distance);
+            float diffMax = mMax - distance;
+            result = distance < mSensor.getMaximumRange() && DIFF_MIN < diffMax;
+        }
         return result;
     }
 

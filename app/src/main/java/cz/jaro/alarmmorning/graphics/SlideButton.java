@@ -10,7 +10,8 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.SeekBar;
 
 /**
- * Created by jmalenko on 19.2.2016.
+ * SlideButton is a button that needs to be slided instead of clicked. This is useful for sensitive actions where a click can be done too easily and a more
+ * intentional action (like slide) is required.
  */
 public class SlideButton extends SeekBar {
 
@@ -23,12 +24,12 @@ public class SlideButton extends SeekBar {
         setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromTouch) {
-                //label.setAlpha(1f - progress * 0.02f);
+                // nothing
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-
+                // nothing
             }
 
             @Override
@@ -45,6 +46,7 @@ public class SlideButton extends SeekBar {
                 }
             }
         });
+
         setOnTouchListener(new View.OnTouchListener() {
             private boolean isInvalidMove;
 
@@ -61,7 +63,6 @@ public class SlideButton extends SeekBar {
                 return false;
             }
         });
-
     }
 
     @Override

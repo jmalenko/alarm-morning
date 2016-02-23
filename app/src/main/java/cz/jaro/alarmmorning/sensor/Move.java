@@ -3,11 +3,9 @@ package cz.jaro.alarmmorning.sensor;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.util.Log;
-import android.widget.TextView;
 
 import java.util.Arrays;
 
-import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.RingInterface;
 import cz.jaro.alarmmorning.SettingsFragment;
 
@@ -23,7 +21,7 @@ public class Move extends SensorEventDetector {
     private double mAccel;
 
     public Move(RingInterface ringInterface) {
-        super(ringInterface, "move", Sensor.TYPE_ACCELEROMETER, SettingsFragment.PREF_ACTION_ON_SHAKE);
+        super(ringInterface, "move", Sensor.TYPE_ACCELEROMETER, SettingsFragment.PREF_ACTION_ON_MOVE);
     }
 
     protected boolean isFiring(SensorEvent event) {
@@ -44,9 +42,6 @@ public class Move extends SensorEventDetector {
             mAccel = mAccel * 0.9f + delta;
 
             boolean result = 1 < Math.abs(mAccel);
-
-            TextView textView = (TextView) ringInterface.findViewByIdI(R.id.move);
-            textView.setText("Move mAccel=" + String.format("%.2f", mAccel) + ", mAccelCurrent=" + String.format("%.2f", mAccelCurrent) + "." + (result ? " MOVED" : ""));
 
             return result;
         }

@@ -121,8 +121,7 @@ public abstract class SensorEventDetector implements SensorEventListener {
 
         String action = getActionFromPreference();
 
-//        ringInterface.actOnEvent(action); // FIXME: 19.2.2016
-        ringInterface.actOnEvent(name);
+        ringInterface.actOnEvent(action);
     }
 
     /**

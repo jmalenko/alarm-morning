@@ -42,40 +42,6 @@
             android:text="Alarm was set to 7:15"
             />
 
-
-        <TextView
-            android:id="@+id/move"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/margin_medium"
-            android:layout_gravity="center_horizontal"
-            android:text="Move info"
-            />
-
-        <TextView
-            android:id="@+id/flip"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="Flip info"
-            />
-
-        <TextView
-            android:id="@+id/shake"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="Shake info"
-            />
-
-        <TextView
-            android:id="@+id/proximity"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="Proximity info"
-            />
-
         <Space
             android:layout_width="match_parent"
             android:layout_height="0dip"
@@ -94,10 +60,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginBottom="@dimen/margin_large"
-                android:contentDescription="Snooze button"
-                android:onClick="onSnoozeImage"
-                android:src="@drawable/snooze_button"
-                android:text="@string/action_snooze"
+                android:onClick="onSnooze"
+                android:background="@drawable/snooze_button"
                 />
 
             <TextView
@@ -114,48 +78,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="@dimen/margin_small"
-                android:layout_marginLeft="@dimen/margin_small"
-                android:layout_marginRight="@dimen/margin_small"
                 android:layout_marginBottom="@dimen/margin_medium"
                 android:layout_marginLeft="@dimen/margin_medium"
                 android:layout_marginRight="@dimen/margin_medium"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:paddingLeft="34dp"
+                android:paddingRight="34dp"
                 android:clickable="false"
                 android:max="100"
                 android:background="@drawable/slidebutton_background"
                 android:progressDrawable="@android:color/transparent"
                 android:thumb="@drawable/slidebutton_thumb"
                 />
-        </LinearLayout>
-
-        <!-- Buttons -->
-        <LinearLayout
-            android:id="@+id/fullscreen_content_controls"
-            style="?metaButtonBarStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|center_horizontal"
-            android:background="@color/black_overlay"
-            android:orientation="horizontal"
-            tools:ignore="UselessParent">
-
-            <Button
-                android:id="@+id/dismiss_button"
-                style="?metaButtonBarButtonStyle"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="onDismiss"
-                android:text="@string/action_dismiss"/>
-
-            <Button
-                android:id="@+id/snooze_button"
-                style="?metaButtonBarButtonStyle"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:onClick="onSnooze"
-                android:text="@string/action_snooze"/>
 
         </LinearLayout>
     </LinearLayout>

@@ -3,11 +3,9 @@ package cz.jaro.alarmmorning.sensor;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.util.Log;
-import android.widget.TextView;
 
 import java.util.Arrays;
 
-import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.RingInterface;
 import cz.jaro.alarmmorning.SettingsFragment;
 
@@ -18,6 +16,11 @@ public class Flip extends SensorEventDetector {
 
     private static final String TAG = Flip.class.getSimpleName();
 
+    private final float THRESHOLD = 5; // when the device is still facing up and flips, the value goes from 9.81 do -9.81
+
+    private boolean mInitialized;
+    private boolean mUp;
+
     public Flip(RingInterface ringInterface) {
         super(ringInterface, "flip", Sensor.TYPE_ACCELEROMETER, SettingsFragment.PREF_ACTION_ON_FLIP);
     }
@@ -27,10 +30,25 @@ public class Flip extends SensorEventDetector {
 
         float z = event.values[2];
 
-        boolean result = z < 0;
+        boolean result = false;
 
-        TextView textView = (TextView) ringInterface.findViewByIdI(R.id.flip);
-        textView.setText("Flip is " + (result ? "down" : "up") + ". value="+ String.format("%.2f", z) +  (result ? " FLIPPED" : ""));
+        if (!mInitialized) {
+            if (THRESHOLD < z) {
+                mInitialized = true;
+                mUp = true;
+            } else if (z < -THRESHOLD) {
+                mInitialized = true;
+                mUp = false;
+            }
+        } else {
+            if (THRESHOLD < z) {
+                result = !mUp;
+                mUp = true;
+            } else if (z < -THRESHOLD) {
+                result = mUp;
+                mUp = false;
+            }
+        }
 
         return result;
     }
