@@ -28,7 +28,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="@dimen/margin_medium"
             android:text="12:34"
             android:textColor="@color/accent"
             android:textSize="70sp"
@@ -40,6 +40,40 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:text="Alarm was set to 7:15"
+            />
+
+
+        <TextView
+            android:id="@+id/move"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/margin_medium"
+            android:layout_gravity="center_horizontal"
+            android:text="Move info"
+            />
+
+        <TextView
+            android:id="@+id/flip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="Flip info"
+            />
+
+        <TextView
+            android:id="@+id/shake"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="Shake info"
+            />
+
+        <TextView
+            android:id="@+id/proximity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="Proximity info"
             />
 
         <Space
@@ -59,7 +93,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="32dp"
+                android:layout_marginBottom="@dimen/margin_large"
                 android:contentDescription="Snooze button"
                 android:onClick="onSnoozeImage"
                 android:src="@drawable/snooze_button"
@@ -80,6 +114,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
+                android:layout_marginBottom="@dimen/margin_small"
+                android:layout_marginLeft="@dimen/margin_small"
+                android:layout_marginRight="@dimen/margin_small"
                 android:layout_marginBottom="@dimen/margin_medium"
                 android:layout_marginLeft="@dimen/margin_medium"
                 android:layout_marginRight="@dimen/margin_medium"

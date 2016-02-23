@@ -35,8 +35,12 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
+
+import cz.jaro.alarmmorning.clock.Clock;
+import cz.jaro.alarmmorning.clock.SystemClock;
 
 
 public class AlarmMorningActivity extends AppCompatActivity implements ActivityInterface {
@@ -163,6 +167,8 @@ public class AlarmMorningActivity extends AppCompatActivity implements ActivityI
             MenuItem calendarMenu = mNavigationView.getMenu().findItem(R.id.navigation_calendar);
             highlightMenuItem(calendarMenu);
         }
+
+//        startRingingActivity(getBaseContext());
     }
 
     private void setupDrawerContent(NavigationView navigationView) {
@@ -294,9 +300,29 @@ public class AlarmMorningActivity extends AppCompatActivity implements ActivityI
         return getResources();
     }
 
-//    public String getTestString() {
-//        return getString(R.string.app_name);
-//    }
+    // // FIXME: 17.2.2016 after testing
+    @Override
+    public boolean onKeyDown(int keycode, KeyEvent e) {
+        switch (keycode) {
+            case KeyEvent.KEYCODE_SEARCH: // F5
+                Log.w(TAG, "Manually invoked ringing");
+                startRingingActivity(getBaseContext());
+                return true;
+        }
+        return super.onKeyDown(keycode, e);
+    }
+
+    private void startRingingActivity(Context context) {
+        Log.d(TAG, "startRingingActivity()");
+
+        Intent ringIntent = new Intent();
+        ringIntent.setClassName("cz.jaro.alarmmorning", "cz.jaro.alarmmorning.RingActivity");
+//        ringIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        ringIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        Clock clock = new SystemClock();
+        ringIntent.putExtra(RingActivity.ALARM_TIME, clock.now());
+        context.startActivity(ringIntent);
+    }
 
 }
 

@@ -97,6 +97,7 @@ public class SettingsFragment extends PreferenceFragment {
             String key = preference.getKey();
 
             if (preference instanceof RingtonePreference) {
+                // TODO After installation, the summary says something like "Default (notification ringtne)". It should say something like "Default (alarm ringtone"
                 // For ringtone preferences, look up the correct display value using RingtoneManager.
                 if (TextUtils.isEmpty(stringValue)) {
                     // Empty values correspond to 'silent' (no ringtone).

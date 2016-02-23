@@ -26,9 +26,16 @@ import android.widget.TextView;
 
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.HashSet;
+import java.util.Set;
 
 import cz.jaro.alarmmorning.clock.SystemClock;
 import cz.jaro.alarmmorning.graphics.SlideButton;
+import cz.jaro.alarmmorning.sensor.Flip;
+import cz.jaro.alarmmorning.sensor.Move;
+import cz.jaro.alarmmorning.sensor.Proximity;
+import cz.jaro.alarmmorning.sensor.SensorEventDetector;
+import cz.jaro.alarmmorning.sensor.Shake;
 
 
 /**
@@ -67,6 +74,8 @@ public class RingActivity extends Activity {
     private boolean mutedInPast;
     private int mutedSecondsLeft;
     public static final int MUTE_SECONDS = 10;
+
+    private Set<SensorEventDetector> sensorEventDetectors;
 
     LocalBroadcastManager bManager;
     private static IntentFilter b_intentFilter;
@@ -108,32 +117,29 @@ public class RingActivity extends Activity {
 
         // This work only for android 4.4+
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            final int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+            final int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
             getWindow().getDecorView().setSystemUiVisibility(flags);
 
             // Code below is to handle presses of Volume up or Volume down.
             // Without this, after pressing volume buttons, the navigation bar will show up and won't hide.
             final View decorView = getWindow().getDecorView();
-            decorView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
-                @Override
-                public void onSystemUiVisibilityChange(int visibility) {
-                    if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
-                        decorView.setSystemUiVisibility(flags);
-                    }
-                }
-            });
+            decorView
+                    .setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
+                        @Override
+                        public void onSystemUiVisibilityChange(int visibility) {
+                            if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
+                                decorView.setSystemUiVisibility(flags);
+                            }
+                        }
+                    });
         }
 
         alarmTime = (Calendar) getIntent().getSerializableExtra(ALARM_TIME);
-
-        dismissButton = (SlideButton) findViewById(R.id.dismissButton);
-        dismissButton.setSlideButtonListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Log.i(TAG, "Dismiss");
-                doDismiss(view.getContext());
-            }
-        });
 
         startAll();
     }
@@ -143,7 +149,12 @@ public class RingActivity extends Activity {
         super.onWindowFocusChanged(hasFocus);
         // The seetings must be reset after the user interacts with UI
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && hasFocus) {
-            final int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+            final int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
             getWindow().getDecorView().setSystemUiVisibility(flags);
         }
     }
@@ -161,11 +172,6 @@ public class RingActivity extends Activity {
     }
 
     public void onSnooze(View view) {
-        Log.i(TAG, "Snooze");
-        doSnooze(view.getContext());
-    }
-
-    public void onSnoozeImage(View view) {
         Log.i(TAG, "Snooze");
         doSnooze(view.getContext());
     }
@@ -360,7 +366,8 @@ public class RingActivity extends Activity {
     }
 
     private boolean onTheSameDate(Calendar cal1, Calendar cal2) {
-        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) && cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR);
+        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
+                cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR);
     }
 
     private boolean onTheSameMinute(Calendar cal1, Calendar cal2) {
@@ -528,7 +535,8 @@ public class RingActivity extends Activity {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         int volumePreference = preferences.getInt(SettingsFragment.PREF_VOLUME, SettingsFragment.PREF_VOLUME_DEFAULT);
 
-        if (volumePreference == 0) Log.w(TAG, "Volume is set to 0");
+        if (volumePreference == 0)
+            Log.w(TAG, "Volume is set to 0");
 
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM);
@@ -558,7 +566,8 @@ public class RingActivity extends Activity {
     private boolean updateIncreasingVolume() {
         Log.v(TAG, "updateIncreasingVolume");
 
-        if (isMuted) return false;
+        if (isMuted)
+            return false;
 
         increasingVolumePercentage++;
         Log.v(TAG, "   volume percentage = " + increasingVolumePercentage);
@@ -660,7 +669,32 @@ public class RingActivity extends Activity {
         }
     }
 
+    private void startSensors() {
+        Log.v(TAG, "startSensors()");
+        sensorEventDetectors = new HashSet<>();
+
+        sensorEventDetectors.add(new Flip(this));
+        sensorEventDetectors.add(new Move(this));
+        sensorEventDetectors.add(new Shake(this));
+        sensorEventDetectors.add(new Proximity(this));
+
+        for (SensorEventDetector sensorEventDetector : sensorEventDetectors) {
+            sensorEventDetector.start();
+        }
+    }
+    
+    private void stopSensors() {
+        Log.v(TAG, "stopSensors()");
+
+        for (SensorEventDetector sensorEventDetector : sensorEventDetectors) {
+            sensorEventDetector.stop();
+        }
+    }
+
     public Calendar clock() {
         return new SystemClock().now();
     }
+
 }
+
+
