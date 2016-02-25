@@ -182,7 +182,8 @@ public class AlarmMorningActivity extends AppCompatActivity implements ActivityI
                 mFragment = new CalendarFragment();
                 break;
             case R.id.navigation_defaults:
-                mFragment = new DefaultsFragment();
+                Intent defaultsActivityIntent = new Intent(this, DefaultsActivity.class);
+                startActivity(defaultsActivityIntent);
                 break;
             case R.id.navigation_settings:
                 Intent settingsActivityIntent = new Intent(this, SettingsActivity.class);

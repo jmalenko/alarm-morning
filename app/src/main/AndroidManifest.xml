@@ -28,6 +28,11 @@
             android:theme="@style/FullscreenTheme">
         </activity>
         <activity
+            android:name=".DefaultsActivity"
+            android:label="@string/title_activity_defaults"
+            android:parentActivityName=".AlarmMorningActivity">
+        </activity>
+        <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings"
             android:parentActivityName=".AlarmMorningActivity">
