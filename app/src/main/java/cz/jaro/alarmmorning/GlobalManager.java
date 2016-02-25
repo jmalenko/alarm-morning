@@ -134,22 +134,25 @@ public class GlobalManager {
         Calendar time = new GregorianCalendar();
         time.setTime(new Date(timeInMS));
 
-        Calendar alarmTime = new GregorianCalendar();
-        alarmTime.setTime(new Date(alarmTimeInMS));
+        Calendar alarmTime = null;
+        if (alarmTimeInMS != -1) {
+            alarmTime = new GregorianCalendar();
+            alarmTime.setTime(new Date(alarmTimeInMS));
+        }
 
         NextAction nextAction = new NextAction(action, time, alarmTime);
         return nextAction;
     }
 
     public void setNextAction(NextAction nextAction) {
-        Log.v(TAG, "setNextAction(action=" + nextAction.action + ", time=" + nextAction.time.getTime() + ", alarmTime=" + (nextAction.alarmTime == null ? "null" : nextAction.alarmTime.getTime()) + ")");
+        Log.v(TAG, "setNextAction(action=" + nextAction.action + ", time=" + nextAction.time.getTime() + ", alarmTime=" + (nextAction.alarmTime != null ? nextAction.alarmTime.getTime() : "null") + ")");
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = preferences.edit();
 
         editor.putString(PERSIST_ACTION, nextAction.action);
         editor.putLong(PERSIST_TIME, nextAction.time.getTimeInMillis());
-        editor.putLong(PERSIST_ALARM_TIME, nextAction.time.getTimeInMillis());
+        editor.putLong(PERSIST_ALARM_TIME, nextAction.alarmTime != null ? nextAction.alarmTime.getTimeInMillis() : -1);
 
         editor.commit();
     }
