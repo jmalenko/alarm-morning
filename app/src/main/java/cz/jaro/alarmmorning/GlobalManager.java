@@ -142,7 +142,7 @@ public class GlobalManager {
     }
 
     public void setNextAction(NextAction nextAction) {
-        Log.v(TAG, "setNextAction(action=" + nextAction.action + ", time=" + nextAction.time.getTime() + ", alarmTime=" + nextAction.alarmTime.getTime() + ")");
+        Log.v(TAG, "setNextAction(action=" + nextAction.action + ", time=" + nextAction.time.getTime() + ", alarmTime=" + (nextAction.alarmTime == null ? "null" : nextAction.alarmTime.getTime()) + ")");
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = preferences.edit();
