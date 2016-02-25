@@ -7,7 +7,7 @@ import android.util.Log;
 import java.util.Arrays;
 
 import cz.jaro.alarmmorning.RingInterface;
-import cz.jaro.alarmmorning.SettingsFragment;
+import cz.jaro.alarmmorning.SettingsActivity;
 
 /**
  * Provides detection of device move.
@@ -21,7 +21,7 @@ public class Move extends SensorEventDetector {
     private double mAccel;
 
     public Move(RingInterface ringInterface) {
-        super(ringInterface, "move", Sensor.TYPE_ACCELEROMETER, SettingsFragment.PREF_ACTION_ON_MOVE);
+        super(ringInterface, "move", Sensor.TYPE_ACCELEROMETER, SettingsActivity.PREF_ACTION_ON_MOVE);
     }
 
     protected boolean isFiring(SensorEvent event) {

@@ -356,7 +356,7 @@ public class GlobalManager {
         Log.d(TAG, "getRingAfterSnoozeTime()");
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        int snoozeTime = preferences.getInt(SettingsFragment.PREF_SNOOZE_TIME, SettingsFragment.PREF_SNOOZE_TIME_DEFAULT);
+        int snoozeTime = preferences.getInt(SettingsActivity.PREF_SNOOZE_TIME, SettingsActivity.PREF_SNOOZE_TIME_DEFAULT);
 
         Calendar ringAfterSnoozeTime = clock.now();
         ringAfterSnoozeTime.add(Calendar.MINUTE, snoozeTime);

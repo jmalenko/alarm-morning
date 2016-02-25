@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <!-- The ActionBar displayed at the top -->
+    <!-- The toolbar displayed at the top -->
     <include
         layout="@layout/toolbar"
         android:layout_width="match_parent"
@@ -15,7 +15,6 @@
         android:id="@+id/drawer_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <!--android:fitsSystemWindows="false"-->
 
         <!-- The main content view -->
         <LinearLayout

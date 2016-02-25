@@ -6,14 +6,23 @@ import android.content.res.Resources;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
-import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
+import android.support.v4.app.NavUtils;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.TypedValue;
+import android.view.LayoutInflater;
+import android.view.MenuItem;
+import android.view.ViewGroup;
+import android.widget.ListView;
 
-public class SettingsFragment extends PreferenceFragment {
+import cz.jaro.alarmmorning.graphics.AppCompatPreferenceActivity;
+
+public class SettingsActivity extends AppCompatPreferenceActivity {
 
     // TODO Reregister system alarm if the preference for future time changes
     // TODO Reregister system alarm if the alarm is snoozed and the preference for snooze time changes
@@ -72,6 +81,7 @@ public class SettingsFragment extends PreferenceFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setupActionBar();
 
         // Load the preferences from an XML resource
         addPreferencesFromResource(R.xml.preferences);
@@ -85,6 +95,48 @@ public class SettingsFragment extends PreferenceFragment {
         bindPreferenceSummaryToValue(findPreference(PREF_ACTION_ON_FLIP));
         bindPreferenceSummaryToValue(findPreference(PREF_ACTION_ON_SHAKE));
         bindPreferenceSummaryToValue(findPreference(PREF_ACTION_ON_PROXIMITY));
+    }
+
+    /**
+     * Set up the {@link android.app.ActionBar}, if the API is available.
+     */
+    private void setupActionBar() {
+        Toolbar toolbar;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            ViewGroup root = (ViewGroup) findViewById(android.R.id.list).getParent().getParent().getParent();
+            toolbar = (Toolbar) LayoutInflater.from(this).inflate(R.layout.toolbar, root, false);
+            root.addView(toolbar, 0);
+        } else {
+            ViewGroup root = (ViewGroup) findViewById(android.R.id.content);
+            ListView content = (ListView) root.getChildAt(0);
+            root.removeAllViews();
+            toolbar = (Toolbar) LayoutInflater.from(this).inflate(R.layout.toolbar, root, false);
+            int height;
+            TypedValue tv = new TypedValue();
+            if (getTheme().resolveAttribute(R.attr.actionBarSize, tv, true)) {
+                height = TypedValue.complexToDimensionPixelSize(tv.data, getResources().getDisplayMetrics());
+            } else {
+                height = toolbar.getHeight();
+            }
+            content.setPadding(0, height, 0, 0);
+            root.addView(content);
+            root.addView(toolbar);
+        }
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    @Override
+    public boolean onMenuItemSelected(int featureId, MenuItem item) {
+        int id = item.getItemId();
+        if (id == android.R.id.home) {
+            if (!super.onMenuItemSelected(featureId, item)) {
+                NavUtils.navigateUpFromSameTask(this);
+            }
+            return true;
+        }
+        return super.onMenuItemSelected(featureId, item);
     }
 
     /**
@@ -170,7 +222,7 @@ public class SettingsFragment extends PreferenceFragment {
     }
 
     public static int getRealVolume(double volumePreference, int maxVolume) {
-        return (int) Math.ceil(((volumePreference / SettingsFragment.PREF_VOLUME_MAX) * maxVolume));
+        return (int) Math.ceil(((volumePreference / SettingsActivity.PREF_VOLUME_MAX) * maxVolume));
     }
 
     /**

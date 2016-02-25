@@ -163,7 +163,7 @@ public class SystemAlarm {
 
     private Calendar getNearFutureTime(Calendar alarmTime) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        int nearFutureMinutes = preferences.getInt(SettingsFragment.PREF_NEAR_FUTURE_TIME, SettingsFragment.PREF_NEAR_FUTURE_TIME_DEFAULT);
+        int nearFutureMinutes = preferences.getInt(SettingsActivity.PREF_NEAR_FUTURE_TIME, SettingsActivity.PREF_NEAR_FUTURE_TIME_DEFAULT);
 
         Calendar nearFutureTime = (Calendar) alarmTime.clone();
         nearFutureTime.add(Calendar.MINUTE, -nearFutureMinutes);

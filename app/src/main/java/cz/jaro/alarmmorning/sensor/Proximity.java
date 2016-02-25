@@ -7,7 +7,7 @@ import android.util.Log;
 import java.util.Arrays;
 
 import cz.jaro.alarmmorning.RingInterface;
-import cz.jaro.alarmmorning.SettingsFragment;
+import cz.jaro.alarmmorning.SettingsActivity;
 
 /**
  * Provides detection of proximity a near object to the device.
@@ -22,7 +22,7 @@ public class Proximity extends SensorEventDetector {
     private float mMax;
 
     public Proximity(RingInterface ringInterface) {
-        super(ringInterface, "proximity", Sensor.TYPE_PROXIMITY, SettingsFragment.PREF_ACTION_ON_PROXIMITY);
+        super(ringInterface, "proximity", Sensor.TYPE_PROXIMITY, SettingsActivity.PREF_ACTION_ON_PROXIMITY);
     }
 
     protected boolean isFiring(SensorEvent event) {

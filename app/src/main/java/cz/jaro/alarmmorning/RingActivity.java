@@ -394,9 +394,9 @@ public class RingActivity extends Activity implements RingInterface {
         Uri ringtoneUri;
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 
-        if (preferences.contains(SettingsFragment.PREF_RINGTONE)) {
-            String ringtonePreference = preferences.getString(SettingsFragment.PREF_RINGTONE, SettingsFragment.PREF_RINGTONE_DEFAULT);
-            ringtoneUri = ringtonePreference.equals(SettingsFragment.PREF_RINGTONE_DEFAULT) ? null : Uri.parse(ringtonePreference);
+        if (preferences.contains(SettingsActivity.PREF_RINGTONE)) {
+            String ringtonePreference = preferences.getString(SettingsActivity.PREF_RINGTONE, SettingsActivity.PREF_RINGTONE_DEFAULT);
+            ringtoneUri = ringtonePreference.equals(SettingsActivity.PREF_RINGTONE_DEFAULT) ? null : Uri.parse(ringtonePreference);
         } else {
             ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
         }
@@ -546,7 +546,7 @@ public class RingActivity extends Activity implements RingInterface {
         Log.d(TAG, "startVolume()");
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        int volumePreference = preferences.getInt(SettingsFragment.PREF_VOLUME, SettingsFragment.PREF_VOLUME_DEFAULT);
+        int volumePreference = preferences.getInt(SettingsActivity.PREF_VOLUME, SettingsActivity.PREF_VOLUME_DEFAULT);
 
         if (volumePreference == 0)
             Log.w(TAG, "Volume is set to 0");
@@ -557,13 +557,13 @@ public class RingActivity extends Activity implements RingInterface {
         previousVolume = audioManager.getStreamVolume(AudioManager.STREAM_ALARM);
         Log.v(TAG, "previous volume= " + previousVolume);
 
-        volume = SettingsFragment.getRealVolume(volumePreference, maxVolume);
+        volume = SettingsActivity.getRealVolume(volumePreference, maxVolume);
 
         Log.v(TAG, "preference volume = " + volumePreference);
         Log.v(TAG, "max volume= " + maxVolume);
         Log.v(TAG, "volume = " + volume);
 
-        increasing = preferences.getBoolean(SettingsFragment.PREF_VOLUME_INCREASING, SettingsFragment.PREF_VOLUME_INCREASING_DEFAULT);
+        increasing = preferences.getBoolean(SettingsActivity.PREF_VOLUME_INCREASING, SettingsActivity.PREF_VOLUME_INCREASING_DEFAULT);
 
         if (increasing) {
             increasingVolumePercentage = 0;
@@ -624,7 +624,7 @@ public class RingActivity extends Activity implements RingInterface {
         Log.d(TAG, "startVibrate()");
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        boolean vibratePreference = preferences.getBoolean(SettingsFragment.PREF_VIBRATE, SettingsFragment.PREF_VIBRATE_DEFAULT);
+        boolean vibratePreference = preferences.getBoolean(SettingsActivity.PREF_VIBRATE, SettingsActivity.PREF_VIBRATE_DEFAULT);
 
         isVibrating = false;
 
@@ -674,10 +674,10 @@ public class RingActivity extends Activity implements RingInterface {
         Log.d(TAG, "onKeyDown(keycode=" + keycode + ")");
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        String buttonActionPreference = preferences.getString(SettingsFragment.PREF_ACTION_ON_BUTTON, SettingsFragment.PREF_ACTION_DEFAULT);
+        String buttonActionPreference = preferences.getString(SettingsActivity.PREF_ACTION_ON_BUTTON, SettingsActivity.PREF_ACTION_DEFAULT);
 
         switch (buttonActionPreference) {
-            case SettingsFragment.PREF_ACTION_DEFAULT:
+            case SettingsActivity.PREF_ACTION_DEFAULT:
                 Log.d(TAG, "Doing nothing");
                 return super.onKeyDown(keycode, e);
 
@@ -721,20 +721,20 @@ public class RingActivity extends Activity implements RingInterface {
     @Override
     public void actOnEvent(String action) {
         switch (action) {
-            case SettingsFragment.PREF_ACTION_DEFAULT:
+            case SettingsActivity.PREF_ACTION_DEFAULT:
                 Log.d(TAG, "Doing nothing");
                 return;
 
-            case SettingsFragment.PREF_ACTION_MUTE:
+            case SettingsActivity.PREF_ACTION_MUTE:
                 doMute();
                 return;
 
-            case SettingsFragment.PREF_ACTION_SNOOZE:
+            case SettingsActivity.PREF_ACTION_SNOOZE:
                 Log.i(TAG, "Snooze");
                 doSnooze(getBaseContext());
                 return;
 
-            case SettingsFragment.PREF_ACTION_DISMISS:
+            case SettingsActivity.PREF_ACTION_DISMISS:
                 Log.i(TAG, "Dismiss");
                 doDismiss(getBaseContext());
                 return;

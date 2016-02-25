@@ -27,6 +27,11 @@
             android:label="@string/title_activity_ring"
             android:theme="@style/FullscreenTheme">
         </activity>
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".AlarmMorningActivity">
+        </activity>
 
         <receiver android:name=".receivers.AlarmReceiver"/>
         <receiver android:name=".receivers.BootReceiver">

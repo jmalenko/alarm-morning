@@ -185,7 +185,8 @@ public class AlarmMorningActivity extends AppCompatActivity implements ActivityI
                 mFragment = new DefaultsFragment();
                 break;
             case R.id.navigation_settings:
-                mFragment = new SettingsFragment();
+                Intent settingsActivityIntent = new Intent(this, SettingsActivity.class);
+                startActivity(settingsActivityIntent);
                 break;
             case R.id.navigation_website:
                 closeNavigationDrawer();

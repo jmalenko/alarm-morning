@@ -7,7 +7,7 @@ import android.util.Log;
 import java.util.Arrays;
 
 import cz.jaro.alarmmorning.RingInterface;
-import cz.jaro.alarmmorning.SettingsFragment;
+import cz.jaro.alarmmorning.SettingsActivity;
 
 /**
  * Provides detection of device flip.
@@ -22,7 +22,7 @@ public class Flip extends SensorEventDetector {
     private boolean mUp;
 
     public Flip(RingInterface ringInterface) {
-        super(ringInterface, "flip", Sensor.TYPE_ACCELEROMETER, SettingsFragment.PREF_ACTION_ON_FLIP);
+        super(ringInterface, "flip", Sensor.TYPE_ACCELEROMETER, SettingsActivity.PREF_ACTION_ON_FLIP);
     }
 
     protected boolean isFiring(SensorEvent event) {

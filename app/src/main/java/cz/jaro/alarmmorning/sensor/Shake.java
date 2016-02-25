@@ -7,7 +7,7 @@ import android.util.Log;
 import java.util.Arrays;
 
 import cz.jaro.alarmmorning.RingInterface;
-import cz.jaro.alarmmorning.SettingsFragment;
+import cz.jaro.alarmmorning.SettingsActivity;
 
 /**
  * Provides detection of device shake.
@@ -24,7 +24,7 @@ public class Shake extends SensorEventDetector {
     private long mShakeStartTime;
 
     public Shake(RingInterface ringInterface) {
-        super(ringInterface, "shake", Sensor.TYPE_ACCELEROMETER, SettingsFragment.PREF_ACTION_ON_SHAKE);
+        super(ringInterface, "shake", Sensor.TYPE_ACCELEROMETER, SettingsActivity.PREF_ACTION_ON_SHAKE);
     }
 
     protected boolean isFiring(SensorEvent event) {
