@@ -1,45 +1,51 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:custom="http://schemas.android.com/apk/res-auto">
 
-    <RingtonePreference
-        android:key="pref_ringtone"
-        android:title="@string/pref_title_ringtone"
-        android:ringtoneType="alarm"
-        android:defaultValue="content://settings/system/notification_sound" />
+    <PreferenceCategory
+        android:title="@string/pref_ring_appearance"
+        android:key="pref_ring_appearance">
 
-    <cz.jaro.alarmmorning.graphics.VolumePreference
-        android:key="pref_volume"
-        android:title="@string/pref_title_volume"
-        android:numeric="integer"
-        android:defaultValue="8"
-        custom:maxValue="10" />
+        <RingtonePreference
+            android:key="pref_ringtone"
+            android:title="@string/pref_title_ringtone"
+            android:ringtoneType="alarm"
+            android:defaultValue="content://settings/system/notification_sound"/>
 
-    <CheckBoxPreference
-        android:key="pref_volume_increasing"
-        android:title="@string/pref_title_volume_increasing"
-        android:summaryOff="@string/pref_summaryoff_volume_increasing"
-        android:summaryOn="@string/pref_summaryon_volume_increasing"
-        android:defaultValue="true" />
+        <cz.jaro.alarmmorning.graphics.VolumePreference
+            android:key="pref_volume"
+            android:title="@string/pref_title_volume"
+            android:numeric="integer"
+            android:defaultValue="8"
+            custom:maxValue="10"/>
 
-    <CheckBoxPreference
-        android:key="pref_vibrate"
-        android:title="@string/pref_title_vibrate"
-        android:summaryOff="@string/pref_summaryoff_vibrate"
-        android:summaryOn="@string/pref_summaryon_vibrate"
-        android:defaultValue="true" />
+        <CheckBoxPreference
+            android:key="pref_volume_increasing"
+            android:title="@string/pref_title_volume_increasing"
+            android:summaryOff="@string/pref_summaryoff_volume_increasing"
+            android:summaryOn="@string/pref_summaryon_volume_increasing"
+            android:defaultValue="true"/>
 
-    <cz.jaro.alarmmorning.graphics.IntegerPreference
-        android:key="pref_snooze_time"
-        android:title="@string/pref_title_snooze_time"
-        android:defaultValue="10"
-        custom:minValue="1"
-        custom:maxValue="60" />
+        <CheckBoxPreference
+            android:key="pref_vibrate"
+            android:title="@string/pref_title_vibrate"
+            android:summaryOff="@string/pref_summaryoff_vibrate"
+            android:summaryOn="@string/pref_summaryon_vibrate"
+            android:defaultValue="true"/>
 
-    <cz.jaro.alarmmorning.graphics.RelativeTimePreference
-        android:key="pref_near_future_time"
-        android:title="@string/pref_title_near_future_time"
-        android:defaultValue="120"
-        custom:maxHour="12" />
+        <cz.jaro.alarmmorning.graphics.IntegerPreference
+            android:key="pref_snooze_time"
+            android:title="@string/pref_title_snooze_time"
+            android:defaultValue="10"
+            custom:minValue="1"
+            custom:maxValue="60"/>
+
+        <cz.jaro.alarmmorning.graphics.RelativeTimePreference
+            android:key="pref_near_future_time"
+            android:title="@string/pref_title_near_future_time"
+            android:defaultValue="120"
+            custom:maxHour="12"/>
+
+    </PreferenceCategory>
 
     <PreferenceCategory
         android:title="@string/pref_ring_actions_title"
