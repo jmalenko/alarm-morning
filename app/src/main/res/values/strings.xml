@@ -9,6 +9,11 @@
     <!-- Default activity -->
     <string name="title_activity_defaults">Default alarms</string>
 
+    <string name="change_others_title">Set alarm to %1$s on %2$s too?</string>
+    <string name="change_others_message">This quickly changes other weekdays with the same alarm time to the new alarm time.</string>
+    <string name="change_others_yes">Change</string>
+    <string name="change_others_no">No</string>
+
     <!-- Settings activity -->
     <string name="title_activity_settings">Settings</string>
 
@@ -51,6 +56,10 @@
     <!-- Descriptions for accessibility -->
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
+
+    <!-- Localization -->
+    <string name="list_separator">", "</string>
+    <string name="list_separator_last">" and "</string>
 
     <!-- Menu (left drawer) -->
     <string name="menu_calendar_title">Scheduled alarms</string>

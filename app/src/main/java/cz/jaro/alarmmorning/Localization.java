@@ -1,11 +1,13 @@
 package cz.jaro.alarmmorning;
 
 import android.content.Context;
+import android.content.res.Resources;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import cz.jaro.alarmmorning.clock.Clock;
 
@@ -28,6 +30,39 @@ public class Localization {
         SimpleDateFormat sdf = new SimpleDateFormat("E");
         sdf.setCalendar(date);
         return sdf.format(date.getTime());
+    }
+
+    /**
+     * Converts the list of days of week identifiers to string.
+     *
+     * @param daysOfWeek list of day of week identifiers
+     * @param res        resources
+     * @param clock      clock
+     * @return string with the names of days. The can be simly inserted into a sentence.
+     */
+    public static String daysOfWeekToString(List<Integer> daysOfWeek, Resources res, Clock clock) {
+        String title;
+
+        int index = daysOfWeek.size();
+
+        if (index == 0) {
+            title = "";
+        } else {
+            title = Localization.dayOfWeekToString(daysOfWeek.get(--index), clock);
+
+            if (0 < index) {
+                title = Localization.dayOfWeekToString(daysOfWeek.get(--index), clock)
+                        + res.getString(R.string.list_separator_last)
+                        + title;
+            }
+
+            while (0 < index) {
+                title = Localization.dayOfWeekToString(daysOfWeek.get(--index), clock)
+                        + res.getString(R.string.list_separator)
+                        + title;
+            }
+        }
+        return title;
     }
 
     /**

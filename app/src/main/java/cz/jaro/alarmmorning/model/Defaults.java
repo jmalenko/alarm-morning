@@ -3,7 +3,7 @@ package cz.jaro.alarmmorning.model;
 /**
  * Represents the alarm clock setting for a particular weekday.
  */
-public class Defaults {
+public class Defaults implements Cloneable {
 
     /**
      * Value of the {@code state} field indicating the disabled state.
@@ -93,5 +93,15 @@ public class Defaults {
         } else {
             setState(STATE_ENABLED);
         }
+    }
+
+    @Override
+    public Defaults clone() {
+        Defaults cloned = new Defaults();
+        cloned.setState(getState());
+        cloned.setDayOfWeek(getDayOfWeek());
+        cloned.setHour(getHour());
+        cloned.setMinute(getMinute());
+        return cloned;
     }
 }
