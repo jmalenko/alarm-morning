@@ -24,12 +24,43 @@ public class Localization {
      * @return the name of the day of week
      */
     public static String dayOfWeekToString(int dayOfWeek, Clock clock) {
+        // TODO Localization - rename to ...Short (usein calendar) and create ...Long (use in sentende, dialogue to change other days with the same alarm time
         // TODO Remove dependency on clock
+
         Calendar date = clock.now();
         date.set(Calendar.DAY_OF_WEEK, dayOfWeek);
         SimpleDateFormat sdf = new SimpleDateFormat("E");
         sdf.setCalendar(date);
         return sdf.format(date.getTime());
+    }
+
+    /**
+     * Converts the day of week identifier to string.
+     *
+     * @param dayOfWeek identifier of the day of week. Use identifiers from {@code Calendar} class, like {@link Calendar#SUNDAY}.
+     * @param res       resources
+     * @return the name of the day of week
+     */
+    public static String dayOfWeekToString2(int dayOfWeek, Resources res) {
+        // TODO Localization - consider using values in LOCALE - day names, month names, formats of calendar days...
+        switch (dayOfWeek) {
+            case Calendar.SUNDAY:
+                return res.getString(R.string.sunday_short);
+            case Calendar.MONDAY:
+                return res.getString(R.string.monday_short);
+            case Calendar.TUESDAY:
+                return res.getString(R.string.tuesday_short);
+            case Calendar.WEDNESDAY:
+                return res.getString(R.string.wednesday_short);
+            case Calendar.THURSDAY:
+                return res.getString(R.string.thursday_short);
+            case Calendar.FRIDAY:
+                return res.getString(R.string.friday_short);
+            case Calendar.SATURDAY:
+                return res.getString(R.string.saturday_short);
+            default:
+                throw new IllegalArgumentException("Unexpected argument " + dayOfWeek);
+        }
     }
 
     /**
