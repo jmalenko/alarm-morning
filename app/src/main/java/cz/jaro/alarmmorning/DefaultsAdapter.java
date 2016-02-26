@@ -4,7 +4,9 @@ import android.app.FragmentManager;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -117,6 +119,13 @@ public class DefaultsAdapter extends RecyclerView.Adapter<DefaultsAdapter.Defaul
 
         // Create list of weekdays to change
         otherWeekdaysWithTheSameAlarmTime = new ArrayList<>();
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(activityInterface.getContextI());
+        boolean askPreference = preferences.getBoolean(SettingsActivity.PREF_ASK_TO_CHANGE_OTHER_WEEKDAYS_WIT_THE_SAME_ALARM_TIME, SettingsActivity.PREF_ASK_TO_CHANGE_OTHER_WEEKDAYS_WIT_THE_SAME_ALARM_TIME_DEFAULT);
+
+        if (!askPreference)
+            return;
+
         for (int dayOfWeek : AlarmDataSource.allDaysOfWeek) {
             Defaults defaults = dataSource.loadDefault(dayOfWeek);
             boolean sameAlarmTime = defaults.getState() == changingDefaults.getState() &&

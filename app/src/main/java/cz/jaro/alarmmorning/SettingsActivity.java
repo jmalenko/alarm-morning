@@ -57,6 +57,12 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
      */
     public static final String PREF_NEAR_FUTURE_TIME = "pref_near_future_time";
 
+    /**
+     * Value is boolean.
+     */
+    public static final String PREF_ASK_TO_CHANGE_OTHER_WEEKDAYS_WIT_THE_SAME_ALARM_TIME = "pref_ask_to_change_other_weekdays_with_the_same_alarm_time";
+
+
     public static final String PREF_ACTION_ON_BUTTON = "pref_action_on_button";
     public static final String PREF_ACTION_ON_MOVE = "pref_action_on_move";
     public static final String PREF_ACTION_ON_FLIP = "pref_action_on_flip";
@@ -75,6 +81,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     public static final int PREF_SNOOZE_TIME_DEFAULT = 10;
     public static final int PREF_NEAR_FUTURE_TIME_DEFAULT = 120;
     public static final String PREF_ACTION_DEFAULT = PREF_ACTION_NOTHING;
+    public static final boolean PREF_ASK_TO_CHANGE_OTHER_WEEKDAYS_WIT_THE_SAME_ALARM_TIME_DEFAULT = true;
 
     public static final int PREF_VOLUME_MAX = 10;
 
