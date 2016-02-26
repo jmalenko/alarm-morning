@@ -14,6 +14,10 @@
     <string name="change_others_yes">Change</string>
     <string name="change_others_no">No</string>
 
+    <string name="menu_default_header">%1$s on %2$s</string>
+    <string name="menu_default_set_time">Set time</string>
+    <string name="menu_default_disable">Disable</string>
+
     <!-- Settings activity -->
     <string name="title_activity_settings">Settings</string>
 
@@ -66,4 +70,5 @@
     <string name="menu_defaults_title">Default alarms</string>
     <string name="menu_settings_title">Settings</string>
     <string name="menu_website_title">Website</string>
+
 </resources>
