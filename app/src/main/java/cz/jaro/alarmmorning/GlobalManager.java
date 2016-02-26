@@ -87,7 +87,7 @@ public class GlobalManager {
         dataSource.open();
 
         Clock clock = new SystemClock();
-        Calendar today = CalendarAdapter.getToday(clock);
+        Calendar today = CalendarFragment.getToday(clock);
         Day day = dataSource.loadDayDeep(today);
 
         dataSource.close();

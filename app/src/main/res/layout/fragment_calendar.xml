@@ -1,4 +1,4 @@
-<android.support.v7.widget.RecyclerView
+<cz.jaro.alarmmorning.graphics.RecyclerViewWithContextMenu
     android:id="@+id/calendar_recycler_view"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"

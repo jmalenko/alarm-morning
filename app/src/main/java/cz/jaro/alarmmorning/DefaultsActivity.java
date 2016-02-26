@@ -3,7 +3,6 @@ package cz.jaro.alarmmorning;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
@@ -96,7 +95,10 @@ public class DefaultsActivity extends AppCompatActivity implements View.OnCreate
         globalManager.onAlarmSet();
     }
 
-    // On click
+    /*
+     * On click
+     * ========
+     */
 
     @Override
     public void onClick(View view) {
@@ -138,7 +140,10 @@ public class DefaultsActivity extends AppCompatActivity implements View.OnCreate
         showDialogChangeOtherDays();
     }
 
-    // On context menu
+    /*
+     * On context menu
+     * ===============
+     */
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
@@ -151,19 +156,28 @@ public class DefaultsActivity extends AppCompatActivity implements View.OnCreate
         // Set header
 
         defaults = loadPosition(position);
-        Resources res = getResources();
 
         Clock clock = new SystemClock();
         String dayOfWeekText = Localization.dayOfWeekToString(defaults.getDayOfWeek(), clock);
 
-        String timeText;
+        String headerTitle;
         if (defaults.isEnabled()) {
-            timeText = Localization.timeToString(defaults.getHour(), defaults.getMinute(), this, clock);
+            String timeText;
+            if (defaults.isEnabled()) {
+                timeText = Localization.timeToString(defaults.getHour(), defaults.getMinute(), this, clock);
+            } else {
+                timeText = getResources().getString(R.string.alarm_unset);
+            }
+            headerTitle = getResources().getString(R.string.menu_default_header, timeText, dayOfWeekText);
         } else {
-            timeText = getResources().getString(R.string.alarm_unset);
+            headerTitle = getResources().getString(R.string.menu_default_header_disabled, dayOfWeekText);
         }
-        String headerTitle = res.getString(R.string.menu_default_header, timeText, dayOfWeekText);
         menu.setHeaderTitle(headerTitle);
+
+        // Hide irrelevant items
+
+        MenuItem disable = menu.findItem(R.id.default_disable);
+        disable.setVisible(defaults.isEnabled());
     }
 
     @Override
@@ -182,7 +196,10 @@ public class DefaultsActivity extends AppCompatActivity implements View.OnCreate
         return super.onContextItemSelected(item);
     }
 
-    // Change other days
+    /*
+     * Change other days
+     * =================
+     */
 
     /**
      * Create list of weekdays to change.

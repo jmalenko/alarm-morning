@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/day_set_time"
+        android:title="@string/menu_day_set_time"/>
+
+    <item
+        android:id="@+id/day_disable"
+        android:title="@string/menu_day_disable"/>
+
+    <item
+        android:id="@+id/day_revert"
+        android:title="@string/menu_day_revert"/>
+
+    <item
+        android:id="@+id/day_dismiss"
+        android:title="@string/action_dismiss"/>
+
+    <item
+        android:id="@+id/day_snooze"
+        android:title="@string/action_snooze"/>
+</menu>

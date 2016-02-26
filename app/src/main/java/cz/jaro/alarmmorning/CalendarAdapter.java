@@ -1,18 +1,12 @@
 package cz.jaro.alarmmorning;
 
-import android.app.FragmentManager;
-import android.app.TimePickerDialog;
-import android.content.Context;
 import android.content.res.Resources;
-import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.TimePicker;
-import android.widget.Toast;
 
 import java.util.Calendar;
 
@@ -24,39 +18,19 @@ import cz.jaro.alarmmorning.model.Day;
 /**
  * Provide views to RecyclerView with data from mDataSet.
  */
-public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.CalendarViewHolder> implements TimePickerDialog.OnTimeSetListener {
+public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.CalendarViewHolder> {
 
     private static final String TAG = CalendarAdapter.class.getSimpleName();
 
-    private static final int POSITION_UNSET = -1;
-
-    private ActivityInterface activityInterface;
-    private Calendar today;
-    private AlarmDataSource dataSource;
-    private Day changingDay;
-    private int changingItem;
-
-    private int positionNextAlarm;
-
-    // TODO Change time of ringing alarm
-
-    // TODO Show not dismissed alarms from previous days
-
-    // TODO Add menu item "Dismiss" in "near future" and when snoozed
+    private final CalendarFragment fragment;
 
     /**
      * Initialize the Adapter.
      *
-     * @param activityInterface interface to fields accessible in Activity
+     * @param fragment
      */
-    public CalendarAdapter(ActivityInterface activityInterface) {
-        this.activityInterface = activityInterface;
-
-        dataSource = new AlarmDataSource(activityInterface.getContextI());
-        dataSource.open();
-
-        today = getToday(clock());
-        updatePositionNextAlarm();
+    public CalendarAdapter(CalendarFragment fragment) {
+        this.fragment = fragment;
     }
 
     /**
@@ -64,9 +38,11 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
      */
     @Override
     public CalendarViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
-        View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.calendar_row_item, viewGroup, false);
+        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.calendar_row_item, viewGroup, false);
 
-        return new CalendarViewHolder(v, activityInterface.getFragmentManagerI(), this);
+        view.setOnClickListener(fragment);
+
+        return new CalendarViewHolder(view);
     }
 
     /**
@@ -76,9 +52,10 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
     public void onBindViewHolder(CalendarViewHolder viewHolder, final int position) {
         Log.v(TAG, "Replacing position " + position);
 
-        Calendar date = addDays(today, position);
+        Day day = fragment.loadPosition(position);
+        Calendar date = day.getDateTime();
 
-        Resources res = activityInterface.getResourcesI();
+        Resources res = fragment.getResources();
 
         int dayOfWeek = date.get(Calendar.DAY_OF_WEEK);
         String dayOfWeekText = Localization.dayOfWeekToString(dayOfWeek, clock());
@@ -87,10 +64,9 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         String dateText = Localization.dateToStringVeryShort(date.getTime());
         viewHolder.getTextDate().setText(dateText);
 
-        Day day = dataSource.loadDayDeep(date);
         String timeText;
         if (day.isEnabled()) {
-            timeText = Localization.timeToString(day.getHourX(), day.getMinuteX(), activityInterface.getContextI(), clock());
+            timeText = Localization.timeToString(day.getHourX(), day.getMinuteX(), fragment.activityInterface.getContextI(), clock());
         } else {
             timeText = res.getString(R.string.alarm_unset);
         }
@@ -98,7 +74,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
 
         boolean enabled = true;
         if (position == 0) {
-            GlobalManager globalManager = new GlobalManager(activityInterface.getContextI());
+            GlobalManager globalManager = new GlobalManager(fragment.activityInterface.getContextI());
             int state = globalManager.getState(day.getDateTime());
             if (state != GlobalManager.STATE_UNDEFINED) {
                 enabled = state != GlobalManager.STATE_DISMISSED_BEFORE_RINGING && state != GlobalManager.STATE_DISMISSED;
@@ -110,7 +86,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
 
         String stateText;
         if (position == 0) {
-            GlobalManager globalManager = new GlobalManager(activityInterface.getContextI());
+            GlobalManager globalManager = new GlobalManager(fragment.activityInterface.getContextI());
             int state = globalManager.getState(day.getDateTime());
             if (state != GlobalManager.STATE_UNDEFINED) {
                 if (state == GlobalManager.STATE_FUTURE) {
@@ -142,10 +118,10 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         viewHolder.getTextState().setText(stateText);
 
         String messageText;
-        if (position == positionNextAlarm) {
+        if (fragment.positionWithNextAlarm(position)) {
             long diff = day.getTimeToRing(clock());
 
-            TimeDifference timeDifference = TimeDifference.getTimeUnits(diff);
+            TimeDifference timeDifference = TimeDifference.split(diff);
 
             if (timeDifference.days > 0) {
                 messageText = res.getString(R.string.time_to_ring_message_days, timeDifference.days, timeDifference.hours);
@@ -158,53 +134,11 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
             messageText = "";
         }
         viewHolder.getTextComment().setText(messageText);
-
-        viewHolder.setDay(day);
-        viewHolder.setPosition(position);
     }
 
     // TODO Solve dependency on clock
     private Clock clock() {
         return new SystemClock();
-    }
-
-    private int calcPositionNextAlarm() {
-        for (int position = 0; position < AlarmDataSource.HORIZON_DAYS; position++) {
-
-            Calendar date = addDays(today, position);
-
-            Day day = dataSource.loadDayDeep(date);
-
-            if (day.isEnabled() && !day.isPassed(clock())) {
-                // TODO At one time point, there may be up to two early dismissed alarm. At Monday 23:00, the user can early dismiss  te alarm on Monday 23:30 and Tuesday 0:30.
-                GlobalManager globalManager = new GlobalManager(activityInterface.getContextI());
-                int state = globalManager.getState(day.getDateTime());
-                if (state != GlobalManager.STATE_UNDEFINED) {
-                    if (state != GlobalManager.STATE_DISMISSED_BEFORE_RINGING && state != GlobalManager.STATE_DISMISSED) {
-                        return position;
-                    }
-                } else {
-                    return position;
-                }
-            }
-        }
-        return POSITION_UNSET;
-    }
-
-    protected void updatePositionNextAlarm() {
-        int newPositionNextAlarm = calcPositionNextAlarm();
-
-        if (positionNextAlarm != newPositionNextAlarm) {
-            Log.d(TAG, "Next alarm is at position " + newPositionNextAlarm);
-
-            int oldPositionNextAlarm = positionNextAlarm;
-            positionNextAlarm = newPositionNextAlarm;
-
-            if (oldPositionNextAlarm != POSITION_UNSET)
-                notifyItemChanged(oldPositionNextAlarm);
-            if (positionNextAlarm != POSITION_UNSET)
-                notifyItemChanged(positionNextAlarm);
-        }
     }
 
     /**
@@ -215,156 +149,19 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         return AlarmDataSource.HORIZON_DAYS;
     }
 
-    public void onResume() {
-        Calendar today2 = getToday(clock());
-
-        if (!today.equals(today2)) {
-            today = today2;
-            notifyDataSetChanged();
-        } else {
-            notifyItemChanged(positionNextAlarm);
-        }
-    }
-
-    public void onDestroy() {
-        dataSource.close();
-    }
-
-    public void onSystemTimeChange() {
-        Log.v(TAG, "onSystemTimeChange()");
-
-        // Update time to next alarm
-        if (positionNextAlarm != POSITION_UNSET)
-            notifyItemChanged(positionNextAlarm);
-
-        // Shift items when date changes
-        Calendar today2 = getToday(clock());
-
-        if (!today.equals(today2)) {
-            int diffInDays = -1;
-            for (int i = 1; i < AlarmDataSource.HORIZON_DAYS; i++) {
-                Calendar date = addDays(today, i);
-                if (today2.equals(date)) {
-                    diffInDays = i;
-                    break;
-                }
-            }
-
-            today = today2;
-
-            if (diffInDays != -1) {
-                notifyItemRangeRemoved(0, diffInDays);
-            } else {
-                notifyDataSetChanged();
-            }
-        }
-    }
-
-    public void onTimeOrTimeZoneChange() {
-        Log.d(TAG, "onTimeOrTimeZoneChange()");
-        today = getToday(clock());
-        notifyDataSetChanged();
-    }
-
-    @Override
-    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-        changingDay.setState(Day.STATE_ENABLED);
-        changingDay.setHour(hourOfDay);
-        changingDay.setMinute(minute);
-
-        save(changingDay);
-    }
-
-    public void onLongClick() {
-        changingDay.reverse();
-
-        save(changingDay);
-    }
-
-    private void save(Day day) {
-        dataSource.saveDay(day);
-
-        refresh();
-
-        String toastText = formatToastText(day);
-        Context context = activityInterface.getContextI();
-        Toast.makeText(context, toastText, Toast.LENGTH_LONG).show();
-    }
-
-    private void refresh() {
-        notifyItemChanged(changingItem);
-        updatePositionNextAlarm();
-
-        Context context = activityInterface.getContextI();
-        GlobalManager globalManager = new GlobalManager(context);
-        globalManager.onAlarmSet();
-    }
-
-    private String formatToastText(Day day) {
-        Resources res = activityInterface.getResourcesI();
-        String toastText;
-
-        if (!day.isEnabled()) {
-            toastText = res.getString(R.string.time_to_ring_toast_off);
-        } else {
-            long diff = day.getTimeToRing(clock());
-
-            if (diff < 0) {
-                toastText = res.getString(R.string.time_to_ring_toast_passed);
-            } else {
-                TimeDifference timeDifference = TimeDifference.getTimeUnits(diff);
-                if (timeDifference.days > 0) {
-                    toastText = res.getString(R.string.time_to_ring_toast_days, timeDifference.days, timeDifference.hours, timeDifference.minutes);
-                } else if (timeDifference.hours > 0) {
-                    toastText = res.getString(R.string.time_to_ring_toast_hours, timeDifference.hours, timeDifference.minutes);
-                } else {
-                    toastText = res.getString(R.string.time_to_ring_toast_minutes, timeDifference.minutes, timeDifference.seconds);
-                }
-            }
-        }
-        return toastText;
-    }
-
-    public static Calendar addDays(Calendar today, int numberOfDays) {
-        Calendar date = (Calendar) today.clone();
-        date.add(Calendar.DAY_OF_MONTH, numberOfDays);
-        return date;
-    }
-
-    public static Calendar getToday(Clock clock) {
-        Calendar today = clock.now();
-        today.set(Calendar.HOUR_OF_DAY, 0);
-        today.set(Calendar.MINUTE, 0);
-        today.set(Calendar.SECOND, 0);
-        today.set(Calendar.MILLISECOND, 0);
-
-        return today;
-    }
-
-    public void setChangingDay(Day changingDay, int changingItem) {
-        this.changingDay = changingDay;
-        this.changingItem = changingItem;
-    }
 
     /**
      * Provide a reference to the type of views that you are using (custom ViewHolder)
      */
-    public static class CalendarViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
-        private final FragmentManager fragmentManager;
-        private final CalendarAdapter calendarAdapter;
+    public static class CalendarViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener {
         private final TextView textDayOfWeek;
         private final TextView textDate;
         private final TextView textTime;
         private final TextView textState;
         private final TextView textComment;
-        private Day day;
-        private int position;
 
-        public CalendarViewHolder(View view, final FragmentManager fragmentManager, CalendarAdapter calendarAdapter) {
+        public CalendarViewHolder(View view) {
             super(view);
-
-            this.fragmentManager = fragmentManager;
-            this.calendarAdapter = calendarAdapter;
 
             textDayOfWeek = (TextView) view.findViewById(R.id.textDayOfWeekCal);
             textDate = (TextView) view.findViewById(R.id.textDate);
@@ -372,9 +169,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
             textState = (TextView) view.findViewById(R.id.textState);
             textComment = (TextView) view.findViewById(R.id.textComment);
 
-            view.setOnClickListener(this);
             view.setOnLongClickListener(this);
-
         }
 
         public TextView getTextDayOfWeek() {
@@ -397,46 +192,21 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
             return textComment;
         }
 
-        public void setDay(Day day) {
-            this.day = day;
-        }
-
-        public void setPosition(int position) {
-            this.position = position;
-        }
-
-        @Override
-        public void onClick(View view) {
-            calendarAdapter.setChangingDay(day, position);
-
-            TimePickerFragment fragment = new TimePickerFragment();
-
-            fragment.setOnTimeSetListener(calendarAdapter);
-
-            // Preset time
-            Bundle bundle = new Bundle();
-            bundle.putInt(TimePickerFragment.HOURS, day.getHourX());
-            bundle.putInt(TimePickerFragment.MINUTES, day.getMinuteX());
-            fragment.setArguments(bundle);
-
-            fragment.show(fragmentManager, "timePicker");
-        }
-
         @Override
         public boolean onLongClick(View view) {
-            calendarAdapter.setChangingDay(day, position);
-            calendarAdapter.onLongClick();
+            itemView.showContextMenu();
             return true;
         }
     }
 
-    private static class TimeDifference {
+
+    static class TimeDifference {
         long days;
         long hours;
         long minutes;
         long seconds;
 
-        public static TimeDifference getTimeUnits(long diff) {
+        public static TimeDifference split(long diff) {
             TimeDifference timeDifference = new TimeDifference();
 
             long remaining = diff;
@@ -461,4 +231,3 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         }
     }
 }
-

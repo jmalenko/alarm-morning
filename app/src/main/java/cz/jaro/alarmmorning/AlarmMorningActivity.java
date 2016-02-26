@@ -87,7 +87,7 @@ public class AlarmMorningActivity extends AppCompatActivity implements ActivityI
 
             if (mFragment instanceof CalendarFragment) {
                 CalendarFragment calendarFragment = (CalendarFragment) mFragment;
-                calendarFragment.adapter.onTimeOrTimeZoneChange();
+                calendarFragment.onTimeOrTimeZoneChange();
             }
         }
     };
@@ -156,7 +156,9 @@ public class AlarmMorningActivity extends AppCompatActivity implements ActivityI
         bManager.registerReceiver(bReceiver, b_intentFilter);
 
         if (savedInstanceState == null) {
-            mFragment = new CalendarFragment();
+            CalendarFragment calendarFragment = new CalendarFragment();
+            calendarFragment.setActivityInterface(this);
+            mFragment = calendarFragment;
             getFragmentManager().beginTransaction().replace(R.id.content_frame, mFragment).commit();
 
             // Highlight the menu item
@@ -179,16 +181,18 @@ public class AlarmMorningActivity extends AppCompatActivity implements ActivityI
     public void selectDrawerItem(MenuItem menuItem) {
         switch (menuItem.getItemId()) {
             case R.id.navigation_calendar:
-                mFragment = new CalendarFragment();
+                CalendarFragment calendarFragment = new CalendarFragment();
+                calendarFragment.setActivityInterface(this);
+                mFragment = calendarFragment;
                 break;
             case R.id.navigation_defaults:
                 Intent defaultsActivityIntent = new Intent(this, DefaultsActivity.class);
                 startActivity(defaultsActivityIntent);
-                break;
+                return;
             case R.id.navigation_settings:
                 Intent settingsActivityIntent = new Intent(this, SettingsActivity.class);
                 startActivity(settingsActivityIntent);
-                break;
+                return;
             case R.id.navigation_website:
                 closeNavigationDrawer();
 
