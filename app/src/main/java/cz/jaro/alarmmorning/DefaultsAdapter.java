@@ -103,7 +103,7 @@ public class DefaultsAdapter extends RecyclerView.Adapter<DefaultsAdapter.Defaul
 
     @Override
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-        calcultateChangeOtherDays();
+        calculaateChangeOtherDays();
 
         changingDefaults.setState(Defaults.STATE_ENABLED);
         changingDefaults.setHour(hourOfDay);
@@ -114,7 +114,7 @@ public class DefaultsAdapter extends RecyclerView.Adapter<DefaultsAdapter.Defaul
         showDialogToChangeOtherDays();
     }
 
-    private void calcultateChangeOtherDays() {
+    private void calculaateChangeOtherDays() {
         // TODO Localization - sort weekdays in natural order
 
         // Create list of weekdays to change
