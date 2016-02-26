@@ -172,7 +172,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
                 Context context = preference.getContext();
                 Resources res = context.getResources();
-                String summaryText = String.format(res.getString(R.string.pref_summary_volume), volume);
+                String summaryText = res.getString(R.string.pref_summary_volume, volume);
 
                 preference.setSummary(summaryText);
             } else if (key.equals(PREF_SNOOZE_TIME)) {
@@ -180,7 +180,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
                 Context context = preference.getContext();
                 Resources res = context.getResources();
-                String summaryText = String.format(res.getString(R.string.pref_summary_snooze_time), intValue);
+                String summaryText = res.getString(R.string.pref_summary_snooze_time, intValue);
 
                 preference.setSummary(summaryText);
             } else if (key.equals(PREF_NEAR_FUTURE_TIME)) {
@@ -190,7 +190,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
                 Context context = preference.getContext();
                 Resources res = context.getResources();
-                String summaryText = String.format(res.getString(R.string.pref_summary_near_future_time), hours, minutes);
+                String summaryText = res.getString(R.string.pref_summary_near_future_time, hours, minutes);
 
                 preference.setSummary(summaryText);
             } else if (key.equals(PREF_ACTION_ON_BUTTON) || key.equals(PREF_ACTION_ON_MOVE) || key.equals(PREF_ACTION_ON_FLIP) || key.equals(PREF_ACTION_ON_SHAKE) || key.equals(PREF_ACTION_ON_PROXIMITY)) {

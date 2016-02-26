@@ -45,7 +45,7 @@ public class SystemNotification {
         Resources res = context.getResources();
         Clock clock = new SystemClock(); // TODO Solve dependency on clock
         String timeText = Localization.timeToString(day.getHourX(), day.getMinuteX(), context, clock);
-        String contentTitle = String.format(res.getString(R.string.notification_title), timeText);
+        String contentTitle = res.getString(R.string.notification_title, timeText);
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
                 .setSmallIcon(R.drawable.ic_alarm_white)
@@ -152,7 +152,7 @@ public class SystemNotification {
         Resources res = context.getResources();
         Clock clock = new SystemClock(); // TODO Solve dependency on clock
         String ringAfterSnoozeTimeText = Localization.timeToString(ringAfterSnoozeTime.get(Calendar.HOUR_OF_DAY), ringAfterSnoozeTime.get(Calendar.MINUTE), context, clock);
-        String contentText = String.format(res.getString(R.string.notification_text_snoozed), ringAfterSnoozeTimeText);
+        String contentText = res.getString(R.string.notification_text_snoozed, ringAfterSnoozeTimeText);
         mBuilder.setContentText(contentText);
 
         Intent intent = new Intent(context, AlarmMorningActivity.class);

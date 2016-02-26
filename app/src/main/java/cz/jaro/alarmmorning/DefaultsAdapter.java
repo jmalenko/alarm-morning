@@ -140,7 +140,7 @@ public class DefaultsAdapter extends RecyclerView.Adapter<DefaultsAdapter.Defaul
             } else {
                 timeText = activityInterface.getResourcesI().getString(R.string.alarm_unset);
             }
-            String title = String.format(activityInterface.getResourcesI().getString(R.string.change_others_title), timeText, days);
+            String title = activityInterface.getResourcesI().getString(R.string.change_others_title, timeText, days);
 
             AlertDialog.Builder builder = new AlertDialog.Builder(activityInterface.getContextI());
             builder.setTitle(title)

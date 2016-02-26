@@ -148,11 +148,11 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
             TimeDifference timeDifference = TimeDifference.getTimeUnits(diff);
 
             if (timeDifference.days > 0) {
-                messageText = String.format(res.getString(R.string.time_to_ring_message_days), timeDifference.days, timeDifference.hours);
+                messageText = res.getString(R.string.time_to_ring_message_days, timeDifference.days, timeDifference.hours);
             } else if (timeDifference.hours > 0) {
-                messageText = String.format(res.getString(R.string.time_to_ring_message_hours), timeDifference.hours, timeDifference.minutes);
+                messageText = res.getString(R.string.time_to_ring_message_hours, timeDifference.hours, timeDifference.minutes);
             } else {
-                messageText = String.format(res.getString(R.string.time_to_ring_message_minutes), timeDifference.minutes, timeDifference.seconds);
+                messageText = res.getString(R.string.time_to_ring_message_minutes, timeDifference.minutes, timeDifference.seconds);
             }
         } else {
             messageText = "";
@@ -314,11 +314,11 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
             } else {
                 TimeDifference timeDifference = TimeDifference.getTimeUnits(diff);
                 if (timeDifference.days > 0) {
-                    toastText = String.format(res.getString(R.string.time_to_ring_toast_days), timeDifference.days, timeDifference.hours, timeDifference.minutes);
+                    toastText = res.getString(R.string.time_to_ring_toast_days, timeDifference.days, timeDifference.hours, timeDifference.minutes);
                 } else if (timeDifference.hours > 0) {
-                    toastText = String.format(res.getString(R.string.time_to_ring_toast_hours), timeDifference.hours, timeDifference.minutes);
+                    toastText = res.getString(R.string.time_to_ring_toast_hours, timeDifference.hours, timeDifference.minutes);
                 } else {
-                    toastText = String.format(res.getString(R.string.time_to_ring_toast_minutes), timeDifference.minutes, timeDifference.seconds);
+                    toastText = res.getString(R.string.time_to_ring_toast_minutes, timeDifference.minutes, timeDifference.seconds);
                 }
             }
         }

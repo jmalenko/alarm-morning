@@ -264,7 +264,7 @@ public class RingActivity extends Activity implements RingInterface {
         Log.d(TAG, "updateMute()");
 
         Resources res = getResources();
-        String muteText = String.format(res.getString(R.string.muted), mutedSecondsLeft);
+        String muteText = res.getString(R.string.muted, mutedSecondsLeft);
 
         mutedTextView.setText(muteText);
     }
@@ -368,10 +368,10 @@ public class RingActivity extends Activity implements RingInterface {
             String alarmTimeText;
             String timeStr = Localization.timeToString(alarmTime.getTime(), getBaseContext());
             if (onTheSameDate(alarmTime, now)) {
-                alarmTimeText = String.format(res.getString(R.string.alarm_was_set_to_today), timeStr);
+                alarmTimeText = res.getString(R.string.alarm_was_set_to_today, timeStr);
             } else {
                 String dateStr = Localization.dateToStringFull(alarmTime.getTime());
-                alarmTimeText = String.format(res.getString(R.string.alarm_was_set_to_nontoday), timeStr, dateStr);
+                alarmTimeText = res.getString(R.string.alarm_was_set_to_nontoday, timeStr, dateStr);
             }
             alarmTimeView.setText(alarmTimeText);
             alarmTimeView.setVisibility(View.VISIBLE);
