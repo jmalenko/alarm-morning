@@ -27,7 +27,8 @@ public class Defaults implements Cloneable {
     private int state;
 
     /**
-     * The dey of week is represented by the same number as in {@link java.util.Calendar}. Specifically, the identifier of Monday is {@link java.util.Calendar#MONDAY}
+     * The dey of week is represented by the same number as in {@link java.util.Calendar}. Specifically, the identifier of Monday is {@link
+     * java.util.Calendar#MONDAY}
      */
     private int dayOfWeek;
 

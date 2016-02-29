@@ -14,9 +14,9 @@ import cz.jaro.alarmmorning.R;
 
 /**
  * The Preference representing volume level.
- * <p>
+ * <p/>
  * The user uses a SeekBar to set the volume..
- * <p>
+ * <p/>
  * The value is stored as an integer between 0 and 100 (including borders)
  */
 public class VolumePreference extends DialogPreference {

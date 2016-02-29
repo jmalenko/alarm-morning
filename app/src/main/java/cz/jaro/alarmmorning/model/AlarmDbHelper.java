@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 /**
  * Represent changes of the database model.
- * <p>
+ * <p/>
  * The changes are represented as a difference (forward and backward patches) between two subsequent versions.
  * Invariant: the database version V has applied exactly the patches 0..V.
  */

@@ -11,9 +11,9 @@ import cz.jaro.alarmmorning.R;
 
 /**
  * The Preference representing a time difference.
- * <p>
+ * <p/>
  * The user uses two number pickers: one for hours and send for minutes.
- * <p>
+ * <p/>
  * The value is stored in minutes. Default value is 0.
  */
 public class RelativeTimePreference extends DialogPreference {

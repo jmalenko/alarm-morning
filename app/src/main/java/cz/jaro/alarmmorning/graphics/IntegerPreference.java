@@ -14,9 +14,9 @@ import cz.jaro.alarmmorning.R;
 
 /**
  * The Preference representing an integer (a natural number).
- * <p>
+ * <p/>
  * The user uses a NumberPicker to set the volume..
- * <p>
+ * <p/>
  * The value is stored as an integer.
  */
 public class IntegerPreference extends DialogPreference {
