@@ -72,10 +72,8 @@ public class GlobalManager {
 
     // TODO Resume ringing if the app was upgraded while ringing
     // TODO Resume ringing if the operating system restarted while ringing
+    // TODO On start, show notification with number of alarms that were skipped
     // TODO User early dimisses the alarm and then sets the alarm to the same day and time => fix time to next alarm and other things
-    // TODO Fix: when ringing continues to next day
-    // TODO Fix: when ringing overlaps with next alarm
-
 
     public GlobalManager(Context context) {
         this.context = context;
@@ -93,6 +91,22 @@ public class GlobalManager {
         dataSource.close();
 
         return day;
+    }
+
+    private boolean isRinging() {
+        Calendar alarmTimeOfRingingAlarm = getAlarmTimeOfRingingAlarm();
+        int state = getState(alarmTimeOfRingingAlarm);
+        return state == GlobalManager.STATE_RINGING || state == GlobalManager.STATE_SNOOZED;
+    }
+
+    private boolean afterNearFuture() {
+        Clock clock = new SystemClock(); // // TODO Solve dependency on clock
+        Calendar now = clock.now();
+
+        NextAction nextAction = getNextAction();
+        Calendar nearFutureTime = SystemAlarm.getNearFutureTime(context, nextAction.alarmTime);
+
+        return now.after(nearFutureTime);
     }
 
     /**
@@ -166,15 +180,15 @@ public class GlobalManager {
         Calendar stateAlarmTime = new GregorianCalendar();
         stateAlarmTime.setTime(new Date(stateAlarmTimeInMS));
 
-        Log.d(TAG, "   comparing state alarm time " + stateAlarmTime.getTime() + " with " + date.getTime());
+        Log.v(TAG, "   comparing state alarm time " + stateAlarmTime.getTime() + " with " + date.getTime());
 
         if (stateAlarmTime.equals(date)) {
             int state = preferences.getInt(PERSIST_STATE, STATE_UNDEFINED);
 
-            Log.d(TAG, "   state=" + state);
+            Log.v(TAG, "   state=" + state);
             return state;
         } else {
-            Log.d(TAG, "   state=" + STATE_UNDEFINED + " because the persisted day is for another alarm time");
+            Log.v(TAG, "   state=" + STATE_UNDEFINED + " because the persisted day is for another alarm time");
             return STATE_UNDEFINED;
         }
     }
@@ -259,6 +273,17 @@ public class GlobalManager {
     private void onNearFuture(boolean callSystemAlarm) {
         Log.d(TAG, "onNearFuture(callSystemAlarm=" + callSystemAlarm + ")");
 
+        if (isRinging()) {
+            Log.i(TAG, "The previous alarm is still ringing. Ignoring this event.");
+
+            if (callSystemAlarm) {
+                SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
+                systemAlarm.onNearFuture();
+            }
+
+            return;
+        }
+
         setState(STATE_FUTURE, getNextAction().alarmTime);
 
         if (callSystemAlarm) {
@@ -296,7 +321,18 @@ public class GlobalManager {
     public void onRing() {
         Log.d(TAG, "onRing()");
 
-        setState(STATE_RINGING, getAlarmTimeOfRingingAlarm());
+        if (isRinging()) {
+            Log.i(TAG, "The previous alarm is still ringing. Cancelling it.");
+
+            onAlarmCancel();
+
+            SystemNotification systemNotification = SystemNotification.getInstance(context);
+            systemNotification.notifyCancelledAlarm(context);
+
+            setState(STATE_RINGING, getNextAction().alarmTime);
+        } else {
+            setState(STATE_RINGING, getAlarmTimeOfRingingAlarm());
+        }
 
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
         systemAlarm.onRing();
@@ -320,6 +356,12 @@ public class GlobalManager {
         updateRingingActivity(context, RingActivity.ACTION_HIDE_ACTIVITY);
 
         updateCalendarActivity(context, AlarmMorningActivity.ACTION_DISMISS);
+
+        if (afterNearFuture()) {
+            Log.i(TAG, "Immediately starting \"alarm in near future\" period.");
+
+            onNearFuture(false);
+        }
     }
 
     public void onSnooze() {
@@ -350,6 +392,8 @@ public class GlobalManager {
 
         SystemNotification systemNotification = SystemNotification.getInstance(context);
         systemNotification.onAlarmCancel(context);
+
+        updateRingingActivity(context, RingActivity.ACTION_HIDE_ACTIVITY);
     }
 
     /*

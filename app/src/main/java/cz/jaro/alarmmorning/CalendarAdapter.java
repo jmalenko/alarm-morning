@@ -50,7 +50,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
      */
     @Override
     public void onBindViewHolder(CalendarViewHolder viewHolder, final int position) {
-        Log.v(TAG, "Replacing position " + position);
+        Log.v(TAG, "   replacing position " + position);
 
         Day day = fragment.loadPosition(position);
         Calendar date = day.getDateTime();

@@ -43,6 +43,9 @@
     <string name="notification_text_ringing">Ringing</string>
     <string name="notification_text_snoozed">Snoozed till %1$s</string>
 
+    <string name="notification_title_long">Alarm at %1$s on %2$s</string>
+    <string name="notification_text_cancelled">Alarm cancelled</string>
+
     <string name="action_dismiss">Dismiss</string>
     <string name="action_snooze">Snooze</string>
     <string name="action_change">Change</string>

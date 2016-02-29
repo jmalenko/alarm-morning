@@ -26,6 +26,7 @@ public class SystemNotification {
     private Context context;
 
     private static final int NOTIFICATION_ID = 0;
+    private static int NOTIFICATION_ERROR_ID = NOTIFICATION_ID;
 
     private SystemNotification(Context context) {
         this.context = context;
@@ -174,4 +175,29 @@ public class SystemNotification {
         hideNotification(context);
     }
 
+    public void notifyCancelledAlarm(Context context) {
+        Log.d(TAG, "notifyCancelledAlarm()");
+
+        NotificationCompat.Builder mBuilder = buildNotification(context);
+
+        GlobalManager globalManager = new GlobalManager(context);
+        Calendar alarmTime = globalManager.getAlarmTimeOfRingingAlarm();
+
+        Resources res = context.getResources();
+        Clock clock = new SystemClock(); // TODO Solve dependency on clock
+        String timeText = Localization.timeToString(alarmTime.get(Calendar.HOUR_OF_DAY), alarmTime.get(Calendar.MINUTE), context, clock);
+        String dateText = Localization.dateToStringVeryShort(alarmTime.getTime());
+        String contentTitle = res.getString(R.string.notification_title_long, timeText, dateText);
+        mBuilder.setContentTitle(contentTitle);
+
+        String contentText = res.getString(R.string.notification_text_cancelled);
+        mBuilder.setContentText(contentText);
+
+        Intent intent = new Intent(context, AlarmMorningActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        mBuilder.setContentIntent(pendingIntent);
+
+        NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.notify(++NOTIFICATION_ERROR_ID, mBuilder.build());
+    }
 }

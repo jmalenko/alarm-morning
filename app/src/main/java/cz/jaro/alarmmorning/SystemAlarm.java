@@ -171,6 +171,10 @@ public class SystemAlarm {
     }
 
     private Calendar getNearFutureTime(Calendar alarmTime) {
+        return getNearFutureTime(context, alarmTime);
+    }
+
+    public static Calendar getNearFutureTime(Context context, Calendar alarmTime) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         int nearFutureMinutes = preferences.getInt(SettingsActivity.PREF_NEAR_FUTURE_TIME, SettingsActivity.PREF_NEAR_FUTURE_TIME_DEFAULT);
 

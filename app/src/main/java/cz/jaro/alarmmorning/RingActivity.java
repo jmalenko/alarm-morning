@@ -49,6 +49,8 @@ public class RingActivity extends Activity implements RingInterface {
 
     public static final String ALARM_TIME = "ALARM_TIME";
 
+    static boolean isActive = false;
+
     private Calendar alarmTime;
 
     private Ringtone ringtone;
@@ -164,6 +166,18 @@ public class RingActivity extends Activity implements RingInterface {
                     | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
             getWindow().getDecorView().setSystemUiVisibility(flags);
         }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        isActive = true;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        isActive = false;
     }
 
     @Override
@@ -700,7 +714,7 @@ public class RingActivity extends Activity implements RingInterface {
             sensorEventDetector.start();
         }
     }
-    
+
     private void stopSensors() {
         Log.v(TAG, "stopSensors()");
 
