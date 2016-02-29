@@ -1,98 +1,92 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:tools="http://schemas.android.com/tools"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent"
-             tools:context="cz.jaro.alarmmorning.RingActivity">
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:keepScreenOn="true"
+    android:orientation="vertical">
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_weight="1"/>
+
+    <TextView
+        android:id="@+id/date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="Monday, February 15"
+        />
+
+    <TextView
+        android:id="@+id/time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="@dimen/margin_medium"
+        android:text="12:34"
+        android:textColor="@color/accent"
+        android:textSize="70sp"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/alarmTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="Alarm was set to 7:15"
+        />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:layout_weight="1"
+        />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:keepScreenOn="true"
+        android:layout_height="wrap_content"
+        android:gravity="bottom"
         android:orientation="vertical">
 
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="0dip"
-            android:layout_weight="1"/>
-
-        <TextView
-            android:id="@+id/date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="Monday, February 15"
-            />
-
-        <TextView
-            android:id="@+id/time"
+        <ImageButton
+            android:id="@+id/snoozeButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="@dimen/margin_medium"
-            android:text="12:34"
-            android:textColor="@color/accent"
-            android:textSize="70sp"
-            android:textStyle="bold"/>
+            android:background="@drawable/snooze_button"
+            android:onClick="onSnooze"
+            />
 
         <TextView
-            android:id="@+id/alarmTime"
+            android:id="@+id/muted"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:text="Alarm was set to 7:15"
+            android:layout_marginBottom="@dimen/margin_medium"
+            android:text="Muted for 9 seconds"
+            android:visibility="invisible"
             />
 
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="0dip"
-            android:layout_weight="1"
-            />
-
-        <LinearLayout
+        <cz.jaro.alarmmorning.graphics.SlideButton
+            android:id="@+id/dismissButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="bottom"
-            android:orientation="vertical">
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="@dimen/margin_medium"
+            android:layout_marginLeft="@dimen/margin_medium"
+            android:layout_marginRight="@dimen/margin_medium"
+            android:background="@drawable/slidebutton_background"
+            android:clickable="false"
+            android:max="100"
+            android:paddingBottom="2dp"
+            android:paddingLeft="34dp"
+            android:paddingRight="34dp"
+            android:paddingTop="2dp"
+            android:progressDrawable="@android:color/transparent"
+            android:thumb="@drawable/slidebutton_thumb"
+            />
 
-            <ImageButton
-                android:id="@+id/snoozeButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="@dimen/margin_medium"
-                android:onClick="onSnooze"
-                android:background="@drawable/snooze_button"
-                />
-
-            <TextView
-                android:id="@+id/muted"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="@dimen/margin_medium"
-                android:text="Muted for 9 seconds"
-                android:visibility="invisible"
-                />
-
-            <cz.jaro.alarmmorning.graphics.SlideButton
-                android:id="@+id/dismissButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="@dimen/margin_medium"
-                android:layout_marginLeft="@dimen/margin_medium"
-                android:layout_marginRight="@dimen/margin_medium"
-                android:paddingTop="2dp"
-                android:paddingBottom="2dp"
-                android:paddingLeft="34dp"
-                android:paddingRight="34dp"
-                android:clickable="false"
-                android:max="100"
-                android:background="@drawable/slidebutton_background"
-                android:progressDrawable="@android:color/transparent"
-                android:thumb="@drawable/slidebutton_thumb"
-                />
-
-        </LinearLayout>
     </LinearLayout>
-</FrameLayout>
+</LinearLayout>
