@@ -61,10 +61,6 @@
             </intent-filter>
         </receiver>
         <receiver android:name=".receivers.NotificationReceiver">
-            <intent-filter>
-                <action android:name="cz.jaro.alarmmorning.intent.action.DISMISS_ALARM" />
-                <action android:name="cz.jaro.alarmmorning.intent.action.SNOOZE_ALARM" />
-            </intent-filter>
         </receiver>
     </application>
 </manifest>

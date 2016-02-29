@@ -27,8 +27,7 @@ public class NotificationReceiver extends BroadcastReceiver {
 
         if (action == ACTION_DELETE_NOTIFICATION) {
             deleteNotification(context);
-        }
-        if (action == ACTION_DISMISS_BEFORE_RINGING) {
+        } else if (action == ACTION_DISMISS_BEFORE_RINGING) {
             Log.i(TAG, "Dismiss");
             GlobalManager globalManager = new GlobalManager(context);
             globalManager.onDismissBeforeRinging();
