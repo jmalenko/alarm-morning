@@ -239,7 +239,9 @@ public class GlobalManager {
             } else if (nextAction.action.equals(SystemAlarm.ACTION_RING_IN_NEAR_FUTURE)) {
                 // nothing
             } else if (nextAction.action.equals(SystemAlarm.ACTION_RING)) {
-                onNearFuture(false);
+                if (systemAlarm.useNearFutureTime()) {
+                    onNearFuture(false);
+                }
             } else {
                 throw new IllegalArgumentException("Unexpected argument " + nextAction);
             }

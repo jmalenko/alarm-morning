@@ -137,13 +137,15 @@ public class SystemAlarm {
 
             return new NextAction(ACTION_SET_SYSTEM_ALARM, resetTime, alarmTime);
         } else {
-            Calendar nearFutureTime = getNearFutureTime(alarmTime);
+            if (useNearFutureTime()) {
+                Calendar nearFutureTime = getNearFutureTime(alarmTime);
 
-            if (now.before(nearFutureTime)) {
-                return new NextAction(ACTION_RING_IN_NEAR_FUTURE, nearFutureTime, alarmTime);
-            } else {
-                return new NextAction(ACTION_RING, alarmTime, alarmTime);
+                if (now.before(nearFutureTime)) {
+                    return new NextAction(ACTION_RING_IN_NEAR_FUTURE, nearFutureTime, alarmTime);
+                }
             }
+
+            return new NextAction(ACTION_RING, alarmTime, alarmTime);
         }
     }
 
@@ -159,6 +161,13 @@ public class SystemAlarm {
         resetTime.add(Calendar.DAY_OF_MONTH, AlarmDataSource.HORIZON_DAYS - 1);
 
         return resetTime;
+    }
+
+    public boolean useNearFutureTime() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        int nearFutureMinutes = preferences.getInt(SettingsActivity.PREF_NEAR_FUTURE_TIME, SettingsActivity.PREF_NEAR_FUTURE_TIME_DEFAULT);
+
+        return 0 < nearFutureMinutes;
     }
 
     private Calendar getNearFutureTime(Calendar alarmTime) {
