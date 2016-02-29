@@ -23,6 +23,7 @@
         <item
             android:id="@+id/navigation_website"
             android:icon="@drawable/ic_info_outline"
-            android:title="@string/menu_website_title" />
+            android:title="@string/menu_website_title"
+            android:checkable="false"/>
     </group>
 </menu>

@@ -176,6 +176,9 @@ public class AlarmMorningActivity extends AppCompatActivity implements ActivityI
                         return true;
                     }
                 });
+
+        MenuItem calendarMenuItem = mNavigationView.getMenu().getItem(0);
+        setFragmentTitle(calendarMenuItem.getTitle());
     }
 
     public void selectDrawerItem(MenuItem menuItem) {
