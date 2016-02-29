@@ -8,7 +8,7 @@
         <RingtonePreference
             android:key="pref_ringtone"
             android:title="@string/pref_title_ringtone"
-            android:defaultValue="content://settings/system/notification_sound"
+            android:defaultValue="content://settings/system/alarm_alert"
             android:ringtoneType="alarm"/>
 
         <cz.jaro.alarmmorning.graphics.VolumePreference
