@@ -1,23 +1,63 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/relative_time_layout"
-    android:orientation="horizontal"
+<LinearLayout
+    android:id="@+id/relative_time_wrap_layout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:gravity="center"
-    android:layoutDirection="ltr">
+    android:gravity="center">
 
-    <NumberPicker
-        android:id="@+id/hour"
-        android:layout_width="70dp"
-        android:layout_height="wrap_content"
-        android:focusable="true"
-        android:focusableInTouchMode="true" />
+    <TableLayout
+        android:id="@+id/relative_time_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
 
-    <NumberPicker
-        android:id="@+id/minute"
-        android:layout_width="70dp"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/margin_small"
-        android:focusable="true"
-        android:focusableInTouchMode="true" />
+        <TableRow>
+
+            <TextView
+                android:id="@+id/hour_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/relative_time_picker_label_hour"/>
+
+            <Space
+                android:layout_width="0dip"
+                android:layout_height="0dip"/>
+
+            <TextView
+                android:id="@+id/minute_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/relative_time_picker_label_minute"/>
+
+        </TableRow>
+
+        <TableRow>
+
+            <NumberPicker
+                android:id="@+id/hour"
+                android:layout_width="70dp"
+                android:layout_height="wrap_content"
+                android:focusable="true"
+                android:focusableInTouchMode="true"/>
+
+            <TextView
+                android:id="@+id/separator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginLeft="@dimen/margin_tiny"
+                android:layout_marginRight="@dimen/margin_tiny"
+                android:text=":"/>
+
+            <NumberPicker
+                android:id="@+id/minute"
+                android:layout_width="70dp"
+                android:layout_height="wrap_content"
+                android:focusable="true"
+                android:focusableInTouchMode="true"/>
+
+        </TableRow>
+    </TableLayout>
+
 </LinearLayout>

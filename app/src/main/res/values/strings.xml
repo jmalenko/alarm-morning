@@ -78,4 +78,8 @@
     <string name="menu_settings_title">Settings</string>
     <string name="menu_website_title">Website</string>
 
+    <!-- Widgets -->
+    <string name="relative_time_picker_label_hour">Hour</string>
+    <string name="relative_time_picker_label_minute">Minute</string>
+
 </resources>
