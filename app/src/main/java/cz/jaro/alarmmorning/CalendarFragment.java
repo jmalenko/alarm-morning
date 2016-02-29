@@ -70,11 +70,6 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         // Empty constructor required for fragment subclasses
     }
 
-//    public CalendarFragment(ActivityInterface activityInterface) {
-//        this();
-//        this.activityInterface = activityInterface;
-//    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_calendar, container, false);
