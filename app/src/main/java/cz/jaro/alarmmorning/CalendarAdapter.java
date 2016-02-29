@@ -66,7 +66,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
 
         String timeText;
         if (day.isEnabled()) {
-            timeText = Localization.timeToString(day.getHourX(), day.getMinuteX(), fragment.activityInterface.getContextI(), clock());
+            timeText = Localization.timeToString(day.getHourX(), day.getMinuteX(), fragment.getActivity(), clock());
         } else {
             timeText = res.getString(R.string.alarm_unset);
         }
@@ -74,7 +74,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
 
         boolean enabled = true;
         if (position == 0) {
-            GlobalManager globalManager = new GlobalManager(fragment.activityInterface.getContextI());
+            GlobalManager globalManager = new GlobalManager(fragment.getActivity());
             int state = globalManager.getState(day.getDateTime());
             if (state != GlobalManager.STATE_UNDEFINED) {
                 enabled = state != GlobalManager.STATE_DISMISSED_BEFORE_RINGING && state != GlobalManager.STATE_DISMISSED;
@@ -86,7 +86,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
 
         String stateText;
         if (position == 0) {
-            GlobalManager globalManager = new GlobalManager(fragment.activityInterface.getContextI());
+            GlobalManager globalManager = new GlobalManager(fragment.getActivity());
             int state = globalManager.getState(day.getDateTime());
             if (state != GlobalManager.STATE_UNDEFINED) {
                 if (state == GlobalManager.STATE_FUTURE) {

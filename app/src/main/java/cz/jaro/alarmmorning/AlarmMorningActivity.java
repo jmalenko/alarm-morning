@@ -157,7 +157,6 @@ public class AlarmMorningActivity extends AppCompatActivity implements ActivityI
 
         if (savedInstanceState == null) {
             CalendarFragment calendarFragment = new CalendarFragment();
-            calendarFragment.setActivityInterface(this);
             mFragment = calendarFragment;
             getFragmentManager().beginTransaction().replace(R.id.content_frame, mFragment).commit();
 
@@ -185,7 +184,6 @@ public class AlarmMorningActivity extends AppCompatActivity implements ActivityI
         switch (menuItem.getItemId()) {
             case R.id.navigation_calendar:
                 CalendarFragment calendarFragment = new CalendarFragment();
-                calendarFragment.setActivityInterface(this);
                 mFragment = calendarFragment;
                 break;
             case R.id.navigation_defaults:

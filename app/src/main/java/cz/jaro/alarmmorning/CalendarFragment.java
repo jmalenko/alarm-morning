@@ -39,8 +39,6 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
     private static final String TAG = CalendarFragment.class.getSimpleName();
 
-    protected ActivityInterface activityInterface;
-
     private AlarmDataSource dataSource;
 
     protected CalendarAdapter adapter;
@@ -234,7 +232,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
             if (day.isEnabled() && !day.isPassed(clock())) {
                 // TODO At one time point, there may be up to two early dismissed alarm. At Monday 23:00, the user can early dismiss  te alarm on Monday 23:30 and Tuesday 0:30.
-                GlobalManager globalManager = new GlobalManager(activityInterface.getContextI());
+                GlobalManager globalManager = new GlobalManager(getActivity());
                 int state = globalManager.getState(day.getDateTime());
                 if (state != GlobalManager.STATE_UNDEFINED) {
                     if (state != GlobalManager.STATE_DISMISSED_BEFORE_RINGING && state != GlobalManager.STATE_DISMISSED) {
@@ -279,15 +277,14 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         refresh();
 
         String toastText = formatToastText(day);
-        Context context = activityInterface.getContextI();
-        Toast.makeText(context, toastText, Toast.LENGTH_LONG).show();
+        Toast.makeText(getActivity(), toastText, Toast.LENGTH_LONG).show();
     }
 
     private void refresh() {
         adapter.notifyItemChanged(position);
         updatePositionNextAlarm();
 
-        GlobalManager globalManager = new GlobalManager(activityInterface.getContextI());
+        GlobalManager globalManager = new GlobalManager(getActivity());
         globalManager.onAlarmSet();
     }
 
@@ -320,10 +317,6 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         Calendar date = addDays(today, position);
         Day day = dataSource.loadDayDeep(date);
         return day;
-    }
-
-    public void setActivityInterface(ActivityInterface activityInterface) {
-        this.activityInterface = activityInterface;
     }
 
     public static Calendar addDays(Calendar today, int numberOfDays) {
@@ -409,13 +402,13 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         if (day.isEnabled()) {
             String timeText;
             if (day.isEnabled()) {
-                timeText = Localization.timeToString(day.getHourX(), day.getMinuteX(), activityInterface.getContextI(), clock());
+                timeText = Localization.timeToString(day.getHourX(), day.getMinuteX(), getActivity(), clock());
             } else {
                 timeText = getResources().getString(R.string.alarm_unset);
             }
-            headerTitle = activityInterface.getResourcesI().getString(R.string.menu_day_header, timeText, dayOfWeekText, dateText);
+            headerTitle = getResources().getString(R.string.menu_day_header, timeText, dayOfWeekText, dateText);
         } else {
-            headerTitle = activityInterface.getResourcesI().getString(R.string.menu_day_header_disabled, dayOfWeekText, dateText);
+            headerTitle = getResources().getString(R.string.menu_day_header_disabled, dayOfWeekText, dateText);
         }
         menu.setHeaderTitle(headerTitle);
 
@@ -428,7 +421,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         MenuItem snooze = menu.findItem(R.id.day_snooze);
 
         if (position == 0) {
-            GlobalManager globalManager = new GlobalManager(activityInterface.getContextI());
+            GlobalManager globalManager = new GlobalManager(getActivity());
             int state = globalManager.getState(day.getDateTime());
             if (state != GlobalManager.STATE_UNDEFINED) {
                 if (state == GlobalManager.STATE_FUTURE) {
@@ -482,14 +475,14 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
             case R.id.day_dismiss:
                 Log.d(TAG, "Dismiss");
-                Context context = activityInterface.getContextI();
+                Context context = getActivity();
                 GlobalManager globalManager = new GlobalManager(context);
                 globalManager.onDismissBeforeRinging();
                 break;
 
             case R.id.day_snooze:
                 Log.d(TAG, "Snooze");
-                Context context2 = activityInterface.getContextI();
+                Context context2 = getActivity();
                 GlobalManager globalManager2 = new GlobalManager(context2);
                 globalManager2.onSnooze();
                 break;
