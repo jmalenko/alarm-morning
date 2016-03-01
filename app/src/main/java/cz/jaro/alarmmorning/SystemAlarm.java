@@ -150,6 +150,8 @@ public class SystemAlarm {
     }
 
     protected boolean nextActionShouldChange(NextAction nextAction) {
+        Log.v(TAG, "nextActionShouldChange(action=" + nextAction.action + ", time = " + nextAction.time.getTime());
+
         GlobalManager globalManager = new GlobalManager(context);
         NextAction nextActionPersisted = globalManager.getNextAction();
 

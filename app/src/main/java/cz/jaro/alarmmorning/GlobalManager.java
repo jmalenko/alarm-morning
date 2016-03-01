@@ -246,8 +246,6 @@ public class GlobalManager {
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
         NextAction nextAction = systemAlarm.nextAction();
 
-        Log.d(TAG, "next action is action=" + nextAction.action + ", time=" + nextAction.time.getTime().toString());
-
         if (systemAlarm.nextActionShouldChange(nextAction)) {
             // cancel the current alarm
             onAlarmCancel();
