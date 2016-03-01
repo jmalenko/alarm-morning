@@ -251,7 +251,7 @@ public class SystemAlarm {
 //        return time;
 //    }
 
-    public void onSystemAlarm(Context context, Intent intent) {
+    public void onSystemAlarm(Intent intent) {
         String action = intent.getAction();
 
         Log.i(TAG, "Acting on system alarm. action=" + action);

@@ -23,6 +23,6 @@ public class AlarmReceiver extends BroadcastReceiver {
         Log.v(TAG, "onReceive()");
 
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
-        systemAlarm.onSystemAlarm(context, intent);
+        systemAlarm.onSystemAlarm(intent);
     }
 }
