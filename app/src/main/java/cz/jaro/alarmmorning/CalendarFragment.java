@@ -53,8 +53,6 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     private int positionNextAlarm;
     private static final int POSITION_UNSET = -1;
 
-    // TODO Show not dismissed alarms from previous days
-
     private Handler handler = new Handler();
     private Runnable runnable = new Runnable() {
         @Override
