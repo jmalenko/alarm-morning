@@ -80,7 +80,7 @@ public class GlobalManager {
     }
 
     public Day getDayWithNextAlarm() {
-        Log.d(TAG, "getDayWithNextAlarm()");
+        Log.v(TAG, "getDayWithNextAlarm()");
         AlarmDataSource dataSource = new AlarmDataSource(context);
         dataSource.open();
 
