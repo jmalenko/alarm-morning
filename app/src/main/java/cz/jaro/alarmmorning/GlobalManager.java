@@ -292,7 +292,7 @@ public class GlobalManager {
         }
 
         SystemNotification systemNotification = SystemNotification.getInstance(context);
-        systemNotification.onNearFuture(context);
+        systemNotification.onNearFuture();
     }
 
     public void onDismissBeforeRinging() {
@@ -304,7 +304,7 @@ public class GlobalManager {
         systemAlarm.onDismissBeforeRinging();
 
         SystemNotification systemNotification = SystemNotification.getInstance(context);
-        systemNotification.onDismissBeforeRinging(context);
+        systemNotification.onDismissBeforeRinging();
 
         updateCalendarActivity(context, AlarmMorningActivity.ACTION_DISMISS_BEFORE_RINGING);
     }
@@ -327,7 +327,7 @@ public class GlobalManager {
             onAlarmCancel();
 
             SystemNotification systemNotification = SystemNotification.getInstance(context);
-            systemNotification.notifyCancelledAlarm(context);
+            systemNotification.notifyCancelledAlarm();
 
             setState(STATE_RINGING, getNextAction().alarmTime);
         } else {
@@ -338,7 +338,7 @@ public class GlobalManager {
         systemAlarm.onRing();
 
         SystemNotification systemNotification = SystemNotification.getInstance(context);
-        systemNotification.onRing(context);
+        systemNotification.onRing();
 
         startRingingActivity(context);
 
@@ -351,7 +351,7 @@ public class GlobalManager {
         setState(STATE_DISMISSED, getAlarmTimeOfRingingAlarm());
 
         SystemNotification systemNotification = SystemNotification.getInstance(context);
-        systemNotification.onDismiss(context);
+        systemNotification.onDismiss();
 
         updateRingingActivity(context, RingActivity.ACTION_HIDE_ACTIVITY);
 
@@ -376,7 +376,7 @@ public class GlobalManager {
         systemAlarm.onSnooze(ringAfterSnoozeTime, getAlarmTimeOfRingingAlarm());
 
         SystemNotification systemNotification = SystemNotification.getInstance(context);
-        systemNotification.onSnooze(context, ringAfterSnoozeTime);
+        systemNotification.onSnooze(ringAfterSnoozeTime);
 
         updateRingingActivity(context, RingActivity.ACTION_HIDE_ACTIVITY);
 
@@ -391,7 +391,7 @@ public class GlobalManager {
         Log.d(TAG, "onAlarmCancel()");
 
         SystemNotification systemNotification = SystemNotification.getInstance(context);
-        systemNotification.onAlarmCancel(context);
+        systemNotification.onAlarmCancel();
 
         updateRingingActivity(context, RingActivity.ACTION_HIDE_ACTIVITY);
     }

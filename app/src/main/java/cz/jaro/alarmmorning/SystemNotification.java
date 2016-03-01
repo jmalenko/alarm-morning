@@ -39,7 +39,7 @@ public class SystemNotification {
         return instance;
     }
 
-    private NotificationCompat.Builder buildNotification(Context context) {
+    private NotificationCompat.Builder buildNotification() {
         GlobalManager globalManager = new GlobalManager(context);
         Day day = globalManager.getDayWithNextAlarm();
 
@@ -60,13 +60,13 @@ public class SystemNotification {
         return mBuilder;
     }
 
-    private void showNotification(Context context, NotificationCompat.Builder mBuilder) {
+    private void showNotification(NotificationCompat.Builder mBuilder) {
         Log.d(TAG, "showNotification()");
         NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
     }
 
-    private void hideNotification(Context context) {
+    private void hideNotification() {
         Log.d(TAG, "hideNotification()");
         NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.cancel(NOTIFICATION_ID);
@@ -77,16 +77,16 @@ public class SystemNotification {
      * ======
      */
 
-    public void onAlarmSet(Context context) {
+    public void onAlarmSet() {
         Log.d(TAG, "onAlarmSet()");
 
-        hideNotification(context);
+        hideNotification();
     }
 
-    protected void onNearFuture(Context context) {
+    protected void onNearFuture() {
         Log.d(TAG, "onNearFuture()");
 
-        NotificationCompat.Builder mBuilder = buildNotification(context);
+        NotificationCompat.Builder mBuilder = buildNotification();
 
         Resources res = context.getResources();
         String contentText = res.getString(R.string.notification_text_future);
@@ -102,19 +102,19 @@ public class SystemNotification {
         PendingIntent dismissPendingIntent = PendingIntent.getBroadcast(context, 1, dismissIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.addAction(R.drawable.ic_alarm_off_white, dismissText, dismissPendingIntent);
 
-        showNotification(context, mBuilder);
+        showNotification(mBuilder);
     }
 
-    public void onDismissBeforeRinging(Context context) {
+    public void onDismissBeforeRinging() {
         Log.d(TAG, "onDismissBeforeRinging()");
 
-        hideNotification(context);
+        hideNotification();
     }
 
-    protected void onRing(Context context) {
+    protected void onRing() {
         Log.d(TAG, "onRing()");
 
-        NotificationCompat.Builder mBuilder = buildNotification(context);
+        NotificationCompat.Builder mBuilder = buildNotification();
 
         Resources res = context.getResources();
         String contentText = res.getString(R.string.notification_text_ringing);
@@ -136,19 +136,19 @@ public class SystemNotification {
         PendingIntent snoozePendingIntent = PendingIntent.getBroadcast(context, 1, snoozeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.addAction(R.drawable.ic_snooze_white, snoozeText, snoozePendingIntent);
 
-        showNotification(context, mBuilder);
+        showNotification(mBuilder);
     }
 
-    public void onDismiss(Context context) {
+    public void onDismiss() {
         Log.d(TAG, "onDismiss()");
 
-        hideNotification(context);
+        hideNotification();
     }
 
-    public void onSnooze(Context context, Calendar ringAfterSnoozeTime) {
+    public void onSnooze(Calendar ringAfterSnoozeTime) {
         Log.d(TAG, "onSnooze()");
 
-        NotificationCompat.Builder mBuilder = buildNotification(context);
+        NotificationCompat.Builder mBuilder = buildNotification();
 
         Resources res = context.getResources();
         Clock clock = new SystemClock(); // TODO Solve dependency on clock
@@ -166,19 +166,19 @@ public class SystemNotification {
         PendingIntent dismissPendingIntent = PendingIntent.getBroadcast(context, 1, dismissIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.addAction(R.drawable.ic_alarm_off_white, dismissText, dismissPendingIntent);
 
-        showNotification(context, mBuilder);
+        showNotification(mBuilder);
     }
 
-    public void onAlarmCancel(Context context) {
+    public void onAlarmCancel() {
         Log.d(TAG, "onAlarmCancel()");
 
-        hideNotification(context);
+        hideNotification();
     }
 
-    public void notifyCancelledAlarm(Context context) {
+    public void notifyCancelledAlarm() {
         Log.d(TAG, "notifyCancelledAlarm()");
 
-        NotificationCompat.Builder mBuilder = buildNotification(context);
+        NotificationCompat.Builder mBuilder = buildNotification();
 
         GlobalManager globalManager = new GlobalManager(context);
         Calendar alarmTime = globalManager.getAlarmTimeOfRingingAlarm();
