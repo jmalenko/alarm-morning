@@ -321,7 +321,9 @@ public class GlobalManager {
     public void onRing() {
         Log.d(TAG, "onRing()");
 
-        if (isRinging()) {
+        boolean isNew = getNextAction().time.equals(getNextAction().alarmTime); // otherwise the alarm is resumed after snoozing
+
+        if (isRinging() && isNew) {
             Log.i(TAG, "The previous alarm is still ringing. Cancelling it.");
 
             onAlarmCancel();
