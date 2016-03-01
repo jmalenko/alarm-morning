@@ -200,4 +200,25 @@ public class SystemNotification {
         NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.notify(++NOTIFICATION_ERROR_ID, mBuilder.build());
     }
+
+    public void notifySkippedAlarms() {
+        Log.d(TAG, "notifySkippedAlarms()");
+
+        Resources res = context.getResources();
+        String contentTitle = res.getString(R.string.app_name);
+        String contentText = res.getString(R.string.notification_text_skipped);
+
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
+                .setSmallIcon(R.drawable.ic_alarm_white)
+                .setContentTitle(contentTitle)
+                .setContentText(contentText);
+
+        Intent intent = new Intent(context, AlarmMorningActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        mBuilder.setContentIntent(pendingIntent);
+
+        NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        mNotificationManager.notify(++NOTIFICATION_ERROR_ID, mBuilder.build());
+    }
+
 }

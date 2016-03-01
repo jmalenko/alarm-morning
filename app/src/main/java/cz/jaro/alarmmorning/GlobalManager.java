@@ -70,10 +70,7 @@ public class GlobalManager {
 
     private Context context;
 
-    // TODO Resume ringing if the app was upgraded while ringing
-    // TODO Resume ringing if the operating system restarted while ringing
-    // TODO On start, show notification with number of alarms that were skipped
-    // TODO User early dimisses the alarm and then sets the alarm to the same day and time => fix time to next alarm and other things
+    // TODO User early dismisses the alarm and then sets the alarm to the same day and time => fix time to next alarm and other things
 
     public GlobalManager(Context context) {
         this.context = context;
@@ -93,6 +90,19 @@ public class GlobalManager {
         return day;
     }
 
+    /**
+     * Used for cancelling the not dismissed old alarms.
+     * <pre>
+     *                                                                    Time
+     * ----------+---------------+---------------+---------------------------->
+     *           |               |               |
+     *           |               |               \- Alarm time on day D=1
+     *           |               \- Start of "alarm in near future" period
+     *           \- Alarm time on day D=0
+     * </pre>
+     *
+     * @return true if the current alarm state {@link #STATE_RINGING} or {@link #STATE_SNOOZED}
+     */
     private boolean isRinging() {
         Calendar alarmTimeOfRingingAlarm = getAlarmTimeOfRingingAlarm();
         int state = getState(alarmTimeOfRingingAlarm);
@@ -100,7 +110,7 @@ public class GlobalManager {
     }
 
     private boolean afterNearFuture() {
-        Clock clock = new SystemClock(); // // TODO Solve dependency on clock
+        Clock clock = new SystemClock(); // TODO Solve dependency on clock
         Calendar now = clock.now();
 
         NextAction nextAction = getNextAction();
@@ -221,7 +231,26 @@ public class GlobalManager {
 
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
         NextAction nextAction = systemAlarm.nextAction();
-        onAlarmSetNew(systemAlarm, nextAction);
+
+        if (systemAlarm.nextActionShouldChange(nextAction)) {
+            NextAction nextActionPersisted = getNextAction();
+
+            Log.w(TAG, "The next system alarm changed while the app was not running.\n"
+                            + "   Persisted is action=" + nextActionPersisted.action + ", time=" + nextActionPersisted.time + ", alarmTime" + nextActionPersisted.alarmTime + "\n"
+                            + "   Current is   action=" + nextAction.action + ", time=" + nextAction.time + ", alarmTime" + nextAction.alarmTime
+            ); // More precisely: ... while the app was not running (e.g. because it was being upgraded or the device was  off)
+
+            SystemNotification systemNotification = SystemNotification.getInstance(context);
+            systemNotification.notifySkippedAlarms();
+        }
+
+        if (isRinging()) {
+            Log.w(TAG, "Previous alarm was not correctly dismissed. Resuming ringing.");
+
+            onRing();
+        } else {
+            onAlarmSetNew(systemAlarm, nextAction);
+        }
     }
 
     /*

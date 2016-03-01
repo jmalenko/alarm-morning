@@ -46,6 +46,8 @@
     <string name="notification_title_long">Alarm at %1$s on %2$s</string>
     <string name="notification_text_cancelled">Alarm cancelled</string>
 
+    <string name="notification_text_skipped">There might have been some skipped alarms while the device was off</string>
+
     <string name="action_dismiss">Dismiss</string>
     <string name="action_snooze">Snooze</string>
     <string name="action_change">Change</string>
