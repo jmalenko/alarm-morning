@@ -24,5 +24,9 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
         systemAlarm.onSystemAlarm(intent);
+
+        if (!intent.getAction().equals(SystemAlarm.ACTION_RING)) {
+            WakeLocker.release();
+        }
     }
 }

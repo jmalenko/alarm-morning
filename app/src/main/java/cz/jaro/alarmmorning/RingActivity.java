@@ -105,6 +105,7 @@ public class RingActivity extends Activity implements RingInterface {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.e(TAG, "start of onCreate()");
         Log.d(TAG, "onCreate()");
         super.onCreate(savedInstanceState);
 

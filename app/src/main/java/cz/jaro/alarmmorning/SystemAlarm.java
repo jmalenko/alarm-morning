@@ -49,7 +49,7 @@ public class SystemAlarm {
     /**
      * Action meaning: Start ringing.
      */
-    protected static String ACTION_RING = "RING";
+    public static String ACTION_RING = "RING";
 
     private SystemAlarm(Context context) {
         this.context = context;
@@ -314,10 +314,6 @@ public class SystemAlarm {
         Log.d(TAG, "onRing()");
 
         initialize();
-    }
-
-    public void onDismiss() {
-        Log.d(TAG, "onDismiss()");
     }
 
     public void onSnooze(Calendar ringAfterSnoozeTime, Calendar alarmTime) {
