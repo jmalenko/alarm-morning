@@ -231,7 +231,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
             Day day = dataSource.loadDayDeep(date);
 
             if (day.isEnabled() && !day.isPassed(clock())) {
-                // TODO At one time point, there may be up to two early dismissed alarm. At Monday 23:00, the user can early dismiss  te alarm on Monday 23:30 and Tuesday 0:30.
+                // TODO At one time point, there may be up to two early dismissed alarm. At Monday 23:00, the user can early dismiss the alarm on Monday 23:30 and Tuesday 0:30.
                 GlobalManager globalManager = new GlobalManager(getActivity());
                 int state = globalManager.getState(day.getDateTime());
                 if (state != GlobalManager.STATE_UNDEFINED) {
