@@ -109,19 +109,6 @@ public class GlobalManager {
         return now.after(nearFutureTime);
     }
 
-    /**
-     * This method registers system alarm. If a system alarm is registered, it is canceled first.
-     * <p/>
-     * This method should be called on external events. Such events are application start after booting or upgrading, time (and time zone) change.
-     * <p/>
-     * This method should NOT be called when user sets the alarm time. Instead, call {@link #onAlarmSet()}.
-     */
-    public void forceSetAlarm() {
-        Log.d(TAG, "forceSetAlarm()");
-
-        onAlarmSet();
-    }
-
     /*
      * Persistence
      * ===========
@@ -218,6 +205,26 @@ public class GlobalManager {
     }
 
     /*
+     * Exernal events
+     * ==============
+     */
+
+    /**
+     * This method registers system alarm. If a system alarm is registered, it is canceled first.
+     * <p/>
+     * This method should be called on external events. Such events are application start after booting or upgrading, time (and time zone) change.
+     * <p/>
+     * This method should NOT be called when user sets the alarm time. Instead, call {@link #onAlarmSet()}.
+     */
+    public void forceSetAlarm() {
+        Log.d(TAG, "forceSetAlarm()");
+
+        SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
+        NextAction nextAction = systemAlarm.nextAction();
+        onAlarmSetNew(systemAlarm, nextAction);
+    }
+
+    /*
      * Events
      * ======
      *
@@ -245,23 +252,29 @@ public class GlobalManager {
             // cancel the current alarm
             onAlarmCancel();
 
-            // register next system alarm
-            systemAlarm.onAlarmSet();
-
-            if (nextAction.action.equals(SystemAlarm.ACTION_SET_SYSTEM_ALARM)) {
-                // nothing
-            } else if (nextAction.action.equals(SystemAlarm.ACTION_RING_IN_NEAR_FUTURE)) {
-                // nothing
-            } else if (nextAction.action.equals(SystemAlarm.ACTION_RING)) {
-                if (systemAlarm.useNearFutureTime()) {
-                    onNearFuture(false);
-                }
-            } else {
-                throw new IllegalArgumentException("Unexpected argument " + nextAction);
-            }
-
-            updateCalendarActivity(context, AlarmMorningActivity.ACTION_ALARM_SET);
+            onAlarmSetNew(systemAlarm, nextAction);
         }
+    }
+
+    private void onAlarmSetNew(SystemAlarm systemAlarm, NextAction nextAction) {
+        Log.d(TAG, "onAlarmSetNew()");
+
+        // register next system alarm
+        systemAlarm.onAlarmSet();
+
+        if (nextAction.action.equals(SystemAlarm.ACTION_SET_SYSTEM_ALARM)) {
+            // nothing
+        } else if (nextAction.action.equals(SystemAlarm.ACTION_RING_IN_NEAR_FUTURE)) {
+            // nothing
+        } else if (nextAction.action.equals(SystemAlarm.ACTION_RING)) {
+            if (systemAlarm.useNearFutureTime()) {
+                onNearFuture(false);
+            }
+        } else {
+            throw new IllegalArgumentException("Unexpected argument " + nextAction);
+        }
+
+        updateCalendarActivity(context, AlarmMorningActivity.ACTION_ALARM_SET);
     }
 
     public void onNearFuture() {
