@@ -357,17 +357,20 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         fragment.setOnTimeSetListener(this);
 
         // Preset time
+        Clock clock = new SystemClock(); // TODO Solve dependency on clock
+        Calendar now = clock.now();
+
         GlobalManager globalManager = new GlobalManager(getActivity());
         int state = globalManager.getState(day.getDateTime());
-        boolean presetNap = position == 0 && (state == GlobalManager.STATE_SNOOZED || state == GlobalManager.STATE_DISMISSED || state == GlobalManager.STATE_DISMISSED_BEFORE_RINGING);
+        boolean presetNap = position == 0 && (day.isEnabled() ?
+                (state == GlobalManager.STATE_SNOOZED || state == GlobalManager.STATE_DISMISSED || state == GlobalManager.STATE_DISMISSED_BEFORE_RINGING)
+                : now.after(day.getDateTime()));
 
         Bundle bundle = new Bundle();
         if (presetNap) {
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
             int napTime = preferences.getInt(SettingsActivity.PREF_NAP_TIME, SettingsActivity.PREF_NAP_TIME_DEFAULT);
 
-            Clock clock = new SystemClock(); // TODO Solve dependency on clock
-            Calendar now = clock.now();
             now.add(Calendar.MINUTE, napTime);
 
             bundle.putInt(TimePickerFragment.HOURS, now.get(Calendar.HOUR_OF_DAY));
