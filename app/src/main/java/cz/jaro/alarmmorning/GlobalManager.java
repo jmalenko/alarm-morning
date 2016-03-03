@@ -169,7 +169,7 @@ public class GlobalManager {
     }
 
     public int getState(Calendar date) {
-        Log.v(TAG, "getState()");
+//        Log.v(TAG, "getState()");
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 
@@ -177,15 +177,15 @@ public class GlobalManager {
         Calendar stateAlarmTime = new GregorianCalendar();
         stateAlarmTime.setTime(new Date(stateAlarmTimeInMS));
 
-        Log.v(TAG, "   comparing state alarm time " + stateAlarmTime.getTime() + " with " + date.getTime());
+//        Log.v(TAG, "   comparing state alarm time " + stateAlarmTime.getTime() + " with " + date.getTime());
 
         if (stateAlarmTime.equals(date)) {
             int state = preferences.getInt(PERSIST_STATE, STATE_UNDEFINED);
 
-            Log.v(TAG, "   state=" + state);
+//            Log.v(TAG, "   state=" + state);
             return state;
         } else {
-            Log.v(TAG, "   state=" + STATE_UNDEFINED + " because the persisted day is for another alarm time");
+//            Log.v(TAG, "   state=" + STATE_UNDEFINED + " because the persisted day is for another alarm time");
             return STATE_UNDEFINED;
         }
     }
