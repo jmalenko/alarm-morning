@@ -121,6 +121,8 @@ public class SystemNotification {
         mBuilder.setContentText(contentText);
 
         Intent intent = new Intent(context, RingActivity.class);
+        GlobalManager globalManager = new GlobalManager(context);
+        intent.putExtra(RingActivity.ALARM_TIME, globalManager.getAlarmTimeOfRingingAlarm()); // We must pass this to the activity as it might have been destroyed
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.setContentIntent(pendingIntent);
 

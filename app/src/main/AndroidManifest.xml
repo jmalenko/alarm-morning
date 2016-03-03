@@ -25,6 +25,7 @@
             android:name=".RingActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_ring"
+            android:launchMode="singleInstance"
             android:theme="@style/FullscreenTheme">
         </activity>
         <activity

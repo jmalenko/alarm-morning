@@ -49,9 +49,7 @@ public class RingActivity extends Activity implements RingInterface {
 
     public static final String ALARM_TIME = "ALARM_TIME";
 
-    static boolean isActive = false;
-
-    private Calendar alarmTime;
+    private Calendar mAlarmTime;
 
     private Ringtone ringtone;
     private MediaPlayer mediaPlayer;
@@ -140,7 +138,14 @@ public class RingActivity extends Activity implements RingInterface {
             });
         }
 
-        alarmTime = (Calendar) getIntent().getSerializableExtra(ALARM_TIME);
+        if (savedInstanceState != null) {
+            mAlarmTime = (Calendar) savedInstanceState.getSerializable(ALARM_TIME);
+        }
+
+        Calendar alarmTime = (Calendar) getIntent().getSerializableExtra(ALARM_TIME);
+        if (alarmTime != null) {
+            this.mAlarmTime = alarmTime;
+        }
 
         dismissButton = (SlideButton) findViewById(R.id.dismissButton);
         dismissButton.setSlideButtonListener(new View.OnClickListener() {
@@ -169,19 +174,16 @@ public class RingActivity extends Activity implements RingInterface {
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        isActive = true;
-    }
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        Log.v(TAG, "onSaveInstanceState()");
+        super.onSaveInstanceState(savedInstanceState);
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        isActive = false;
+        savedInstanceState.putSerializable(ALARM_TIME, mAlarmTime);
     }
 
     @Override
     protected void onDestroy() {
+        Log.v(TAG, "onDestroy()");
         super.onDestroy();
 
         bManager.unregisterReceiver(bReceiver);
@@ -375,16 +377,16 @@ public class RingActivity extends Activity implements RingInterface {
         timeView.setText(currentTimeString);
 
         TextView alarmTimeView = (TextView) findViewById(R.id.alarmTime);
-        if (onTheSameMinute(alarmTime, now)) {
+        if (onTheSameMinute(mAlarmTime, now)) {
             alarmTimeView.setVisibility(View.INVISIBLE);
         } else {
             Resources res = getResources();
             String alarmTimeText;
-            String timeStr = Localization.timeToString(alarmTime.getTime(), getBaseContext());
-            if (onTheSameDate(alarmTime, now)) {
+            String timeStr = Localization.timeToString(mAlarmTime.getTime(), getBaseContext());
+            if (onTheSameDate(mAlarmTime, now)) {
                 alarmTimeText = res.getString(R.string.alarm_was_set_to_today, timeStr);
             } else {
-                String dateStr = Localization.dateToStringFull(alarmTime.getTime());
+                String dateStr = Localization.dateToStringFull(mAlarmTime.getTime());
                 alarmTimeText = res.getString(R.string.alarm_was_set_to_nontoday, timeStr, dateStr);
             }
             alarmTimeView.setText(alarmTimeText);
@@ -398,8 +400,7 @@ public class RingActivity extends Activity implements RingInterface {
     }
 
     private boolean onTheSameMinute(Calendar cal1, Calendar cal2) {
-        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
-                cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR) &&
+        return onTheSameDate(cal1, cal2) &&
                 cal1.get(Calendar.HOUR_OF_DAY) == cal2.get(Calendar.HOUR_OF_DAY) &&
                 cal1.get(Calendar.MINUTE) == cal2.get(Calendar.MINUTE);
     }
@@ -692,8 +693,13 @@ public class RingActivity extends Activity implements RingInterface {
 
         switch (buttonActionPreference) {
             case SettingsActivity.PREF_ACTION_DEFAULT:
-                Log.d(TAG, "Doing nothing");
-                return super.onKeyDown(keycode, e);
+                if (keycode == KeyEvent.KEYCODE_BACK) {
+                    Log.d(TAG, "Doing nothing on back key.");
+                    return true;
+                } else {
+                    Log.d(TAG, "Doing nothing. Let the operating system handles tke key.");
+                    return super.onKeyDown(keycode, e);
+                }
 
             default:
                 actOnEvent(buttonActionPreference);
