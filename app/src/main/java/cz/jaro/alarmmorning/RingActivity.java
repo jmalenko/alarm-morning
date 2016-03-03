@@ -69,6 +69,7 @@ public class RingActivity extends Activity implements RingInterface {
 
     private Vibrator vibrator;
     private boolean isVibrating;
+    private static final long[] VIBRATOR_PATTERN = {0, 500, 1000};
 
     private TextView mutedTextView;
     private boolean isMuted;
@@ -653,20 +654,33 @@ public class RingActivity extends Activity implements RingInterface {
             if (vibrator.hasVibrator()) {
                 isVibrating = true;
 
-                long[] pattern = {0, 500, 1000};
+                vibrator.vibrate(VIBRATOR_PATTERN, 0);
 
-                vibrator.vibrate(pattern, 0);
+                // To continue vibrating when screen goes off
+                IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
+                registerReceiver(vibrateReceiver, filter);
             } else {
                 Log.w(TAG, "The device cannot vibrate");
             }
         }
     }
 
+    public BroadcastReceiver vibrateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
+                vibrator.vibrate(VIBRATOR_PATTERN, 0);
+            }
+        }
+    };
+
     private void stopVibrate() {
         Log.d(TAG, "stopVibrate()");
 
         if (isVibrating) {
             vibrator.cancel();
+
+            unregisterReceiver(vibrateReceiver);
         }
     }
 
@@ -675,6 +689,8 @@ public class RingActivity extends Activity implements RingInterface {
 
         if (isVibrating) {
             vibrator.cancel();
+
+            unregisterReceiver(vibrateReceiver);
         }
     }
 
@@ -682,9 +698,11 @@ public class RingActivity extends Activity implements RingInterface {
         Log.d(TAG, "unmuteVibrate()");
 
         if (isVibrating) {
-            long[] pattern = {0, 500, 1000};
+            vibrator.vibrate(VIBRATOR_PATTERN, 0);
 
-            vibrator.vibrate(pattern, 0);
+            // To continue vibrating when screen goes off
+            IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
+            registerReceiver(vibrateReceiver, filter);
         }
     }
 
