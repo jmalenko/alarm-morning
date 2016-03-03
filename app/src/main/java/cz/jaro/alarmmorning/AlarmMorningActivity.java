@@ -199,31 +199,34 @@ public class AlarmMorningActivity extends AppCompatActivity implements ActivityI
             case R.id.navigation_calendar:
                 CalendarFragment calendarFragment = new CalendarFragment();
                 mFragment = calendarFragment;
+
+                // Insert the mFragment by replacing any existing mFragment
+                getFragmentManager().beginTransaction().replace(R.id.content_frame, mFragment).commit();
+
+                // Highlight the selected item, update the title, and close the drawer
+                highlightMenuItem(menuItem);
+                setFragmentTitle(menuItem.getTitle());
                 break;
+
             case R.id.navigation_defaults:
                 Intent defaultsActivityIntent = new Intent(this, DefaultsActivity.class);
                 startActivity(defaultsActivityIntent);
-                return;
+                break;
+
             case R.id.navigation_settings:
                 Intent settingsActivityIntent = new Intent(this, SettingsActivity.class);
                 startActivity(settingsActivityIntent);
-                return;
-            case R.id.navigation_website:
-                closeNavigationDrawer();
+                break;
 
+            case R.id.navigation_website:
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                 startActivity(browserIntent);
-                return;
+                break;
+
             default:
                 throw new IllegalArgumentException("Unexpected argument " + menuItem.getItemId());
         }
 
-        // Insert the mFragment by replacing any existing mFragment
-        getFragmentManager().beginTransaction().replace(R.id.content_frame, mFragment).commit();
-
-        // Highlight the selected item, update the title, and close the drawer
-        highlightMenuItem(menuItem);
-        setFragmentTitle(menuItem.getTitle());
         closeNavigationDrawer();
     }
 
