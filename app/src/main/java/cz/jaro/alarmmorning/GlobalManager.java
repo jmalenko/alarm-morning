@@ -168,8 +168,18 @@ public class GlobalManager {
         editor.commit();
     }
 
+    public int getState() {
+        Log.v(TAG, "getState()");
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+
+        int state = preferences.getInt(PERSIST_STATE, STATE_UNDEFINED);
+
+        return state;
+    }
+
+
     public int getState(Calendar date) {
-//        Log.v(TAG, "getState()");
+        Log.v(TAG, "getState(date=" + date.getTime() + ")");
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 
@@ -180,10 +190,7 @@ public class GlobalManager {
 //        Log.v(TAG, "   comparing state alarm time " + stateAlarmTime.getTime() + " with " + date.getTime());
 
         if (stateAlarmTime.equals(date)) {
-            int state = preferences.getInt(PERSIST_STATE, STATE_UNDEFINED);
-
-//            Log.v(TAG, "   state=" + state);
-            return state;
+            return getState();
         } else {
 //            Log.v(TAG, "   state=" + STATE_UNDEFINED + " because the persisted day is for another alarm time");
             return STATE_UNDEFINED;
@@ -457,7 +464,7 @@ public class GlobalManager {
         return ringAfterSnoozeTime;
     }
 
-    private void startRingingActivity(Context context) {
+    protected void startRingingActivity(Context context) {
         Log.d(TAG, "startRingingActivity()");
 
         Intent ringIntent = new Intent();

@@ -119,6 +119,7 @@ public class AlarmMorningActivity extends AppCompatActivity implements ActivityI
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.v(TAG, "onCreate()");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_calendar);
 
@@ -163,6 +164,19 @@ public class AlarmMorningActivity extends AppCompatActivity implements ActivityI
             // Highlight the menu item
             MenuItem calendarMenu = mNavigationView.getMenu().findItem(R.id.navigation_calendar);
             highlightMenuItem(calendarMenu);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        Log.v(TAG, "onResume()");
+        super.onResume();
+
+        // Redirect to ring activity if ringing
+        GlobalManager globalManager = new GlobalManager(this);
+        int state = globalManager.getState();
+        if (state == GlobalManager.STATE_RINGING) {
+            globalManager.startRingingActivity(this);
         }
     }
 
