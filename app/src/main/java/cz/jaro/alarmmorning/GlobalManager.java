@@ -397,6 +397,11 @@ public class GlobalManager {
     public void onDismiss() {
         Log.d(TAG, "onDismiss()");
 
+        if (getState() == STATE_SNOOZED) {
+            SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
+            systemAlarm.onAlarmSet();
+        }
+
         setState(STATE_DISMISSED, getAlarmTimeOfRingingAlarm());
 
         SystemNotification systemNotification = SystemNotification.getInstance(context);
