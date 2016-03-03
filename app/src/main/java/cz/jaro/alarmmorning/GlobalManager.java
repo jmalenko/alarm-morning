@@ -467,8 +467,7 @@ public class GlobalManager {
     protected void startRingingActivity(Context context) {
         Log.d(TAG, "startRingingActivity()");
 
-        Intent ringIntent = new Intent();
-        ringIntent.setClassName("cz.jaro.alarmmorning", "cz.jaro.alarmmorning.RingActivity");
+        Intent ringIntent = new Intent(context, RingActivity.class);
 //        ringIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         ringIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         ringIntent.putExtra(RingActivity.ALARM_TIME, getAlarmTimeOfRingingAlarm());
@@ -478,8 +477,7 @@ public class GlobalManager {
     private void updateRingingActivity(Context context, String action) {
         Log.d(TAG, "updateRingingActivity(action=" + action + ")");
 
-        Intent hideIntent = new Intent();
-        hideIntent.setClassName("cz.jaro.alarmmorning", "cz.jaro.alarmmorning.RingActivity");
+        Intent hideIntent = new Intent(context, RingActivity.class);
         hideIntent.setAction(action);
         LocalBroadcastManager.getInstance(context).sendBroadcast(hideIntent);
     }
@@ -487,8 +485,7 @@ public class GlobalManager {
     private void updateCalendarActivity(Context context, String action) {
         Log.d(TAG, "updateCalendarActivity(action=" + action + ")");
 
-        Intent intent = new Intent();
-        intent.setClassName("cz.jaro.alarmmorning", "cz.jaro.alarmmorning.AlarmMorningActivity");
+        Intent intent = new Intent(context, AlarmMorningActivity.class);
         intent.setAction(action);
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
