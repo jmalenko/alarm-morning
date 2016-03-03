@@ -31,6 +31,7 @@ import java.util.Set;
 
 import cz.jaro.alarmmorning.clock.SystemClock;
 import cz.jaro.alarmmorning.graphics.SlideButton;
+import cz.jaro.alarmmorning.receivers.AlarmReceiver;
 import cz.jaro.alarmmorning.sensor.Flip;
 import cz.jaro.alarmmorning.sensor.Move;
 import cz.jaro.alarmmorning.sensor.Proximity;
@@ -319,6 +320,9 @@ public class RingActivity extends Activity implements RingInterface {
         }
     }
 
+    /**
+     * The wake lock that was acquired on system notification in {@link AlarmReceiver#onReceive(Context, Intent)} must be released.
+     */
     public void stopAll() {
         Log.d(TAG, "stopAll()");
 
