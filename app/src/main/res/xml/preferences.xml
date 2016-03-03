@@ -104,6 +104,12 @@
                 android:summaryOff="@string/pref_summaryoff_ask_to_change_other_weekdays_with_the_same_alarm_time"
                 android:summaryOn="@string/pref_summaryon_ask_to_change_other_weekdays_with_the_same_alarm_time"/>
 
+            <cz.jaro.alarmmorning.graphics.RelativeTimePreference
+                android:key="pref_nap_time"
+                android:title="@string/pref_title_nap_time"
+                android:defaultValue="30"
+                custom:maxHour="6"/>
+
         </PreferenceScreen>
 
     </PreferenceCategory>

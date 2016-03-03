@@ -7,9 +7,11 @@ package cz.jaro.alarmmorning;
 import android.app.Fragment;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -355,9 +357,25 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         fragment.setOnTimeSetListener(this);
 
         // Preset time
+        GlobalManager globalManager = new GlobalManager(getActivity());
+        int state = globalManager.getState(day.getDateTime());
+        boolean presetNap = position == 0 && (state == GlobalManager.STATE_SNOOZED || state == GlobalManager.STATE_DISMISSED || state == GlobalManager.STATE_DISMISSED_BEFORE_RINGING);
+
         Bundle bundle = new Bundle();
-        bundle.putInt(TimePickerFragment.HOURS, day.getHourX());
-        bundle.putInt(TimePickerFragment.MINUTES, day.getMinuteX());
+        if (presetNap) {
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            int napTime = preferences.getInt(SettingsActivity.PREF_NAP_TIME, SettingsActivity.PREF_NAP_TIME_DEFAULT);
+
+            Clock clock = new SystemClock(); // TODO Solve dependency on clock
+            Calendar now = clock.now();
+            now.add(Calendar.MINUTE, napTime);
+
+            bundle.putInt(TimePickerFragment.HOURS, now.get(Calendar.HOUR_OF_DAY));
+            bundle.putInt(TimePickerFragment.MINUTES, now.get(Calendar.MINUTE));
+        } else {
+            bundle.putInt(TimePickerFragment.HOURS, day.getHourX());
+            bundle.putInt(TimePickerFragment.MINUTES, day.getMinuteX());
+        }
         fragment.setArguments(bundle);
 
         fragment.show(getFragmentManager(), "timePicker");

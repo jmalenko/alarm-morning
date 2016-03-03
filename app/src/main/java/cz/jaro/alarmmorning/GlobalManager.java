@@ -114,9 +114,12 @@ public class GlobalManager {
         Calendar now = clock.now();
 
         NextAction nextAction = getNextAction();
-        Calendar nearFutureTime = SystemAlarm.getNearFutureTime(context, nextAction.alarmTime);
-
-        return now.after(nearFutureTime);
+        if (nextAction.alarmTime != null) {
+            Calendar nearFutureTime = SystemAlarm.getNearFutureTime(context, nextAction.alarmTime);
+            return now.after(nearFutureTime);
+        } else {
+            return false;
+        }
     }
 
     /*

@@ -62,6 +62,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
      */
     public static final String PREF_ASK_TO_CHANGE_OTHER_WEEKDAYS_WIT_THE_SAME_ALARM_TIME = "pref_ask_to_change_other_weekdays_with_the_same_alarm_time";
 
+    /**
+     * Value is in minutes.
+     */
+    public static final String PREF_NAP_TIME = "pref_nap_time";
 
     public static final String PREF_ACTION_ON_BUTTON = "pref_action_on_button";
     public static final String PREF_ACTION_ON_MOVE = "pref_action_on_move";
@@ -82,6 +86,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     public static final int PREF_NEAR_FUTURE_TIME_DEFAULT = 120;
     public static final String PREF_ACTION_DEFAULT = PREF_ACTION_NOTHING;
     public static final boolean PREF_ASK_TO_CHANGE_OTHER_WEEKDAYS_WIT_THE_SAME_ALARM_TIME_DEFAULT = true;
+    public static final int PREF_NAP_TIME_DEFAULT = 30;
 
     public static final int PREF_VOLUME_MAX = 10;
 
@@ -102,6 +107,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         bindPreferenceSummaryToValue(findPreference(PREF_ACTION_ON_FLIP));
         bindPreferenceSummaryToValue(findPreference(PREF_ACTION_ON_SHAKE));
         bindPreferenceSummaryToValue(findPreference(PREF_ACTION_ON_PROXIMITY));
+        bindPreferenceSummaryToValue(findPreference(PREF_NAP_TIME));
     }
 
     /**
@@ -207,6 +213,16 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 CharSequence summaryText = res.getTextArray(R.array.actionArray)[intValue];
 
                 preference.setSummary(summaryText);
+            } else if (key.equals(PREF_NAP_TIME)) {
+                int intValue = (int) value;
+                int hours = minutesToHour(intValue);
+                int minutes = minutesToMinute(intValue);
+
+                Context context = preference.getContext();
+                Resources res = context.getResources();
+                String summaryText = res.getString(R.string.pref_summary_nap_time, hours, minutes);
+
+                preference.setSummary(summaryText);
             } else {
                 // For all other preferences, set the summary to the value's simple string representation.
                 preference.setSummary(stringValue);
@@ -256,6 +272,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             newValue = defaultSharedPreferences.getInt(preference.getKey(), PREF_NEAR_FUTURE_TIME_DEFAULT);
         } else if (key.equals(PREF_ACTION_ON_BUTTON) || key.equals(PREF_ACTION_ON_MOVE) || key.equals(PREF_ACTION_ON_FLIP) || key.equals(PREF_ACTION_ON_SHAKE) || key.equals(PREF_ACTION_ON_PROXIMITY)) {
             newValue = defaultSharedPreferences.getString(preference.getKey(), PREF_ACTION_DEFAULT);
+        } else if (key.equals(PREF_NAP_TIME)) {
+            newValue = defaultSharedPreferences.getInt(preference.getKey(), PREF_NAP_TIME_DEFAULT);
         } else {
             throw new IllegalArgumentException("Unexpected argument " + key);
         }
