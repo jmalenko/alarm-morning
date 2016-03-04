@@ -240,9 +240,9 @@ public class GlobalManager {
         Log.d(TAG, "forceSetAlarm()");
 
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
-        NextAction nextAction = systemAlarm.nextAction();
 
-        if (systemAlarm.nextActionShouldChange(nextAction)) {
+        if (systemAlarm.nextActionShouldChange()) {
+            NextAction nextAction = systemAlarm.nextAction();
             NextAction nextActionPersisted = getNextAction();
 
             Log.w(TAG, "The next system alarm changed while the app was not running.\n"
@@ -259,7 +259,7 @@ public class GlobalManager {
 
             onRing();
         } else {
-            onAlarmSetNew(systemAlarm, nextAction);
+            onAlarmSetNew(systemAlarm);
         }
     }
 
@@ -283,21 +283,21 @@ public class GlobalManager {
         Log.d(TAG, "onAlarmSet()");
 
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
-        NextAction nextAction = systemAlarm.nextAction();
 
-        if (systemAlarm.nextActionShouldChange(nextAction)) {
+        if (systemAlarm.nextActionShouldChange()) {
             // cancel the current alarm
             onAlarmCancel();
 
-            onAlarmSetNew(systemAlarm, nextAction);
+            onAlarmSetNew(systemAlarm);
         }
     }
 
-    private void onAlarmSetNew(SystemAlarm systemAlarm, NextAction nextAction) {
+    private void onAlarmSetNew(SystemAlarm systemAlarm) {
         Log.d(TAG, "onAlarmSetNew()");
 
         // register next system alarm
         systemAlarm.onAlarmSet();
+        NextAction nextAction = systemAlarm.nextAction();
 
         if (nextAction.action.equals(SystemAlarm.ACTION_SET_SYSTEM_ALARM)) {
             // nothing
