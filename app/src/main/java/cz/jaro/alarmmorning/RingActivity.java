@@ -350,23 +350,21 @@ public class RingActivity extends Activity implements RingInterface {
     private void startContent() {
         Log.d(TAG, "startContent()");
 
-        runnableContent.run();
+        handlerContent.start();
     }
 
-    private Handler handlerContent = new Handler();
     private Runnable runnableContent = new Runnable() {
         @Override
         public void run() {
             updateContent();
-
-            handlerContent.postDelayed(this, 60000);
         }
     };
+    private HandlerOnClockChange handlerContent = new HandlerOnClockChange(Calendar.MINUTE, runnableContent);
 
     private void stopContent() {
         Log.d(TAG, "stopContent()");
 
-        handlerContent.removeCallbacks(runnableContent);
+        handlerContent.stop();
     }
 
     private void updateContent() {

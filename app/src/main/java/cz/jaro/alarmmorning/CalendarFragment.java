@@ -10,7 +10,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -55,12 +54,11 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     private int positionNextAlarm;
     private static final int POSITION_UNSET = -1;
 
-    private Handler handler = new Handler();
+    private HandlerOnClockChange handler = new HandlerOnClockChange();
     private Runnable runnable = new Runnable() {
         @Override
         public void run() {
             onSystemTimeChange();
-            handler.postDelayed(this, 1000);
         }
     };
 
@@ -107,8 +105,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         super.onResume();
 
         // handler for refreshing the content
-        handler.postDelayed(runnable, 1000);
-
+        handler.start(runnable, Calendar.SECOND);
 
         Calendar today2 = getToday(clock());
 
@@ -125,7 +122,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     public void onPause() {
         super.onPause();
 
-        handler.removeCallbacks(runnable);
+        handler.stop();
     }
 
     @Override
