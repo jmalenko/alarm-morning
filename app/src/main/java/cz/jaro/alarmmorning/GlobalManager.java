@@ -1,11 +1,14 @@
 package cz.jaro.alarmmorning;
 
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
+import android.widget.RemoteViews;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -273,6 +276,8 @@ public class GlobalManager {
         SystemAlarmClock systemAlarmClock = SystemAlarmClock.getInstance(context);
         systemAlarmClock.onAlarmSet();
 
+        updateWidget(context);
+
         if (systemAlarm.nextActionShouldChange()) {
             NextAction nextAction = systemAlarm.calcNextAction();
             NextAction nextActionPersisted = getNextAction();
@@ -304,8 +309,9 @@ public class GlobalManager {
      * 2. Register next system alarm
      * 3. Handle notification
      * 4. Handle system alarm clock
-     * 5. Handle ring activity
-     * 6. Handle calendar activity
+     * 5. Handle widget
+     * 6. Handle ring activity
+     * 7. Handle calendar activity
      */
 
     /**
@@ -333,6 +339,8 @@ public class GlobalManager {
 
         SystemAlarmClock systemAlarmClock = SystemAlarmClock.getInstance(context);
         systemAlarmClock.onAlarmSet();
+
+        updateWidget(context);
 
         NextAction nextAction = systemAlarm.calcNextAction();
         if (nextAction.action.equals(SystemAlarm.ACTION_SET_SYSTEM_ALARM)) {
@@ -395,6 +403,8 @@ public class GlobalManager {
         SystemAlarmClock systemAlarmClock = SystemAlarmClock.getInstance(context);
         systemAlarmClock.onDismissBeforeRinging();
 
+        updateWidget(context);
+
         updateCalendarActivity(context, AlarmMorningActivity.ACTION_DISMISS_BEFORE_RINGING);
     }
 
@@ -434,6 +444,8 @@ public class GlobalManager {
         if (isNew) {
             SystemAlarmClock systemAlarmClock = SystemAlarmClock.getInstance(context);
             systemAlarmClock.onRing();
+
+            updateWidget(context);
         }
 
         startRingingActivity(context);
@@ -494,9 +506,6 @@ public class GlobalManager {
         SystemNotification systemNotification = SystemNotification.getInstance(context);
         systemNotification.onAlarmCancel();
 
-        SystemAlarmClock systemAlarmClock = SystemAlarmClock.getInstance(context);
-        systemAlarmClock.onAlarmCancel();
-
         updateRingingActivity(context, RingActivity.ACTION_HIDE_ACTIVITY);
     }
 
@@ -517,6 +526,15 @@ public class GlobalManager {
         ringAfterSnoozeTime.set(Calendar.MILLISECOND, 0);
 
         return ringAfterSnoozeTime;
+    }
+
+    private void updateWidget(Context context) {
+        Log.d(TAG, "updateWidget()");
+
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_layout);
+        WidgetProvider.updateContent(context, views);
+        appWidgetManager.updateAppWidget(new ComponentName(context, WidgetProvider.class), views);
     }
 
     protected void startRingingActivity(Context context) {
