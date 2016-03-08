@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -73,7 +74,11 @@ public class SystemAlarm {
 
         operation = PendingIntent.getBroadcast(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        alarmManager.set(AlarmManager.RTC_WAKEUP, nextAction.time.getTimeInMillis(), operation);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, nextAction.time.getTimeInMillis(), operation);
+        } else {
+            alarmManager.set(AlarmManager.RTC_WAKEUP, nextAction.time.getTimeInMillis(), operation);
+        }
     }
 
     protected void registerSystemAlarm(String action, Calendar time, Calendar alarmTime) {
