@@ -232,7 +232,7 @@ public class AlarmDataSource {
                 continue;
             }
 
-            Log.d(TAG, "   The day that satisfies filter is " + day);
+            Log.v(TAG, "   The day that satisfies filter is " + day.getDate().getTime());
             return day;
         }
 
