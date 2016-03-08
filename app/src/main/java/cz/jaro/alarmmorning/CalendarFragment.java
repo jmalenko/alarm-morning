@@ -484,20 +484,20 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
                 break;
 
             case R.id.day_revert:
-                Log.d(TAG, "Revert");
+                Log.i(TAG, "Revert");
                 day.setState(Day.STATE_DEFAULT);
                 save(day);
                 break;
 
             case R.id.day_dismiss:
-                Log.d(TAG, "Dismiss");
+                Log.i(TAG, "Dismiss");
                 Context context = getActivity();
                 GlobalManager globalManager = new GlobalManager(context);
                 globalManager.onDismissBeforeRinging();
                 break;
 
             case R.id.day_snooze:
-                Log.d(TAG, "Snooze");
+                Log.i(TAG, "Snooze");
                 Context context2 = getActivity();
                 GlobalManager globalManager2 = new GlobalManager(context2);
                 globalManager2.onSnooze();
