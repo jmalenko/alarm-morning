@@ -11,9 +11,6 @@ import android.util.Log;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-import cz.jaro.alarmmorning.clock.Clock;
-import cz.jaro.alarmmorning.clock.SystemClock;
-import cz.jaro.alarmmorning.model.AlarmDataSource;
 import cz.jaro.alarmmorning.model.Day;
 import cz.jaro.alarmmorning.receivers.VoidReceiver;
 
@@ -112,7 +109,9 @@ public class SystemAlarmClock {
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void register() {
         Log.v(TAG, "register()");
-        Day day = calcNextAlarm();
+
+        GlobalManager globalManager = new GlobalManager(context);
+        Day day = globalManager.getDayWithNextAlarmToRing();
 
         if (day != null) {
             Calendar alarmTime = day.getDateTime();
@@ -141,42 +140,4 @@ public class SystemAlarmClock {
             Log.v(TAG, "   system alarm clock is at " + t.getTime());
         }
     }
-
-    // TODO Solve dependency on clock
-    private Clock clock() {
-        return new SystemClock();
-    }
-
-    // TODO Refactoring - similar to CalendarFragment.calcPositionNextAlarm()
-    private Day calcNextAlarm() {
-        Calendar today = clock().now();
-
-        AlarmDataSource dataSource = new AlarmDataSource(context);
-        dataSource.open();
-
-        for (int position = 0; position < AlarmDataSource.HORIZON_DAYS; position++) {
-
-            Calendar date = CalendarFragment.addDays(today, position);
-
-            Day day = dataSource.loadDayDeep(date);
-
-            if (day.isEnabled() && !day.isPassed(clock())) {
-                GlobalManager globalManager = new GlobalManager(context);
-                int state = globalManager.getState(day.getDateTime());
-                if (state != GlobalManager.STATE_UNDEFINED) {
-                    if (state != GlobalManager.STATE_DISMISSED_BEFORE_RINGING && state != GlobalManager.STATE_DISMISSED) {
-                        dataSource.close();
-                        return day;
-                    }
-                } else {
-                    dataSource.close();
-                    return day;
-                }
-            }
-        }
-
-        dataSource.close();
-        return null;
-    }
-
 }

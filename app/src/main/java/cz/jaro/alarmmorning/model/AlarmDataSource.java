@@ -197,6 +197,24 @@ public class AlarmDataSource {
      * @return next alarm time
      */
     public Calendar getNextAlarm(Clock clock) {
+        Day day = getNextAlarm(clock, null);
+        if (day != null) {
+            Calendar alarmTime = day.getDateTime();
+            Log.v(TAG, "Next alarm is at " + alarmTime.getTime().toString());
+            return alarmTime;
+        } else {
+            Log.v(TAG, "Next alarm is never");
+            return null;
+        }
+    }
+
+    /**
+     * Return the nearest Day with alarm such that the Day matches the filter. The filter that such a Day is enabled and not in past is also checked.
+     *
+     * @param clock clock
+     * @return nearest Day with alarm
+     */
+    public Day getNextAlarm(Clock clock, DayFilter filter) {
         Calendar date = clock.now();
 
         for (int daysInAdvance = 0; daysInAdvance < HORIZON_DAYS; daysInAdvance++, date.add(Calendar.DATE, 1)) {
@@ -210,9 +228,12 @@ public class AlarmDataSource {
                 continue;
             }
 
-            Calendar alarmTime = day.getDateTime();
-            Log.v(TAG, "Next alarm is at " + alarmTime.getTime().toString());
-            return alarmTime;
+            if (filter != null && !filter.match(day)) {
+                continue;
+            }
+
+            Log.d(TAG, "   The day that satisfies filter is " + day);
+            return day;
         }
 
         Log.v(TAG, "Next alarm is never");

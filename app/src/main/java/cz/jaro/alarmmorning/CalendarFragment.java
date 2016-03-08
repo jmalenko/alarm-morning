@@ -221,23 +221,23 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     }
 
     private int calcPositionNextAlarm() {
-        for (int position = 0; position < AlarmDataSource.HORIZON_DAYS; position++) {
+        GlobalManager globalManager = new GlobalManager(getActivity());
+        Day day = globalManager.getDayWithNextAlarmToRing();
 
-            Calendar date = addDays(today, position);
+        if (day == null) {
+            return POSITION_UNSET;
+        } else {
+            int position = dayToPosition(day);
+            return position;
+        }
+    }
 
-            Day day = dataSource.loadDayDeep(date);
+    private int dayToPosition(Day day) {
+        Calendar date = clock().now();
 
-            if (day.isEnabled() && !day.isPassed(clock())) {
-                // TODO At one time point, there may be up to two early dismissed alarm. At Monday 23:00, the user can early dismiss the alarm on Monday 23:30 and Tuesday 0:30.
-                GlobalManager globalManager = new GlobalManager(getActivity());
-                int state = globalManager.getState(day.getDateTime());
-                if (state != GlobalManager.STATE_UNDEFINED) {
-                    if (state != GlobalManager.STATE_DISMISSED_BEFORE_RINGING && state != GlobalManager.STATE_DISMISSED) {
-                        return position;
-                    }
-                } else {
-                    return position;
-                }
+        for (int daysInAdvance = 0; daysInAdvance < AlarmDataSource.HORIZON_DAYS; daysInAdvance++, date.add(Calendar.DATE, 1)) {
+            if (RingActivity.onTheSameDate(day.getDate(), date)) {
+                return daysInAdvance;
             }
         }
         return POSITION_UNSET;

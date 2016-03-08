@@ -397,12 +397,12 @@ public class RingActivity extends Activity implements RingInterface {
         }
     }
 
-    private boolean onTheSameDate(Calendar cal1, Calendar cal2) {
+    public static boolean onTheSameDate(Calendar cal1, Calendar cal2) {
         return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
                 cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR);
     }
 
-    private boolean onTheSameMinute(Calendar cal1, Calendar cal2) {
+    public static boolean onTheSameMinute(Calendar cal1, Calendar cal2) {
         return onTheSameDate(cal1, cal2) &&
                 cal1.get(Calendar.HOUR_OF_DAY) == cal2.get(Calendar.HOUR_OF_DAY) &&
                 cal1.get(Calendar.MINUTE) == cal2.get(Calendar.MINUTE);

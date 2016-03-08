@@ -15,6 +15,7 @@ import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.clock.SystemClock;
 import cz.jaro.alarmmorning.model.AlarmDataSource;
 import cz.jaro.alarmmorning.model.Day;
+import cz.jaro.alarmmorning.model.DayFilter;
 
 /**
  * The GlobalManager keeps the state of the application and communicates with the application components.
@@ -81,11 +82,39 @@ public class GlobalManager {
         AlarmDataSource dataSource = new AlarmDataSource(context);
         dataSource.open();
 
-        Clock clock = new SystemClock();
+        Clock clock = new SystemClock(); // TODO Solve dependency on clock
+
         Calendar today = CalendarFragment.getToday(clock);
         Day day = dataSource.loadDayDeep(today);
 
         dataSource.close();
+
+        return day;
+    }
+
+    protected Day getDayWithNextAlarmToRing() {
+        Log.v(TAG, "getDayWithNextAlarm()");
+
+        AlarmDataSource dataSource = new AlarmDataSource(context);
+        dataSource.open();
+
+        Clock clock = new SystemClock(); // TODO Solve dependency on clock
+
+        Day day = dataSource.getNextAlarm(clock, new DayFilter() {
+            @Override
+            public boolean match(Day day) {
+                GlobalManager globalManager = new GlobalManager(context);
+                int state = globalManager.getState(day.getDateTime());
+                if (state != GlobalManager.STATE_UNDEFINED) {
+                    if (state != GlobalManager.STATE_DISMISSED_BEFORE_RINGING && state != GlobalManager.STATE_DISMISSED) {
+                        return true;
+                    }
+                } else {
+                    return true;
+                }
+                return false;
+            }
+        });
 
         return day;
     }
