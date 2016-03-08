@@ -241,8 +241,11 @@ public class GlobalManager {
 
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
 
+        SystemAlarmClock systemAlarmClock = SystemAlarmClock.getInstance(context);
+        systemAlarmClock.onAlarmSet();
+
         if (systemAlarm.nextActionShouldChange()) {
-            NextAction nextAction = systemAlarm.nextAction();
+            NextAction nextAction = systemAlarm.calcNextAction();
             NextAction nextActionPersisted = getNextAction();
 
             Log.w(TAG, "The next system alarm changed while the app was not running.\n"
@@ -271,8 +274,9 @@ public class GlobalManager {
      * 1. Set state
      * 2. Register next system alarm
      * 3. Handle notification
-     * 4. Handle ring activity
-     * 5. Handle calendar activity
+     * 4. Handle system alarm clock
+     * 5. Handle ring activity
+     * 6. Handle calendar activity
      */
 
     /**
@@ -297,8 +301,11 @@ public class GlobalManager {
 
         // register next system alarm
         systemAlarm.onAlarmSet();
-        NextAction nextAction = systemAlarm.nextAction();
 
+        SystemAlarmClock systemAlarmClock = SystemAlarmClock.getInstance(context);
+        systemAlarmClock.onAlarmSet();
+
+        NextAction nextAction = systemAlarm.calcNextAction();
         if (nextAction.action.equals(SystemAlarm.ACTION_SET_SYSTEM_ALARM)) {
             // nothing
         } else if (nextAction.action.equals(SystemAlarm.ACTION_RING_IN_NEAR_FUTURE)) {
@@ -356,6 +363,9 @@ public class GlobalManager {
         SystemNotification systemNotification = SystemNotification.getInstance(context);
         systemNotification.onDismissBeforeRinging();
 
+        SystemAlarmClock systemAlarmClock = SystemAlarmClock.getInstance(context);
+        systemAlarmClock.onDismissBeforeRinging();
+
         updateCalendarActivity(context, AlarmMorningActivity.ACTION_DISMISS_BEFORE_RINGING);
     }
 
@@ -391,6 +401,11 @@ public class GlobalManager {
 
         SystemNotification systemNotification = SystemNotification.getInstance(context);
         systemNotification.onRing();
+
+        if (isNew) {
+            SystemAlarmClock systemAlarmClock = SystemAlarmClock.getInstance(context);
+            systemAlarmClock.onRing();
+        }
 
         startRingingActivity(context);
 
@@ -449,6 +464,9 @@ public class GlobalManager {
 
         SystemNotification systemNotification = SystemNotification.getInstance(context);
         systemNotification.onAlarmCancel();
+
+        SystemAlarmClock systemAlarmClock = SystemAlarmClock.getInstance(context);
+        systemAlarmClock.onAlarmCancel();
 
         updateRingingActivity(context, RingActivity.ACTION_HIDE_ACTIVITY);
     }

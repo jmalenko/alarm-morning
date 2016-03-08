@@ -18,7 +18,7 @@ import cz.jaro.alarmmorning.model.AlarmDataSource;
 import cz.jaro.alarmmorning.receivers.AlarmReceiver;
 
 /**
- * Created by jmalenko on 22.12.2015.
+ * The SystemAlarm handles the "waking up of the app at a specified time to perform an action".
  */
 public class SystemAlarm {
 
@@ -123,7 +123,7 @@ public class SystemAlarm {
      */
 
     private void initialize() {
-        NextAction nextAction = nextAction();
+        NextAction nextAction = calcNextAction();
         registerSystemAlarm(nextAction);
     }
 
@@ -132,8 +132,8 @@ public class SystemAlarm {
      *
      * @return the next action and system alarm
      */
-    protected NextAction nextAction() {
-        Log.d(TAG, "nextAction()");
+    protected NextAction calcNextAction() {
+        Log.d(TAG, "calcNextAction()");
 
         Clock clock = new SystemClock(); // TODO Solve dependency on clock
         Calendar now = clock.now();
@@ -160,7 +160,7 @@ public class SystemAlarm {
     protected boolean nextActionShouldChange() {
         Log.v(TAG, "nextActionSh ouldChange()");
 
-        NextAction nextAction = nextAction();
+        NextAction nextAction = calcNextAction();
 
         GlobalManager globalManager = new GlobalManager(context);
         NextAction nextActionPersisted = globalManager.getNextAction();
@@ -195,73 +195,6 @@ public class SystemAlarm {
 
         return nearFutureTime;
     }
-
-    // TODO Clean up
-//    /**
-//     * This method registers system alarm. If a system alarm is registered, it is canceled first.
-//     * <p/>
-//     * This method should be called on external events. Such events are application start after booting or upgrading, time (and time zone) change.
-//     * <p/>
-//     * This method should NOT be called when user sets the alarm time. Instead, call {@link GlobalManager#onAlarmSet()} which possibly calls this method.
-//     */
-//    public void setSystemAlarm() {
-//        Log.d(TAG, "setSystemAlarm()");
-//
-//        // there may be a registered alarm when this method is called from TimeChangedReceiver or TimeZoneChangedReceiver.
-//        cancelSystemAlarm();
-//
-//        initialize();
-//    }
-
-//    public void setAlarmOld() {
-//        Log.d(TAG, "setAlarmOld()");
-//
-//        Calendar alarmTime = AlarmDataSource.getNextAlarm(context);
-//
-//        if (alarmTime == null) {
-//            if (operation != null) {
-//                Log.i(TAG, "Cancelling current alarm");
-//                operation.cancel();
-//            }
-//            Log.i(TAG, "No alarm scheduled");
-//            return;
-//        }
-//
-//        if (operation != null) {
-//            if (time == alarmTime.getTimeInMillis()) {
-//                Log.i(TAG, "Scheduled alarm does not change at " + alarmTime.getTime().toString());
-//                return;
-//            } else {
-//                Log.i(TAG, "Cancelling current alarm");
-//                operation.cancel();
-//            }
-//        }
-//
-//        Log.i(TAG, "Setting alarm at " + alarmTime.getTime().toString());
-//
-//        Intent ringIntent = new Intent(context, AlarmReceiver.class);
-//
-//        time = alarmTime.getTimeInMillis();
-//        operation = PendingIntent.getBroadcast(context, 1, ringIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-//        alarmManager.set(AlarmManager.RTC_WAKEUP, time, operation);
-//
-//        // requires API level 21 or higher
-////        PendingIntent showIntent = PendingIntent.getBroadcast(context, 1, ringIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-////        AlarmManager.AlarmClockInfo alarmClockInfo = new AlarmManager.AlarmClockInfo(alarmTime.getTimeInMillis(), showIntent);
-////        alarmManager.setAlarmClock(alarmClockInfo, operation);
-//    }
-
-//    public long getTime() {
-//        return time;
-//    }
-
-    //    // requires API level 21 or hi
-//    public static long getNextGlobalAlarm(Context context) {
-//        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-//        AlarmManager.AlarmClockInfo alarm = alarmManager.getNextAlarmClock();
-//        long time = alarm.getTriggerTime();
-//        return time;
-//    }
 
     public void onSystemAlarm(Intent intent) {
         String action = intent.getAction();
