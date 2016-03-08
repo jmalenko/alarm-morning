@@ -416,12 +416,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
         String headerTitle;
         if (day.isEnabled()) {
-            String timeText;
-            if (day.isEnabled()) {
-                timeText = Localization.timeToString(day.getHourX(), day.getMinuteX(), getActivity(), clock());
-            } else {
-                timeText = getResources().getString(R.string.alarm_unset);
-            }
+            String timeText = Localization.timeToString(day.getHourX(), day.getMinuteX(), getActivity(), clock());
             headerTitle = getResources().getString(R.string.menu_day_header, timeText, dayOfWeekText, dateText);
         } else {
             headerTitle = getResources().getString(R.string.menu_day_header_disabled, dayOfWeekText, dateText);
