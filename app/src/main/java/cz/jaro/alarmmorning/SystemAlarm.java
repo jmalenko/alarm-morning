@@ -63,23 +63,26 @@ public class SystemAlarm {
         return instance;
     }
 
-    protected void registerSystemAlarm(String action, Calendar time, Calendar alarmTime) {
-        Log.i(TAG, "Setting system alarm at " + time.getTime().toString() + " with action " + action);
+    private void registerSystemAlarm(NextAction nextAction) {
+        Log.i(TAG, "Setting system alarm at " + nextAction.time.getTime().toString() + " with action " + nextAction.action);
 
-        saveNextAction(action, time, alarmTime);
+        saveNextAction(nextAction);
 
         intent = new Intent(context, AlarmReceiver.class);
-        intent.setAction(action);
+        intent.setAction(nextAction.action);
 
         operation = PendingIntent.getBroadcast(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        alarmManager.set(AlarmManager.RTC_WAKEUP, time.getTimeInMillis(), operation);
+        alarmManager.set(AlarmManager.RTC_WAKEUP, nextAction.time.getTimeInMillis(), operation);
     }
 
-    private void saveNextAction(String action, Calendar time, Calendar alarmTime) {
-        Log.d(TAG, "setNextAction()");
-
+    protected void registerSystemAlarm(String action, Calendar time, Calendar alarmTime) {
         NextAction nextAction = new NextAction(action, time, alarmTime);
+        registerSystemAlarm(nextAction);
+    }
+
+    private void saveNextAction(NextAction nextAction) {
+        Log.d(TAG, "setNextAction()");
 
         GlobalManager globalManager = new GlobalManager(context);
         globalManager.setNextAction(nextAction);
@@ -116,7 +119,7 @@ public class SystemAlarm {
 
     private void initialize() {
         NextAction nextAction = nextAction();
-        registerSystemAlarm(nextAction.action, nextAction.time, nextAction.alarmTime);
+        registerSystemAlarm(nextAction);
     }
 
     /**
@@ -150,7 +153,7 @@ public class SystemAlarm {
     }
 
     protected boolean nextActionShouldChange() {
-        Log.v(TAG, "nextActionShouldChange()");
+        Log.v(TAG, "nextActionSh ouldChange()");
 
         NextAction nextAction = nextAction();
 
