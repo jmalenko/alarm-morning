@@ -127,6 +127,15 @@ public class HandlerOnClockChange extends Handler {
     }
 
     /**
+     * Checks whether the HandlerOnClockChange is running.
+     *
+     * @return true if the handler is running
+     */
+    public boolean isRunning() {
+        return isRunning;
+    }
+
+    /**
      * First, set the Unit and Runnable.
      * Second, start running the Runnable on the change of clock, whenever the clock unit changes.
      *
@@ -135,8 +144,7 @@ public class HandlerOnClockChange extends Handler {
      */
     public void start(Runnable runnable, int unit) {
         setUnit(unit);
-        setRunnable(runnable);
-        start();
+        start(runnable);
     }
 
     /**

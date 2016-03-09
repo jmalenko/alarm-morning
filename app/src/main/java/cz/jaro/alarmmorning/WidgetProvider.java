@@ -3,6 +3,7 @@ package cz.jaro.alarmmorning;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
@@ -22,7 +23,7 @@ public class WidgetProvider extends AppWidgetProvider {
     private static final String TAG = WidgetProvider.class.getSimpleName();
 
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        Log.v(TAG, "onUpdate()");
+        Log.e(TAG, "onUpdate()");
 
         // Perform this loop procedure for each App Widget that belongs to this provider
         for (int i = 0; i < appWidgetIds.length; i++) {
@@ -43,7 +44,7 @@ public class WidgetProvider extends AppWidgetProvider {
     }
 
     public static void updateContent(Context context, RemoteViews views) {
-        Log.v(TAG, "updateContent()");
+        Log.e(TAG, "updateContent()");
         GlobalManager globalManager = new GlobalManager(context);
         Day day = globalManager.getDayWithNextAlarmToRing();
 
@@ -100,4 +101,40 @@ public class WidgetProvider extends AppWidgetProvider {
         }
         return false;
     }
+
+    /*
+     * Update on day change
+     * ====================
+     */
+
+    private Context context;
+    private Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+            onSystemTimeChange();
+        }
+    };
+    private HandlerOnClockChange handler = new HandlerOnClockChange(Calendar.DATE, runnable);
+
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        Log.e(TAG, "onReceive(intent=" + intent.getAction() + ")");
+
+        super.onReceive(context, intent);
+
+        if (!handler.isRunning()) {
+            this.context = context;
+            handler.start();
+        }
+    }
+
+    public void onSystemTimeChange() {
+        Log.e(TAG, "onSystemTimeC hange()");
+
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_layout);
+        updateContent(context, views);
+        appWidgetManager.updateAppWidget(new ComponentName(context, WidgetProvider.class), views);
+    }
+
 }

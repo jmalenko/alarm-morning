@@ -20,6 +20,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
+        android:shadowDx="3"
+        android:shadowDy="3"
         android:text="08:00 Mon"
         android:textAlignment="center"/>
 
