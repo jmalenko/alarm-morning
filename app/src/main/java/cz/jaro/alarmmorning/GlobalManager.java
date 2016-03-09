@@ -119,6 +119,8 @@ public class GlobalManager {
             }
         });
 
+        dataSource.close();
+
         return day;
     }
 
