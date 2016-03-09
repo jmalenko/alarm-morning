@@ -359,7 +359,7 @@ public class RingActivity extends Activity implements RingInterface {
             updateContent();
         }
     };
-    private HandlerOnClockChange handlerContent = new HandlerOnClockChange(Calendar.MINUTE, runnableContent);
+    private HandlerOnClockChange handlerContent = new HandlerOnClockChange(runnableContent, Calendar.MINUTE);
 
     private void stopContent() {
         Log.d(TAG, "stopContent()");

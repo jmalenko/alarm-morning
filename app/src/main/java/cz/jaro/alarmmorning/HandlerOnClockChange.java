@@ -50,7 +50,7 @@ public class HandlerOnClockChange extends Handler {
      * @param unit Clock unit identifier
      */
     public HandlerOnClockChange(int unit) {
-        this(unit, null);
+        this(null, unit);
     }
 
     /**
@@ -59,19 +59,19 @@ public class HandlerOnClockChange extends Handler {
      * @param runnable Runnable
      */
     public HandlerOnClockChange(Runnable runnable) {
-        this(Calendar.SECOND, runnable);
+        this(runnable, Calendar.SECOND);
     }
 
     /**
      * Constructor that sets the Unit and Runnable.
      *
-     * @param unit     Clock unit identifier
      * @param runnable Runnable
+     * @param unit     Clock unit identifier
      */
-    public HandlerOnClockChange(int unit, Runnable runnable) {
+    public HandlerOnClockChange(Runnable runnable, int unit) {
         super();
-        setUnit(unit);
         setRunnable(runnable);
+        setUnit(unit);
     }
 
     /**

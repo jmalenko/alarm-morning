@@ -112,7 +112,7 @@ public class WidgetProvider extends AppWidgetProvider {
             onSystemTimeChange();
         }
     };
-    private HandlerOnClockChange handler = new HandlerOnClockChange(Calendar.DATE, runnable);
+    private HandlerOnClockChange handler = new HandlerOnClockChange(runnable, Calendar.DATE);
 
     @Override
     public void onReceive(Context context, Intent intent) {
