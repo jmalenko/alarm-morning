@@ -26,9 +26,7 @@ public class WidgetProvider extends AppWidgetProvider {
         Log.e(TAG, "onUpdate()");
 
         // Perform this loop procedure for each App Widget that belongs to this provider
-        for (int i = 0; i < appWidgetIds.length; i++) {
-            int appWidgetId = appWidgetIds[i];
-
+        for (int appWidgetId : appWidgetIds) {
             // Create an Intent to launch ExampleActivity
             Intent intent = new Intent(context, AlarmMorningActivity.class);
             PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
