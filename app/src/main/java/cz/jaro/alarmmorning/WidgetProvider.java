@@ -23,7 +23,7 @@ public class WidgetProvider extends AppWidgetProvider {
     private static final String TAG = WidgetProvider.class.getSimpleName();
 
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        Log.e(TAG, "onUpdate()");
+        Log.v(TAG, "onUpdate()");
 
         // Perform this loop procedure for each App Widget that belongs to this provider
         for (int appWidgetId : appWidgetIds) {
@@ -42,7 +42,7 @@ public class WidgetProvider extends AppWidgetProvider {
     }
 
     public static void updateContent(Context context, RemoteViews views) {
-        Log.e(TAG, "updateContent()");
+        Log.d(TAG, "updateContent()");
         GlobalManager globalManager = new GlobalManager(context);
         Day day = globalManager.getDayWithNextAlarmToRing();
 
@@ -116,7 +116,7 @@ public class WidgetProvider extends AppWidgetProvider {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.e(TAG, "onReceive(intent=" + intent.getAction() + ")");
+        Log.v(TAG, "onReceive(intent=" + intent.getAction() + ")");
 
         super.onReceive(context, intent);
 
@@ -127,7 +127,7 @@ public class WidgetProvider extends AppWidgetProvider {
     }
 
     public void onSystemTimeChange() {
-        Log.e(TAG, "onSystemTimeC hange()");
+        Log.v(TAG, "onSystemTimeChange()");
 
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_layout);
