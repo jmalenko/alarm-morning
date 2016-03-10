@@ -185,49 +185,13 @@ public class AlarmMorningActivity extends AppCompatActivity implements ActivityI
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override
                     public boolean onNavigationItemSelected(MenuItem menuItem) {
-                        selectDrawerItem(menuItem);
+                        onOptionsItemSelected(menuItem);
                         return true;
                     }
                 });
 
         MenuItem calendarMenuItem = mNavigationView.getMenu().getItem(0);
         setFragmentTitle(calendarMenuItem.getTitle());
-    }
-
-    public void selectDrawerItem(MenuItem menuItem) {
-        switch (menuItem.getItemId()) {
-            case R.id.navigation_calendar:
-                CalendarFragment calendarFragment = new CalendarFragment();
-                mFragment = calendarFragment;
-
-                // Insert the mFragment by replacing any existing mFragment
-                getFragmentManager().beginTransaction().replace(R.id.content_frame, mFragment).commit();
-
-                // Highlight the selected item, update the title, and close the drawer
-                highlightMenuItem(menuItem);
-                setFragmentTitle(menuItem.getTitle());
-                break;
-
-            case R.id.navigation_defaults:
-                Intent defaultsActivityIntent = new Intent(this, DefaultsActivity.class);
-                startActivity(defaultsActivityIntent);
-                break;
-
-            case R.id.navigation_settings:
-                Intent settingsActivityIntent = new Intent(this, SettingsActivity.class);
-                startActivity(settingsActivityIntent);
-                break;
-
-            case R.id.navigation_website:
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                startActivity(browserIntent);
-                break;
-
-            default:
-                throw new IllegalArgumentException("Unexpected argument " + menuItem.getItemId());
-        }
-
-        closeNavigationDrawer();
     }
 
     private void highlightMenuItem(MenuItem menuItem) {
@@ -282,9 +246,40 @@ public class AlarmMorningActivity extends AppCompatActivity implements ActivityI
                 else
                     openNavigationDrawer();
                 return true;
+
+            case R.id.navigation_calendar:
+                CalendarFragment calendarFragment = new CalendarFragment();
+                mFragment = calendarFragment;
+
+                // Insert the mFragment by replacing any existing mFragment
+                getFragmentManager().beginTransaction().replace(R.id.content_frame, mFragment).commit();
+
+                // Highlight the selected item, update the title, and close the drawer
+                highlightMenuItem(item);
+                setFragmentTitle(item.getTitle());
+                break;
+
+            case R.id.navigation_defaults:
+                Intent defaultsActivityIntent = new Intent(this, DefaultsActivity.class);
+                startActivity(defaultsActivityIntent);
+                break;
+
+            case R.id.navigation_settings:
+                Intent settingsActivityIntent = new Intent(this, SettingsActivity.class);
+                startActivity(settingsActivityIntent);
+                break;
+
+            case R.id.navigation_website:
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                startActivity(browserIntent);
+                break;
+
+            default:
+                return super.onOptionsItemSelected(item);
         }
 
-        return super.onOptionsItemSelected(item);
+        closeNavigationDrawer();
+        return true;
     }
 
     // When using the ActionBarDrawerToggle, you must call it during onPostCreate() and onConfigurationChanged()...
