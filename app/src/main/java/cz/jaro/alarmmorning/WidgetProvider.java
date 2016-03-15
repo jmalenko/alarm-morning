@@ -65,7 +65,13 @@ public class WidgetProvider extends AppWidgetProvider {
                 widgetText = context.getResources().getString(R.string.widget_alarm_text_today, timeStr);
             } else {
                 if (inTomorrow(now, alarmTime)) {
-                    widgetText = context.getResources().getString(R.string.widget_alarm_text_tomorrow, timeStr);
+                    Calendar fewHoursBeforeAlarmTime = (Calendar) alarmTime.clone();
+                    fewHoursBeforeAlarmTime.add(Calendar.HOUR_OF_DAY, -22);
+                    if (now.before(fewHoursBeforeAlarmTime)) {
+                        widgetText = context.getResources().getString(R.string.widget_alarm_text_tomorrow, timeStr);
+                    } else {
+                        widgetText = context.getResources().getString(R.string.widget_alarm_text_today, timeStr);
+                    }
                 } else {
                     int dayOfWeek = alarmTime.get(Calendar.DAY_OF_WEEK);
                     String dayOfWeekText = Localization.dayOfWeekToString(dayOfWeek, clock);
@@ -111,10 +117,10 @@ public class WidgetProvider extends AppWidgetProvider {
     private Runnable runnable = new Runnable() {
         @Override
         public void run() {
-            onSystemTimeChange();
+            onDateChange();
         }
     };
-    private HandlerOnClockChange handler = new HandlerOnClockChange(runnable, Calendar.DATE);
+    private HandlerOnClockChange handler = new HandlerOnClockChange(runnable, Calendar.HOUR_OF_DAY);
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -128,8 +134,8 @@ public class WidgetProvider extends AppWidgetProvider {
         }
     }
 
-    public void onSystemTimeChange() {
-        Log.v(TAG, "onSystemTimeChange()");
+    public void onDateChange() {
+        Log.v(TAG, "onDateChange()");
 
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_layout);
