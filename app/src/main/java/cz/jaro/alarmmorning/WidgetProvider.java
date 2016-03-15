@@ -27,12 +27,7 @@ public class WidgetProvider extends AppWidgetProvider {
 
         // Perform this loop procedure for each App Widget that belongs to this provider
         for (int appWidgetId : appWidgetIds) {
-            // Create an Intent to launch ExampleActivity
-            Intent intent = new Intent(context, AlarmMorningActivity.class);
-            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
-
             RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_layout);
-            views.setOnClickPendingIntent(R.id.widget_layout, pendingIntent);
 
             updateContent(context, views);
 
@@ -43,6 +38,13 @@ public class WidgetProvider extends AppWidgetProvider {
 
     public static void updateContent(Context context, RemoteViews views) {
         Log.d(TAG, "updateContent()");
+
+        // Launch activity
+        Intent intent = new Intent(context, AlarmMorningActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+        views.setOnClickPendingIntent(R.id.widget_layout, pendingIntent);
+
+        // Set content
         GlobalManager globalManager = new GlobalManager(context);
         Day day = globalManager.getDayWithNextAlarmToRing();
 
