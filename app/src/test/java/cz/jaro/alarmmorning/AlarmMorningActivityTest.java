@@ -9,10 +9,12 @@ import org.robolectric.RobolectricGradleTestRunner;
 import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowActivity;
-import org.robolectric.shadows.ShadowIntent;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * Test navigation.
+ */
 @RunWith(RobolectricGradleTestRunner.class)
 @Config(constants = BuildConfig.class, manifest = "app/src/main/AndroidManifest.xml", sdk = 21)
 public class AlarmMorningActivityTest {
@@ -24,8 +26,30 @@ public class AlarmMorningActivityTest {
 
         shadowActivity.clickMenuItem(R.id.navigation_defaults);
 
-        Intent startedIntent = shadowActivity.getNextStartedActivity();
-        ShadowIntent shadowIntent = Shadows.shadowOf(startedIntent);
-        assertThat(shadowIntent.getComponent().getClassName()).isEqualTo(DefaultsActivity.class.getName());
+        Intent intent = shadowActivity.peekNextStartedActivity();
+        assertThat(intent.getComponent().getClassName()).isEqualTo(DefaultsActivity.class.getName());
     }
+
+    @Test
+    public void menu_startSettingsActivity() {
+        AlarmMorningActivity activity = Robolectric.setupActivity(AlarmMorningActivity.class);
+        ShadowActivity shadowActivity = Shadows.shadowOf(activity);
+
+        shadowActivity.clickMenuItem(R.id.navigation_settings);
+
+        Intent intent = shadowActivity.peekNextStartedActivity();
+        assertThat(intent.getComponent().getClassName()).isEqualTo(SettingsActivity.class.getName());
+    }
+
+    @Test
+    public void menu_startWebsiteActivity() {
+        AlarmMorningActivity activity = Robolectric.setupActivity(AlarmMorningActivity.class);
+        ShadowActivity shadowActivity = Shadows.shadowOf(activity);
+
+        shadowActivity.clickMenuItem(R.id.navigation_website);
+
+        Intent intent = shadowActivity.peekNextStartedActivity();
+        assertThat(intent.getAction()).isEqualTo(Intent.ACTION_VIEW);
+    }
+
 }

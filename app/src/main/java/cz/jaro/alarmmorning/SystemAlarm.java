@@ -168,7 +168,7 @@ public class SystemAlarm {
         return !nextActionPersisted.equals(nextAction);
     }
 
-    private Calendar getResetTime(Calendar now) {
+    public static Calendar getResetTime(Calendar now) {
         Calendar resetTime = new GregorianCalendar(now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH));
         resetTime.add(Calendar.DAY_OF_MONTH, 1);
 
