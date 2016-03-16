@@ -20,7 +20,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/margin_tiny"
+        android:textColor="@android:color/white"
+        android:shadowColor="#7F000000"
+        android:shadowRadius="2"
+        android:shadowDx="0"
+        android:shadowDy="2"
         android:text="08:00 Mon"
         android:textAlignment="center"/>
-
 </LinearLayout>
