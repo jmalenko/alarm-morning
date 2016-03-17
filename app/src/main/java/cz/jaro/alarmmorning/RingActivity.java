@@ -340,8 +340,6 @@ public class RingActivity extends Activity implements RingInterface {
 
             stopContent();
 
-            stopMute();
-
             // allow device sleep
             WakeLocker.release();
         }
