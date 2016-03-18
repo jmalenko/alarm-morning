@@ -79,7 +79,6 @@ public class SystemAlarm {
         } else if (Build.VERSION_CODES.KITKAT <= Build.VERSION.SDK_INT && Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             alarmManager.setExact(AlarmManager.RTC_WAKEUP, nextAction.time.getTimeInMillis(), operation);
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            // FIXME: setExactAndAllowWhileIdle() still does not work (e.g. is inexact) if the alarm is nearer than 15 minutes
             alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, nextAction.time.getTimeInMillis(), operation);
         }
     }
