@@ -23,6 +23,8 @@ public class WidgetProvider extends AppWidgetProvider {
 
     private static final String TAG = WidgetProvider.class.getSimpleName();
 
+    public static final int HIDE_TOMORROW_HOURS = -22;
+
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         Log.v(TAG, "onUpdate()");
 
@@ -66,7 +68,7 @@ public class WidgetProvider extends AppWidgetProvider {
             if (!RingActivity.onTheSameDate(now, alarmTime)) {
                 if (inTomorrow(now, alarmTime)) {
                     Calendar fewHoursBeforeAlarmTime = (Calendar) alarmTime.clone();
-                    fewHoursBeforeAlarmTime.add(Calendar.HOUR_OF_DAY, -22);
+                    fewHoursBeforeAlarmTime.add(Calendar.HOUR_OF_DAY, HIDE_TOMORROW_HOURS);
                     if (now.before(fewHoursBeforeAlarmTime)) {
                         dateText = context.getResources().getString(R.string.tomorrow);
                     }
