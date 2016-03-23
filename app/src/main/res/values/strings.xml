@@ -48,10 +48,7 @@
 
     <!-- Widget -->
     <string name="widget_alarm_text_none">No alarm</string>
-    <string name="widget_alarm_text_today">%1$s</string>
-    <string name="widget_alarm_text_tomorrow">%1$s Tomorrow</string>
-    <string name="widget_alarm_text_next_week">%1$s on %2$s</string>
-    <string name="widget_alarm_text_later">%1$s on %2$s, %3$s</string>
+    <string name="widget_alarm_text_later">%1$s, %2$s</string>
 
     <!-- Common -->
     <string name="alarm_unset">Off</string>
@@ -75,6 +72,8 @@
     <string name="time_to_ring_message_days">%1$dd %2$dh</string>
     <string name="time_to_ring_message_hours">%1$dh %2$dm</string>
     <string name="time_to_ring_message_minutes">%1$dm %2$ds</string>
+
+    <string name="tomorrow">Tomorrow</string>
 
     <!-- Descriptions for accessibility -->
     <string name="drawer_open">Open navigation drawer</string>
