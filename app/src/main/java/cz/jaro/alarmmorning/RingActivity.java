@@ -369,7 +369,8 @@ public class RingActivity extends Activity implements RingInterface {
         Log.d(TAG, "updateContent()");
         Calendar now = clock();
 
-        String currentDateString = Localization.dateToStringFull(now.getTime());
+        Resources res = getResources();
+        String currentDateString = Localization.dateToStringFull(res, now.getTime());
         TextView dateView = (TextView) findViewById(R.id.date);
         dateView.setText(currentDateString);
 
@@ -381,13 +382,12 @@ public class RingActivity extends Activity implements RingInterface {
         if (onTheSameMinute(mAlarmTime, now)) {
             alarmTimeView.setVisibility(View.INVISIBLE);
         } else {
-            Resources res = getResources();
             String alarmTimeText;
             String timeStr = Localization.timeToString(mAlarmTime.getTime(), getBaseContext());
             if (onTheSameDate(mAlarmTime, now)) {
                 alarmTimeText = res.getString(R.string.alarm_was_set_to_today, timeStr);
             } else {
-                String dateStr = Localization.dateToStringFull(mAlarmTime.getTime());
+                String dateStr = Localization.dateToStringFull(res, mAlarmTime.getTime());
                 alarmTimeText = res.getString(R.string.alarm_was_set_to_nontoday, timeStr, dateStr);
             }
             alarmTimeView.setText(alarmTimeText);

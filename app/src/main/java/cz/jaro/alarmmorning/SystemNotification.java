@@ -188,7 +188,7 @@ public class SystemNotification {
         Resources res = context.getResources();
         Clock clock = new SystemClock(); // TODO Solve dependency on clock
         String timeText = Localization.timeToString(alarmTime.get(Calendar.HOUR_OF_DAY), alarmTime.get(Calendar.MINUTE), context, clock);
-        String dateText = Localization.dateToStringVeryShort(alarmTime.getTime());
+        String dateText = Localization.dateToStringVeryShort(res, alarmTime.getTime());
         String contentTitle = res.getString(R.string.notification_title_long, timeText, dateText);
         mBuilder.setContentTitle(contentTitle);
 

@@ -13,9 +13,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import cz.jaro.alarmmorning.Localization;
 import cz.jaro.alarmmorning.clock.Clock;
-import cz.jaro.alarmmorning.clock.SystemClock;
 
 /**
  * Store objects to a database.
@@ -84,12 +82,13 @@ public class AlarmDataSource {
      * @param defaults object to be stored
      */
     public void saveDefault(Defaults defaults) {
-        Clock clock = new SystemClock(); // TODO Solve dependency on clock
-        String dayOfWeekText = Localization.dayOfWeekToString(defaults.getDayOfWeek(), clock);
-        if (defaults.getState() == Defaults.STATE_ENABLED)
-            Log.i(TAG, "Set alarm at " + defaults.getHour() + ":" + defaults.getMinute() + " on " + dayOfWeekText);
-        else
-            Log.i(TAG, "Disabling alarm on " + dayOfWeekText);
+        // FIXME: 4.4.2016 refactor to GlobalManager
+//        Clock clock = new SystemClock(); // TODO Solve dependency on clock
+//        String dayOfWeekText = Localization.dayOfWeekToStringShort(defaults.getDayOfWeek(), clock);
+//        if (defaults.getState() == Defaults.STATE_ENABLED)
+//            Log.i(TAG, "Set alarm at " + defaults.getHour() + ":" + defaults.getMinute() + " on " + dayOfWeekText);
+//        else
+//            Log.i(TAG, "Disabling alarm on " + dayOfWeekText);
 
         ContentValues values = new ContentValues();
         values.put(AlarmDbHelper.COLUMN_DEFAULTS_DAY_OF_WEEK, defaults.getDayOfWeek());//

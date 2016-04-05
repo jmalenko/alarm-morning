@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Starts with capital letter -->
     <string name="sunday_short">Ne</string>
     <string name="monday_short">Po</string>
     <string name="tuesday_short">Út</string>
@@ -7,4 +8,17 @@
     <string name="thursday_short">Čt</string>
     <string name="friday_short">Pá</string>
     <string name="saturday_short">So</string>
+
+    <!-- Starts with small letter, in 4th form -->
+    <string name="sunday">neděli</string>
+    <string name="monday">pondělí</string>
+    <string name="tuesday">úterý</string>
+    <string name="wednesday">středu</string>
+    <string name="thursday">čtvrtek</string>
+    <string name="friday">pátek</string>
+    <string name="saturday">sobotu</string>
+
+    <string name="date_format_very_short">d. M.</string>
+    <string name="date_format_full"></string>
+    <string name="time_format"></string>
 </resources>

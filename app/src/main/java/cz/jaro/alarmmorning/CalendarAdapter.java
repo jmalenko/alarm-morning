@@ -58,10 +58,10 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         Resources res = fragment.getResources();
 
         int dayOfWeek = date.get(Calendar.DAY_OF_WEEK);
-        String dayOfWeekText = Localization.dayOfWeekToString(dayOfWeek, clock());
+        String dayOfWeekText = Localization.dayOfWeekToStringShort(res, dayOfWeek);
         viewHolder.getTextDayOfWeek().setText(dayOfWeekText);
 
-        String dateText = Localization.dateToStringVeryShort(date.getTime());
+        String dateText = Localization.dateToStringVeryShort(res, date.getTime());
         viewHolder.getTextDate().setText(dateText);
 
         String timeText;

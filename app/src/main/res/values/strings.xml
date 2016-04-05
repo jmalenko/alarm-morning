@@ -17,7 +17,7 @@
 
     <string name="change_others_title">Set alarm to %1$s on %2$s too?</string>
     <string name="change_others_message">This quickly changes other weekdays with the same alarm time to the new alarm time.</string>
-    <string name="change_others_yes">Change</string>
+    <string name="change_others_yes">Set</string>
     <string name="change_others_no">No</string>
 
     <string name="menu_default_header">Alarms at %1$s on %2$s</string>

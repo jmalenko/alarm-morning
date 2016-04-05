@@ -74,11 +74,11 @@ public class WidgetProvider extends AppWidgetProvider {
                     }
                 } else {
                     int dayOfWeek = alarmTime.get(Calendar.DAY_OF_WEEK);
-                    String dayOfWeekText = Localization.dayOfWeekToString(dayOfWeek, clock);
+                    String dayOfWeekText = Localization.dayOfWeekToStringShort(context.getResources(), dayOfWeek);
                     if (inNextWeek(now, alarmTime)) {
                         dateText = dayOfWeekText;
                     } else {
-                        String calendarText = Localization.dateToStringVeryShort(alarmTime.getTime());
+                        String calendarText = Localization.dateToStringVeryShort(context.getResources(), alarmTime.getTime());
                         dateText = context.getResources().getString(R.string.widget_alarm_text_later, dayOfWeekText, calendarText);
                     }
                 }

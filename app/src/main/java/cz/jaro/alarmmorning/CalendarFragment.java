@@ -410,9 +410,9 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
         Calendar date = day.getDate();
         int dayOfWeek = date.get(Calendar.DAY_OF_WEEK);
-        String dayOfWeekText = Localization.dayOfWeekToString(dayOfWeek, clock());
+        String dayOfWeekText = Localization.dayOfWeekToStringShort(getResources(), dayOfWeek);
 
-        String dateText = Localization.dateToStringVeryShort(date.getTime());
+        String dateText = Localization.dateToStringVeryShort(getResources(), date.getTime());
 
         String headerTitle;
         if (day.isEnabled()) {
