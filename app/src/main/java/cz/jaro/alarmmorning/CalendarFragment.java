@@ -439,9 +439,13 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
                     disable.setVisible(day.isEnabled());
                     revert.setVisible(day.getState() != Day.STATE_DEFAULT);
                     snooze.setVisible(false);
-                } else if (state == GlobalManager.STATE_RINGING || state == GlobalManager.STATE_SNOOZED) {
+                } else if (state == GlobalManager.STATE_RINGING) {
                     disable.setVisible(false);
                     revert.setVisible(false);
+                } else if (state == GlobalManager.STATE_SNOOZED) {
+                    disable.setVisible(false);
+                    revert.setVisible(false);
+                    snooze.setVisible(false);
                 } else if (state == GlobalManager.STATE_DISMISSED_BEFORE_RINGING || state == GlobalManager.STATE_DISMISSED) {
                     disable.setVisible(false);
                     revert.setVisible(false);
