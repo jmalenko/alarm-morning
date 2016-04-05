@@ -87,12 +87,10 @@ public class DefaultsActivity extends AppCompatActivity implements View.OnCreate
     }
 
     private void save(Defaults defaults) {
-        dataSource.saveDefault(defaults);
+        GlobalManager globalManager = new GlobalManager(this);
+        globalManager.saveAlarmTimeDefault(defaults, dataSource);
 
         adapter.notifyDataSetChanged();
-
-        GlobalManager globalManager = new GlobalManager(this);
-        globalManager.onAlarmSet();
     }
 
     /*

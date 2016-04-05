@@ -140,6 +140,12 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     public void onAlarmSet() {
         Log.d(TAG, "onAlarmSet()");
         adapter.notifyItemChanged(0);
+
+        adapter.notifyItemChanged(position);
+        updatePositionNextAlarm();
+
+        String toastText = formatToastText(day);
+        Toast.makeText(getActivity(), toastText, Toast.LENGTH_LONG).show();
     }
 
     public void onDismissBeforeRinging() {
@@ -269,20 +275,8 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     }
 
     private void save(Day day) {
-        dataSource.saveDay(day);
-
-        refresh();
-
-        String toastText = formatToastText(day);
-        Toast.makeText(getActivity(), toastText, Toast.LENGTH_LONG).show();
-    }
-
-    private void refresh() {
-        adapter.notifyItemChanged(position);
-        updatePositionNextAlarm();
-
         GlobalManager globalManager = new GlobalManager(getActivity());
-        globalManager.onAlarmSet();
+        globalManager.saveAlarmTime(day, dataSource);
     }
 
     private String formatToastText(Day day) {
