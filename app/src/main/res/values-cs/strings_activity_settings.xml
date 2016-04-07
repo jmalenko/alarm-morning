@@ -1,11 +1,11 @@
-<resources>
+<resources xmlns:xliff="http://schemas.android.com/tools">
     <string name="pref_title_ring_appearance">Vzhled a chování při zvonění</string>
 
     <string name="pref_title_ringtone">Zvuk budíku</string>
     <string name="pref_ringtone_silent">Žádný</string>
 
     <string name="pref_title_volume">Hlasitost</string>
-    <string name="pref_summary_volume">%1$d%%</string>
+    <string name="pref_summary_volume"><xliff:g id="level" example="80">%1$d%</xliff:g>%</string>
 
     <string name="pref_title_volume_increasing">Vzrůstající hlasitost</string>
     <string name="pref_summaryoff_volume_increasing">Hlasitost se nemění</string>
@@ -16,10 +16,10 @@
     <string name="pref_summaryon_vibrate">Vibruje</string>
 
     <string name="pref_title_snooze_time">Délka odložení</string>
-    <string name="pref_summary_snooze_time">%1$d minut</string>
+    <string name="pref_summary_snooze_time"><xliff:g id="minutes" example="3">%1$</xliff:g>d minut</string>
 
     <string name="pref_title_near_future_time">Oznámění před budíkem</string>
-    <string name="pref_summary_near_future_time">%1$d hodin a %2$d minut</string>
+    <string name="pref_summary_near_future_time"><xliff:g id="hours" example="2">%1$d</xliff:g> hodin a <xliff:g id="minutes" example="3">%2$d</xliff:g> minut</string>
 
     <string name="pref_title_ring_actions">Akce během zvonění</string>
 
