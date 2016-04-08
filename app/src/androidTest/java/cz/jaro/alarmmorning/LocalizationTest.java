@@ -24,26 +24,26 @@ public class LocalizationTest extends AndroidTestCase {
         setLocale("en", "EN");
         Resources res = getContext().getResources();
 
-        assertEquals(Localization.dayOfWeekToString2(Calendar.SUNDAY, res), "Sun");
-        assertEquals(Localization.dayOfWeekToString2(Calendar.MONDAY, res), "Mon");
-        assertEquals(Localization.dayOfWeekToString2(Calendar.TUESDAY, res), "Tue");
-        assertEquals(Localization.dayOfWeekToString2(Calendar.WEDNESDAY, res), "Wed");
-        assertEquals(Localization.dayOfWeekToString2(Calendar.THURSDAY, res), "Thu");
-        assertEquals(Localization.dayOfWeekToString2(Calendar.FRIDAY, res), "Fri");
-        assertEquals(Localization.dayOfWeekToString2(Calendar.SATURDAY, res), "Sat");
+        assertEquals(Localization.dayOfWeekToString(Calendar.SUNDAY, res), "Sun");
+        assertEquals(Localization.dayOfWeekToString(Calendar.MONDAY, res), "Mon");
+        assertEquals(Localization.dayOfWeekToString(Calendar.TUESDAY, res), "Tue");
+        assertEquals(Localization.dayOfWeekToString(Calendar.WEDNESDAY, res), "Wed");
+        assertEquals(Localization.dayOfWeekToString(Calendar.THURSDAY, res), "Thu");
+        assertEquals(Localization.dayOfWeekToString(Calendar.FRIDAY, res), "Fri");
+        assertEquals(Localization.dayOfWeekToString(Calendar.SATURDAY, res), "Sat");
     }
 
     public void test_dayOfWeekToString_cs() {
         setLocale("cs", "CZ");
         Resources res = getContext().getResources();
 
-        assertEquals(Localization.dayOfWeekToString2(Calendar.SUNDAY, res), "Ne");
-        assertEquals(Localization.dayOfWeekToString2(Calendar.MONDAY, res), "Po");
-        assertEquals(Localization.dayOfWeekToString2(Calendar.TUESDAY, res), "Út");
-        assertEquals(Localization.dayOfWeekToString2(Calendar.WEDNESDAY, res), "St");
-        assertEquals(Localization.dayOfWeekToString2(Calendar.THURSDAY, res), "Čt");
-        assertEquals(Localization.dayOfWeekToString2(Calendar.FRIDAY, res), "Pá");
-        assertEquals(Localization.dayOfWeekToString2(Calendar.SATURDAY, res), "So");
+        assertEquals(Localization.dayOfWeekToString(Calendar.SUNDAY, res), "Ne");
+        assertEquals(Localization.dayOfWeekToString(Calendar.MONDAY, res), "Po");
+        assertEquals(Localization.dayOfWeekToString(Calendar.TUESDAY, res), "Út");
+        assertEquals(Localization.dayOfWeekToString(Calendar.WEDNESDAY, res), "St");
+        assertEquals(Localization.dayOfWeekToString(Calendar.THURSDAY, res), "Čt");
+        assertEquals(Localization.dayOfWeekToString(Calendar.FRIDAY, res), "Pá");
+        assertEquals(Localization.dayOfWeekToString(Calendar.SATURDAY, res), "So");
     }
 
     public void test_dayOfWeekToString_invalid() {
@@ -51,7 +51,7 @@ public class LocalizationTest extends AndroidTestCase {
         Resources res = getContext().getResources();
 
         try {
-            Localization.dayOfWeekToString2(100, res);
+            Localization.dayOfWeekToString(100, res);
             fail("Expected IllegalArgumentException to be thrown");
         } catch (IllegalArgumentException e) {
             assertTrue(true);

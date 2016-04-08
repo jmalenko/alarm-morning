@@ -4,6 +4,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
@@ -42,6 +43,8 @@ public class AlarmMorningActivity0Test {
         DefaultsActivity activity = Robolectric.setupActivity(DefaultsActivity.class);
         ShadowActivity shadowActivity = Shadows.shadowOf(activity);
 
+        Resources res = activity.getResources();
+
         RecyclerView recyclerView = (RecyclerView) shadowActivity.findViewById(R.id.defaults_recycler_view);
 
         // Hack: RecyclerView needs to be measured and layed out manually in Robolectric.
@@ -55,8 +58,7 @@ public class AlarmMorningActivity0Test {
             View item = recyclerView.getChildAt(position);
 
             TextView textDayOfWeek = (TextView) item.findViewById(R.id.textDayOfWeek);
-            Clock clock = new SystemClock(); // TODO Solve dependency on clock
-            String dayOfWeekText = Localization.dayOfWeekToString(position, clock);
+            String dayOfWeekText = Localization.dayOfWeekToStringShort(res, position);
             // FIXME: 16.3.2016 Test
 //            assertThat(new Integer(position).toString()+textDayOfWeek.getText()).isEqualTo(new Integer(position).toString()+dayOfWeekText);
 
@@ -69,6 +71,8 @@ public class AlarmMorningActivity0Test {
     public void menu_noAlarmInCalendar() {
         AlarmMorningActivity activity = Robolectric.setupActivity(AlarmMorningActivity.class);
         ShadowActivity shadowActivity = Shadows.shadowOf(activity);
+
+        Resources res = activity.getResources();
 
         RecyclerView recyclerView = (RecyclerView) shadowActivity.findViewById(R.id.calendar_recycler_view);
 
@@ -88,14 +92,14 @@ public class AlarmMorningActivity0Test {
 
             TextView textDayOfWeekCal = (TextView) item.findViewById(R.id.textDayOfWeekCal);
             int dayOfWeek = date.get(Calendar.DAY_OF_WEEK);
-            String dayOfWeekText = Localization.dayOfWeekToString(dayOfWeek, clock);
+            String dayOfWeekText = Localization.dayOfWeekToStringShort(res, dayOfWeek);
             assertThat(textDayOfWeekCal.getText()).isEqualTo(dayOfWeekText);
 
             TextView alarmTimeText = (TextView) item.findViewById(R.id.textTimeCal);
             assertThat(alarmTimeText.getText()).isEqualTo(shadowActivity.getResources().getString(R.string.alarm_unset));
 
             TextView textDate = (TextView) item.findViewById(R.id.textDate);
-            String dateText = Localization.dateToStringVeryShort(date.getTime());
+            String dateText = Localization.dateToStringVeryShort(res, date.getTime());
             assertThat(textDate.getText()).isEqualTo(dateText);
 
             TextView textState = (TextView) item.findViewById(R.id.textState);

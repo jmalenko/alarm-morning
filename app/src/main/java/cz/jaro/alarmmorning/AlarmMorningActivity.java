@@ -60,23 +60,23 @@ public class AlarmMorningActivity extends AppCompatActivity implements ActivityI
     CharSequence fragmentTitle;
     private MenuItem lastMenuItem;
 
-    private static final IntentFilter s_intentFilter;
+    private static final IntentFilter s_intentFilterTime;
 
     LocalBroadcastManager bManager;
-    private static IntentFilter b_intentFilter;
+    private static IntentFilter s_intentFilterInternal;
 
     static {
-        s_intentFilter = new IntentFilter();
-        s_intentFilter.addAction(Intent.ACTION_TIMEZONE_CHANGED);
-        s_intentFilter.addAction(Intent.ACTION_TIME_CHANGED);
+        s_intentFilterTime = new IntentFilter();
+        s_intentFilterTime.addAction(Intent.ACTION_TIMEZONE_CHANGED);
+        s_intentFilterTime.addAction(Intent.ACTION_TIME_CHANGED);
 
-        b_intentFilter = new IntentFilter();
-        b_intentFilter.addAction(ACTION_ALARM_SET);
-        b_intentFilter.addAction(ACTION_DISMISS_BEFORE_RINGING);
-        b_intentFilter.addAction(ACTION_ALARM_TIME_OF_EARLY_DISMISSED_ALARM);
-        b_intentFilter.addAction(ACTION_RING);
-        b_intentFilter.addAction(ACTION_DISMISS);
-        b_intentFilter.addAction(ACTION_SNOOZE);
+        s_intentFilterInternal = new IntentFilter();
+        s_intentFilterInternal.addAction(ACTION_ALARM_SET);
+        s_intentFilterInternal.addAction(ACTION_DISMISS_BEFORE_RINGING);
+        s_intentFilterInternal.addAction(ACTION_ALARM_TIME_OF_EARLY_DISMISSED_ALARM);
+        s_intentFilterInternal.addAction(ACTION_RING);
+        s_intentFilterInternal.addAction(ACTION_DISMISS);
+        s_intentFilterInternal.addAction(ACTION_SNOOZE);
     }
 
     private final BroadcastReceiver timeChangedReceiver = new BroadcastReceiver() {
@@ -150,11 +150,11 @@ public class AlarmMorningActivity extends AppCompatActivity implements ActivityI
         mDrawerLayout.setDrawerListener(mDrawerToggle);
 
         // handler for time nad timezone change
-        registerReceiver(timeChangedReceiver, s_intentFilter);
+        registerReceiver(timeChangedReceiver, s_intentFilterTime);
 
         // handler for local events
         bManager = LocalBroadcastManager.getInstance(this);
-        bManager.registerReceiver(bReceiver, b_intentFilter);
+        bManager.registerReceiver(bReceiver, s_intentFilterInternal);
 
         if (savedInstanceState == null) {
             CalendarFragment calendarFragment = new CalendarFragment();

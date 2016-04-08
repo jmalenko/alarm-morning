@@ -87,12 +87,10 @@ public class DefaultsActivity extends AppCompatActivity implements View.OnCreate
     }
 
     private void save(Defaults defaults) {
-        dataSource.saveDefault(defaults);
+        GlobalManager globalManager = new GlobalManager(this);
+        globalManager.saveAlarmTimeDefault(defaults, dataSource);
 
         adapter.notifyDataSetChanged();
-
-        GlobalManager globalManager = new GlobalManager(this);
-        globalManager.onAlarmSet();
     }
 
     /*
@@ -157,13 +155,13 @@ public class DefaultsActivity extends AppCompatActivity implements View.OnCreate
 
         defaults = loadPosition(position);
 
-        Clock clock = new SystemClock();
-        String dayOfWeekText = Localization.dayOfWeekToString(defaults.getDayOfWeek(), clock);
+        String dayOfWeekText = Localization.dayOfWeekToStringShort(getResources(), defaults.getDayOfWeek());
 
         String headerTitle;
         if (defaults.isEnabled()) {
             String timeText;
             if (defaults.isEnabled()) {
+                Clock clock = new SystemClock();
                 timeText = Localization.timeToString(defaults.getHour(), defaults.getMinute(), this, clock);
             } else {
                 timeText = getResources().getString(R.string.alarm_unset);
@@ -228,12 +226,10 @@ public class DefaultsActivity extends AppCompatActivity implements View.OnCreate
 
     private void showDialogChangeOtherDays() {
         if (!otherWeekdaysWithTheSameAlarmTime.isEmpty()) {
-            Clock clock = new SystemClock(); // // TODO Solve dependency on clock
-            // TODO Localization - full names od days (not abbreviations)
-            String days = Localization.daysOfWeekToString(otherWeekdaysWithTheSameAlarmTime, getResources(), clock);
-            ;
+            String days = Localization.daysOfWeekToString(otherWeekdaysWithTheSameAlarmTime, getResources());
             String timeText;
             if (defaults.isEnabled()) {
+                Clock clock = new SystemClock(); // // TODO Solve dependency on clock
                 timeText = Localization.timeToString(defaults.getHour(), defaults.getMinute(), this, clock);
             } else {
                 timeText = getResources().getString(R.string.alarm_unset);

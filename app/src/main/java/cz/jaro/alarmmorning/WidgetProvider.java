@@ -7,6 +7,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.view.View;
 import android.widget.RemoteViews;
 
 import java.util.Calendar;
@@ -21,6 +22,8 @@ import cz.jaro.alarmmorning.model.Day;
 public class WidgetProvider extends AppWidgetProvider {
 
     private static final String TAG = WidgetProvider.class.getSimpleName();
+
+    public static final int HIDE_TOMORROW_HOURS = -22;
 
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         Log.v(TAG, "onUpdate()");
@@ -49,46 +52,49 @@ public class WidgetProvider extends AppWidgetProvider {
         Day day = globalManager.getDayWithNextAlarmToRing();
 
         int iconSrcId;
-        String widgetText;
+        String timeText;
+        String dateText = null;
 
         if (day != null) {
             Calendar alarmTime = day.getDateTime();
 
             iconSrcId = R.drawable.ic_alarm_white;
 
-            String timeStr = Localization.timeToString(alarmTime.getTime(), context);
+            timeText = Localization.timeToString(alarmTime.getTime(), context);
 
             Clock clock = new SystemClock(); // TODO Solve dependency on clock
             Calendar now = clock.now();
 
-            if (RingActivity.onTheSameDate(now, alarmTime)) {
-                widgetText = context.getResources().getString(R.string.widget_alarm_text_today, timeStr);
-            } else {
+            if (!RingActivity.onTheSameDate(now, alarmTime)) {
                 if (inTomorrow(now, alarmTime)) {
                     Calendar fewHoursBeforeAlarmTime = (Calendar) alarmTime.clone();
-                    fewHoursBeforeAlarmTime.add(Calendar.HOUR_OF_DAY, -22);
+                    fewHoursBeforeAlarmTime.add(Calendar.HOUR_OF_DAY, HIDE_TOMORROW_HOURS);
                     if (now.before(fewHoursBeforeAlarmTime)) {
-                        widgetText = context.getResources().getString(R.string.widget_alarm_text_tomorrow, timeStr);
-                    } else {
-                        widgetText = context.getResources().getString(R.string.widget_alarm_text_today, timeStr);
+                        dateText = context.getResources().getString(R.string.tomorrow);
                     }
                 } else {
                     int dayOfWeek = alarmTime.get(Calendar.DAY_OF_WEEK);
-                    String dayOfWeekText = Localization.dayOfWeekToString(dayOfWeek, clock);
+                    String dayOfWeekText = Localization.dayOfWeekToStringShort(context.getResources(), dayOfWeek);
                     if (inNextWeek(now, alarmTime)) {
-                        widgetText = context.getResources().getString(R.string.widget_alarm_text_next_week, timeStr, dayOfWeekText);
+                        dateText = dayOfWeekText;
                     } else {
-                        String dateText = Localization.dateToStringVeryShort(alarmTime.getTime());
-                        widgetText = context.getResources().getString(R.string.widget_alarm_text_later, timeStr, dayOfWeekText, dateText);
+                        String calendarText = Localization.dateToStringVeryShort(context.getResources(), alarmTime.getTime());
+                        dateText = context.getResources().getString(R.string.widget_alarm_text_later, dayOfWeekText, calendarText);
                     }
                 }
             }
         } else {
             iconSrcId = R.drawable.ic_alarm_off_white;
-            widgetText = context.getResources().getString(R.string.widget_alarm_text_none);
+            timeText = context.getResources().getString(R.string.widget_alarm_text_none);
         }
         views.setImageViewResource(R.id.icon, iconSrcId);
-        views.setTextViewText(R.id.alarm_time, widgetText);
+        views.setTextViewText(R.id.alarm_time, timeText);
+        if (dateText != null) {
+            views.setTextViewText(R.id.alarm_date, dateText);
+            views.setViewVisibility(R.id.alarm_date, View.VISIBLE);
+        } else {
+            views.setViewVisibility(R.id.alarm_date, View.GONE);
+        }
     }
 
     private static boolean inTomorrow(Calendar cal1, Calendar cal2) {

@@ -1,15 +1,20 @@
 package cz.jaro.alarmmorning;
 
 import android.content.Context;
+import android.content.res.AssetManager;
+import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.util.DisplayMetrics;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import cz.jaro.alarmmorning.clock.Clock;
+import cz.jaro.alarmmorning.clock.SystemClock;
 
 /**
  * This class contains all the localization related features.
@@ -17,16 +22,50 @@ import cz.jaro.alarmmorning.clock.Clock;
 public class Localization {
 
     /**
-     * Converts the day of week identifier to string.
+     * Converts the day of week identifier to abbreviated string.
      *
      * @param dayOfWeek identifier of the day of week. Use identifiers from {@code Calendar} class, like {@link Calendar#SUNDAY}.
-     * @param clock     clock
-     * @return the name of the day of week
+     * @return the short name of the day of week
      */
-    public static String dayOfWeekToString(int dayOfWeek, Clock clock) {
-        // TODO Localization - rename to ...Short (usein calendar) and create ...Long (use in sentende, dialogue to change other days with the same alarm time
-        // TODO Remove dependency on clock
+    public static String dayOfWeekToStringShort(Resources resources, int dayOfWeek) {
+        int resId = dayOfWeekToShortResourceId(dayOfWeek);
+        String currentValue = getValue(resources, resId);
+        if (currentValue != null) {
+            return currentValue;
+        } else {
+            return dayOfWeekToShortStringAlgo(dayOfWeek);
+        }
+    }
 
+    public static int dayOfWeekToShortResourceId(int dayOfWeek) {
+        switch (dayOfWeek) {
+            case Calendar.SUNDAY:
+                return R.string.sunday_short;
+            case Calendar.MONDAY:
+                return R.string.monday_short;
+            case Calendar.TUESDAY:
+                return R.string.tuesday_short;
+            case Calendar.WEDNESDAY:
+                return R.string.wednesday_short;
+            case Calendar.THURSDAY:
+                return R.string.thursday_short;
+            case Calendar.FRIDAY:
+                return R.string.friday_short;
+            case Calendar.SATURDAY:
+                return R.string.saturday_short;
+            default:
+                throw new IllegalArgumentException("Unexpected argument " + dayOfWeek);
+        }
+    }
+
+    /**
+     * Converts the day of week identifier to abbreviated string. Uses an algorithm to derive the result from the system locale.
+     *
+     * @param dayOfWeek identifier of the day of week. Use identifiers from {@code Calendar} class, like {@link Calendar#SUNDAY}.
+     * @return the short name of the day of week
+     */
+    private static String dayOfWeekToShortStringAlgo(int dayOfWeek) {
+        Clock clock = new SystemClock(); // TODO Solve dependency on clock
         Calendar date = clock.now();
         date.set(Calendar.DAY_OF_WEEK, dayOfWeek);
         SimpleDateFormat sdf = new SimpleDateFormat("E");
@@ -38,29 +77,52 @@ public class Localization {
      * Converts the day of week identifier to string.
      *
      * @param dayOfWeek identifier of the day of week. Use identifiers from {@code Calendar} class, like {@link Calendar#SUNDAY}.
-     * @param res       resources
      * @return the name of the day of week
      */
-    public static String dayOfWeekToString2(int dayOfWeek, Resources res) {
-        // TODO Localization - consider using values in LOCALE - day names, month names, formats of calendar days...
+    public static String dayOfWeekToString(Resources resources, int dayOfWeek) {
+        int resId = dayOfWeekToResourceId(dayOfWeek);
+        String currentValue = getValue(resources, resId);
+        if (currentValue != null) {
+            return currentValue;
+        } else {
+            return dayOfWeekToStringAlgo(dayOfWeek);
+        }
+    }
+
+    public static int dayOfWeekToResourceId(int dayOfWeek) {
         switch (dayOfWeek) {
             case Calendar.SUNDAY:
-                return res.getString(R.string.sunday_short);
+                return R.string.sunday;
             case Calendar.MONDAY:
-                return res.getString(R.string.monday_short);
+                return R.string.monday;
             case Calendar.TUESDAY:
-                return res.getString(R.string.tuesday_short);
+                return R.string.tuesday;
             case Calendar.WEDNESDAY:
-                return res.getString(R.string.wednesday_short);
+                return R.string.wednesday;
             case Calendar.THURSDAY:
-                return res.getString(R.string.thursday_short);
+                return R.string.thursday;
             case Calendar.FRIDAY:
-                return res.getString(R.string.friday_short);
+                return R.string.friday;
             case Calendar.SATURDAY:
-                return res.getString(R.string.saturday_short);
+                return R.string.saturday;
             default:
                 throw new IllegalArgumentException("Unexpected argument " + dayOfWeek);
         }
+    }
+
+    /**
+     * Converts the day of week identifier to string. Uses an algorithm to derive the result from the system locale.
+     *
+     * @param dayOfWeek identifier of the day of week. Use identifiers from {@code Calendar} class, like {@link Calendar#SUNDAY}.
+     * @return the name of the day of week
+     */
+    private static String dayOfWeekToStringAlgo(int dayOfWeek) {
+        Clock clock = new SystemClock(); // TODO Solve dependency on clock
+        Calendar date = clock.now();
+        date.set(Calendar.DAY_OF_WEEK, dayOfWeek);
+        SimpleDateFormat sdf = new SimpleDateFormat("EEEE");
+        sdf.setCalendar(date);
+        return sdf.format(date.getTime());
     }
 
     /**
@@ -68,10 +130,9 @@ public class Localization {
      *
      * @param daysOfWeek list of day of week identifiers
      * @param res        resources
-     * @param clock      clock
      * @return string with the names of days. The can be simly inserted into a sentence.
      */
-    public static String daysOfWeekToString(List<Integer> daysOfWeek, Resources res, Clock clock) {
+    public static String daysOfWeekToString(List<Integer> daysOfWeek, Resources res) {
         String title;
 
         int index = daysOfWeek.size();
@@ -79,16 +140,16 @@ public class Localization {
         if (index == 0) {
             title = "";
         } else {
-            title = Localization.dayOfWeekToString(daysOfWeek.get(--index), clock);
+            title = Localization.dayOfWeekToString(res, daysOfWeek.get(--index));
 
             if (0 < index) {
-                title = Localization.dayOfWeekToString(daysOfWeek.get(--index), clock)
+                title = Localization.dayOfWeekToString(res, daysOfWeek.get(--index))
                         + res.getString(R.string.list_separator_last)
                         + title;
             }
 
             while (0 < index) {
-                title = Localization.dayOfWeekToString(daysOfWeek.get(--index), clock)
+                title = Localization.dayOfWeekToString(res, daysOfWeek.get(--index))
                         + res.getString(R.string.list_separator)
                         + title;
             }
@@ -120,6 +181,34 @@ public class Localization {
      * @return the time as string
      */
     public static String timeToString(Date date, Context context) {
+        String currentValue = getValue(context.getResources(), R.string.time_format);
+        if (currentValue != null) {
+            return timeToStringFormat(date, currentValue);
+        } else {
+            return timeToStringAlgo(date, context);
+        }
+    }
+
+    /**
+     * Converts the time to text by using the specified format.
+     *
+     * @param date   time moment
+     * @param format time format
+     * @return the time as string
+     */
+    private static String timeToStringFormat(Date date, String format) {
+        SimpleDateFormat sdf = new SimpleDateFormat(format);
+        return sdf.format(date);
+    }
+
+    /**
+     * Converts the time (in a day) to text. Uses an algorithm to derive the result from the system locale.
+     *
+     * @param date    time moment
+     * @param context context
+     * @return the time as string
+     */
+    private static String timeToStringAlgo(Date date, Context context) {
         java.text.DateFormat dateFormat = android.text.format.DateFormat.getTimeFormat(context);
         return dateFormat.format(date);
     }
@@ -127,10 +216,26 @@ public class Localization {
     /**
      * Converts a date to text in <i>very</i> short format.
      *
+     * @param resources resources
      * @param date date
      * @return the date as string
      */
-    public static String dateToStringVeryShort(Date date) {
+    public static String dateToStringVeryShort(Resources resources, Date date) {
+        String currentValue = getValue(resources, R.string.date_format_very_short);
+        if (currentValue != null) {
+            return timeToStringFormat(date, currentValue);
+        } else {
+            return dateToStringVeryShortAlgo(date);
+        }
+    }
+
+    /**
+     * Converts a date to text in <i>very</i> short format. Uses an algorithm to derive the result from the system locale.
+     *
+     * @param date date
+     * @return the date as string
+     */
+    private static String dateToStringVeryShortAlgo(Date date) {
         SimpleDateFormat dateFormat = (SimpleDateFormat) java.text.DateFormat.getDateInstance(java.text.DateFormat.SHORT);
         // Trick: use regex to trim off all y's and any non-alphabetic characters before and after
         dateFormat.applyPattern(dateFormat.toPattern().replaceAll("[^\\p{Alpha}]*y+[^\\p{Alpha}]*", ""));
@@ -140,12 +245,53 @@ public class Localization {
     /**
      * Converts a date to text in full format.
      *
+     * @param resources resources
+     * @param date      date
+     * @return the date as string
+     */
+    public static String dateToStringFull(Resources resources, Date date) {
+        String currentValue = getValue(resources, R.string.date_format_full);
+        if (currentValue != null) {
+            return timeToStringFormat(date, currentValue);
+        } else {
+            return dateToStringFullAlgo(date);
+        }
+    }
+
+    /**
+     * Converts a date to text in full format. Uses an algorithm to derive the result from the system locale.
+     *
      * @param date date
      * @return the date as string
      */
-    public static String dateToStringFull(Date date) {
+    private static String dateToStringFullAlgo(Date date) {
         SimpleDateFormat dateFormat = (SimpleDateFormat) java.text.DateFormat.getDateInstance(DateFormat.FULL);
         return dateFormat.format(date);
+    }
+
+    /**
+     * Gets the value from resources. Considers both the default (English) locale and the current locale.
+     *
+     * @param resources resources
+     * @param resId     resource id
+     * @return the value from current locale if the value in the current locale is different from the value in in the default locale; otherwise returns null.
+     */
+    private static String getValue(Resources resources, int resId) {
+        AssetManager assets = resources.getAssets();
+        DisplayMetrics metrics = resources.getDisplayMetrics();
+        Configuration config = new Configuration(resources.getConfiguration());
+        config.locale = Locale.US;
+        new Resources(assets, metrics, config); // sets the resources in resources
+
+        String defaultValue = resources.getString(resId);
+
+        config.locale = Locale.getDefault();
+        new Resources(assets, metrics, config);
+
+        String currentValue = resources.getString(resId);
+
+        boolean changed = defaultValue.equals(currentValue);
+        return changed ? null : currentValue;
     }
 
 }

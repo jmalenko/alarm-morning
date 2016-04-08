@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:xliff="http://schemas.android.com/tools">
 
     <string name="app_name">Alarm Morning</string>
 
     <!-- Calendar activity -->
     <string name="title_activity_calendar">Scheduled alarms</string>
 
-    <string name="menu_day_header">Alarm at %1$s on %2$s, %3$s</string>
-    <string name="menu_day_header_disabled">Alarm disabled on %1$s, %2$s</string>
+    <string name="menu_day_header">Alarm at <xliff:g id="time" example="07:00">%1$s</xliff:g> on <xliff:g id="dayOfWeek" example="Sat">%2$s</xliff:g>, <xliff:g id="date" example="23/12">%3$s</xliff:g></string>
+    <string name="menu_day_header_disabled">Alarm disabled on <xliff:g id="dayOfWeek" example="Sat">%1$s</xliff:g>, <xliff:g id="date" example="23/12">%2$s</xliff:g></string>
     <string name="menu_day_set_time">Set time</string>
     <string name="menu_day_disable">Disable</string>
     <string name="menu_day_revert">Revert to default</string>
@@ -15,13 +15,13 @@
     <!-- Default activity -->
     <string name="title_activity_defaults">Default alarms</string>
 
-    <string name="change_others_title">Set alarm to %1$s on %2$s too?</string>
+    <string name="change_others_title">Set alarm to <xliff:g id="time" example="07:00">%1$s</xliff:g> on <xliff:g id="dayOfWeek" example="Sat">%2$s</xliff:g> too?</string>
     <string name="change_others_message">This quickly changes other weekdays with the same alarm time to the new alarm time.</string>
-    <string name="change_others_yes">Change</string>
+    <string name="change_others_yes">Set</string>
     <string name="change_others_no">No</string>
 
-    <string name="menu_default_header">Alarms at %1$s on %2$s</string>
-    <string name="menu_default_header_disabled">Alarms disabled on %1$s</string>
+    <string name="menu_default_header">Alarms at <xliff:g id="time" example="07:00">%1$s</xliff:g> on <xliff:g id="dayOfWeek" example="Sat">%2$s</xliff:g></string>
+    <string name="menu_default_header_disabled">Alarms disabled on <xliff:g id="dayOfWeek" example="Sat">%1$s</xliff:g></string>
     <string name="menu_default_set_time">@string/menu_day_set_time</string>
     <string name="menu_default_disable">@string/menu_day_disable</string>
 
@@ -31,27 +31,24 @@
     <!-- Ring activity -->
     <string name="title_activity_ring">Alarm</string>
 
-    <string name="alarm_was_set_to_today">Alarm was set to %1$s</string>
-    <string name="alarm_was_set_to_nontoday">Alarm was set to %1$s on %2$s</string>
-    <string name="muted">Muted for %1$d seconds</string>
+    <string name="alarm_was_set_to_today">Alarm was set to <xliff:g id="time" example="07:00">%1$s</xliff:g></string>
+    <string name="alarm_was_set_to_nontoday">Alarm was set to <xliff:g id="time" example="07:00">%1$s</xliff:g> on <xliff:g id="dateFull" example="Tuesday, April 12, 1952">%2$s</xliff:g></string>
+    <string name="muted">Muted for <xliff:g id="seconds" example="5">%1$d</xliff:g> seconds</string>
 
     <!-- Notification -->
-    <string name="notification_title">Alarm at %1$s</string>
+    <string name="notification_title">Alarm at <xliff:g id="time" example="07:00">%1$s</xliff:g></string>
     <string name="notification_text_future">Touch to view all alarms</string>
     <string name="notification_text_ringing">Ringing</string>
-    <string name="notification_text_snoozed">Snoozed till %1$s</string>
+    <string name="notification_text_snoozed">Snoozed till <xliff:g id="time" example="07:00">%1$s</xliff:g></string>
 
-    <string name="notification_title_long">Alarm at %1$s on %2$s</string>
+    <string name="notification_title_long">Alarm at <xliff:g id="time" example="07:00">%1$s</xliff:g> on <xliff:g id="date" example="23/12">%2$s</xliff:g></string>
     <string name="notification_text_cancelled">Alarm cancelled</string>
 
     <string name="notification_text_skipped">There might have been some skipped alarms while the device was off</string>
 
     <!-- Widget -->
     <string name="widget_alarm_text_none">No alarm</string>
-    <string name="widget_alarm_text_today">%1$s</string>
-    <string name="widget_alarm_text_tomorrow">%1$s Tomorrow</string>
-    <string name="widget_alarm_text_next_week">%1$s on %2$s</string>
-    <string name="widget_alarm_text_later">%1$s on %2$s, %3$s</string>
+    <string name="widget_alarm_text_later"><xliff:g id="list" example="Mon, Tue">%1$s</xliff:g>, <xliff:g id="dayOfWeek" example="Sat">%2$s</xliff:g></string>
 
     <!-- Common -->
     <string name="alarm_unset">Off</string>
@@ -66,15 +63,17 @@
     <string name="action_snooze">Snooze</string>
     <string name="action_change">Change</string>
 
-    <string name="time_to_ring_toast_days">This alarm is set for %1$d days, %2$d hours and %3$d minutes from now</string>
-    <string name="time_to_ring_toast_hours">This alarm is set for %1$d hours and %2$d minutes from now</string>
-    <string name="time_to_ring_toast_minutes">This alarm is set for %1$d minutes and %2$d seconds from now</string>
+    <string name="time_to_ring_toast_days">This alarm is set for <xliff:g id="days" example="1">%1$d</xliff:g> days, <xliff:g id="hours" example="2">%2$d</xliff:g> hours and <xliff:g id="minutes" example="3">%3$d</xliff:g> minutes from now</string>
+    <string name="time_to_ring_toast_hours">This alarm is set for <xliff:g id="hours" example="2">%1$d</xliff:g> hours and <xliff:g id="minutes" example="3">%2$d</xliff:g> minutes from now</string>
+    <string name="time_to_ring_toast_minutes">This alarm is set for <xliff:g id="minutes" example="3">%1$d</xliff:g> minutes and <xliff:g id="seconds" example="4">%2$d</xliff:g> seconds from now</string>
     <string name="time_to_ring_toast_off">This alarm is off</string>
     <string name="time_to_ring_toast_passed">This alarm is set to passed time; it will not ring</string>
 
-    <string name="time_to_ring_message_days">%1$dd %2$dh</string>
-    <string name="time_to_ring_message_hours">%1$dh %2$dm</string>
-    <string name="time_to_ring_message_minutes">%1$dm %2$ds</string>
+    <string name="time_to_ring_message_days"><xliff:g id="days" example="1">%1$d</xliff:g>d <xliff:g id="hours" example="2">%2$d</xliff:g>h</string>
+    <string name="time_to_ring_message_hours"><xliff:g id="hours" example="2">%1$d</xliff:g>h <xliff:g id="minutes" example="3">%2$d</xliff:g>m</string>
+    <string name="time_to_ring_message_minutes"><xliff:g id="minutes" example="3">%1$d</xliff:g>m <xliff:g id="seconds" example="4">%2$d</xliff:g>s</string>
+
+    <string name="tomorrow">Tomorrow</string>
 
     <!-- Descriptions for accessibility -->
     <string name="drawer_open">Open navigation drawer</string>

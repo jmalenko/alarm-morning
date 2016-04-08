@@ -1,11 +1,11 @@
-<resources>
+<resources xmlns:xliff="http://schemas.android.com/tools">
     <string name="pref_title_ring_appearance">Alarm appearance and behavior</string>
 
     <string name="pref_title_ringtone">Alarm ringtone</string>
     <string name="pref_ringtone_silent">Silent</string>
 
     <string name="pref_title_volume">Volume</string>
-    <string name="pref_summary_volume">%1$d%%</string>
+    <string name="pref_summary_volume"><xliff:g id="level" example="80">%1$d%</xliff:g>%</string>
 
     <string name="pref_title_volume_increasing">Increasing volume</string>
     <string name="pref_summaryoff_volume_increasing">Don\'t increase volume</string>
@@ -16,10 +16,10 @@
     <string name="pref_summaryon_vibrate">Vibrate when ringing</string>
 
     <string name="pref_title_snooze_time">Snooze time</string>
-    <string name="pref_summary_snooze_time">%1$d minutes</string>
+    <string name="pref_summary_snooze_time"><xliff:g id="minutes" example="3">%1$d</xliff:g> minutes</string>
 
     <string name="pref_title_near_future_time">Show notification before alarm</string>
-    <string name="pref_summary_near_future_time">%1$d hours and %2$d minutes</string>
+    <string name="pref_summary_near_future_time"><xliff:g id="hours" example="2">%1$d</xliff:g> hours and <xliff:g id="minutes" example="3">%2$d</xliff:g> minutes</string>
 
     <string name="pref_title_ring_actions">Action when ringing</string>
 
@@ -38,5 +38,5 @@
     <string name="pref_summaryon_ask_to_change_other_weekdays_with_the_same_alarm_time">Don\'t ask to change the alarm time on other weekdays with the same original alarm time. This happens when changing default alarm time and there are such other weekdays.</string>
 
     <string name="pref_title_nap_time">Nap time</string>
-    <string name="pref_summary_nap_time">%1$d hours and %2$d minutes</string>
+    <string name="pref_summary_nap_time">@string/pref_summary_near_future_time</string>
 </resources>

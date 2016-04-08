@@ -26,6 +26,19 @@
         android:shadowRadius="2"
         android:shadowDx="0"
         android:shadowDy="2"
-        android:text="08:00 Mon"
+        android:text="08:00"
+        android:textAlignment="center"/>
+
+    <TextView
+        android:id="@+id/alarm_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:textColor="@android:color/white"
+        android:shadowColor="#7F000000"
+        android:shadowRadius="2"
+        android:shadowDx="0"
+        android:shadowDy="2"
+        android:text="Mon"
         android:textAlignment="center"/>
 </LinearLayout>

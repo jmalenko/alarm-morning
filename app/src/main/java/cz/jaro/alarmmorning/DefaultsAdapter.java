@@ -48,12 +48,12 @@ public class DefaultsAdapter extends RecyclerView.Adapter<DefaultsAdapter.Defaul
 
         // Show current alarm
 
-        Clock clock = new SystemClock();
-        String dayOfWeekText = Localization.dayOfWeekToString(defaults.getDayOfWeek(), clock);
+        String dayOfWeekText = Localization.dayOfWeekToStringShort(activity.getResources(), defaults.getDayOfWeek());
         viewHolder.getTextDayOfWeek().setText(dayOfWeekText);
 
         String timeText;
         if (defaults.isEnabled()) {
+            Clock clock = new SystemClock();
             timeText = Localization.timeToString(defaults.getHour(), defaults.getMinute(), activity, clock);
         } else {
             timeText = activity.getResources().getString(R.string.alarm_unset);

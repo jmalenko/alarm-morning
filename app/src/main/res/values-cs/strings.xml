@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="http://schemas.android.com/tools">
+
+    <string name="app_name">Budík</string>
+
+    <!-- Calendar activity -->
+    <string name="title_activity_calendar">Budík</string>
+
+    <string name="menu_day_header">Budík v <xliff:g id="time" example="07:00">%1$s</xliff:g> dne <xliff:g id="dayOfWeek" example="Sat">%2$s</xliff:g>, <xliff:g id="date" example="23/12">%3$s</xliff:g></string>
+    <string name="menu_day_header_disabled">Budík je vypnutý dne <xliff:g id="dayOfWeek" example="Sat">%1$s</xliff:g>, <xliff:g id="date" example="23/12">%2$s</xliff:g></string>
+    <string name="menu_day_set_time">Nastavit čas</string>
+    <string name="menu_day_disable">Vypnout</string>
+    <string name="menu_day_revert">Vrátit na čas z pravidla</string>
+
+    <!-- Default activity -->
+    <string name="title_activity_defaults">Pravidla pro dny</string>
+
+    <string name="change_others_title">Nastavit budík na <xliff:g id="time" example="07:00">%1$s</xliff:g> také v <xliff:g id="dayOfWeek" example="Sat">%2$s</xliff:g>?</string>
+    <string name="change_others_message">Tímto rychle změníte budík i v ostatní dny, které mají nasavený stejný čas.</string>
+    <string name="change_others_yes">Nastavit</string>
+    <string name="change_others_no">Ne</string>
+
+    <string name="menu_default_header">Budík v <xliff:g id="time" example="07:00">%1$s</xliff:g> každé <xliff:g id="dayOfWeek" example="Sat">%2$s</xliff:g></string>
+    <string name="menu_default_header_disabled">Budík je vypnutý každé <xliff:g id="dayOfWeek" example="Sat">%1$s</xliff:g></string>
+    <string name="menu_default_set_time">@string/menu_day_set_time</string>
+    <string name="menu_default_disable">@string/menu_day_disable</string>
+
+    <!-- Settings activity -->
+    <string name="title_activity_settings">Nastavení</string>
+
+    <!-- Ring activity -->
+    <string name="title_activity_ring">Budík</string>
+
+    <string name="alarm_was_set_to_today">Budík byl nastaven na <xliff:g id="time" example="07:00">%1$s</xliff:g></string>
+    <string name="alarm_was_set_to_nontoday">Budík byl nastaven na <xliff:g id="time" example="07:00">%1$s</xliff:g> dne <xliff:g id="dateFull" example="Tuesday, April 12, 1952">%2$s</xliff:g></string>
+    <string name="muted">Ztišený na <xliff:g id="seconds" example="5">%1$d</xliff:g> sekund</string>
+
+    <!-- Notification -->
+    <string name="notification_title">Budík v <xliff:g id="time" example="07:00">%1$s</xliff:g></string>
+    <string name="notification_text_future">Zobraz všechny budíky</string>
+    <string name="notification_text_ringing">Zvoní</string>
+    <string name="notification_text_snoozed">Odložený do <xliff:g id="time" example="07:00">%1$s</xliff:g></string>
+
+    <string name="notification_title_long">Budík v <xliff:g id="time" example="07:00">%1$s</xliff:g> dne <xliff:g id="date" example="23/12">%2$s</xliff:g></string>
+    <string name="notification_text_cancelled">Budík zrušen</string>
+
+    <string name="notification_text_skipped">Zatímco bylo zařízení vypnuto, mohly být budíky, které nezazvonily</string>
+
+    <!-- Widget -->
+    <string name="widget_alarm_text_none">Nezvonit</string>
+    <string name="widget_alarm_text_later"><xliff:g id="list" example="Mon, Tue">%1$s</xliff:g>, <xliff:g id="dayOfWeek" example="Sat">%2$s</xliff:g></string>
+
+    <!-- Common -->
+    <string name="alarm_unset">Vypnutý</string>
+
+    <string name="alarm_state_changed">Změněný</string>
+    <string name="alarm_state_passed">Ukončený</string>
+    <string name="alarm_state_ringing">Zvoní</string>
+    <string name="alarm_state_snoozed">Odložený</string>
+    <string name="alarm_state_dismissed_before_ringing">Ukončený před zvoněním</string>
+
+    <string name="action_dismiss">Ukončit</string>
+    <string name="action_snooze">Odložit</string>
+    <string name="action_change">Změnit</string>
+
+    <string name="time_to_ring_toast_days">Budík zazvoní za <xliff:g id="days" example="1">%1$d</xliff:g> dny, <xliff:g id="hours" example="2">%2$d</xliff:g> hodin a <xliff:g id="minutes" example="3">%3$d</xliff:g> minut</string>
+    <string name="time_to_ring_toast_hours">Budík zazvoní za <xliff:g id="hours" example="2">%1$d</xliff:g> hodin a <xliff:g id="minutes" example="3">%2$d</xliff:g> minut</string>
+    <string name="time_to_ring_toast_minutes">Budík zazvoní za <xliff:g id="minutes" example="3">%1$d</xliff:g> minut a <xliff:g id="seconds" example="4">%2$d</xliff:g> sekund</string>
+    <string name="time_to_ring_toast_off">Budík je vypnutý</string>
+    <string name="time_to_ring_toast_passed">Budík je nastaven na čas v minulosti, nezazvoní</string>
+
+    <string name="time_to_ring_message_days"><xliff:g id="days" example="1">%1$d</xliff:g>d <xliff:g id="hours" example="2">%2$d</xliff:g>h</string>
+    <string name="time_to_ring_message_hours"><xliff:g id="hours" example="2">%1$d</xliff:g>h <xliff:g id="minutes" example="3">%2$d</xliff:g>m</string>
+    <string name="time_to_ring_message_minutes"><xliff:g id="minutes" example="3">%1$d</xliff:g>m <xliff:g id="seconds" example="4">%2$d</xliff:g>s</string>
+
+    <string name="tomorrow">Zítra</string>
+
+    <!-- Descriptions for accessibility -->
+    <string name="drawer_open">Otevřít navigační menu</string>
+    <string name="drawer_close">Zavřít navigační menu</string>
+
+    <!-- Localization -->
+    <string name="list_separator">", "</string>
+    <string name="list_separator_last">" a "</string>
+
+    <!-- Menu (left drawer) -->
+    <string name="menu_calendar_title">Plánované budíky</string>
+    <string name="menu_defaults_title">Pravidla pro dny</string>
+    <string name="menu_settings_title">Nastavení</string>
+    <string name="menu_website_title">Webová tránka</string>
+
+    <!-- Widgets -->
+    <string name="relative_time_picker_label_hour">Hodiny</string>
+    <string name="relative_time_picker_label_minute">Minuty</string>
+</resources>

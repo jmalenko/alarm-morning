@@ -1,0 +1,42 @@
+<resources xmlns:xliff="http://schemas.android.com/tools">
+    <string name="pref_title_ring_appearance">Vzhled a chování při zvonění</string>
+
+    <string name="pref_title_ringtone">Zvuk budíku</string>
+    <string name="pref_ringtone_silent">Žádný</string>
+
+    <string name="pref_title_volume">Hlasitost</string>
+    <string name="pref_summary_volume"><xliff:g id="level" example="80">%1$d%</xliff:g>%</string>
+
+    <string name="pref_title_volume_increasing">Vzrůstající hlasitost</string>
+    <string name="pref_summaryoff_volume_increasing">Hlasitost se nemění</string>
+    <string name="pref_summaryon_volume_increasing">Hlasitost se zvyšuje o 1% každou vteřinu</string>
+
+    <string name="pref_title_vibrate">Vibrace</string>
+    <string name="pref_summaryoff_vibrate">Nevibruje</string>
+    <string name="pref_summaryon_vibrate">Vibruje</string>
+
+    <string name="pref_title_snooze_time">Délka odložení</string>
+    <string name="pref_summary_snooze_time"><xliff:g id="minutes" example="3">%1$</xliff:g>d minut</string>
+
+    <string name="pref_title_near_future_time">Oznámění před budíkem</string>
+    <string name="pref_summary_near_future_time"><xliff:g id="hours" example="2">%1$d</xliff:g> hodin a <xliff:g id="minutes" example="3">%2$d</xliff:g> minut</string>
+
+    <string name="pref_title_ring_actions">Akce během zvonění</string>
+
+    <string name="pref_title_action_on_button">Při stisku klávesy</string>
+    <string name="pref_title_action_on_move">Při pohybu zařízení</string>
+    <string name="pref_title_action_on_flip">Při obrázení vzůru nohama</string>
+    <string name="pref_title_action_on_shake">Při zatřesení</string>
+    <string name="pref_title_action_on_proximity">Při přiblížení</string>
+
+    <string name="pref_other">Ostatní</string>
+
+    <string name="pref_title_advanced_settings">Pokročilá nastavení</string>
+
+    <string name="pref_title_ask_to_change_other_weekdays_with_the_same_alarm_time">Zeptat se na změnu podobných budíků</string>
+    <string name="pref_summaryoff_ask_to_change_other_weekdays_with_the_same_alarm_time">Zeptat se, zda také změnit čas budíku v ostních dnech, které byly nasteveny na původní čas.</string>
+    <string name="pref_summaryon_ask_to_change_other_weekdays_with_the_same_alarm_time">Neptat se, zda také změnit čas budíku v ostních dnech, které byly nasteveny na původní čas.</string>
+
+    <string name="pref_title_nap_time">Délka zdřímnutí</string>
+    <string name="pref_summary_nap_time">@string/pref_summary_near_future_time</string>
+</resources>

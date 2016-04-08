@@ -19,6 +19,7 @@ import cz.jaro.alarmmorning.clock.SystemClock;
 import cz.jaro.alarmmorning.model.AlarmDataSource;
 import cz.jaro.alarmmorning.model.Day;
 import cz.jaro.alarmmorning.model.DayFilter;
+import cz.jaro.alarmmorning.model.Defaults;
 
 /**
  * The GlobalManager keeps the state of the application and communicates with the application components.
@@ -302,6 +303,7 @@ public class GlobalManager {
         }
     }
 
+
     /*
      * Events
      * ======
@@ -317,10 +319,43 @@ public class GlobalManager {
      */
 
     /**
+     * @param day
+     * @param dataSource
+     */
+    public void saveAlarmTime(Day day, AlarmDataSource dataSource) {
+        Log.d(TAG, "saveAlarmTime()");
+
+        if (day.getState() == Day.STATE_DISABLED)
+            Log.i(TAG, "Disable alarm on " + day.getDateTime().getTime());
+        else if (day.getState() == Day.STATE_ENABLED)
+            Log.i(TAG, "Set alarm on " + day.getDateTime().getTime());
+        else
+            Log.i(TAG, "Reverting alarm to default on " + day.getDateTime().getTime());
+
+        dataSource.saveDay(day);
+
+        onAlarmSet();
+    }
+
+    public void saveAlarmTimeDefault(Defaults defaults, AlarmDataSource dataSource) {
+        Log.d(TAG, "saveAlarmTimeDefault()");
+
+        String dayOfWeekText = Localization.dayOfWeekToStringShort(context.getResources(), defaults.getDayOfWeek());
+        if (defaults.getState() == Defaults.STATE_ENABLED)
+            Log.i(TAG, "Set alarm at " + defaults.getHour() + ":" + defaults.getMinute() + " on " + dayOfWeekText);
+        else
+            Log.i(TAG, "Disabling alarm on " + dayOfWeekText);
+
+        dataSource.saveDefault(defaults);
+
+        onAlarmSet();
+    }
+
+    /**
      * This event is triggered when the user sets the alarm. This change may be on any day and may or may not change the next alarm time. This also includes
      * disabling an alarm.
      */
-    public void onAlarmSet() {
+    private void onAlarmSet() {
         Log.d(TAG, "onAlarmSet()");
 
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
@@ -331,6 +366,8 @@ public class GlobalManager {
 
             onAlarmSetNew(systemAlarm);
         }
+
+        updateCalendarActivity(context, AlarmMorningActivity.ACTION_ALARM_SET);
     }
 
     private void onAlarmSetNew(SystemAlarm systemAlarm) {
@@ -356,8 +393,6 @@ public class GlobalManager {
         } else {
             throw new IllegalArgumentException("Unexpected argument " + nextAction);
         }
-
-        updateCalendarActivity(context, AlarmMorningActivity.ACTION_ALARM_SET);
     }
 
     public void onNearFuture() {

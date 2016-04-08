@@ -140,6 +140,12 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     public void onAlarmSet() {
         Log.d(TAG, "onAlarmSet()");
         adapter.notifyItemChanged(0);
+
+        adapter.notifyItemChanged(position);
+        updatePositionNextAlarm();
+
+        String toastText = formatToastText(day);
+        Toast.makeText(getActivity(), toastText, Toast.LENGTH_LONG).show();
     }
 
     public void onDismissBeforeRinging() {
@@ -269,20 +275,8 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     }
 
     private void save(Day day) {
-        dataSource.saveDay(day);
-
-        refresh();
-
-        String toastText = formatToastText(day);
-        Toast.makeText(getActivity(), toastText, Toast.LENGTH_LONG).show();
-    }
-
-    private void refresh() {
-        adapter.notifyItemChanged(position);
-        updatePositionNextAlarm();
-
         GlobalManager globalManager = new GlobalManager(getActivity());
-        globalManager.onAlarmSet();
+        globalManager.saveAlarmTime(day, dataSource);
     }
 
     private String formatToastText(Day day) {
@@ -410,9 +404,9 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
         Calendar date = day.getDate();
         int dayOfWeek = date.get(Calendar.DAY_OF_WEEK);
-        String dayOfWeekText = Localization.dayOfWeekToString(dayOfWeek, clock());
+        String dayOfWeekText = Localization.dayOfWeekToStringShort(getResources(), dayOfWeek);
 
-        String dateText = Localization.dateToStringVeryShort(date.getTime());
+        String dateText = Localization.dateToStringVeryShort(getResources(), date.getTime());
 
         String headerTitle;
         if (day.isEnabled()) {
@@ -439,9 +433,13 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
                     disable.setVisible(day.isEnabled());
                     revert.setVisible(day.getState() != Day.STATE_DEFAULT);
                     snooze.setVisible(false);
-                } else if (state == GlobalManager.STATE_RINGING || state == GlobalManager.STATE_SNOOZED) {
+                } else if (state == GlobalManager.STATE_RINGING) {
                     disable.setVisible(false);
                     revert.setVisible(false);
+                } else if (state == GlobalManager.STATE_SNOOZED) {
+                    disable.setVisible(false);
+                    revert.setVisible(false);
+                    snooze.setVisible(false);
                 } else if (state == GlobalManager.STATE_DISMISSED_BEFORE_RINGING || state == GlobalManager.STATE_DISMISSED) {
                     disable.setVisible(false);
                     revert.setVisible(false);
