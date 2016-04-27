@@ -44,7 +44,7 @@ public class AlarmDataSource2Test extends AndroidTestCase {
         day1.setMinute(MINUTE_DAY + 1);
         dataSource.saveDay(day1);
 
-        // day2 = day0 + 8 days
+        // day2 = day0 + 16 days
         day2 = new Day();
         day2.setState(Day.STATE_ENABLED);
         day2.setDate(new GregorianCalendar(YEAR, MONTH, DAY + 16));
