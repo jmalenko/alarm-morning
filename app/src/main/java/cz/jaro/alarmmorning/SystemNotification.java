@@ -41,7 +41,7 @@ public class SystemNotification {
 
     private NotificationCompat.Builder buildNotification() {
         GlobalManager globalManager = new GlobalManager(context);
-        Day day = globalManager.getDayWithNextAlarm();
+        Day day = globalManager.getDayWithNextAlarmToRing();
 
         Resources res = context.getResources();
         Clock clock = new SystemClock(); // TODO Solve dependency on clock

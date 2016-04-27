@@ -174,8 +174,7 @@ public class AlarmMorningActivity extends AppCompatActivity implements ActivityI
 
         // Redirect to ring activity if ringing
         GlobalManager globalManager = new GlobalManager(this);
-        int state = globalManager.getState();
-        if (state == GlobalManager.STATE_RINGING) {
+        if (globalManager.isRinging()) {
             globalManager.startRingingActivity(this);
         }
     }

@@ -76,11 +76,11 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         if (position == 0) {
             GlobalManager globalManager = new GlobalManager(fragment.getActivity());
             int state = globalManager.getState(day.getDateTime());
-            if (state != GlobalManager.STATE_UNDEFINED) {
+//            if (state != GlobalManager.STATE_UNDEFINED) {
                 enabled = state != GlobalManager.STATE_DISMISSED_BEFORE_RINGING && state != GlobalManager.STATE_DISMISSED;
-            } else {
-                enabled = !day.isPassed(clock());
-            }
+//            } else {
+//                enabled = !day.isPassed(clock());
+//            }
         }
         viewHolder.getTextTime().setEnabled(enabled);
 
@@ -88,7 +88,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         if (position == 0) {
             GlobalManager globalManager = new GlobalManager(fragment.getActivity());
             int state = globalManager.getState(day.getDateTime());
-            if (state != GlobalManager.STATE_UNDEFINED) {
+//            if (state != GlobalManager.STATE_UNDEFINED) {
                 if (state == GlobalManager.STATE_FUTURE) {
                     stateText = day.sameAsDefault() ? "" : res.getString(R.string.alarm_state_changed);
                 } else if (state == GlobalManager.STATE_DISMISSED_BEFORE_RINGING) {
@@ -105,13 +105,13 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
                 } else {
                     throw new IllegalArgumentException("Unexpected argument " + state);
                 }
-            } else {
-                if (day.isPassed(clock())) {
-                    stateText = res.getString(R.string.alarm_state_passed);
-                } else {
-                    stateText = day.sameAsDefault() ? "" : res.getString(R.string.alarm_state_changed);
-                }
-            }
+//            } else {
+//                if (day.isPassed(clock())) {
+//                    stateText = res.getString(R.string.alarm_state_passed);
+//                } else {
+//                    stateText = day.sameAsDefault() ? "" : res.getString(R.string.alarm_state_changed);
+//                }
+//            }
         } else {
             stateText = day.sameAsDefault() ? "" : res.getString(R.string.alarm_state_changed);
         }

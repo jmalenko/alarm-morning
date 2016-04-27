@@ -277,6 +277,9 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     private void save(Day day) {
         GlobalManager globalManager = new GlobalManager(getActivity());
         globalManager.saveAlarmTime(day, dataSource);
+
+        adapter.notifyItemChanged(position);
+        updatePositionNextAlarm();
     }
 
     private String formatToastText(Day day) {
@@ -425,20 +428,24 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         MenuItem dismiss = menu.findItem(R.id.day_dismiss);
         MenuItem snooze = menu.findItem(R.id.day_snooze);
 
-        if (position == 0) {
+//        if (position == 0) {
             GlobalManager globalManager = new GlobalManager(getActivity());
             int state = globalManager.getState(day.getDateTime());
-            if (state != GlobalManager.STATE_UNDEFINED) {
+//            if (state != GlobalManager.STATE_UNDEFINED) {
                 if (state == GlobalManager.STATE_FUTURE) {
                     disable.setVisible(day.isEnabled());
                     revert.setVisible(day.getState() != Day.STATE_DEFAULT);
+                    dismiss.setVisible(position == 0 && day.isEnabled() && globalManager.afterNearFuture(day.getDateTime()));
                     snooze.setVisible(false);
                 } else if (state == GlobalManager.STATE_RINGING) {
                     disable.setVisible(false);
                     revert.setVisible(false);
+                    dismiss.setVisible(true);
+                    snooze.setVisible(true);
                 } else if (state == GlobalManager.STATE_SNOOZED) {
                     disable.setVisible(false);
                     revert.setVisible(false);
+                    dismiss.setVisible(true);
                     snooze.setVisible(false);
                 } else if (state == GlobalManager.STATE_DISMISSED_BEFORE_RINGING || state == GlobalManager.STATE_DISMISSED) {
                     disable.setVisible(false);
@@ -448,18 +455,18 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
                 } else {
                     throw new IllegalArgumentException("Unexpected argument " + state);
                 }
-            } else {
-                disable.setVisible(day.isEnabled());
-                revert.setVisible(day.getState() != Day.STATE_DEFAULT);
-                dismiss.setVisible(false);
-                snooze.setVisible(false);
-            }
-        } else {
-            disable.setVisible(day.isEnabled());
-            revert.setVisible(day.getState() != Day.STATE_DEFAULT);
-            dismiss.setVisible(false);
-            snooze.setVisible(false);
-        }
+//            } else {
+//                disable.setVisible(day.isEnabled());
+//                revert.setVisible(day.getState() != Day.STATE_DEFAULT);
+//                dismiss.setVisible(false);
+//                snooze.setVisible(false);
+//            }
+//        } else {
+//            disable.setVisible(day.isEnabled());
+//            revert.setVisible(day.getState() != Day.STATE_DEFAULT);
+//            dismiss.setVisible(false);
+//            snooze.setVisible(false);
+//        }
     }
 
     @Override
