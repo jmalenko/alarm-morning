@@ -203,12 +203,17 @@ public class SystemNotification {
         mNotificationManager.notify(++NOTIFICATION_ERROR_ID, mBuilder.build());
     }
 
-    public void notifySkippedAlarms() {
+    /**
+     * Shows a notification with the skipped alarm times.
+     *
+     * @param skippedAlarms The count of skipped alarm times.
+     */
+    public void notifySkippedAlarms(int skippedAlarms) {
         Log.d(TAG, "notifySkippedAlarms()");
 
         Resources res = context.getResources();
         String contentTitle = res.getString(R.string.app_name);
-        String contentText = res.getString(R.string.notification_text_skipped);
+        String contentText = res.getString(R.string.notification_text_skipped, skippedAlarms);
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
                 .setSmallIcon(R.drawable.ic_alarm_white)

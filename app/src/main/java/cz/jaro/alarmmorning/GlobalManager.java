@@ -13,10 +13,12 @@ import android.widget.RemoteViews;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import cz.jaro.alarmmorning.clock.Clock;
@@ -80,6 +82,8 @@ public class GlobalManager {
 
     private Context context;
 
+    private static final int RECENT_PERIOD = 30; // minutes
+
     // TODO User early dismisses the alarm and then sets the alarm to the same day and time => fix time to next alarm and other things
 
     public GlobalManager(Context context) {
@@ -140,6 +144,12 @@ public class GlobalManager {
         Log.d(TAG, "isRinging()");
         int state = getState();
         return state == STATE_RINGING;
+    }
+
+    public boolean isDismissedAny() {
+        Log.d(TAG, "isDismissedAny()");
+        int state = getState();
+        return state == STATE_DISMISSED || state == STATE_DISMISSED_BEFORE_RINGING;
     }
 
     private boolean afterNearFuture() {
@@ -361,25 +371,87 @@ public class GlobalManager {
 
         updateWidget(context);
 
+        Calendar lastAlarmTime = null;
+
         if (systemAlarm.nextActionShouldChange()) {
             NextAction nextAction = systemAlarm.calcNextAction();
             NextAction nextActionPersisted = getNextAction();
 
-            Log.w(TAG, "The next system alarm changed while the app was not running.\n" + "   Persisted is action=" + nextActionPersisted.action + ", time=" + nextActionPersisted.time + ", alarmTime" + nextActionPersisted.alarmTime + "\n" + "   Current is   action=" + nextAction.action + ", time=" + nextAction.time + ", alarmTime" + nextAction.alarmTime); // More precisely: ... while the app was not running (e.g. because it was being upgraded or the device was  off)
+            if (nextActionPersisted.action != ACTION_UNDEFINED) {
+                Log.w(TAG, "The next system alarm changed while the app was not running.\n" +
+                        "   Persisted is action=" + nextActionPersisted.action + ", time=" + nextActionPersisted.time + ", alarmTime" + nextActionPersisted.alarmTime + "\n" +
+                        "   Current is   action=" + nextAction.action + ", time=" + nextAction.time + ", alarmTime" + nextAction.alarmTime);
+                // More precisely: ... while the app was not running (e.g. because it was being upgraded or the device was off)
 
-            SystemNotification systemNotification = SystemNotification.getInstance(context);
-            systemNotification.notifySkippedAlarms();
+                List<Calendar> skippedAlarmTimes = new ArrayList<>();
+
+                if (!isDismissedAny()) {
+                    skippedAlarmTimes.add(getAlarmTimeOfRingingAlarm());
+                }
+
+                Calendar from = nextActionPersisted.alarmTime;
+                from.add(Calendar.SECOND, 1);
+
+                Clock clock = new SystemClock(); // TODO Solve dependency on clock
+                Calendar now = clock.now();
+
+                List<Calendar> alarmTimes = AlarmDataSource.getAlarmsInPeriod(context, from, now);
+
+                skippedAlarmTimes.addAll(alarmTimes);
+
+                if (!skippedAlarmTimes.isEmpty()) {
+                    Log.i(TAG, "  The following alarm times were skipped: " + Localization.dateTimesToString(skippedAlarmTimes, context));
+
+                    SystemNotification systemNotification = SystemNotification.getInstance(context);
+                    systemNotification.notifySkippedAlarms(skippedAlarmTimes.size());
+
+                    lastAlarmTime = skippedAlarmTimes.get(skippedAlarmTimes.size()-1);
+                }
+            }
         }
 
+        // resume if the previous alarm (e.g. the one that was the last ringing one) is still ringing
         if (isRingingOrSnoozed()) {
-            Log.w(TAG, "Previous alarm was not correctly dismissed. Resuming ringing.");
+            Log.w(TAG, "Previous alarm is still ringing");
+
+            if (inRecentPast(getAlarmTimeOfRingingAlarm(), RECENT_PERIOD)) {
+                Log.i(TAG, "Resuming ringing as the previous alarm is recent");
+
+                onRing();
+
+                return;
+            } else {
+                Log.d(TAG, "Not resuming ringing as the previous alarm is not recent");
+            }
+        }
+
+        // resume if the last alarm (e.g. the one that was scheduled as last) is recent
+        if (lastAlarmTime != null && inRecentPast(lastAlarmTime, RECENT_PERIOD)) {
+            Log.i(TAG, "Resuming ringing as the last alarm is recent");
 
             onRing();
-        } else {
-            onAlarmSetNew(systemAlarm);
+
+            return;
         }
+
+        onAlarmSetNew(systemAlarm);
     }
 
+    /**
+     * Check if the time is in past minutes minutes.
+     * @param time time
+     * @param minutes minutes
+     * @return true if the time is in the period &lt;now - minutes ; now&gt;
+     */
+    public boolean inRecentPast(Calendar time, int minutes) {
+        Clock clock = new SystemClock(); // TODO Solve dependency on clock
+        Calendar now = clock.now();
+
+        Calendar from = (Calendar) now.clone();
+        from.add(Calendar.MINUTE, -minutes);
+
+        return time.after(from) && time.before(now);
+    }
 
     /*
      * Events

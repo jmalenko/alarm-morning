@@ -9,9 +9,11 @@ import android.util.Log;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import cz.jaro.alarmmorning.clock.Clock;
 
@@ -242,6 +244,64 @@ public class AlarmDataSource {
         datasource.close();
 
         return alarmTime;
+    }
+
+    /**
+     * Return the alarm times in the specified period.
+     *
+     * @param from beginning of the period
+     * @param to   end of the period
+     * @return alarm times, including the borders
+     */
+    public List<Calendar> getAlarmsInPeriod(Calendar from, Calendar to) {
+        Log.d(TAG, "getAlarmsInPeriod(from=" + from.getTime() + ", to=" + to.getTime() + ")");
+
+        List<Calendar> alarmTimes = new ArrayList<>();
+
+        for (Calendar date = (Calendar) from.clone(); date.before(to) ; date.add(Calendar.DATE, 1)) {
+            Day day = loadDayDeep(date);
+
+            if (!day.isEnabled()) {
+                continue;
+            }
+
+            // handle the alarmTimes on the first (alarmTimes before beginning of period) and last day (after the end of period)
+            Calendar alarmTime = day.getDateTime();
+            if (alarmTime.before(from))
+                continue;
+            if (to.before(alarmTime))
+                continue;
+
+            alarmTimes.add(alarmTime);
+        }
+
+        Log.d(TAG, "   There are " + alarmTimes.size() + " alarmTimes");
+        for (Calendar alarmTime : alarmTimes) {
+            Log.d(TAG, "   " + alarmTime.getTime());
+        }
+
+        return alarmTimes;
+    }
+
+    /**
+     * Return the alarm times in the specified period.
+     * <p/>
+     * This is a helper method that opens the database.
+     *
+     * @param context context
+     * @param from    beginning of the period
+     * @param to      end of the period
+     * @return alarm times, including the borders
+     */
+    public static List<Calendar> getAlarmsInPeriod(Context context, Calendar from, Calendar to) {
+        AlarmDataSource datasource = new AlarmDataSource(context);
+        datasource.open();
+
+        List<Calendar> alarmTimes = datasource.getAlarmsInPeriod(from, to);
+
+        datasource.close();
+
+        return alarmTimes;
     }
 
     private Defaults cursorToDefaults(Cursor cursor) {

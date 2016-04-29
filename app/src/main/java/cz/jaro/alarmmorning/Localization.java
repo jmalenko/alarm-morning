@@ -130,7 +130,7 @@ public class Localization {
      *
      * @param daysOfWeek list of day of week identifiers
      * @param res        resources
-     * @return string with the names of days. The can be simly inserted into a sentence.
+     * @return string with the names of days. The can be simply inserted into a sentence.
      */
     public static String daysOfWeekToString(List<Integer> daysOfWeek, Resources res) {
         String title;
@@ -217,7 +217,7 @@ public class Localization {
      * Converts a date to text in <i>very</i> short format.
      *
      * @param resources resources
-     * @param date date
+     * @param date      date
      * @return the date as string
      */
     public static String dateToStringVeryShort(Resources resources, Date date) {
@@ -267,6 +267,49 @@ public class Localization {
     private static String dateToStringFullAlgo(Date date) {
         SimpleDateFormat dateFormat = (SimpleDateFormat) java.text.DateFormat.getDateInstance(DateFormat.FULL);
         return dateFormat.format(date);
+    }
+
+    /**
+     * Converts the date time (date and time) to text.
+     *
+     * @param dateTime date with time
+     * @param context  context
+     * @return the time as string
+     */
+    public static String dateTimeToString(Calendar dateTime, Context context) {
+        Resources resources = context.getResources();
+
+        String dateText = Localization.dateToStringVeryShort(resources, dateTime.getTime());
+        String timeText = Localization.timeToString(dateTime.getTime(), context);
+        String dateTimeText = resources.getString(R.string.datetime_format, timeText, dateText);
+
+        return dateTimeText;
+    }
+
+    /**
+     * Converts the list of datetimes to string.
+     *
+     * @param dateTimes list of datetimes
+     * @param context   context
+     * @return string with the datetimes. The can be simply inserted into a sentence.
+     */
+    public static String dateTimesToString(List<Calendar> dateTimes, Context context) {
+        Resources resources = context.getResources();
+
+        String dateTimesText = "";
+
+        for (int index = 0; index < dateTimes.size(); index++) {
+            if (0 < index) {
+                if (index < dateTimes.size())
+                    dateTimesText = dateTimesText + resources.getString(R.string.list_separator);
+                else
+                    dateTimesText = dateTimesText + resources.getString(R.string.list_separator_last);
+            }
+            Calendar dateTime = dateTimes.get(index);
+            dateTimesText = dateTimesText + Localization.dateTimeToString(dateTime, context);
+        }
+
+        return dateTimesText;
     }
 
     /**
