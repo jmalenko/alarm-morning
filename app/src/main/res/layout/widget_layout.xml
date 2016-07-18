@@ -26,6 +26,8 @@
         android:shadowRadius="2"
         android:shadowDx="0"
         android:shadowDy="2"
+        android:singleLine="true"
+        android:ellipsize="marquee"
         android:text="08:00"
         android:textAlignment="center"/>
 
@@ -39,6 +41,8 @@
         android:shadowRadius="2"
         android:shadowDx="0"
         android:shadowDy="2"
+        android:singleLine="true"
+        android:ellipsize="marquee"
         android:text="Mon"
         android:textAlignment="center"/>
 </LinearLayout>
