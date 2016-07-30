@@ -91,29 +91,30 @@ public class GlobalManager {
     }
 
     protected Day getDayWithNextAlarmToRing() {
-        Log.v(TAG, "getDayWithNextAlarm()");
+        Log.v(TAG, "getDayWithNextAlarmToRing()");
 
         AlarmDataSource dataSource = new AlarmDataSource(context);
         dataSource.open();
 
         Clock clock = new SystemClock(); // TODO Solve dependency on clock
 
-        Day day = dataSource.getNextAlarm(clock, new DayFilter() {
-            @Override
-            public boolean match(Day day) {
-//                GlobalManager globalManager = new GlobalManager(context);
-//                int state = globalManager.getState(day.getDateTime());
-                int state = getState(day.getDateTime());
-//                if (state != GlobalManager.STATE_UNDEFINED) {
-                if (state != GlobalManager.STATE_DISMISSED_BEFORE_RINGING && state != GlobalManager.STATE_DISMISSED) {
-                    return true;
+        Day day;
+        if (isRingingOrSnoozed()) {
+            Log.v(TAG, "   loading the ringing or snoozed alarm");
+            day = dataSource.loadDayDeep(clock.now());
+        } else {
+            day = dataSource.getNextAlarm(clock, new DayFilter() {
+                @Override
+                public boolean match(Day day) {
+                    Log.v(TAG, "   checking filter condition for " + day.getDateTime().getTime());
+                    int state = getState(day.getDateTime());
+                    if (state != GlobalManager.STATE_DISMISSED_BEFORE_RINGING && state != GlobalManager.STATE_DISMISSED) {
+                        return true;
+                    }
+                    return false;
                 }
-//                } else {
-//                    return true;
-//                }
-                return false;
-            }
-        });
+            });
+        }
 
         dataSource.close();
 
@@ -653,6 +654,8 @@ public class GlobalManager {
 
         SystemNotification systemNotification = SystemNotification.getInstance(context);
         systemNotification.onDismiss();
+
+        updateWidget(context);
 
         updateRingingActivity(context, RingActivity.ACTION_HIDE_ACTIVITY);
 
