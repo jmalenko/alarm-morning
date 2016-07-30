@@ -115,7 +115,6 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         } else {
             adapter.notifyItemChanged(positionNextAlarm);
         }
-
     }
 
     @Override
@@ -150,6 +149,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
     public void onDismissBeforeRinging() {
         Log.d(TAG, "onDismissBeforeRinging()");
+        // TODO Use position variable instead of constant 0
         adapter.notifyItemChanged(0);
         updatePositionNextAlarm();
     }
