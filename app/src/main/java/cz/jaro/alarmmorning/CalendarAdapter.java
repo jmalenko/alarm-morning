@@ -62,6 +62,21 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         String dateText = Localization.dateToStringVeryShort(res, date.getTime());
         viewHolder.getTextDate().setText(dateText);
 
+        int backgroundColor;
+        com.ibm.icu.util.Calendar c = com.ibm.icu.util.Calendar.getInstance();
+        int dayOfWeekType = c.getDayOfWeekType(dayOfWeek);
+        Log.w(TAG, "day of week " + dayOfWeek + " has type " + dayOfWeekType);
+        switch (dayOfWeekType) {
+            case com.ibm.icu.util.Calendar.WEEKEND:
+                backgroundColor = res.getColor(R.color.weekend);
+                break;
+
+            default:
+                backgroundColor = res.getColor(R.color.primary_dark);
+        }
+        viewHolder.getTextDayOfWeek().setBackgroundColor(backgroundColor);
+        viewHolder.getTextDate().setBackgroundColor(backgroundColor);
+
         String timeText;
         if (day.isEnabled()) {
             timeText = Localization.timeToString(day.getHourX(), day.getMinuteX(), fragment.getActivity());
