@@ -65,7 +65,6 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         int backgroundColor;
         com.ibm.icu.util.Calendar c = com.ibm.icu.util.Calendar.getInstance();
         int dayOfWeekType = c.getDayOfWeekType(dayOfWeek);
-        Log.w(TAG, "day of week " + dayOfWeek + " has type " + dayOfWeekType);
         switch (dayOfWeekType) {
             case com.ibm.icu.util.Calendar.WEEKEND:
                 backgroundColor = res.getColor(R.color.weekend);
