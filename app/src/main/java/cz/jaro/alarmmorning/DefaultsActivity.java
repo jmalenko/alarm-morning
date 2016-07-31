@@ -37,6 +37,8 @@ public class DefaultsActivity extends AppCompatActivity implements View.OnCreate
     private Defaults defaults;
     private List<Integer> otherWeekdaysWithTheSameAlarmTime;
 
+    protected int firstDayOfWeek;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,6 +65,12 @@ public class DefaultsActivity extends AppCompatActivity implements View.OnCreate
 
         registerForContextMenu(recyclerView);
 
+        com.ibm.icu.util.Calendar c = com.ibm.icu.util.Calendar.getInstance();
+        firstDayOfWeek = c.getFirstDayOfWeek(); // ICU4J library encodes days as 1 = Sunday, ... , 7 = Saturday
+        // This app uses 0 = Sunday, ... , 6 = Saturday
+        firstDayOfWeek--;
+        Log.v(TAG, "First day of week is " + firstDayOfWeek);
+
         dataSource = new AlarmDataSource(this);
         dataSource.open();
     }
@@ -81,7 +89,7 @@ public class DefaultsActivity extends AppCompatActivity implements View.OnCreate
     }
 
     private int positionToDayOfWeek(int position) {
-        return AlarmDataSource.allDaysOfWeek[position];
+        return AlarmDataSource.allDaysOfWeek[(firstDayOfWeek + position) % AlarmDataSource.allDaysOfWeek.length];
     }
 
     private void save(Defaults defaults) {

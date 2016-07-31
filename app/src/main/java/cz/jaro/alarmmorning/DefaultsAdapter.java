@@ -43,18 +43,15 @@ public class DefaultsAdapter extends RecyclerView.Adapter<DefaultsAdapter.Defaul
      */
     @Override
     public void onBindViewHolder(DefaultViewHolder viewHolder, final int position) {
-        Defaults defaults = activity.loadPosition(position);
-
+        Defaults defaults = activity.loadPosition(position); // positions start from 0
         Resources res = activity.getResources();
-
-        // Show current alarm
 
         String dayOfWeekText = Localization.dayOfWeekToStringShort(res, defaults.getDayOfWeek());
         viewHolder.getTextDayOfWeek().setText(dayOfWeekText);
 
         int backgroundColor;
         com.ibm.icu.util.Calendar c = com.ibm.icu.util.Calendar.getInstance();
-        int dayOfWeekType = c.getDayOfWeekType(position + 1); // ICU4J library encodes days as 1 = Sunday, ... , 7 = Saturday
+        int dayOfWeekType = c.getDayOfWeekType(((activity.firstDayOfWeek + position) % AlarmDataSource.allDaysOfWeek.length) + 1); // ICU4J library encodes days as 1 = Sunday, ... , 7 = Saturday
         switch (dayOfWeekType) {
             case com.ibm.icu.util.Calendar.WEEKEND:
                 backgroundColor = res.getColor(R.color.weekend);
