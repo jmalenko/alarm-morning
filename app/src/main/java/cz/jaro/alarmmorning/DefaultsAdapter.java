@@ -1,5 +1,6 @@
 package cz.jaro.alarmmorning;
 
+import android.content.res.Resources;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,10 +45,25 @@ public class DefaultsAdapter extends RecyclerView.Adapter<DefaultsAdapter.Defaul
     public void onBindViewHolder(DefaultViewHolder viewHolder, final int position) {
         Defaults defaults = activity.loadPosition(position);
 
+        Resources res = activity.getResources();
+
         // Show current alarm
 
-        String dayOfWeekText = Localization.dayOfWeekToStringShort(activity.getResources(), defaults.getDayOfWeek());
+        String dayOfWeekText = Localization.dayOfWeekToStringShort(res, defaults.getDayOfWeek());
         viewHolder.getTextDayOfWeek().setText(dayOfWeekText);
+
+        int backgroundColor;
+        com.ibm.icu.util.Calendar c = com.ibm.icu.util.Calendar.getInstance();
+        int dayOfWeekType = c.getDayOfWeekType(position + 1); // ICU4J library encodes days as 1 = Sunday, ... , 7 = Saturday
+        switch (dayOfWeekType) {
+            case com.ibm.icu.util.Calendar.WEEKEND:
+                backgroundColor = res.getColor(R.color.weekend);
+                break;
+
+            default:
+                backgroundColor = res.getColor(R.color.primary_dark);
+        }
+        viewHolder.getTextDayOfWeek().setBackgroundColor(backgroundColor);
 
         String timeText;
         if (defaults.isEnabled()) {
