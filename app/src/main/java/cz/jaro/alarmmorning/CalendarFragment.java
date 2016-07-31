@@ -27,7 +27,6 @@ import android.widget.Toast;
 import java.util.Calendar;
 
 import cz.jaro.alarmmorning.clock.Clock;
-import cz.jaro.alarmmorning.clock.SystemClock;
 import cz.jaro.alarmmorning.graphics.RecyclerViewWithContextMenu;
 import cz.jaro.alarmmorning.graphics.SimpleDividerItemDecoration;
 import cz.jaro.alarmmorning.model.AlarmDataSource;
@@ -221,9 +220,10 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
      * ========
      */
 
-    // TODO Solve dependency on clock
-    private Clock clock() {
-        return new SystemClock();
+    protected Clock clock() {
+        GlobalManager globalManager = new GlobalManager(getActivity());
+        Clock clock = globalManager.clock();
+        return clock;
     }
 
     private int calcPositionNextAlarm() {
@@ -351,8 +351,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         fragment.setOnTimeSetListener(this);
 
         // Preset time
-        Clock clock = new SystemClock(); // TODO Solve dependency on clock
-        Calendar now = clock.now();
+        Calendar now = clock().now();
 
         GlobalManager globalManager = new GlobalManager(getActivity());
         int state = globalManager.getState(day.getDateTime());
@@ -413,7 +412,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
         String headerTitle;
         if (day.isEnabled()) {
-            String timeText = Localization.timeToString(day.getHourX(), day.getMinuteX(), getActivity(), clock());
+            String timeText = Localization.timeToString(day.getHourX(), day.getMinuteX(), getActivity());
             headerTitle = getResources().getString(R.string.menu_day_header, timeText, dayOfWeekText, dateText);
         } else {
             headerTitle = getResources().getString(R.string.menu_day_header_disabled, dayOfWeekText, dateText);

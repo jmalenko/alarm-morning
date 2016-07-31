@@ -6,8 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import cz.jaro.alarmmorning.clock.Clock;
-import cz.jaro.alarmmorning.clock.SystemClock;
 import cz.jaro.alarmmorning.model.AlarmDataSource;
 import cz.jaro.alarmmorning.model.Defaults;
 
@@ -53,8 +51,7 @@ public class DefaultsAdapter extends RecyclerView.Adapter<DefaultsAdapter.Defaul
 
         String timeText;
         if (defaults.isEnabled()) {
-            Clock clock = new SystemClock();
-            timeText = Localization.timeToString(defaults.getHour(), defaults.getMinute(), activity, clock);
+            timeText = Localization.timeToString(defaults.getHour(), defaults.getMinute(), activity);
         } else {
             timeText = activity.getResources().getString(R.string.alarm_unset);
         }

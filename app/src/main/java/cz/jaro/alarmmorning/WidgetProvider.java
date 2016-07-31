@@ -13,7 +13,6 @@ import android.widget.RemoteViews;
 import java.util.Calendar;
 
 import cz.jaro.alarmmorning.clock.Clock;
-import cz.jaro.alarmmorning.clock.SystemClock;
 import cz.jaro.alarmmorning.model.Day;
 
 /**
@@ -62,7 +61,7 @@ public class WidgetProvider extends AppWidgetProvider {
 
             timeText = Localization.timeToString(alarmTime.getTime(), context);
 
-            Clock clock = new SystemClock(); // TODO Solve dependency on clock
+            Clock clock = globalManager.clock();
             Calendar now = clock.now();
 
             if (!RingActivity.onTheSameDate(now, alarmTime)) {

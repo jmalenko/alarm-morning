@@ -90,20 +90,22 @@ public class GlobalManager {
         this.context = context;
     }
 
+    protected Clock clock() {
+        return new SystemClock();
+    }
+
     protected Day getDayWithNextAlarmToRing() {
         Log.v(TAG, "getDayWithNextAlarmToRing()");
 
         AlarmDataSource dataSource = new AlarmDataSource(context);
         dataSource.open();
 
-        Clock clock = new SystemClock(); // TODO Solve dependency on clock
-
         Day day;
         if (isRingingOrSnoozed()) {
             Log.v(TAG, "   loading the ringing or snoozed alarm");
-            day = dataSource.loadDayDeep(clock.now());
+            day = dataSource.loadDayDeep(clock().now());
         } else {
-            day = dataSource.getNextAlarm(clock, new DayFilter() {
+            day = dataSource.getNextAlarm(clock(), new DayFilter() {
                 @Override
                 public boolean match(Day day) {
                     Log.v(TAG, "   checking filter condition for " + day.getDateTime().getTime());
@@ -163,8 +165,7 @@ public class GlobalManager {
     }
 
     public boolean afterNearFuture(Calendar alarmTime) {
-        Clock clock = new SystemClock(); // TODO Solve dependency on clock
-        Calendar now = clock.now();
+        Calendar now = clock().now();
 
         Calendar nearFutureTime = SystemAlarm.getNearFutureTime(context, alarmTime);
         return now.after(nearFutureTime);
@@ -330,9 +331,7 @@ public class GlobalManager {
         }
 
         // Condition 3
-        Clock clock = new SystemClock(); // // TODO Solve dependency on clock
-
-        if (alarmTime.before(clock.now())) {
+        if (alarmTime.before(clock().now())) {
             Log.i(TAG, "   is in past => DISMISSED");
             return STATE_DISMISSED;
         } else {
@@ -375,7 +374,7 @@ public class GlobalManager {
         Calendar lastAlarmTime = null;
 
         if (systemAlarm.nextActionShouldChange()) {
-            NextAction nextAction = systemAlarm.calcNextAction();
+            NextAction nextAction = systemAlarm.calcNextAction(clock());
             NextAction nextActionPersisted = getNextAction();
 
             if (nextActionPersisted.action != ACTION_UNDEFINED) {
@@ -393,10 +392,7 @@ public class GlobalManager {
                 Calendar from = nextActionPersisted.alarmTime;
                 from.add(Calendar.SECOND, 1);
 
-                Clock clock = new SystemClock(); // TODO Solve dependency on clock
-                Calendar now = clock.now();
-
-                List<Calendar> alarmTimes = AlarmDataSource.getAlarmsInPeriod(context, from, now);
+                List<Calendar> alarmTimes = AlarmDataSource.getAlarmsInPeriod(context, from, clock().now());
 
                 skippedAlarmTimes.addAll(alarmTimes);
 
@@ -445,8 +441,7 @@ public class GlobalManager {
      * @return true if the time is in the period &lt;now - minutes ; now&gt;
      */
     public boolean inRecentPast(Calendar time, int minutes) {
-        Clock clock = new SystemClock(); // TODO Solve dependency on clock
-        Calendar now = clock.now();
+        Calendar now = clock().now();
 
         Calendar from = (Calendar) now.clone();
         from.add(Calendar.MINUTE, -minutes);
@@ -531,7 +526,7 @@ public class GlobalManager {
 
         updateWidget(context);
 
-        NextAction nextAction = systemAlarm.calcNextAction();
+        NextAction nextAction = systemAlarm.calcNextAction(clock());
         if (nextAction.action.equals(SystemAlarm.ACTION_SET_SYSTEM_ALARM)) {
             // nothing
         } else if (nextAction.action.equals(SystemAlarm.ACTION_RING_IN_NEAR_FUTURE)) {
@@ -683,8 +678,7 @@ public class GlobalManager {
 
         setState(STATE_SNOOZED, getAlarmTimeOfRingingAlarm());
 
-        Clock clock = new SystemClock(); // TODO Solve dependency on clock
-        Calendar ringAfterSnoozeTime = getRingAfterSnoozeTime(clock);
+        Calendar ringAfterSnoozeTime = getRingAfterSnoozeTime(clock());
 
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
         systemAlarm.onSnooze(ringAfterSnoozeTime, getAlarmTimeOfRingingAlarm());

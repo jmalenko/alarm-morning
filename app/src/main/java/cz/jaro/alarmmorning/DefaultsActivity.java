@@ -20,8 +20,6 @@ import android.widget.TimePicker;
 import java.util.ArrayList;
 import java.util.List;
 
-import cz.jaro.alarmmorning.clock.Clock;
-import cz.jaro.alarmmorning.clock.SystemClock;
 import cz.jaro.alarmmorning.graphics.RecyclerViewWithContextMenu;
 import cz.jaro.alarmmorning.graphics.SimpleDividerItemDecoration;
 import cz.jaro.alarmmorning.model.AlarmDataSource;
@@ -161,8 +159,7 @@ public class DefaultsActivity extends AppCompatActivity implements View.OnCreate
         if (defaults.isEnabled()) {
             String timeText;
             if (defaults.isEnabled()) {
-                Clock clock = new SystemClock();
-                timeText = Localization.timeToString(defaults.getHour(), defaults.getMinute(), this, clock);
+                timeText = Localization.timeToString(defaults.getHour(), defaults.getMinute(), this);
             } else {
                 timeText = getResources().getString(R.string.alarm_unset);
             }
@@ -229,8 +226,7 @@ public class DefaultsActivity extends AppCompatActivity implements View.OnCreate
             String days = Localization.daysOfWeekToString(otherWeekdaysWithTheSameAlarmTime, getResources());
             String timeText;
             if (defaults.isEnabled()) {
-                Clock clock = new SystemClock(); // // TODO Solve dependency on clock
-                timeText = Localization.timeToString(defaults.getHour(), defaults.getMinute(), this, clock);
+                timeText = Localization.timeToString(defaults.getHour(), defaults.getMinute(), this);
             } else {
                 timeText = getResources().getString(R.string.alarm_unset);
             }

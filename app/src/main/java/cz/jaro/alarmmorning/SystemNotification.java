@@ -10,8 +10,6 @@ import android.util.Log;
 
 import java.util.Calendar;
 
-import cz.jaro.alarmmorning.clock.Clock;
-import cz.jaro.alarmmorning.clock.SystemClock;
 import cz.jaro.alarmmorning.model.Day;
 import cz.jaro.alarmmorning.receivers.NotificationReceiver;
 
@@ -44,8 +42,7 @@ public class SystemNotification {
         Day day = globalManager.getDayWithNextAlarmToRing();
 
         Resources res = context.getResources();
-        Clock clock = new SystemClock(); // TODO Solve dependency on clock
-        String timeText = Localization.timeToString(day.getHourX(), day.getMinuteX(), context, clock);
+        String timeText = Localization.timeToString(day.getHourX(), day.getMinuteX(), context);
         String contentTitle = res.getString(R.string.notification_title, timeText);
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
@@ -153,8 +150,7 @@ public class SystemNotification {
         NotificationCompat.Builder mBuilder = buildNotification();
 
         Resources res = context.getResources();
-        Clock clock = new SystemClock(); // TODO Solve dependency on clock
-        String ringAfterSnoozeTimeText = Localization.timeToString(ringAfterSnoozeTime.get(Calendar.HOUR_OF_DAY), ringAfterSnoozeTime.get(Calendar.MINUTE), context, clock);
+        String ringAfterSnoozeTimeText = Localization.timeToString(ringAfterSnoozeTime.get(Calendar.HOUR_OF_DAY), ringAfterSnoozeTime.get(Calendar.MINUTE), context);
         String contentText = res.getString(R.string.notification_text_snoozed, ringAfterSnoozeTimeText);
         mBuilder.setContentText(contentText);
 
@@ -186,8 +182,7 @@ public class SystemNotification {
         Calendar alarmTime = globalManager.getAlarmTimeOfRingingAlarm();
 
         Resources res = context.getResources();
-        Clock clock = new SystemClock(); // TODO Solve dependency on clock
-        String timeText = Localization.timeToString(alarmTime.get(Calendar.HOUR_OF_DAY), alarmTime.get(Calendar.MINUTE), context, clock);
+        String timeText = Localization.timeToString(alarmTime.get(Calendar.HOUR_OF_DAY), alarmTime.get(Calendar.MINUTE), context);
         String dateText = Localization.dateToStringVeryShort(res, alarmTime.getTime());
         String contentTitle = res.getString(R.string.notification_title_long, timeText, dateText);
         mBuilder.setContentTitle(contentTitle);

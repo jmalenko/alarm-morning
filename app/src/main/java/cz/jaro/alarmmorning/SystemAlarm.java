@@ -13,7 +13,6 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import cz.jaro.alarmmorning.clock.Clock;
-import cz.jaro.alarmmorning.clock.SystemClock;
 import cz.jaro.alarmmorning.model.AlarmDataSource;
 import cz.jaro.alarmmorning.receivers.AlarmReceiver;
 
@@ -125,7 +124,10 @@ public class SystemAlarm {
      */
 
     private void initialize() {
-        NextAction nextAction = calcNextAction();
+        GlobalManager globalManager = new GlobalManager(context);
+        Clock clock = globalManager.clock();
+
+        NextAction nextAction = calcNextAction(clock);
         registerSystemAlarm(nextAction);
     }
 
@@ -134,10 +136,9 @@ public class SystemAlarm {
      *
      * @return the next action and system alarm
      */
-    protected NextAction calcNextAction() {
+    protected NextAction calcNextAction(Clock clock) {
         Log.d(TAG, "calcNextAction()");
 
-        Clock clock = new SystemClock(); // TODO Solve dependency on clock
         Calendar now = clock.now();
 
         Calendar alarmTime = AlarmDataSource.getNextAlarm(context, clock);
@@ -162,9 +163,11 @@ public class SystemAlarm {
     protected boolean nextActionShouldChange() {
         Log.v(TAG, "nextActionSh ouldChange()");
 
-        NextAction nextAction = calcNextAction();
-
         GlobalManager globalManager = new GlobalManager(context);
+
+        Clock clock = globalManager.clock();
+        NextAction nextAction = calcNextAction(clock);
+
         NextAction nextActionPersisted = globalManager.getNextAction();
 
         return !nextActionPersisted.equals(nextAction);
@@ -234,7 +237,9 @@ public class SystemAlarm {
     public void onNearFuture() {
         Log.d(TAG, "onNearFuture()");
 
-        Clock clock = new SystemClock(); // // TODO Solve dependency on clock
+        GlobalManager globalManager = new GlobalManager(context);
+        Clock clock = globalManager.clock();
+
         Calendar alarmTime = AlarmDataSource.getNextAlarm(context, clock);
         assert alarmTime != null;
         registerSystemAlarm(ACTION_RING, alarmTime, alarmTime);

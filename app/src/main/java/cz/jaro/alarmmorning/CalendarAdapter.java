@@ -10,8 +10,6 @@ import android.widget.TextView;
 
 import java.util.Calendar;
 
-import cz.jaro.alarmmorning.clock.Clock;
-import cz.jaro.alarmmorning.clock.SystemClock;
 import cz.jaro.alarmmorning.model.AlarmDataSource;
 import cz.jaro.alarmmorning.model.Day;
 
@@ -66,60 +64,41 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
 
         String timeText;
         if (day.isEnabled()) {
-            timeText = Localization.timeToString(day.getHourX(), day.getMinuteX(), fragment.getActivity(), clock());
+            timeText = Localization.timeToString(day.getHourX(), day.getMinuteX(), fragment.getActivity());
         } else {
             timeText = res.getString(R.string.alarm_unset);
         }
         viewHolder.getTextTime().setText(timeText);
 
+        GlobalManager globalManager = new GlobalManager(fragment.getActivity());
+        int state = globalManager.getState(day.getDateTime());
+
         boolean enabled = true;
-        if (position == 0) {
-            GlobalManager globalManager = new GlobalManager(fragment.getActivity());
-            int state = globalManager.getState(day.getDateTime());
-//            if (state != GlobalManager.STATE_UNDEFINED) {
-                enabled = state != GlobalManager.STATE_DISMISSED_BEFORE_RINGING && state != GlobalManager.STATE_DISMISSED;
-//            } else {
-//                enabled = !day.isPassed(clock());
-//            }
-        }
+        enabled = state != GlobalManager.STATE_DISMISSED_BEFORE_RINGING && state != GlobalManager.STATE_DISMISSED;
         viewHolder.getTextTime().setEnabled(enabled);
 
         String stateText;
-        if (position == 0) {
-            GlobalManager globalManager = new GlobalManager(fragment.getActivity());
-            int state = globalManager.getState(day.getDateTime());
-//            if (state != GlobalManager.STATE_UNDEFINED) {
-                if (state == GlobalManager.STATE_FUTURE) {
-                    stateText = day.sameAsDefault() ? "" : res.getString(R.string.alarm_state_changed);
-                } else if (state == GlobalManager.STATE_DISMISSED_BEFORE_RINGING) {
-                    if (day.isPassed(clock()))
-                        stateText = res.getString(R.string.alarm_state_passed);
-                    else
-                        stateText = res.getString(R.string.alarm_state_dismissed_before_ringing);
-                } else if (state == GlobalManager.STATE_RINGING) {
-                    stateText = res.getString(R.string.alarm_state_ringing);
-                } else if (state == GlobalManager.STATE_SNOOZED) {
-                    stateText = res.getString(R.string.alarm_state_snoozed);
-                } else if (state == GlobalManager.STATE_DISMISSED) {
-                    stateText = res.getString(R.string.alarm_state_passed);
-                } else {
-                    throw new IllegalArgumentException("Unexpected argument " + state);
-                }
-//            } else {
-//                if (day.isPassed(clock())) {
-//                    stateText = res.getString(R.string.alarm_state_passed);
-//                } else {
-//                    stateText = day.sameAsDefault() ? "" : res.getString(R.string.alarm_state_changed);
-//                }
-//            }
-        } else {
+        if (state == GlobalManager.STATE_FUTURE) {
             stateText = day.sameAsDefault() ? "" : res.getString(R.string.alarm_state_changed);
+        } else if (state == GlobalManager.STATE_DISMISSED_BEFORE_RINGING) {
+            if (day.isPassed(fragment.clock()))
+                stateText = res.getString(R.string.alarm_state_passed);
+            else
+                stateText = res.getString(R.string.alarm_state_dismissed_before_ringing);
+        } else if (state == GlobalManager.STATE_RINGING) {
+            stateText = res.getString(R.string.alarm_state_ringing);
+        } else if (state == GlobalManager.STATE_SNOOZED) {
+            stateText = res.getString(R.string.alarm_state_snoozed);
+        } else if (state == GlobalManager.STATE_DISMISSED) {
+            stateText = res.getString(R.string.alarm_state_passed);
+        } else {
+            throw new IllegalArgumentException("Unexpected argument " + state);
         }
         viewHolder.getTextState().setText(stateText);
 
         String messageText;
         if (fragment.positionWithNextAlarm(position)) {
-            long diff = day.getTimeToRing(clock());
+            long diff = day.getTimeToRing(fragment.clock());
 
             TimeDifference timeDifference = TimeDifference.split(diff);
 
@@ -134,11 +113,6 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
             messageText = "";
         }
         viewHolder.getTextComment().setText(messageText);
-    }
-
-    // TODO Solve dependency on clock
-    private Clock clock() {
-        return new SystemClock();
     }
 
     /**

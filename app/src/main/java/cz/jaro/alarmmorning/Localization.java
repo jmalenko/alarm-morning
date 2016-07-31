@@ -13,9 +13,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import cz.jaro.alarmmorning.clock.Clock;
-import cz.jaro.alarmmorning.clock.SystemClock;
-
 /**
  * This class contains all the localization related features.
  */
@@ -65,8 +62,7 @@ public class Localization {
      * @return the short name of the day of week
      */
     private static String dayOfWeekToShortStringAlgo(int dayOfWeek) {
-        Clock clock = new SystemClock(); // TODO Solve dependency on clock
-        Calendar date = clock.now();
+        Calendar date = Calendar.getInstance();
         date.set(Calendar.DAY_OF_WEEK, dayOfWeek);
         SimpleDateFormat sdf = new SimpleDateFormat("E");
         sdf.setCalendar(date);
@@ -117,8 +113,7 @@ public class Localization {
      * @return the name of the day of week
      */
     private static String dayOfWeekToStringAlgo(int dayOfWeek) {
-        Clock clock = new SystemClock(); // TODO Solve dependency on clock
-        Calendar date = clock.now();
+        Calendar date = Calendar.getInstance();
         date.set(Calendar.DAY_OF_WEEK, dayOfWeek);
         SimpleDateFormat sdf = new SimpleDateFormat("EEEE");
         sdf.setCalendar(date);
@@ -163,11 +158,10 @@ public class Localization {
      * @param hours   hour
      * @param minutes minute
      * @param context context
-     * @param clock   clock
      * @return the time as string
      */
-    public static String timeToString(int hours, int minutes, Context context, Clock clock) {
-        Calendar date = clock.now();
+    public static String timeToString(int hours, int minutes, Context context) {
+        Calendar date = Calendar.getInstance();
         date.set(Calendar.HOUR_OF_DAY, hours);
         date.set(Calendar.MINUTE, minutes);
         return timeToString(date.getTime(), context);
