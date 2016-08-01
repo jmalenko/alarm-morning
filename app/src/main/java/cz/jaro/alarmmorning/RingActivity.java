@@ -2,11 +2,14 @@ package cz.jaro.alarmmorning;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.database.Cursor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.Ringtone;
@@ -17,6 +20,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
+import android.provider.CalendarContract.Instances;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -83,6 +87,18 @@ public class RingActivity extends Activity implements RingInterface {
     private static IntentFilter b_intentFilter;
 
     private SlideButton dismissButton;
+
+    // Projection for calendar instances
+    public static final String[] INSTANCE_PROJECTION = new String[]{
+            Instances.EVENT_ID,      // 0
+            Instances.BEGIN,         // 1
+            Instances.TITLE          // 2
+    };
+
+    // The indices for the projection array above
+    private static final int PROJECTION_ID_INDEX = 0;
+    private static final int PROJECTION_BEGIN_INDEX = 1;
+    private static final int PROJECTION_TITLE_INDEX = 2;
 
     static {
         b_intentFilter = new IntentFilter();
@@ -392,6 +408,67 @@ public class RingActivity extends Activity implements RingInterface {
             }
             alarmTimeView.setText(alarmTimeText);
             alarmTimeView.setVisibility(View.VISIBLE);
+        }
+
+        /*
+        Show the next calendar entry, which is one or more entries defined by the following rules:
+          1. Entry starts on or after the alarm time
+          2. Entry starts today (before 11:59:59 pm)
+          3. Show the entry that starts earliest from now
+        As there alarm may ring (or be snoozed) for a longer period, consider also the following rule:
+          4. Show the entry that occurs now
+        */
+        TextView nextCalendarView = (TextView) findViewById(R.id.nextCalendar);
+
+        Calendar endOfToday = Calendar.getInstance(); // last milisecond in today
+        endOfToday.add(Calendar.DATE, 1);
+        endOfToday.set(Calendar.HOUR_OF_DAY, 0);
+        endOfToday.set(Calendar.MINUTE, 0);
+        endOfToday.set(Calendar.SECOND, 0);
+        endOfToday.set(Calendar.MILLISECOND, 0);
+        endOfToday.add(Calendar.MILLISECOND, -1);
+
+        // Construct the query with the desired date range.
+        Uri.Builder builder = Instances.CONTENT_URI.buildUpon();
+        ContentUris.appendId(builder, now.getTimeInMillis()); // instances that occur after now
+        ContentUris.appendId(builder, endOfToday.getTimeInMillis());
+
+        String sortOrder = Instances.BEGIN + ", " + Instances.END;
+
+        // Submit the query
+        ContentResolver cr = getContentResolver();
+        Cursor cur = cr.query(builder.build(), INSTANCE_PROJECTION, null, null, sortOrder);
+
+        if (cur != null) {
+            int count = 0;
+            while (cur.moveToNext()) {
+                String title = null;
+                long eventID = 0;
+                long beginVal = 0;
+
+                // Get the field values
+                eventID = cur.getLong(PROJECTION_ID_INDEX);
+                beginVal = cur.getLong(PROJECTION_BEGIN_INDEX);
+                title = cur.getString(PROJECTION_TITLE_INDEX);
+
+                Calendar beginTime = Calendar.getInstance();
+                beginTime.setTimeInMillis(beginVal);
+
+                String timeStr = Localization.timeToString(beginTime.getTime(), getBaseContext());
+                String titleStr = title;
+                Log.v(TAG, "   " + timeStr + " " + titleStr);
+
+                if (!beginTime.before(mAlarmTime)) { // only instances that start on or after alarm time
+                    count++;
+                    if (count == 1) {
+                        String nextCalendarText = res.getString(R.string.next_calendar, timeStr, titleStr);
+                        nextCalendarView.setText(nextCalendarText);
+                        nextCalendarView.setVisibility(View.VISIBLE);
+                    }
+                }
+            }
+        } else {
+            nextCalendarView.setVisibility(View.GONE);
         }
     }
 

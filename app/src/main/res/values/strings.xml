@@ -34,6 +34,7 @@
     <string name="alarm_was_set_to_today">Alarm was set to <xliff:g id="time" example="07:00">%1$s</xliff:g></string>
     <string name="alarm_was_set_to_nontoday">Alarm was set to <xliff:g id="time" example="07:00">%1$s</xliff:g> on <xliff:g id="dateFull" example="Tuesday, April 12, 1952">%2$s</xliff:g></string>
     <string name="muted">Muted for <xliff:g id="seconds" example="5">%1$d</xliff:g> seconds</string>
+    <string name="next_calendar">Next appointment: <xliff:g id="time" example="07:00">%1$s</xliff:g> <xliff:g id="title" example="Dentist">%2$s</xliff:g></string>
 
     <!-- Notification -->
     <string name="notification_title">Alarm at <xliff:g id="time" example="07:00">%1$s</xliff:g></string>

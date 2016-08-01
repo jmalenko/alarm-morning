@@ -37,6 +37,15 @@
         android:text="Alarm was set to 7:15"
         />
 
+    <TextView
+        android:id="@+id/nextCalendar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="@dimen/margin_medium"
+        android:text="Next appointment: 8:00 Dentist"
+        />
+
     <Space
         android:layout_width="match_parent"
         android:layout_height="0dip"
