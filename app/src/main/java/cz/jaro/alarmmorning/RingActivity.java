@@ -33,7 +33,7 @@ import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Set;
 
-import cz.jaro.alarmmorning.clock.SystemClock;
+import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.graphics.SlideButton;
 import cz.jaro.alarmmorning.receivers.AlarmReceiver;
 import cz.jaro.alarmmorning.sensor.Flip;
@@ -383,7 +383,7 @@ public class RingActivity extends Activity implements RingInterface {
 
     private void updateContent() {
         Log.d(TAG, "updateContent()");
-        Calendar now = clock();
+        Calendar now = clock().now();
 
         Resources res = getResources();
         String currentDateString = Localization.dateToStringFull(res, now.getTime());
@@ -824,8 +824,9 @@ public class RingActivity extends Activity implements RingInterface {
         }
     }
 
-    public Calendar clock() {
-        return new SystemClock().now();
+    public Clock clock() {
+        GlobalManager globalManager = new GlobalManager(this);
+        return globalManager.clock();
     }
 
     @Override
