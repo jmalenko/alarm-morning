@@ -208,8 +208,6 @@ public class DefaultsActivity extends AppCompatActivity implements View.OnCreate
      * Create list of weekdays to change.
      */
     private void calculateChangeOtherDays() {
-        // TODO Localization - sort weekdays in natural order
-
         otherWeekdaysWithTheSameAlarmTime = new ArrayList<>();
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -218,7 +216,9 @@ public class DefaultsActivity extends AppCompatActivity implements View.OnCreate
         if (!askPreference)
             return;
 
-        for (int dayOfWeek : AlarmDataSource.allDaysOfWeek) {
+        for (int i = 0; i < AlarmDataSource.allDaysOfWeek.length; i++) {
+            int j = (firstDayOfWeek + i) % AlarmDataSource.allDaysOfWeek.length;
+            int dayOfWeek = AlarmDataSource.allDaysOfWeek[j];
             Defaults defaults2 = dataSource.loadDefault(dayOfWeek);
             boolean sameAlarmTime = defaults2.getState() == defaults.getState() &&
                     defaults2.getHour() == defaults.getHour() &&
