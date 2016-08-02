@@ -595,8 +595,8 @@ public class GlobalManager {
         if (afterNearFuture(dayWithNextAlarmToRing.getDateTime())) {
             Log.i(TAG, "Immediately starting \"alarm in near future\" period.");
 
-            // TODO Handle 1. early dismissed alarm till alarm time and 2. next alarm in near perios at the same tume. (get/setNextAction can store only one of such alarm)
-            Log.w(TAG, "We should show the \"alarm ie near\" notification now. However this is not supported. Instead, we don't show this notification at all. The next alarm will ring.");
+            // TODO Start "alarm in near future" period. We cannot handle 1. early dismissed alarm till alarm time and 2. next alarm in near period at the same time, because get/setNextAction can store only one of such alarm. Instead this notification will be displayed at "alarm time of early dismissed alarm" (remove it from there once this is fixed).
+            Log.w(TAG, "We should show the \"alarm is near\" notification now. This is not supported. Instead, we show this notification at \"alarm time of early dismissed alarm\".");
         }
     }
 
@@ -607,6 +607,14 @@ public class GlobalManager {
         systemAlarm.onAlarmTimeOfEarlyDismissedAlarm();
 
         updateCalendarActivity(context, AlarmMorningActivity.ACTION_ALARM_TIME_OF_EARLY_DISMISSED_ALARM);
+
+        // translate to STATE_FUTURE if in the near future
+        Day dayWithNextAlarmToRing = getDayWithNextAlarmToRing();
+        if (afterNearFuture(dayWithNextAlarmToRing.getDateTime())) {
+            Log.i(TAG, "Immediately starting \"alarm in near future\" period.");
+
+            onNearFuture(false);
+        }
     }
 
     public void onRing() {
