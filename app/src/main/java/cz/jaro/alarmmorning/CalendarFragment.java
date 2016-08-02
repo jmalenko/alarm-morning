@@ -142,8 +142,10 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         adapter.notifyItemChanged(position);
         updatePositionNextAlarm();
 
-        String toastText = formatToastText(day);
-        Toast.makeText(getActivity(), toastText, Toast.LENGTH_LONG).show();
+        if (day != null) { // otherwise the alarm is set because a default alarm time was set. (The DefaultsActivity is running and I don't know why CalendarFragment gets the broadcast message...)
+            String toastText = formatToastText(day);
+            Toast.makeText(getActivity(), toastText, Toast.LENGTH_LONG).show();
+        }
     }
 
     public void onDismissBeforeRinging() {
