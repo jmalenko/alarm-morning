@@ -1,5 +1,6 @@
 package cz.jaro.alarmmorning;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
@@ -8,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.media.AudioManager;
@@ -21,6 +23,7 @@ import android.os.Handler;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.provider.CalendarContract.Instances;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -420,52 +423,57 @@ public class RingActivity extends Activity implements RingInterface {
         */
         TextView nextCalendarView = (TextView) findViewById(R.id.nextCalendar);
 
-        Calendar endOfToday = Calendar.getInstance(); // last milisecond in today
-        endOfToday.add(Calendar.DATE, 1);
-        endOfToday.set(Calendar.HOUR_OF_DAY, 0);
-        endOfToday.set(Calendar.MINUTE, 0);
-        endOfToday.set(Calendar.SECOND, 0);
-        endOfToday.set(Calendar.MILLISECOND, 0);
-        endOfToday.add(Calendar.MILLISECOND, -1);
+        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR);
+        if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
+            Calendar endOfToday = Calendar.getInstance(); // last milisecond in today
+            endOfToday.add(Calendar.DATE, 1);
+            endOfToday.set(Calendar.HOUR_OF_DAY, 0);
+            endOfToday.set(Calendar.MINUTE, 0);
+            endOfToday.set(Calendar.SECOND, 0);
+            endOfToday.set(Calendar.MILLISECOND, 0);
+            endOfToday.add(Calendar.MILLISECOND, -1);
 
-        // Construct the query with the desired date range.
-        Uri.Builder builder = Instances.CONTENT_URI.buildUpon();
-        ContentUris.appendId(builder, now.getTimeInMillis()); // instances that occur after now
-        ContentUris.appendId(builder, endOfToday.getTimeInMillis());
+            // Construct the query with the desired date range.
+            Uri.Builder builder = Instances.CONTENT_URI.buildUpon();
+            ContentUris.appendId(builder, now.getTimeInMillis()); // instances that occur after now
+            ContentUris.appendId(builder, endOfToday.getTimeInMillis());
 
-        String sortOrder = Instances.BEGIN + ", " + Instances.END;
+            String sortOrder = Instances.BEGIN + ", " + Instances.END;
 
-        // Submit the query
-        ContentResolver cr = getContentResolver();
-        Cursor cur = cr.query(builder.build(), INSTANCE_PROJECTION, null, null, sortOrder);
+            // Submit the query
+            ContentResolver cr = getContentResolver();
+            Cursor cur = cr.query(builder.build(), INSTANCE_PROJECTION, null, null, sortOrder);
 
-        if (cur != null) {
-            int count = 0;
-            while (cur.moveToNext()) {
-                String title = null;
-                long eventID = 0;
-                long beginVal = 0;
+            if (cur != null) {
+                int count = 0;
+                while (cur.moveToNext()) {
+                    String title = null;
+                    long eventID = 0;
+                    long beginVal = 0;
 
-                // Get the field values
-                eventID = cur.getLong(PROJECTION_ID_INDEX);
-                beginVal = cur.getLong(PROJECTION_BEGIN_INDEX);
-                title = cur.getString(PROJECTION_TITLE_INDEX);
+                    // Get the field values
+                    eventID = cur.getLong(PROJECTION_ID_INDEX);
+                    beginVal = cur.getLong(PROJECTION_BEGIN_INDEX);
+                    title = cur.getString(PROJECTION_TITLE_INDEX);
 
-                Calendar beginTime = Calendar.getInstance();
-                beginTime.setTimeInMillis(beginVal);
+                    Calendar beginTime = Calendar.getInstance();
+                    beginTime.setTimeInMillis(beginVal);
 
-                String timeStr = Localization.timeToString(beginTime.getTime(), getBaseContext());
-                String titleStr = title;
-                Log.v(TAG, "   " + timeStr + " " + titleStr);
+                    String timeStr = Localization.timeToString(beginTime.getTime(), getBaseContext());
+                    String titleStr = title;
+                    Log.v(TAG, "   " + timeStr + " " + titleStr);
 
-                if (!beginTime.before(mAlarmTime)) { // only instances that start on or after alarm time
-                    count++;
-                    if (count == 1) {
-                        String nextCalendarText = res.getString(R.string.next_calendar, timeStr, titleStr);
-                        nextCalendarView.setText(nextCalendarText);
-                        nextCalendarView.setVisibility(View.VISIBLE);
+                    if (!beginTime.before(mAlarmTime)) { // only instances that start on or after alarm time
+                        count++;
+                        if (count == 1) {
+                            String nextCalendarText = res.getString(R.string.next_calendar, timeStr, titleStr);
+                            nextCalendarView.setText(nextCalendarText);
+                            nextCalendarView.setVisibility(View.VISIBLE);
+                        }
                     }
                 }
+            } else {
+                nextCalendarView.setVisibility(View.GONE);
             }
         } else {
             nextCalendarView.setVisibility(View.GONE);
