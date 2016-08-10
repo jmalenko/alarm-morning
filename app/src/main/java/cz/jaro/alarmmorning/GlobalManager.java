@@ -84,8 +84,6 @@ public class GlobalManager {
 
     private static final int RECENT_PERIOD = 30; // minutes
 
-    // TODO User early dismisses the alarm and then sets the alarm to the same day and time => fix time to next alarm and other things
-
     public GlobalManager(Context context) {
         this.context = context;
     }
@@ -319,7 +317,7 @@ public class GlobalManager {
         Log.v(TAG, "   saved state alarm time is " + stateAlarmTime.getTime());
 
         if (stateAlarmTime.equals(alarmTime)) {
-            Log.i(TAG, "   using saved state alarm time");
+            Log.v(TAG, "   using saved state alarm time");
             return getState();
         }
 
