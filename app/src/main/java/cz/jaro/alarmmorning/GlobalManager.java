@@ -316,7 +316,7 @@ public class GlobalManager {
         // Condition 1
         Calendar stateAlarmTime = getAlarmTimeOfRingingAlarm();
 
-        Log.d(TAG, "   saved state alarm time is " + stateAlarmTime.getTime());
+        Log.v(TAG, "   saved state alarm time is " + stateAlarmTime.getTime());
 
         if (stateAlarmTime.equals(alarmTime)) {
             Log.i(TAG, "   using saved state alarm time");
@@ -326,17 +326,17 @@ public class GlobalManager {
         // Condition 2
         Set<Long> dismissedAlarms = getDismissedAlarms();
         if (dismissedAlarms.contains(alarmTime)) {
-            Log.i(TAG, "   is among dismissed => DISMISSED");
+            Log.v(TAG, "   is among dismissed => DISMISSED");
             return STATE_DISMISSED;
         }
 
         // Condition 3
         if (alarmTime.before(clock().now())) {
-            Log.i(TAG, "   is in past => DISMISSED");
+            Log.v(TAG, "   is in past => DISMISSED");
             return STATE_DISMISSED;
         } else {
             // Condition 4
-            Log.i(TAG, "   is in future => FUTURE");
+            Log.v(TAG, "   is in future => FUTURE");
             return STATE_FUTURE;
         }
     }
