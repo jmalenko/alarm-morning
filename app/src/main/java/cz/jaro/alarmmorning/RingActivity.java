@@ -472,6 +472,9 @@ public class RingActivity extends Activity implements RingInterface {
                         }
                     }
                 }
+                if (count == 0) {
+                    nextCalendarView.setVisibility(View.GONE);
+                }
             } else {
                 nextCalendarView.setVisibility(View.GONE);
             }
