@@ -27,9 +27,11 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.1.1'
     compile 'com.android.support:recyclerview-v7:23.1.0'
     compile 'com.android.support:design:23.1.1'
-    compile 'com.ibm.icu:icu4j:53.1'
 
+    compile 'com.ibm.icu:icu4j:53.1'
     androidTestCompile 'com.ibm.icu:icu4j:53.1'
+
+    compile 'com.github.paolorotolo:appintro:4.0.0'
 
     // Required -- JUnit 4 framework
     testCompile 'junit:junit:4.12'
@@ -40,7 +42,7 @@ dependencies {
     // Optional -- Mockito framework
     testCompile 'org.mockito:mockito-core:1.10.19'
 
-    androidTestCompile 'com.android.support:support-annotations:23.1.1'
+    androidTestCompile 'com.android.support:support-annotations:23.3.0'
     androidTestCompile 'com.android.support.test:runner:0.4.1'
     androidTestCompile 'com.android.support.test:rules:0.4.1'
     // Optional -- Hamcrest library

@@ -36,6 +36,33 @@
     <string name="muted">Muted for <xliff:g id="seconds" example="5">%1$d</xliff:g> seconds</string>
     <string name="next_calendar">Next appointment: <xliff:g id="time" example="07:00">%1$s</xliff:g> <xliff:g id="title" example="Dentist">%2$s</xliff:g></string>
 
+    <!-- Wizard activity -->
+    <string name="title_activity_wizard">First Run Wizard</string>
+
+    <string name="wizard_welcome_title">Welcome to Alarm Morning</string>
+    <string name="wizard_welcome_description">We will guide you through a basic setup. All the settings can be changed later.</string>
+
+    <string name="wizard_set_time_title">Set alarm time</string>
+    <string name="wizard_set_time_description_top">When do you want the alarm clock to go off on workdays?</string>
+    <string name="wizard_set_time_description_bottom">On weekends, the alarm clock will be disabled.</string>
+
+    <string name="wizard_set_actions_title">Set actions while ringing</string>
+    <string name="wizard_set_actions_description">There are also events related to key press and proximity sensor.</string>
+
+    <string name="mute_alarm_for_10_seconds_on_device_move">Mute alarm for 10 seconds on device move</string>
+    <string name="snooze_alarm_on_device_flip">Snooze alarm on device flip</string>
+    <string name="dismiss_alarm_on_device_shake">Dismiss alarm on device shake</string>
+
+    <string name="wizard_set_permissions_title">Allow permissions</string>
+    <string name="wizard_set_permissions_description">The following dialogues ask for the permissions the alarm clock needs.</string>
+    <string name="wizard_set_permissions_explanation"><![CDATA[
+<p>Alarm Morning needs the following permissions to provide full user experience:</p>
+<p><b>READ_CALENDAR</b> – to read the calendar events (the information about next appointment is shown while the alarm is ringing)</p>
+]]></string>
+
+    <string name="wizard_done_title">You are all set</string>
+    <string name="wizard_done_description">Sleep well and don\'t worry about alarm clock management.</string>
+
     <!-- Notification -->
     <string name="notification_title">Alarm at <xliff:g id="time" example="07:00">%1$s</xliff:g></string>
     <string name="notification_text_future">Touch to view all alarms</string>

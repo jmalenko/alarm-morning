@@ -331,6 +331,13 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         return today;
     }
 
+    /**
+     * Update all the calendar items.
+     */
+    public void refresh() {
+        adapter.notifyDataSetChanged();
+    }
+
     /*
      * On click
      * ========

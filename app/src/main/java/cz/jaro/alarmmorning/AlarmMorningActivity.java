@@ -17,16 +17,19 @@
  */
 package cz.jaro.alarmmorning;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.NavigationView;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.DrawerLayout;
@@ -37,6 +40,8 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+
+import cz.jaro.alarmmorning.wizard.Wizard;
 
 
 public class AlarmMorningActivity extends AppCompatActivity implements ActivityInterface {
@@ -51,6 +56,8 @@ public class AlarmMorningActivity extends AppCompatActivity implements ActivityI
     public static final String ACTION_SNOOZE = "SNOOZE";
 
     private final static String url = "https://github.com/jmalenko/alarm-morning/wiki";
+
+    public static final int REQUEST_CODE_WIZARD = 1;
 
     private DrawerLayout mDrawerLayout;
     private NavigationView mNavigationView;
@@ -121,6 +128,15 @@ public class AlarmMorningActivity extends AppCompatActivity implements ActivityI
     protected void onCreate(Bundle savedInstanceState) {
         Log.v(TAG, "onCreate()");
         super.onCreate(savedInstanceState);
+
+        // Possibly run the wizard
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+        boolean wizardPreference = preferences.getBoolean(Wizard.PREF_WIZARD, Wizard.PREF_WIZARD_DEFAULT);
+        if (!wizardPreference) {
+            Intent wizardIntent = new Intent(this, Wizard.class);
+            startActivityForResult(wizardIntent, REQUEST_CODE_WIZARD);
+        }
+
         setContentView(R.layout.activity_calendar);
 
         // Set a Toolbar to replace the ActionBar.
@@ -164,6 +180,17 @@ public class AlarmMorningActivity extends AppCompatActivity implements ActivityI
             // Highlight the menu item
             MenuItem calendarMenu = mNavigationView.getMenu().findItem(R.id.navigation_calendar);
             highlightMenuItem(calendarMenu);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.v(TAG, "onActivityResult(requestCode=" + requestCode + ", resultCode=" + resultCode + ")");
+        if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_CODE_WIZARD) {
+            if (mFragment instanceof CalendarFragment) {
+                CalendarFragment calendarFragment = (CalendarFragment) mFragment;
+                calendarFragment.refresh();
+            }
         }
     }
 

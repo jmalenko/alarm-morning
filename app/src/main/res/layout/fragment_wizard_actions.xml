@@ -1,0 +1,32 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:paddingLeft="32dp"
+    android:paddingRight="32dp">
+
+    <CheckBox
+        android:id="@+id/onMoveCheckBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_large"
+        android:checked="true"
+        android:text="@string/mute_alarm_for_10_seconds_on_device_move"/>
+
+    <CheckBox
+        android:id="@+id/onFlipCheckBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_large"
+        android:checked="true"
+        android:text="@string/snooze_alarm_on_device_flip"/>
+
+    <CheckBox
+        android:id="@+id/onShakeCheckBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="true"
+        android:text="@string/dismiss_alarm_on_device_shake"/>
+
+</LinearLayout>

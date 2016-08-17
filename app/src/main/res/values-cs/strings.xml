@@ -36,6 +36,33 @@
     <string name="muted">Ztišený na <xliff:g id="seconds" example="5">%1$d</xliff:g> sekund</string>
     <string name="next_calendar">Příští schůzka: <xliff:g id="time" example="07:00">%1$s</xliff:g> <xliff:g id="title" example="Dentist">%2$s</xliff:g></string>
 
+    <!-- Wizard activity -->
+    <string name="title_activity_wizard">Průvodce nastavením</string>
+
+    <string name="wizard_welcome_title">Vítejte v Budíku</string>
+    <string name="wizard_welcome_description">Provedeme vás základním nastavením. Všechna nastavení mohou být změněna později.</string>
+
+    <string name="wizard_set_time_title">Nastavit čas</string>
+    <string name="wizard_set_time_description_top">V kolik hodin má budík zazvonit v pracovní dny?</string>
+    <string name="wizard_set_time_description_bottom">O víkendu bude budík vypnutý.</string>
+
+    <string name="wizard_set_actions_title">Nastavit akce při zvonění</string>
+    <string name="wizard_set_actions_description">Také můžete reagovat na stisk klávesy nebo senzor vzdálenosti.</string>
+
+    <string name="mute_alarm_for_10_seconds_on_device_move">Ztišit na 10 sekund pro pohybu zařízení</string>
+    <string name="snooze_alarm_on_device_flip">Odložit při obrázení vzůru nohama</string>
+    <string name="dismiss_alarm_on_device_shake">Ukončit při zatřesení</string>
+
+    <string name="wizard_set_permissions_title">Povolit oprávnění</string>
+    <string name="wizard_set_permissions_description">V následujícím dialogu povolte oprávnění, která budík potřebuje.</string>
+    <string name="wizard_set_permissions_explanation"><![CDATA[
+<p>Budík poskytuje nejlepší uživatelský zážitek s následujícími oprávněními:</p>
+<p><b>READ_CALENDAR</b> – pro čtení událostí v kalendáři (informace o následující schůzce je zobrazena když budík zvoní)</p>
+]]></string>
+
+    <string name="wizard_done_title">Vše je připraveno</string>
+    <string name="wizard_done_description">Přejeme klidný spánek a ať se nemusíte starat o nastavování budíku.</string>
+
     <!-- Notification -->
     <string name="notification_title">Budík v <xliff:g id="time" example="07:00">%1$s</xliff:g></string>
     <string name="notification_text_future">Zobraz všechny budíky</string>
