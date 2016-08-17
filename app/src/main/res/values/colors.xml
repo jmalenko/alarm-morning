@@ -9,7 +9,7 @@
     <color name="icons">#FFFFFF</color>
     <color name="divider">#66666666</color>
 
-    <color name="weekend">@color/Red_100</color>           /* Red A100 */
+    <color name="weekend">@color/Red_300</color>
 
     <!--
     In Light theme use
