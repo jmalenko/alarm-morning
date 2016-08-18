@@ -117,7 +117,7 @@
     <string name="menu_calendar_title">Plánované budíky</string>
     <string name="menu_defaults_title">Pravidla pro dny</string>
     <string name="menu_settings_title">Nastavení</string>
-    <string name="menu_website_title">Webová tránka</string>
+    <string name="menu_website_title">Webová stránka</string>
 
     <!-- Widgets -->
     <string name="relative_time_picker_label_hour">Hodiny</string>
