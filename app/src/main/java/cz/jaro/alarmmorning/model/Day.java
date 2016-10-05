@@ -176,7 +176,7 @@ public class Day {
     /**
      * Return the alarm time.
      * <p/>
-     * If the alarm is enabled, then use this method to get the minute of alarm time.
+     * If the alarm is enabled, then use this method to get the alarm time.
      *
      * @return alarm time
      */
