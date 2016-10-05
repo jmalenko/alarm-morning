@@ -377,8 +377,8 @@ public class GlobalManager {
 
             if (nextActionPersisted.action != ACTION_UNDEFINED) {
                 Log.w(TAG, "The next system alarm changed while the app was not running.\n" +
-                        "   Persisted is action=" + nextActionPersisted.action + ", time=" + nextActionPersisted.time + ", alarmTime" + nextActionPersisted.alarmTime + "\n" +
-                        "   Current is   action=" + nextAction.action + ", time=" + nextAction.time + ", alarmTime" + nextAction.alarmTime);
+                        "   Persisted is action=" + nextActionPersisted.action + ", time=" + nextActionPersisted.time.getTime() + ", alarmTime=" + nextActionPersisted.alarmTime.getTime() + "\n" +
+                        "   Current is   action=" + nextAction.action + ", time=" + nextAction.time.getTime() + ", alarmTime=" + nextAction.alarmTime.getTime());
                 // More precisely: ... while the app was not running (e.g. because it was being upgraded or the device was off)
 
                 List<Calendar> skippedAlarmTimes = new ArrayList<>();
