@@ -76,15 +76,15 @@ public class RelativeTimePreference extends DialogPreference {
         }
     }
 
-    private static int valueToHour(int value) {
+    public static int valueToHour(int value) {
         return value / 60;
     }
 
-    private static int valueToMinute(int value) {
+    public static int valueToMinute(int value) {
         return value % 60;
     }
 
-    private static int hourAndMinuteToValue(int hour, int minute) {
+    public static int hourAndMinuteToValue(int hour, int minute) {
         return 60 * hour + minute;
     }
 

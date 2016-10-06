@@ -29,6 +29,18 @@
     <string name="pref_title_action_on_shake">Při zatřesení</string>
     <string name="pref_title_action_on_proximity">Při přiblížení</string>
 
+    <string name="pref_category_check_alarm_time">@string/pref_title_check_alarm_time</string>
+
+    <string name="pref_title_check_alarm_time">Kontrolovat čas budíku každý večer</string>
+    <string name="pref_summaryoff_check_alarm_time">Nekontrolovat</string>
+    <string name="pref_summaryon_check_alarm_time">Kontrolovat</string>
+
+    <string name="pref_title_check_alarm_time_at">Kontrolovat v</string>
+    <string name="pref_summary_check_alarm_time_at"><xliff:g id="time" example="22:00">%1$s</xliff:g></string>
+
+    <string name="pref_title_check_alarm_time_gap">Budík musí být aspoň … před první schůzkou</string>
+    <string name="pref_summary_check_alarm_time_gap">@string/pref_summary_near_future_time</string>
+
     <string name="pref_other">Ostatní</string>
 
     <string name="pref_title_advanced_settings">Pokročilá nastavení</string>

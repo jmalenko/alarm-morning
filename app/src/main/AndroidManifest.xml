@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
-    package="cz.jaro.alarmmorning"
+<manifest package="cz.jaro.alarmmorning"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
-    <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.READ_CALENDAR" />
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.READ_CALENDAR"/>
 
     <application
         android:allowBackup="true"
@@ -43,6 +42,10 @@
             android:name=".wizard.Wizard"
             android:label="@string/title_activity_wizard">
         </activity>
+        <activity
+            android:name=".cz.jaro.alarmmorning.checkalarmtime.SetTimeActivity"
+            android:theme="@style/TransparentTheme">
+        </activity>
 
         <receiver android:name=".WidgetProvider">
             <intent-filter>
@@ -67,15 +70,19 @@
         </receiver>
         <receiver android:name=".receivers.TimeChangedReceiver">
             <intent-filter>
-                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIME_SET"/>
             </intent-filter>
         </receiver>
         <receiver android:name=".receivers.TimeZoneChangedReceiver">
             <intent-filter>
-                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED"/>
             </intent-filter>
         </receiver>
         <receiver android:name=".receivers.NotificationReceiver">
+        </receiver>
+        <receiver android:name=".cz.jaro.alarmmorning.checkalarmtime.CheckAlarmTimeAlarmReceiver">
+        </receiver>
+        <receiver android:name=".cz.jaro.alarmmorning.checkalarmtime.CheckAlarmTimeNotificationReceiver">
         </receiver>
     </application>
 </manifest>

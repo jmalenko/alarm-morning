@@ -9,6 +9,7 @@ import android.util.Log;
 import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.WakeLocker;
+import cz.jaro.alarmmorning.cz.jaro.alarmmorning.checkalarmtime.CheckAlarmTime;
 
 /**
  * This receiver is called by the operating system on the app upgrade.
@@ -27,9 +28,12 @@ public class UpgradeReceiver extends BroadcastReceiver {
         PreferenceManager.setDefaultValues(context, R.xml.preferences, false);
 
         Log.i(TAG, "Setting alarm on update");
-
         GlobalManager globalManager = new GlobalManager(context);
         globalManager.forceSetAlarm();
+
+        Log.i(TAG, "Starting CheckAlarmTime on update");
+        CheckAlarmTime checkAlarmTime = CheckAlarmTime.getInstance(context);
+        checkAlarmTime.checkAndRegisterCheckAlarmTime();
 
         WakeLocker.release();
     }

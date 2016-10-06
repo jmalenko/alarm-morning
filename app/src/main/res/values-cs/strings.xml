@@ -78,6 +78,14 @@
     <string name="widget_alarm_text_none">Nezvonit</string>
     <string name="widget_alarm_text_later"><xliff:g id="list" example="Mon, Tue">%1$s</xliff:g>, <xliff:g id="dayOfWeek" example="Sat">%2$s</xliff:g></string>
 
+    <!-- Check alarm time in the evening of the previous day -->
+    <string name="notification_check_title_currently_set">Budík je nyní nastaven na <xliff:g id="time" example="07:00">%1$s</xliff:g></string>
+    <string name="notification_check_title_currently_unset">Budík je nyní vypnutý</string>
+    <string name="notification_check_text_with_location">První schůzka: <xliff:g id="time" example="07:00">%1$s</xliff:g> <xliff:g id="title" example="Dentist">%2$s</xliff:g> (<xliff:g id="location" example="Main St">%3$s</xliff:g>)</string>
+    <string name="notification_check_text_without_location">První schůzka: <xliff:g id="time" example="07:00">%1$s</xliff:g> <xliff:g id="title" example="Dentist">%2$s</xliff:g></string>
+    <string name="notification_check_text_set_at">Nastavit na <xliff:g id="time" example="07:00">%1$s</xliff:g></string>
+    <string name="notification_check_text_set_dialog">Nastavit…</string>
+
     <!-- Common -->
     <string name="alarm_unset">Vypnutý</string>
 

@@ -285,13 +285,16 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     }
 
     private String formatToastText(Day day) {
-        Resources res = getResources();
+        return formatToastText(getResources(), clock(), day);
+    }
+
+    static public String formatToastText(Resources res, Clock clock, Day day) {
         String toastText;
 
         if (!day.isEnabled()) {
             toastText = res.getString(R.string.time_to_ring_toast_off);
         } else {
-            long diff = day.getTimeToRing(clock());
+            long diff = day.getTimeToRing(clock);
 
             if (diff < 0) {
                 toastText = res.getString(R.string.time_to_ring_toast_passed);

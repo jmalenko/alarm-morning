@@ -95,13 +95,15 @@ public class RingActivity extends Activity implements RingInterface {
     public static final String[] INSTANCE_PROJECTION = new String[]{
             Instances.EVENT_ID,      // 0
             Instances.BEGIN,         // 1
-            Instances.TITLE          // 2
+            Instances.TITLE,         // 2
+            Instances.EVENT_LOCATION // 3
     };
 
     // The indices for the projection array above
-    private static final int PROJECTION_ID_INDEX = 0;
-    private static final int PROJECTION_BEGIN_INDEX = 1;
-    private static final int PROJECTION_TITLE_INDEX = 2;
+    public static final int PROJECTION_ID_INDEX = 0;
+    public static final int PROJECTION_BEGIN_INDEX = 1;
+    public static final int PROJECTION_TITLE_INDEX = 2;
+    public static final int PROJECTION_LOCATION_INDEX = 3;
 
     static {
         b_intentFilter = new IntentFilter();
@@ -455,6 +457,7 @@ public class RingActivity extends Activity implements RingInterface {
                     eventID = cur.getLong(PROJECTION_ID_INDEX);
                     beginVal = cur.getLong(PROJECTION_BEGIN_INDEX);
                     title = cur.getString(PROJECTION_TITLE_INDEX);
+                    // TODO Show location & refactoring of calendar (prevent code duplication RingActivity and CheckAlarmTime) & add all-day
 
                     Calendar beginTime = Calendar.getInstance();
                     beginTime.setTimeInMillis(beginVal);

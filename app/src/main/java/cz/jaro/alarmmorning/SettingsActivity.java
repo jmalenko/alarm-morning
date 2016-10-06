@@ -14,15 +14,21 @@ import android.preference.RingtonePreference;
 import android.support.v4.app.NavUtils;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+import cz.jaro.alarmmorning.cz.jaro.alarmmorning.checkalarmtime.CheckAlarmTime;
 import cz.jaro.alarmmorning.graphics.AppCompatPreferenceActivity;
+import cz.jaro.alarmmorning.graphics.RelativeTimePreference;
+import cz.jaro.alarmmorning.graphics.TimePreference;
 
 public class SettingsActivity extends AppCompatPreferenceActivity {
+
+    private static final String TAG = AppCompatPreferenceActivity.class.getSimpleName();
 
     // TODO Reregister system alarm if the preference for future time changes
     // TODO Reregister system alarm if the alarm is snoozed and the preference for snooze time changes
@@ -78,6 +84,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     public static final String PREF_ACTION_SNOOZE = "2";
     public static final String PREF_ACTION_DISMISS = "3";
 
+    public static final String PREF_CHECK_ALARM_TIME = "pref_check_alarm_time";
+    public static final String PREF_CHECK_ALARM_TIME_AT = "pref_check_alarm_time_at";
+    public static final String PREF_CHECK_ALARM_TIME_GAP = "pref_check_alarm_time_gap";
+
     public static final String PREF_RINGTONE_DEFAULT = "";
     public static final int PREF_VOLUME_DEFAULT = 8;
     public static final boolean PREF_VOLUME_INCREASING_DEFAULT = true;
@@ -87,6 +97,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     public static final String PREF_ACTION_DEFAULT = PREF_ACTION_NOTHING;
     public static final boolean PREF_ASK_TO_CHANGE_OTHER_WEEKDAYS_WIT_THE_SAME_ALARM_TIME_DEFAULT = true;
     public static final int PREF_NAP_TIME_DEFAULT = 30;
+    public static final boolean PREF_CHECK_ALARM_TIME_DEFAULT = true;
+    public static final String PREF_CHECK_ALARM_TIME_AT_DEFAULT = "22:00";
+    public static final int PREF_CHECK_ALARM_TIME_GAP_DEFAULT = 60;
 
     public static final int PREF_VOLUME_MAX = 10;
 
@@ -107,7 +120,40 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         bindPreferenceSummaryToValue(findPreference(PREF_ACTION_ON_FLIP));
         bindPreferenceSummaryToValue(findPreference(PREF_ACTION_ON_SHAKE));
         bindPreferenceSummaryToValue(findPreference(PREF_ACTION_ON_PROXIMITY));
+        bindPreferenceSummaryToValue(findPreference(PREF_CHECK_ALARM_TIME_AT));
+        bindPreferenceSummaryToValue(findPreference(PREF_CHECK_ALARM_TIME_GAP));
         bindPreferenceSummaryToValue(findPreference(PREF_NAP_TIME));
+
+        final Context context = this;
+
+        Preference prefCheckAlarmTime = (Preference) findPreference(PREF_CHECK_ALARM_TIME);
+        prefCheckAlarmTime.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                boolean boolValue = (boolean) newValue;
+                CheckAlarmTime checkAlarmTime = CheckAlarmTime.getInstance(context);
+                if (boolValue) {
+                    Log.i(TAG, "Starting CheckAlarmTimeService");
+                    checkAlarmTime.registerCheckAlarmTime();
+                } else {
+                    Log.i(TAG, "Stopping CheckAlarmTimeService");
+                    checkAlarmTime.unregisterCheckAlarmTime();
+                }
+                return true;
+            }
+        });
+
+        Preference prefCheckAlarmTimeAt = (Preference) findPreference(PREF_CHECK_ALARM_TIME_AT);
+        prefCheckAlarmTimeAt.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                CheckAlarmTime checkAlarmTime = CheckAlarmTime.getInstance(context);
+                checkAlarmTime.unregisterCheckAlarmTime();
+                checkAlarmTime.registerCheckAlarmTime();
+                return true;
+            }
+        });
+
     }
 
     /**
@@ -197,8 +243,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 preference.setSummary(summaryText);
             } else if (key.equals(PREF_NEAR_FUTURE_TIME)) {
                 int intValue = (int) value;
-                int hours = minutesToHour(intValue);
-                int minutes = minutesToMinute(intValue);
+                int hours = RelativeTimePreference.valueToHour(intValue);
+                int minutes = RelativeTimePreference.valueToMinute(intValue);
 
                 Context context = preference.getContext();
                 Resources res = context.getResources();
@@ -213,10 +259,30 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 CharSequence summaryText = res.getTextArray(R.array.actionArray)[intValue];
 
                 preference.setSummary(summaryText);
+            } else if (key.equals(PREF_CHECK_ALARM_TIME_AT)) {
+                int hours = TimePreference.getHour(stringValue);
+                int minutes = TimePreference.getMinute(stringValue);
+
+                Context context = preference.getContext();
+                Resources res = context.getResources();
+                String timeText = Localization.timeToString(hours, minutes, context);
+                String summaryText = res.getString(R.string.pref_summary_check_alarm_time_at, timeText);
+
+                preference.setSummary(summaryText);
+            } else if (key.equals(PREF_CHECK_ALARM_TIME_GAP)) {
+                int intValue = (int) value;
+                int hours = RelativeTimePreference.valueToHour(intValue);
+                int minutes = RelativeTimePreference.valueToMinute(intValue);
+
+                Context context = preference.getContext();
+                Resources res = context.getResources();
+                String summaryText = res.getString(R.string.pref_summary_check_alarm_time_gap, hours, minutes);
+
+                preference.setSummary(summaryText);
             } else if (key.equals(PREF_NAP_TIME)) {
                 int intValue = (int) value;
-                int hours = minutesToHour(intValue);
-                int minutes = minutesToMinute(intValue);
+                int hours = RelativeTimePreference.valueToHour(intValue);
+                int minutes = RelativeTimePreference.valueToMinute(intValue);
 
                 Context context = preference.getContext();
                 Resources res = context.getResources();
@@ -230,18 +296,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             return true;
         }
     };
-
-    private static int minutesToHour(int minutes) {
-        return minutes / 60;
-    }
-
-    private static int minutesToMinute(int minutes) {
-        return minutes % 60;
-    }
-
-    private static int hourAndMinuteToMinutes(int hour, int minute) {
-        return 60 * hour + minute;
-    }
 
     public static int getRealVolume(double volumePreference, int maxVolume) {
         return (int) Math.ceil(((volumePreference / SettingsActivity.PREF_VOLUME_MAX) * maxVolume));
@@ -272,6 +326,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             newValue = defaultSharedPreferences.getInt(preference.getKey(), PREF_NEAR_FUTURE_TIME_DEFAULT);
         } else if (key.equals(PREF_ACTION_ON_BUTTON) || key.equals(PREF_ACTION_ON_MOVE) || key.equals(PREF_ACTION_ON_FLIP) || key.equals(PREF_ACTION_ON_SHAKE) || key.equals(PREF_ACTION_ON_PROXIMITY)) {
             newValue = defaultSharedPreferences.getString(preference.getKey(), PREF_ACTION_DEFAULT);
+        } else if (key.equals(PREF_CHECK_ALARM_TIME_AT)) {
+            newValue = defaultSharedPreferences.getString(preference.getKey(), PREF_CHECK_ALARM_TIME_AT_DEFAULT);
+        } else if (key.equals(PREF_CHECK_ALARM_TIME_GAP)) {
+            newValue = defaultSharedPreferences.getInt(preference.getKey(), PREF_CHECK_ALARM_TIME_GAP_DEFAULT);
         } else if (key.equals(PREF_NAP_TIME)) {
             newValue = defaultSharedPreferences.getInt(preference.getKey(), PREF_NAP_TIME_DEFAULT);
         } else {

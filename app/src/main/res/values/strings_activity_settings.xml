@@ -29,6 +29,18 @@
     <string name="pref_title_action_on_shake">On device shake</string>
     <string name="pref_title_action_on_proximity">On proximity</string>
 
+    <string name="pref_category_check_alarm_time">@string/pref_title_check_alarm_time</string>
+
+    <string name="pref_title_check_alarm_time">Check alarm time in the evening of the previous day</string>
+    <string name="pref_summaryoff_check_alarm_time">Don\'t check alarm time</string>
+    <string name="pref_summaryon_check_alarm_time">Check alarm time</string>
+
+    <string name="pref_title_check_alarm_time_at">Check at</string>
+    <string name="pref_summary_check_alarm_time_at"><xliff:g id="time" example="22:00">%1$s</xliff:g></string>
+
+    <string name="pref_title_check_alarm_time_gap">Alarm must ring at least … before the first appointment</string>
+    <string name="pref_summary_check_alarm_time_gap">@string/pref_summary_near_future_time</string>
+
     <string name="pref_other">Other</string>
 
     <string name="pref_title_advanced_settings">Advanced settings</string>

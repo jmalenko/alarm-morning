@@ -89,6 +89,33 @@
     </PreferenceCategory>
 
     <PreferenceCategory
+        android:key="pref_category_check_alarm_time"
+        android:title="@string/pref_category_check_alarm_time">
+
+        <CheckBoxPreference
+            android:key="pref_check_alarm_time"
+            android:title="@string/pref_title_check_alarm_time"
+            android:defaultValue="true"
+            android:summaryOff="@string/pref_summaryoff_check_alarm_time"
+            android:summaryOn="@string/pref_summaryon_check_alarm_time"/>
+
+        <cz.jaro.alarmmorning.graphics.TimePreference
+            android:key="pref_check_alarm_time_at"
+            android:title="@string/pref_title_check_alarm_time_at"
+            android:dependency="pref_check_alarm_time"
+            android:defaultValue="22:00"
+            android:summary="@string/pref_summary_check_alarm_time_at"/>
+
+        <cz.jaro.alarmmorning.graphics.RelativeTimePreference
+            android:key="pref_check_alarm_time_gap"
+            android:title="@string/pref_title_check_alarm_time_gap"
+            android:dependency="pref_check_alarm_time"
+            android:defaultValue="60"
+            android:summary="@string/pref_summary_check_alarm_time_gap"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
         android:key="pref_other"
         android:title="@string/pref_other">
 

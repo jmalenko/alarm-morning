@@ -88,7 +88,7 @@ public class GlobalManager {
         this.context = context;
     }
 
-    protected Clock clock() {
+    public Clock clock() {
         return new SystemClock();
     }
 
