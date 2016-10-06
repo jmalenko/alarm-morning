@@ -299,8 +299,20 @@ public class CheckAlarmTime {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         String checkAlarmTimeAtPreference = preferences.getString(SettingsActivity.PREF_CHECK_ALARM_TIME_AT, SettingsActivity.PREF_CHECK_ALARM_TIME_AT_DEFAULT);
 
-        int hours = TimePreference.getHour(checkAlarmTimeAtPreference);
-        int minutes = TimePreference.getMinute(checkAlarmTimeAtPreference);
+        return calcNextOccurence(context, checkAlarmTimeAtPreference);
+    }
+
+    /**
+     * Calculate the date and time of the next event that is occuring daily at {@code time}.
+     *
+     * @param context context
+     * @param time    a string representation of {@link TimePreference} value
+     * @return
+     */
+    @NonNull
+    static public Calendar calcNextOccurence(Context context, String time) {
+        int hours = TimePreference.getHour(time);
+        int minutes = TimePreference.getMinute(time);
 
         GlobalManager globalManager = new GlobalManager(context);
         Clock clock = globalManager.clock();
@@ -312,6 +324,7 @@ public class CheckAlarmTime {
         checkAlarmTimeAt.set(Calendar.SECOND, 0);
         checkAlarmTimeAt.set(Calendar.MILLISECOND, 0);
 
+        // If in the past, then shift to tomorrow
         if (checkAlarmTimeAt.before(now)) {
             checkAlarmTimeAt.add(Calendar.DAY_OF_MONTH, 1);
         }

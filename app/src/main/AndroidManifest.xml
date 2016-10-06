@@ -84,5 +84,7 @@
         </receiver>
         <receiver android:name=".checkalarmtime.CheckAlarmTimeNotificationReceiver">
         </receiver>
+        <receiver android:name=".nighttimebell.NighttimeBellAlarmReceiver">
+        </receiver>
     </application>
 </manifest>

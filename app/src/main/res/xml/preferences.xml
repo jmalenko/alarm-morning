@@ -116,6 +116,33 @@
     </PreferenceCategory>
 
     <PreferenceCategory
+        android:key="pref_category_nighttime"
+        android:title="@string/pref_category_nighttime_bell_title">
+
+        <CheckBoxPreference
+            android:key="pref_nighttime_bell"
+            android:title="@string/pref_title_nighttime_bell"
+            android:defaultValue="true"
+            android:summaryOff="@string/pref_summaryoff_nighttime_bell"
+            android:summaryOn="@string/pref_summaryon_nighttime_bell"/>
+
+        <cz.jaro.alarmmorning.graphics.TimePreference
+            android:key="pref_nighttime_bell_at"
+            android:title="@string/pref_title_nighttime_bell_at"
+            android:dependency="pref_nighttime_bell"
+            android:defaultValue="22:00"
+            android:summary="@string/pref_summary_nighttime_bell_at"/>
+
+        <RingtonePreference
+            android:key="pref_nighttime_bell_ringtone"
+            android:title="@string/pref_title_nighttime_bell_ringtone"
+            android:dependency="pref_nighttime_bell"
+            android:defaultValue="content://settings/system/notification_sound"
+            android:ringtoneType="notification"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
         android:key="pref_category_other"
         android:title="@string/pref_category_other_title">
 

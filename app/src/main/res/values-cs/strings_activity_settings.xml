@@ -45,6 +45,18 @@
     <string name="pref_summary_check_alarm_time_gap">@string/pref_summary_near_future_time</string>
 
 
+    <string name="pref_category_nighttime_bell_title">@string/pref_title_nighttime_bell</string>
+
+    <string name="pref_title_nighttime_bell">Večerka</string>
+    <string name="pref_summaryoff_nighttime_bell">Zahrát zvuk</string>
+    <string name="pref_summaryon_nighttime_bell">Nezahrávat zvuk</string>
+
+    <string name="pref_title_nighttime_bell_at">Zahrát v</string>
+    <string name="pref_summary_nighttime_bell_at">@string/pref_summary_check_alarm_time_at</string>
+
+    <string name="pref_title_nighttime_bell_ringtone">Zvuk večerky</string>
+
+
     <string name="pref_category_other_title">Ostatní</string>
 
     <string name="pref_title_advanced_settings">Pokročilá nastavení</string>

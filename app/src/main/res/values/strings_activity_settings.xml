@@ -45,6 +45,18 @@
     <string name="pref_summary_check_alarm_time_gap">@string/pref_summary_near_future_time</string>
 
 
+    <string name="pref_category_nighttime_bell_title">@string/pref_title_nighttime_bell</string>
+
+    <string name="pref_title_nighttime_bell">Nighttime bell (taps bugle call)</string>
+    <string name="pref_summaryoff_nighttime_bell">Don\'t play</string>
+    <string name="pref_summaryon_nighttime_bell">Play</string>
+
+    <string name="pref_title_nighttime_bell_at">Play at</string>
+    <string name="pref_summary_nighttime_bell_at">@string/pref_summary_check_alarm_time_at</string>
+
+    <string name="pref_title_nighttime_bell_ringtone">Nighttime bell sound</string>
+
+
     <string name="pref_category_other_title">Other</string>
 
     <string name="pref_title_advanced_settings">Advanced settings</string>

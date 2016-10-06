@@ -87,6 +87,9 @@
     <string name="notification_check_text_set_at">Nastavit na <xliff:g id="time" example="07:00">%1$s</xliff:g></string>
     <string name="notification_check_text_set_dialog">Nastavit…</string>
 
+    <!-- Nighttime bell -->
+    <string name="nighttime_bell_toast">Dobrou noc</string>
+
     <!-- Common -->
     <string name="alarm_unset">Vypnutý</string>
 

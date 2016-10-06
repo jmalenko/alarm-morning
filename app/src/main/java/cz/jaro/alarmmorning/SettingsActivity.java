@@ -25,6 +25,7 @@ import cz.jaro.alarmmorning.checkalarmtime.CheckAlarmTime;
 import cz.jaro.alarmmorning.graphics.AppCompatPreferenceActivity;
 import cz.jaro.alarmmorning.graphics.RelativeTimePreference;
 import cz.jaro.alarmmorning.graphics.TimePreference;
+import cz.jaro.alarmmorning.nighttimebell.NighttimeBell;
 
 public class SettingsActivity extends AppCompatPreferenceActivity {
 
@@ -88,6 +89,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     public static final String PREF_CHECK_ALARM_TIME_AT = "pref_check_alarm_time_at";
     public static final String PREF_CHECK_ALARM_TIME_GAP = "pref_check_alarm_time_gap";
 
+    public static final String PREF_NIGHTTIME_BELL = "pref_nighttime_bell";
+    public static final String PREF_NIGHTTIME_BELL_AT = "pref_nighttime_bell_at";
+    public static final String PREF_NIGHTTIME_BELL_RINGTONE = "pref_nighttime_bell_ringtone";
+
     public static final String PREF_RINGTONE_DEFAULT = "";
     public static final int PREF_VOLUME_DEFAULT = 8;
     public static final boolean PREF_VOLUME_INCREASING_DEFAULT = true;
@@ -100,6 +105,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     public static final boolean PREF_CHECK_ALARM_TIME_DEFAULT = true;
     public static final String PREF_CHECK_ALARM_TIME_AT_DEFAULT = "22:00";
     public static final int PREF_CHECK_ALARM_TIME_GAP_DEFAULT = 60;
+
+    public static final boolean PREF_NIGHTTIME_BELL_DEFAULT = true;
+    public static final String PREF_NIGHTTIME_BELL_AT_DEFAULT = "22:00";
+    public static final String PREF_NIGHTTIME_BELL_RINGTONE_DEFAULT = "";
 
     public static final int PREF_VOLUME_MAX = 10;
 
@@ -122,9 +131,13 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         bindPreferenceSummaryToValue(findPreference(PREF_ACTION_ON_PROXIMITY));
         bindPreferenceSummaryToValue(findPreference(PREF_CHECK_ALARM_TIME_AT));
         bindPreferenceSummaryToValue(findPreference(PREF_CHECK_ALARM_TIME_GAP));
+        bindPreferenceSummaryToValue(findPreference(PREF_NIGHTTIME_BELL_AT));
+        bindPreferenceSummaryToValue(findPreference(PREF_NIGHTTIME_BELL_RINGTONE));
         bindPreferenceSummaryToValue(findPreference(PREF_NAP_TIME));
 
         final Context context = this;
+
+        // Start/stop CheckAlarmTime
 
         Preference prefCheckAlarmTime = (Preference) findPreference(PREF_CHECK_ALARM_TIME);
         prefCheckAlarmTime.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
@@ -133,10 +146,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 boolean boolValue = (boolean) newValue;
                 CheckAlarmTime checkAlarmTime = CheckAlarmTime.getInstance(context);
                 if (boolValue) {
-                    Log.i(TAG, "Starting CheckAlarmTimeService");
+                    Log.i(TAG, "Starting CheckAlarmTime");
                     checkAlarmTime.registerCheckAlarmTime();
                 } else {
-                    Log.i(TAG, "Stopping CheckAlarmTimeService");
+                    Log.i(TAG, "Stopping CheckAlarmTime");
                     checkAlarmTime.unregisterCheckAlarmTime();
                 }
                 return true;
@@ -154,6 +167,35 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             }
         });
 
+        // Start/stop NighttimeBell
+
+        Preference prefNighttimeBell = (Preference) findPreference(PREF_NIGHTTIME_BELL);
+        prefNighttimeBell.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                boolean boolValue = (boolean) newValue;
+                NighttimeBell nighttimeBell = NighttimeBell.getInstance(context);
+                if (boolValue) {
+                    Log.i(TAG, "Starting NighttimeBell");
+                    nighttimeBell.register();
+                } else {
+                    Log.i(TAG, "Stopping NighttimeBell");
+                    nighttimeBell.unregister();
+                }
+                return false;
+            }
+        });
+
+        Preference prefNighttimeBellAt = (Preference) findPreference(PREF_NIGHTTIME_BELL_AT);
+        prefNighttimeBellAt.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            @Override
+            public boolean onPreferenceChange(Preference preference, Object newValue) {
+                NighttimeBell nighttimeBell = NighttimeBell.getInstance(context);
+                nighttimeBell.unregister();
+                nighttimeBell.register();
+                return false;
+            }
+        });
     }
 
     /**
@@ -279,6 +321,16 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 String summaryText = res.getString(R.string.pref_summary_check_alarm_time_gap, hours, minutes);
 
                 preference.setSummary(summaryText);
+            } else if (key.equals(PREF_NIGHTTIME_BELL_AT)) {
+                int hours = TimePreference.getHour(stringValue);
+                int minutes = TimePreference.getMinute(stringValue);
+
+                Context context = preference.getContext();
+                Resources res = context.getResources();
+                String timeText = Localization.timeToString(hours, minutes, context);
+                String summaryText = res.getString(R.string.pref_summary_nighttime_bell_at, timeText);
+
+                preference.setSummary(summaryText);
             } else if (key.equals(PREF_NAP_TIME)) {
                 int intValue = (int) value;
                 int hours = RelativeTimePreference.valueToHour(intValue);
@@ -330,6 +382,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             newValue = defaultSharedPreferences.getString(preference.getKey(), PREF_CHECK_ALARM_TIME_AT_DEFAULT);
         } else if (key.equals(PREF_CHECK_ALARM_TIME_GAP)) {
             newValue = defaultSharedPreferences.getInt(preference.getKey(), PREF_CHECK_ALARM_TIME_GAP_DEFAULT);
+        } else if (key.equals(PREF_NIGHTTIME_BELL_AT)) {
+            newValue = defaultSharedPreferences.getString(preference.getKey(), PREF_NIGHTTIME_BELL_AT_DEFAULT);
+        } else if (key.equals(PREF_NIGHTTIME_BELL_RINGTONE)) {
+            newValue = defaultSharedPreferences.getString(preference.getKey(), PREF_NIGHTTIME_BELL_RINGTONE_DEFAULT);
         } else if (key.equals(PREF_NAP_TIME)) {
             newValue = defaultSharedPreferences.getInt(preference.getKey(), PREF_NAP_TIME_DEFAULT);
         } else {
