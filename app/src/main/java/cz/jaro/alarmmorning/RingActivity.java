@@ -29,6 +29,8 @@ import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Set;
 
+import cz.jaro.alarmmorning.calendar.CalendarEvent;
+import cz.jaro.alarmmorning.calendar.CalendarHelper;
 import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.graphics.SlideButton;
 import cz.jaro.alarmmorning.receivers.AlarmReceiver;
@@ -418,8 +420,8 @@ public class RingActivity extends Activity implements RingInterface {
         if (event != null) {
             // TODO Show location & refactoring of calendar (prevent code duplication RingActivity and CheckAlarmTime) & add all-day
 
-            String timeStr = Localization.timeToString(event.begin.getTime(), getBaseContext());
-            String titleStr = event.title;
+            String timeStr = Localization.timeToString(event.getBegin().getTime(), getBaseContext());
+            String titleStr = event.getTitle();
 
             String nextCalendarText = res.getString(R.string.next_calendar, timeStr, titleStr);
             nextCalendarView.setText(nextCalendarText);

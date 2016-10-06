@@ -15,13 +15,14 @@ import android.util.Log;
 import java.util.Calendar;
 
 import cz.jaro.alarmmorning.AlarmMorningActivity;
-import cz.jaro.alarmmorning.CalendarEvent;
-import cz.jaro.alarmmorning.CalendarHelper;
 import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.Localization;
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.SettingsActivity;
 import cz.jaro.alarmmorning.SystemAlarm;
+import cz.jaro.alarmmorning.calendar.CalendarEvent;
+import cz.jaro.alarmmorning.calendar.CalendarEventFilter;
+import cz.jaro.alarmmorning.calendar.CalendarHelper;
 import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.graphics.TimePreference;
 import cz.jaro.alarmmorning.model.AlarmDataSource;
@@ -205,12 +206,16 @@ public class CheckAlarmTime {
         Log.v(TAG, "checkAlarmTimeGap=" + checkAlarmTimeGap + " minutes");
 
         CalendarHelper calendarHelper = new CalendarHelper(context);
-        CalendarEvent event = calendarHelper.find(tomorrowStart, tomorrowNoon);
+        CalendarEventFilter notAllDay = new CalendarEventFilter() {
+            @Override
+            public boolean match(CalendarEvent event) {
+                return !event.getAllDay();
+            }
+        };
+        CalendarEvent event = calendarHelper.find(tomorrowStart, tomorrowNoon, notAllDay);
 
         if (event != null) {
-            // TODO Omit all-day events
-
-            Calendar targetAlarmTime = (Calendar) event.begin.clone();
+            Calendar targetAlarmTime = (Calendar) event.getBegin().clone();
             targetAlarmTime.add(Calendar.MINUTE, -checkAlarmTimeGap);
             Log.v(TAG, "      targetAlarmTime=" + targetAlarmTime.getTime());
 
@@ -251,12 +256,12 @@ public class CheckAlarmTime {
                 .setContentTitle(contentTitle)
                 .setAutoCancel(true);
 
-        String meetingTimeText = Localization.timeToString(event.begin.get(Calendar.HOUR_OF_DAY), event.begin.get(Calendar.MINUTE), context);
+        String meetingTimeText = Localization.timeToString(event.getBegin().get(Calendar.HOUR_OF_DAY), event.getBegin().get(Calendar.MINUTE), context);
         String contentText;
-        if (event.location != null) {
-            contentText = res.getString(R.string.notification_check_text_with_location, meetingTimeText, event.title, event.location);
+        if (event.getLocation() != null) {
+            contentText = res.getString(R.string.notification_check_text_with_location, meetingTimeText, event.getTitle(), event.getLocation());
         } else {
-            contentText = res.getString(R.string.notification_check_text_without_location, meetingTimeText, event.title);
+            contentText = res.getString(R.string.notification_check_text_without_location, meetingTimeText, event.getTitle());
         }
         mBuilder.setContentText(contentText);
 

@@ -1,4 +1,4 @@
-package cz.jaro.alarmmorning;
+package cz.jaro.alarmmorning.calendar;
 
 import android.Manifest;
 import android.content.ContentResolver;
@@ -12,6 +12,8 @@ import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import java.util.Calendar;
+
+import cz.jaro.alarmmorning.Localization;
 
 /**
  * This class provides unifed access to calendar.
@@ -43,13 +45,25 @@ public class CalendarHelper {
     }
 
     /**
-     * Find the first event that starts after {@code from} and before {@code to}.
+     * Find the first event that starts between {@code from} and {@code to}.
      *
      * @param from Beginning of the interval in which the returned event starts
      * @param to   End of the interval in which the returned event starts
      * @return calendar event
      */
     public CalendarEvent find(Calendar from, Calendar to) {
+        return find(from, to, null);
+    }
+
+    /**
+     * Find the first event that<br/> 1. starts between {@code from} and {@code to}, and<br/> 2. matches {@code match}.
+     *
+     * @param from   Beginning of the interval in which the returned event starts
+     * @param to     End of the interval in which the returned event starts
+     * @param filter Filter
+     * @return calendar event
+     */
+    public CalendarEvent find(Calendar from, Calendar to, CalendarEventFilter filter) {
         Log.d(TAG, "Find the first calendar that starts between " + from.getTime() + " and " + to.getTime());
 
         int permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission.READ_CALENDAR);
@@ -67,14 +81,16 @@ public class CalendarHelper {
 
             if (cur != null) {
                 while (cur.moveToNext()) {
-                    CalendarEvent event = CalendarEvent.load(cur);
+                    CalendarEvent event = load(cur);
 
                     String timeStr = Localization.timeToString(event.begin.getTime(), context);
                     Log.v(TAG, "   " + timeStr + " " + event.title + "    " + event.location);
 
                     if (!event.begin.before(from)) { // event starts on or after startOfTomorrow
-                        Log.d(TAG, "Found");
-                        return event;
+                        if (filter == null || filter.match(event)) { // match filter
+                            Log.d(TAG, "Found");
+                            return event;
+                        }
                     }
                 }
                 Log.d(TAG, "Calendar query returned no events that match criteria");
@@ -86,4 +102,29 @@ public class CalendarHelper {
         }
         return null;
     }
+
+    CalendarEvent load(Cursor cur) {
+        CalendarEvent event = new CalendarEvent();
+
+        long eventID = cur.getLong(PROJECTION_ID_INDEX);
+        event.setEventID(eventID);
+
+        long beginMS = cur.getLong(PROJECTION_BEGIN_INDEX);
+        Calendar begin = Calendar.getInstance();
+        begin.setTimeInMillis(beginMS);
+        event.setBegin(begin);
+
+        String title = cur.getString(PROJECTION_TITLE_INDEX);
+        event.setTitle(title);
+
+        String location = cur.getString(PROJECTION_LOCATION_INDEX);
+        event.setLocation(location);
+
+        int allDayInt = cur.getInt(PROJECTION_ALL_DAY_INDEX);
+        boolean allDayBool = allDayInt == 1;
+        event.setAllDay(allDayBool);
+
+        return event;
+    }
+
 }
