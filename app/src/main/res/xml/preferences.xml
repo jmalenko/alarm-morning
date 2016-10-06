@@ -2,8 +2,8 @@
                   xmlns:custom="http://schemas.android.com/apk/res-auto">
 
     <PreferenceCategory
-        android:key="pref_ring_appearance"
-        android:title="@string/pref_title_ring_appearance">
+        android:key="pref_category_ring_appearance"
+        android:title="@string/pref_category_ring_appearance_title">
 
         <RingtonePreference
             android:key="pref_ringtone"
@@ -48,8 +48,8 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:key="pref_ring_actions"
-        android:title="@string/pref_title_ring_actions">
+        android:key="pref_category_ring_actions"
+        android:title="@string/pref_category_ring_actions_title">
 
         <ListPreference
             android:key="pref_action_on_button"
@@ -90,7 +90,7 @@
 
     <PreferenceCategory
         android:key="pref_category_check_alarm_time"
-        android:title="@string/pref_category_check_alarm_time">
+        android:title="@string/pref_category_check_alarm_time_title">
 
         <CheckBoxPreference
             android:key="pref_check_alarm_time"
@@ -116,8 +116,8 @@
     </PreferenceCategory>
 
     <PreferenceCategory
-        android:key="pref_other"
-        android:title="@string/pref_other">
+        android:key="pref_category_other"
+        android:title="@string/pref_category_other_title">
 
         <PreferenceScreen
             android:key="@string/pref_title_advanced_settings"

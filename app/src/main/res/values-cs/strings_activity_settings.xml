@@ -1,5 +1,6 @@
 <resources xmlns:xliff="http://schemas.android.com/tools">
-    <string name="pref_title_ring_appearance">Vzhled a chování při zvonění</string>
+
+    <string name="pref_category_ring_appearance_title">Vzhled a chování při zvonění</string>
 
     <string name="pref_title_ringtone">Zvuk budíku</string>
     <string name="pref_ringtone_silent">Žádný</string>
@@ -21,7 +22,8 @@
     <string name="pref_title_near_future_time">Oznámení před budíkem</string>
     <string name="pref_summary_near_future_time"><xliff:g id="hours" example="2">%1$d</xliff:g> hodin a <xliff:g id="minutes" example="3">%2$d</xliff:g> minut</string>
 
-    <string name="pref_title_ring_actions">Akce během zvonění</string>
+
+    <string name="pref_category_ring_actions_title">Akce během zvonění</string>
 
     <string name="pref_title_action_on_button">Při stisku klávesy</string>
     <string name="pref_title_action_on_move">Při pohybu zařízení</string>
@@ -29,7 +31,8 @@
     <string name="pref_title_action_on_shake">Při zatřesení</string>
     <string name="pref_title_action_on_proximity">Při přiblížení</string>
 
-    <string name="pref_category_check_alarm_time">@string/pref_title_check_alarm_time</string>
+
+    <string name="pref_category_check_alarm_time_title">@string/pref_title_check_alarm_time</string>
 
     <string name="pref_title_check_alarm_time">Kontrolovat čas budíku každý večer</string>
     <string name="pref_summaryoff_check_alarm_time">Nekontrolovat</string>
@@ -41,7 +44,8 @@
     <string name="pref_title_check_alarm_time_gap">Budík musí být aspoň … před první schůzkou</string>
     <string name="pref_summary_check_alarm_time_gap">@string/pref_summary_near_future_time</string>
 
-    <string name="pref_other">Ostatní</string>
+
+    <string name="pref_category_other_title">Ostatní</string>
 
     <string name="pref_title_advanced_settings">Pokročilá nastavení</string>
 
