@@ -1,4 +1,4 @@
-package cz.jaro.alarmmorning.cz.jaro.alarmmorning.checkalarmtime;
+package cz.jaro.alarmmorning.checkalarmtime;
 
 import android.app.TimePickerDialog;
 import android.content.Context;
@@ -18,7 +18,7 @@ import cz.jaro.alarmmorning.model.AlarmDataSource;
 import cz.jaro.alarmmorning.model.Day;
 
 import static cz.jaro.alarmmorning.RingActivity.ALARM_TIME;
-import static cz.jaro.alarmmorning.cz.jaro.alarmmorning.checkalarmtime.CheckAlarmTimeNotificationReceiver.EXTRA_NEW_ALARM_TIME;
+import static cz.jaro.alarmmorning.checkalarmtime.CheckAlarmTimeNotificationReceiver.EXTRA_NEW_ALARM_TIME;
 import static cz.jaro.alarmmorning.model.Day.VALUE_UNSET;
 
 /**

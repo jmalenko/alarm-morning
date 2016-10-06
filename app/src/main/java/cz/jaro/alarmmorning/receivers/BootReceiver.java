@@ -7,7 +7,7 @@ import android.util.Log;
 
 import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.WakeLocker;
-import cz.jaro.alarmmorning.cz.jaro.alarmmorning.checkalarmtime.CheckAlarmTime;
+import cz.jaro.alarmmorning.checkalarmtime.CheckAlarmTime;
 
 /**
  * This receiver is called by the operating system on the system start (boot).

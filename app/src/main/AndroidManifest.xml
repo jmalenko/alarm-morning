@@ -43,7 +43,7 @@
             android:label="@string/title_activity_wizard">
         </activity>
         <activity
-            android:name=".cz.jaro.alarmmorning.checkalarmtime.SetTimeActivity"
+            android:name=".checkalarmtime.SetTimeActivity"
             android:theme="@style/TransparentTheme">
         </activity>
 
@@ -80,9 +80,9 @@
         </receiver>
         <receiver android:name=".receivers.NotificationReceiver">
         </receiver>
-        <receiver android:name=".cz.jaro.alarmmorning.checkalarmtime.CheckAlarmTimeAlarmReceiver">
+        <receiver android:name=".checkalarmtime.CheckAlarmTimeAlarmReceiver">
         </receiver>
-        <receiver android:name=".cz.jaro.alarmmorning.checkalarmtime.CheckAlarmTimeNotificationReceiver">
+        <receiver android:name=".checkalarmtime.CheckAlarmTimeNotificationReceiver">
         </receiver>
     </application>
 </manifest>

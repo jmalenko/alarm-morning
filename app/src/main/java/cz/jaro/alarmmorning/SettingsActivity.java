@@ -21,7 +21,7 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-import cz.jaro.alarmmorning.cz.jaro.alarmmorning.checkalarmtime.CheckAlarmTime;
+import cz.jaro.alarmmorning.checkalarmtime.CheckAlarmTime;
 import cz.jaro.alarmmorning.graphics.AppCompatPreferenceActivity;
 import cz.jaro.alarmmorning.graphics.RelativeTimePreference;
 import cz.jaro.alarmmorning.graphics.TimePreference;

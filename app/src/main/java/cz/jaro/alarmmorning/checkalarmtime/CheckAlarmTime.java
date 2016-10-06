@@ -1,4 +1,4 @@
-package cz.jaro.alarmmorning.cz.jaro.alarmmorning.checkalarmtime;
+package cz.jaro.alarmmorning.checkalarmtime;
 
 import android.app.AlarmManager;
 import android.app.NotificationManager;
