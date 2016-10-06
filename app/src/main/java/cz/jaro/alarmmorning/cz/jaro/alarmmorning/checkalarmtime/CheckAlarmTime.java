@@ -1,40 +1,31 @@
 package cz.jaro.alarmmorning.cz.jaro.alarmmorning.checkalarmtime;
 
-import android.Manifest;
 import android.app.AlarmManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.content.res.Resources;
-import android.database.Cursor;
-import android.net.Uri;
 import android.preference.PreferenceManager;
-import android.provider.CalendarContract;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import java.util.Calendar;
 
 import cz.jaro.alarmmorning.AlarmMorningActivity;
+import cz.jaro.alarmmorning.CalendarEvent;
+import cz.jaro.alarmmorning.CalendarHelper;
 import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.Localization;
 import cz.jaro.alarmmorning.R;
-import cz.jaro.alarmmorning.RingActivity;
 import cz.jaro.alarmmorning.SettingsActivity;
 import cz.jaro.alarmmorning.SystemAlarm;
 import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.graphics.TimePreference;
 import cz.jaro.alarmmorning.model.AlarmDataSource;
 import cz.jaro.alarmmorning.model.Day;
-
-import static cz.jaro.alarmmorning.RingActivity.INSTANCE_PROJECTION;
 
 /**
  * This class implements the "check alarm time" feature. Specifically, the following check is (typically) run in the evening: compare the alarm time and time of
@@ -181,101 +172,60 @@ public class CheckAlarmTime {
         // Register for tomorrow
         registerCheckAlarmTime();
 
-        int permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission.READ_CALENDAR);
-        if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-            GlobalManager globalManager = new GlobalManager(context);
-            Clock clock = globalManager.clock();
+        // Find first calendar event
+        GlobalManager globalManager = new GlobalManager(context);
+        Clock clock = globalManager.clock();
 
-            Calendar startOfTomorrow = clock.now();
-            startOfTomorrow.add(Calendar.DATE, 1);
-            startOfTomorrow.set(Calendar.HOUR_OF_DAY, 0);
-            startOfTomorrow.set(Calendar.MINUTE, 0);
-            startOfTomorrow.set(Calendar.SECOND, 0);
-            startOfTomorrow.set(Calendar.MILLISECOND, 0);
-            Log.v(TAG, "startOfTomorrow=" + startOfTomorrow.getTime());
+        Calendar tomorrowStart = clock.now();
+        tomorrowStart.add(Calendar.DATE, 1);
+        tomorrowStart.set(Calendar.HOUR_OF_DAY, 0);
+        tomorrowStart.set(Calendar.MINUTE, 0);
+        tomorrowStart.set(Calendar.SECOND, 0);
+        tomorrowStart.set(Calendar.MILLISECOND, 0);
+        Log.v(TAG, "tomorrowStart=" + tomorrowStart.getTime());
 
-            Calendar noonOfTomorrow = (Calendar) startOfTomorrow.clone();
-            noonOfTomorrow.add(Calendar.HOUR_OF_DAY, 12);
-            noonOfTomorrow.add(Calendar.MILLISECOND, -1);
-            Log.v(TAG, "noonOfTomorrow=" + noonOfTomorrow.getTime());
+        Calendar tomorrowNoon = (Calendar) tomorrowStart.clone();
+        tomorrowNoon.add(Calendar.HOUR_OF_DAY, 12);
+        tomorrowNoon.add(Calendar.MILLISECOND, -1);
+        Log.v(TAG, "tomorrowNoon=" + tomorrowNoon.getTime());
 
-            // Load tomorrow
-            AlarmDataSource dataSource = new AlarmDataSource(context);
-            dataSource.open();
+        // Load tomorrow's alarm time
+        AlarmDataSource dataSource = new AlarmDataSource(context);
+        dataSource.open();
 
-            Day day = dataSource.loadDayDeep(startOfTomorrow);
-            Calendar alarmTime = day.getDateTime();
-            Log.v(TAG, "alarmTime=" + alarmTime.getTime());
+        Day day = dataSource.loadDayDeep(tomorrowStart);
+        Calendar alarmTime = day.getDateTime();
+        Log.v(TAG, "alarmTime=" + alarmTime.getTime());
 
-            dataSource.close();
+        dataSource.close();
 
-            // Load gap
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-            int checkAlarmTimeGapPreference = preferences.getInt(SettingsActivity.PREF_CHECK_ALARM_TIME_GAP, SettingsActivity.PREF_CHECK_ALARM_TIME_GAP_DEFAULT);
+        // Load gap
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        int checkAlarmTimeGap = preferences.getInt(SettingsActivity.PREF_CHECK_ALARM_TIME_GAP, SettingsActivity.PREF_CHECK_ALARM_TIME_GAP_DEFAULT);
+        Log.v(TAG, "checkAlarmTimeGap=" + checkAlarmTimeGap + " minutes");
 
-            // Construct the query with the desired date range.
-            Uri.Builder builder = CalendarContract.Instances.CONTENT_URI.buildUpon();
-            ContentUris.appendId(builder, startOfTomorrow.getTimeInMillis()); // Event happens in this interval
-            ContentUris.appendId(builder, noonOfTomorrow.getTimeInMillis());
+        CalendarHelper calendarHelper = new CalendarHelper(context);
+        CalendarEvent event = calendarHelper.find(tomorrowStart, tomorrowNoon);
 
-            String sortOrder = CalendarContract.Instances.BEGIN + ", " + CalendarContract.Instances.END;
+        if (event != null) {
+            // TODO Omit all-day events
 
-            // Submit the query
-            ContentResolver cr = context.getContentResolver();
-            Cursor cur = cr.query(builder.build(), INSTANCE_PROJECTION, null, null, sortOrder);
+            Calendar targetAlarmTime = (Calendar) event.begin.clone();
+            targetAlarmTime.add(Calendar.MINUTE, -checkAlarmTimeGap);
+            Log.v(TAG, "      targetAlarmTime=" + targetAlarmTime.getTime());
 
-            if (cur != null) {
-                int count = 0;
-                while (cur.moveToNext()) {
-                    long eventID = 0;
-                    long beginVal = 0;
-                    String title = null;
-                    String location = null;
-
-                    // Get the field values
-                    eventID = cur.getLong(RingActivity.PROJECTION_ID_INDEX);
-                    beginVal = cur.getLong(RingActivity.PROJECTION_BEGIN_INDEX);
-                    title = cur.getString(RingActivity.PROJECTION_TITLE_INDEX);
-                    location = cur.getString(RingActivity.PROJECTION_LOCATION_INDEX);
-
-                    Calendar beginTime = Calendar.getInstance();
-                    beginTime.setTimeInMillis(beginVal);
-
-                    String timeStr = Localization.timeToString(beginTime.getTime(), context);
-                    Log.v(TAG, "   " + timeStr + " " + title + "    " + location);
-
-                    if (!beginTime.before(startOfTomorrow)) { // event starts on or after startOfTomorrow
-                        // TODO Omit all-day events
-
-                        Calendar targetAlarmTime = (Calendar) beginTime.clone();
-                        targetAlarmTime.add(Calendar.MINUTE, -checkAlarmTimeGapPreference);
-                        Log.v(TAG, "      targetAlarmTime=" + targetAlarmTime.getTime());
-
-                        // TODO Currently, the alarm time must be on the same date. Support alarm on the previous day.
-                        if (targetAlarmTime.before(startOfTomorrow)) {
-                            targetAlarmTime = startOfTomorrow;
-                            Log.v(TAG, "      adjusted t argetAlarmTime to " + targetAlarmTime.getTime());
-                        }
-
-                        if (!day.isEnabled() || targetAlarmTime.before(alarmTime)) {
-                            count++;
-                            if (count == 1) {
-                                Log.d(TAG, "Appointment that needs and earlier alarm time found");
-
-                                showNotification(day, targetAlarmTime, checkAlarmTimeGapPreference, beginTime, title, location);
-                                registerNotificationDismiss(targetAlarmTime);
-                            }
-                        }
-                    }
-                }
-                if (count == 0) {
-                    Log.d(TAG, "Calendar query returned no events that match criteria");
-                }
-            } else {
-                Log.d(TAG, "Calendar query returned null");
+            // TODO Currently, the alarm time must be on the same date. Support alarm on the previous day.
+            if (targetAlarmTime.before(tomorrowStart)) {
+                targetAlarmTime = tomorrowStart;
+                Log.v(TAG, "      adjusted targetAlarmTime to " + targetAlarmTime.getTime());
             }
-        } else {
-            Log.d(TAG, "Permission to read calendar not granted");
+
+            if (!day.isEnabled() || targetAlarmTime.before(alarmTime)) {
+                Log.d(TAG, "Appointment that needs and earlier alarm time found");
+
+                showNotification(day, targetAlarmTime, checkAlarmTimeGap, event);
+                registerNotificationDismiss(targetAlarmTime);
+            }
         }
     }
 
@@ -284,7 +234,7 @@ public class CheckAlarmTime {
         hideNotification();
     }
 
-    private void showNotification(Day day, Calendar targetAlarmTime, int checkAlarmTimeGapPreference, Calendar beginTime, String title, String location) {
+    private void showNotification(Day day, Calendar targetAlarmTime, int checkAlarmTimeGapPreference, CalendarEvent event) {
         Log.d(TAG, "showNotification()");
         Resources res = context.getResources();
 
@@ -301,12 +251,12 @@ public class CheckAlarmTime {
                 .setContentTitle(contentTitle)
                 .setAutoCancel(true);
 
-        String meetingTimeText = Localization.timeToString(beginTime.get(Calendar.HOUR_OF_DAY), beginTime.get(Calendar.MINUTE), context);
+        String meetingTimeText = Localization.timeToString(event.begin.get(Calendar.HOUR_OF_DAY), event.begin.get(Calendar.MINUTE), context);
         String contentText;
-        if (location != null) {
-            contentText = res.getString(R.string.notification_check_text_with_location, meetingTimeText, title, location);
+        if (event.location != null) {
+            contentText = res.getString(R.string.notification_check_text_with_location, meetingTimeText, event.title, event.location);
         } else {
-            contentText = res.getString(R.string.notification_check_text_without_location, meetingTimeText, title);
+            contentText = res.getString(R.string.notification_check_text_without_location, meetingTimeText, event.title);
         }
         mBuilder.setContentText(contentText);
 
