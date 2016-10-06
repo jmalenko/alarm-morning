@@ -217,8 +217,7 @@ public class Day {
 
     /**
      * Checks if this is the next alarm. Specifically: there is no other alarm between now and
-     * alarm
-     * time.
+     * alarm time.
      *
      * @param context context
      * @param clock   clock
@@ -248,16 +247,15 @@ public class Day {
     /**
      * Check if the alarm is changed on this date.
      * <p/>
-     * Note that only the (enabled/disabled) state and time (hour and minute) is compared between
-     * with default.
+     * Note that only the (enabled/disabled) state and time (hour and minute) is compared with default.
      * <p/>
-     * Technically, if 1. the default is enabled
-     * and 2. the day state uses the time from default (the state is {@link
-     * Day#STATE_DEFAULT}) and 3. the day is changed to disabled and 4.
-     * back to enabled (to {@link Day#STATE_ENABLED}), then this method returns
-     * true. On technical it could be argued that the alarm is changed
-     * since the state is {@link Day#STATE_ENABLED} and not {@link
-     * Day#STATE_DEFAULT}.
+     * Technically, if<br>
+     * 1. the default is enabled and
+     * 2. the day state uses the time from default (the state is {@link Day#STATE_DEFAULT}) and<br>
+     * 3. the day is changed to disabled and<br>
+     * 4. back to enabled (to {@link Day#STATE_ENABLED}),<br>
+     * then this method returns true. On technical level, it could be argued that the alarm is changed since the state is {@link Day#STATE_ENABLED} and not
+     * {@link Day#STATE_DEFAULT}.
      *
      * @return false if the alarm time on this date is changed (compared to default)
      */
