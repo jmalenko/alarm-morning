@@ -5,3 +5,4 @@
 # directive in build.gradle.
 
 -printmapping build/outputs/proguard/release/mapping.txt
+-keepattributes EnclosingMethod
