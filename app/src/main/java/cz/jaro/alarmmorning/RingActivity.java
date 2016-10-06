@@ -418,12 +418,12 @@ public class RingActivity extends Activity implements RingInterface {
         CalendarEvent event = calendarHelper.find(now, endOfToday);
 
         if (event != null) {
-            // TODO Show location & refactoring of calendar (prevent code duplication RingActivity and CheckAlarmTime) & add all-day
-
             String timeStr = Localization.timeToString(event.getBegin().getTime(), getBaseContext());
-            String titleStr = event.getTitle();
 
-            String nextCalendarText = res.getString(R.string.next_calendar, timeStr, titleStr);
+            String nextCalendarText = event.getLocation() != null ?
+                    res.getString(R.string.next_calendar_with_location, timeStr, event.getTitle(), event.getLocation()) :
+                    res.getString(R.string.next_calendar_without_location, timeStr, event.getTitle());
+
             nextCalendarView.setText(nextCalendarText);
             nextCalendarView.setVisibility(View.VISIBLE);
         } else {

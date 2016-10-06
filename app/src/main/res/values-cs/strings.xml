@@ -34,7 +34,8 @@
     <string name="alarm_was_set_to_today">Budík byl nastaven na <xliff:g id="time" example="07:00">%1$s</xliff:g></string>
     <string name="alarm_was_set_to_nontoday">Budík byl nastaven na <xliff:g id="time" example="07:00">%1$s</xliff:g> dne <xliff:g id="dateFull" example="Tuesday, April 12, 1952">%2$s</xliff:g></string>
     <string name="muted">Ztišený na <xliff:g id="seconds" example="5">%1$d</xliff:g> sekund</string>
-    <string name="next_calendar">Příští schůzka: <xliff:g id="time" example="07:00">%1$s</xliff:g> <xliff:g id="title" example="Dentist">%2$s</xliff:g></string>
+    <string name="next_calendar_with_location">Příští schůzka: <xliff:g id="time" example="07:00">%1$s</xliff:g> <xliff:g id="title" example="Dentist">%2$s</xliff:g> (<xliff:g id="location" example="Main St">%3$s</xliff:g>)</string>
+    <string name="next_calendar_without_location">Příští schůzka: <xliff:g id="time" example="07:00">%1$s</xliff:g> <xliff:g id="title" example="Dentist">%2$s</xliff:g></string>
 
     <!-- Wizard activity -->
     <string name="title_activity_wizard">Průvodce nastavením</string>
