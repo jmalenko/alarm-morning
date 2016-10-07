@@ -17,6 +17,7 @@ import java.util.Calendar;
 
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.SettingsActivity;
+import cz.jaro.alarmmorning.SystemAlarm;
 import cz.jaro.alarmmorning.checkalarmtime.CheckAlarmTime;
 
 /**
@@ -85,7 +86,7 @@ public class NighttimeBell {
 
         operation = PendingIntent.getBroadcast(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        alarmManager.set(AlarmManager.RTC, playNighttimeBellAt.getTimeInMillis(), operation);
+        SystemAlarm.setSystemAlarm(alarmManager, playNighttimeBellAt, operation);
     }
 
     public void unregister() {

@@ -73,12 +73,24 @@ public class SystemAlarm {
 
         operation = PendingIntent.getBroadcast(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
+        setSystemAlarm(alarmManager, nextAction.time, operation);
+    }
+
+    /**
+     * Register ssytem alarm that works reliably - triggers on a specific time, regardles the Android version, and whether the devicee is asleep (in low-power
+     * idle mode).
+     *
+     * @param alarmManager alarmManager
+     * @param time         time
+     * @param operation    operation
+     */
+    static public void setSystemAlarm(AlarmManager alarmManager, Calendar time, PendingIntent operation) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
-            alarmManager.set(AlarmManager.RTC_WAKEUP, nextAction.time.getTimeInMillis(), operation);
+            alarmManager.set(AlarmManager.RTC_WAKEUP, time.getTimeInMillis(), operation);
         } else if (Build.VERSION_CODES.KITKAT <= Build.VERSION.SDK_INT && Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            alarmManager.setExact(AlarmManager.RTC_WAKEUP, nextAction.time.getTimeInMillis(), operation);
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, time.getTimeInMillis(), operation);
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, nextAction.time.getTimeInMillis(), operation);
+            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, time.getTimeInMillis(), operation);
         }
     }
 

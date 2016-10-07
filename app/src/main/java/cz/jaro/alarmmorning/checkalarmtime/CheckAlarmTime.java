@@ -113,7 +113,7 @@ public class CheckAlarmTime {
 
         operation = PendingIntent.getBroadcast(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        alarmManager.set(AlarmManager.RTC, checkAlarmTimeAt.getTimeInMillis(), operation);
+        SystemAlarm.setSystemAlarm(alarmManager, checkAlarmTimeAt, operation);
     }
 
     public void unregister() {
