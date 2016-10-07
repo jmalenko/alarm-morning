@@ -103,15 +103,13 @@
             android:key="pref_check_alarm_time_at"
             android:title="@string/pref_title_check_alarm_time_at"
             android:dependency="pref_check_alarm_time"
-            android:defaultValue="22:00"
-            android:summary="@string/pref_summary_check_alarm_time_at"/>
+            android:defaultValue="22:00"/>
 
         <cz.jaro.alarmmorning.graphics.RelativeTimePreference
             android:key="pref_check_alarm_time_gap"
             android:title="@string/pref_title_check_alarm_time_gap"
             android:dependency="pref_check_alarm_time"
-            android:defaultValue="60"
-            android:summary="@string/pref_summary_check_alarm_time_gap"/>
+            android:defaultValue="60"/>
 
     </PreferenceCategory>
 
@@ -130,8 +128,7 @@
             android:key="pref_nighttime_bell_at"
             android:title="@string/pref_title_nighttime_bell_at"
             android:dependency="pref_nighttime_bell"
-            android:defaultValue="22:00"
-            android:summary="@string/pref_summary_nighttime_bell_at"/>
+            android:defaultValue="22:00"/>
 
         <RingtonePreference
             android:key="pref_nighttime_bell_ringtone"

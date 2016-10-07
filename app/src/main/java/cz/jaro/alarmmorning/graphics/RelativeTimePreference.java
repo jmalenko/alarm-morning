@@ -49,6 +49,8 @@ public class RelativeTimePreference extends DialogPreference {
 
     @Override
     protected void onBindDialogView(View view) {
+        super.onBindDialogView(view);
+
         mHourPicker = (NumberPicker) view.findViewById(R.id.hour);
         mHourPicker.setMaxValue(mMaxHour);
         mHourPicker.setValue(valueToHour(mSelectedValue));
@@ -57,8 +59,6 @@ public class RelativeTimePreference extends DialogPreference {
         mMinutePicker = (NumberPicker) view.findViewById(R.id.minute);
         mMinutePicker.setMaxValue(59);
         mMinutePicker.setValue(valueToMinute(mSelectedValue));
-
-        super.onBindDialogView(view);
     }
 
     @Override
@@ -68,10 +68,10 @@ public class RelativeTimePreference extends DialogPreference {
         if (positiveResult) {
             final int selectedValue = hourAndMinuteToValue(mHourPicker.getValue(), mMinutePicker.getValue());
 
-            if (this.callChangeListener(selectedValue)) {
+            if (callChangeListener(selectedValue)) {
                 mSelectedValue = selectedValue;
 
-                this.persistInt(mSelectedValue);
+                persistInt(mSelectedValue);
             }
         }
     }

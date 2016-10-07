@@ -12,21 +12,9 @@ import android.widget.TimePicker;
  * The Preference representing time (absolute time in a day).
  */
 public class TimePreference extends DialogPreference {
-    private int lastHour = 0;
-    private int lastMinute = 0;
-    private TimePicker picker = null;
-
-    public static int getHour(String time) {
-        String[] pieces = time.split(":");
-
-        return Integer.parseInt(pieces[0]);
-    }
-
-    public static int getMinute(String time) {
-        String[] pieces = time.split(":");
-
-        return Integer.parseInt(pieces[1]);
-    }
+    private int mHour = 0;
+    private int mMinute = 0;
+    private TimePicker mTimePicker = null;
 
     public TimePreference(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -36,45 +24,8 @@ public class TimePreference extends DialogPreference {
     }
 
     @Override
-    protected View onCreateDialogView() {
-        picker = new TimePicker(getContext());
-        picker.setIs24HourView(DateFormat.is24HourFormat(getContext()));
-
-        return picker;
-    }
-
-    @Override
-    protected void onBindDialogView(View v) {
-        super.onBindDialogView(v);
-
-        picker.setCurrentHour(lastHour);
-        picker.setCurrentMinute(lastMinute);
-    }
-
-    @Override
-    protected void onDialogClosed(boolean positiveResult) {
-        super.onDialogClosed(positiveResult);
-
-        if (positiveResult) {
-            lastHour = picker.getCurrentHour();
-            lastMinute = picker.getCurrentMinute();
-
-            String time = String.valueOf(lastHour) + ":" + String.valueOf(lastMinute);
-
-            if (callChangeListener(time)) {
-                persistString(time);
-            }
-        }
-    }
-
-    @Override
-    protected Object onGetDefaultValue(TypedArray a, int index) {
-        return a.getString(index);
-    }
-
-    @Override
     protected void onSetInitialValue(boolean restoreValue, Object defaultValue) {
-        String time = null;
+        String time;
 
         if (restoreValue) {
             if (defaultValue == null) {
@@ -86,7 +37,57 @@ public class TimePreference extends DialogPreference {
             time = defaultValue.toString();
         }
 
-        lastHour = getHour(time);
-        lastMinute = getMinute(time);
+        mHour = getHour(time);
+        mMinute = getMinute(time);
+    }
+
+    @Override
+    protected Object onGetDefaultValue(TypedArray a, int index) {
+        return a.getString(index);
+    }
+
+    @Override
+    protected View onCreateDialogView() {
+        mTimePicker = new TimePicker(getContext());
+        mTimePicker.setIs24HourView(DateFormat.is24HourFormat(getContext()));
+
+        return mTimePicker;
+    }
+
+    @Override
+    protected void onBindDialogView(View v) {
+        super.onBindDialogView(v);
+
+        mTimePicker.setCurrentHour(mHour);
+        mTimePicker.setCurrentMinute(mMinute);
+    }
+
+    @Override
+    protected void onDialogClosed(boolean positiveResult) {
+        super.onDialogClosed(positiveResult);
+
+        if (positiveResult) {
+            int hour = mTimePicker.getCurrentHour();
+            int minute = mTimePicker.getCurrentMinute();
+
+            String time = String.valueOf(hour) + ":" + String.valueOf(minute);
+
+            if (callChangeListener(time)) {
+                mHour = hour;
+                mMinute = minute;
+
+                persistString(time);
+            }
+        }
+    }
+
+    public static int getHour(String time) {
+        String[] pieces = time.split(":");
+        return Integer.parseInt(pieces[0]);
+    }
+
+    public static int getMinute(String time) {
+        String[] pieces = time.split(":");
+        return Integer.parseInt(pieces[1]);
     }
 }

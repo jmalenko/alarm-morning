@@ -156,17 +156,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             }
         });
 
-        Preference prefCheckAlarmTimeAt = (Preference) findPreference(PREF_CHECK_ALARM_TIME_AT);
-        prefCheckAlarmTimeAt.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object newValue) {
-                CheckAlarmTime checkAlarmTime = CheckAlarmTime.getInstance(context);
-                checkAlarmTime.unregisterCheckAlarmTime();
-                checkAlarmTime.registerCheckAlarmTime();
-                return true;
-            }
-        });
-
         // Start/stop NighttimeBell
 
         Preference prefNighttimeBell = (Preference) findPreference(PREF_NIGHTTIME_BELL);
@@ -182,18 +171,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     Log.i(TAG, "Stopping NighttimeBell");
                     nighttimeBell.unregister();
                 }
-                return false;
-            }
-        });
-
-        Preference prefNighttimeBellAt = (Preference) findPreference(PREF_NIGHTTIME_BELL_AT);
-        prefNighttimeBellAt.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object newValue) {
-                NighttimeBell nighttimeBell = NighttimeBell.getInstance(context);
-                nighttimeBell.unregister();
-                nighttimeBell.register();
-                return false;
+                return true;
             }
         });
     }
@@ -246,6 +224,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
         @Override
         public boolean onPreferenceChange(Preference preference, Object value) {
+            // Update summary
+
             String stringValue = value.toString();
             String key = preference.getKey();
 
@@ -283,14 +263,24 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 String summaryText = res.getString(R.string.pref_summary_snooze_time, intValue);
 
                 preference.setSummary(summaryText);
-            } else if (key.equals(PREF_NEAR_FUTURE_TIME)) {
+            } else if (preference instanceof RelativeTimePreference) {
                 int intValue = (int) value;
                 int hours = RelativeTimePreference.valueToHour(intValue);
                 int minutes = RelativeTimePreference.valueToMinute(intValue);
 
                 Context context = preference.getContext();
                 Resources res = context.getResources();
-                String summaryText = res.getString(R.string.pref_summary_near_future_time, hours, minutes);
+                String summaryText = res.getString(R.string.pref_summary_relative_time, hours, minutes);
+
+                preference.setSummary(summaryText);
+            } else if (preference instanceof TimePreference) {
+                int hours = TimePreference.getHour(stringValue);
+                int minutes = TimePreference.getMinute(stringValue);
+
+                Context context = preference.getContext();
+                Resources res = context.getResources();
+                String timeText = Localization.timeToString(hours, minutes, context);
+                String summaryText = res.getString(R.string.pref_summary_time_preference, timeText);
 
                 preference.setSummary(summaryText);
             } else if (key.equals(PREF_ACTION_ON_BUTTON) || key.equals(PREF_ACTION_ON_MOVE) || key.equals(PREF_ACTION_ON_FLIP) || key.equals(PREF_ACTION_ON_SHAKE) || key.equals(PREF_ACTION_ON_PROXIMITY)) {
@@ -301,50 +291,25 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 CharSequence summaryText = res.getTextArray(R.array.actionArray)[intValue];
 
                 preference.setSummary(summaryText);
-            } else if (key.equals(PREF_CHECK_ALARM_TIME_AT)) {
-                int hours = TimePreference.getHour(stringValue);
-                int minutes = TimePreference.getMinute(stringValue);
-
-                Context context = preference.getContext();
-                Resources res = context.getResources();
-                String timeText = Localization.timeToString(hours, minutes, context);
-                String summaryText = res.getString(R.string.pref_summary_check_alarm_time_at, timeText);
-
-                preference.setSummary(summaryText);
-            } else if (key.equals(PREF_CHECK_ALARM_TIME_GAP)) {
-                int intValue = (int) value;
-                int hours = RelativeTimePreference.valueToHour(intValue);
-                int minutes = RelativeTimePreference.valueToMinute(intValue);
-
-                Context context = preference.getContext();
-                Resources res = context.getResources();
-                String summaryText = res.getString(R.string.pref_summary_check_alarm_time_gap, hours, minutes);
-
-                preference.setSummary(summaryText);
-            } else if (key.equals(PREF_NIGHTTIME_BELL_AT)) {
-                int hours = TimePreference.getHour(stringValue);
-                int minutes = TimePreference.getMinute(stringValue);
-
-                Context context = preference.getContext();
-                Resources res = context.getResources();
-                String timeText = Localization.timeToString(hours, minutes, context);
-                String summaryText = res.getString(R.string.pref_summary_nighttime_bell_at, timeText);
-
-                preference.setSummary(summaryText);
-            } else if (key.equals(PREF_NAP_TIME)) {
-                int intValue = (int) value;
-                int hours = RelativeTimePreference.valueToHour(intValue);
-                int minutes = RelativeTimePreference.valueToMinute(intValue);
-
-                Context context = preference.getContext();
-                Resources res = context.getResources();
-                String summaryText = res.getString(R.string.pref_summary_nap_time, hours, minutes);
-
-                preference.setSummary(summaryText);
             } else {
                 // For all other preferences, set the summary to the value's simple string representation.
                 preference.setSummary(stringValue);
             }
+
+            // Reset alarms
+
+            if (key.equals(PREF_CHECK_ALARM_TIME_AT)) {
+                Context context = preference.getContext();
+                CheckAlarmTime checkAlarmTime = CheckAlarmTime.getInstance(context);
+                checkAlarmTime.unregisterCheckAlarmTime();
+                checkAlarmTime.registerCheckAlarmTime();
+            } else if (key.equals(PREF_NIGHTTIME_BELL_AT)) {
+                Context context = preference.getContext();
+                NighttimeBell nighttimeBell = NighttimeBell.getInstance(context);
+                nighttimeBell.unregister();
+                nighttimeBell.register();
+            }
+
             return true;
         }
     };

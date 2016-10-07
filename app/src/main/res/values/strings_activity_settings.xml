@@ -20,7 +20,6 @@
     <string name="pref_summary_snooze_time"><xliff:g id="minutes" example="3">%1$d</xliff:g> minutes</string>
 
     <string name="pref_title_near_future_time">Show notification before alarm</string>
-    <string name="pref_summary_near_future_time"><xliff:g id="hours" example="2">%1$d</xliff:g> hours and <xliff:g id="minutes" example="3">%2$d</xliff:g> minutes</string>
 
 
     <string name="pref_category_ring_actions_title">Action when ringing</string>
@@ -39,10 +38,8 @@
     <string name="pref_summaryon_check_alarm_time">Check alarm time</string>
 
     <string name="pref_title_check_alarm_time_at">Check at</string>
-    <string name="pref_summary_check_alarm_time_at"><xliff:g id="time" example="22:00">%1$s</xliff:g></string>
 
     <string name="pref_title_check_alarm_time_gap">Alarm must ring at least … before the first appointment</string>
-    <string name="pref_summary_check_alarm_time_gap">@string/pref_summary_near_future_time</string>
 
 
     <string name="pref_category_nighttime_bell_title">@string/pref_title_nighttime_bell</string>
@@ -52,7 +49,6 @@
     <string name="pref_summaryon_nighttime_bell">Play</string>
 
     <string name="pref_title_nighttime_bell_at">Play at</string>
-    <string name="pref_summary_nighttime_bell_at">@string/pref_summary_check_alarm_time_at</string>
 
     <string name="pref_title_nighttime_bell_ringtone">Nighttime bell sound</string>
 
@@ -66,5 +62,4 @@
     <string name="pref_summaryon_ask_to_change_other_weekdays_with_the_same_alarm_time">Don\'t ask to change the alarm time on other weekdays with the same original alarm time. This happens when changing default alarm time and there are such other weekdays.</string>
 
     <string name="pref_title_nap_time">Nap time</string>
-    <string name="pref_summary_nap_time">@string/pref_summary_near_future_time</string>
 </resources>

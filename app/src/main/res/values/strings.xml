@@ -135,4 +135,7 @@
     <string name="relative_time_picker_label_hour">Hour</string>
     <string name="relative_time_picker_label_minute">Minute</string>
 
+    <!-- Preferences -->
+    <string name="pref_summary_relative_time"><xliff:g id="hours" example="2">%1$d</xliff:g> hours and <xliff:g id="minutes" example="3">%2$d</xliff:g> minutes</string>
+    <string name="pref_summary_time_preference"><xliff:g id="time" example="22:00">%1$s</xliff:g></string>
 </resources>
