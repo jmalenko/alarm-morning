@@ -147,10 +147,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 CheckAlarmTime checkAlarmTime = CheckAlarmTime.getInstance(context);
                 if (boolValue) {
                     Log.i(TAG, "Starting CheckAlarmTime");
-                    checkAlarmTime.registerCheckAlarmTime();
+                    checkAlarmTime.register();
                 } else {
                     Log.i(TAG, "Stopping CheckAlarmTime");
-                    checkAlarmTime.unregisterCheckAlarmTime();
+                    checkAlarmTime.unregister();
                 }
                 return true;
             }
@@ -301,13 +301,11 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             if (key.equals(PREF_CHECK_ALARM_TIME_AT)) {
                 Context context = preference.getContext();
                 CheckAlarmTime checkAlarmTime = CheckAlarmTime.getInstance(context);
-                checkAlarmTime.unregisterCheckAlarmTime();
-                checkAlarmTime.registerCheckAlarmTime();
+                checkAlarmTime.reregister(stringValue);
             } else if (key.equals(PREF_NIGHTTIME_BELL_AT)) {
                 Context context = preference.getContext();
                 NighttimeBell nighttimeBell = NighttimeBell.getInstance(context);
-                nighttimeBell.unregister();
-                nighttimeBell.register();
+                nighttimeBell.reregister(stringValue);
             }
 
             return true;

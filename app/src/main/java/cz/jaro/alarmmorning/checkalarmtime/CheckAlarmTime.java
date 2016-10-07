@@ -85,14 +85,25 @@ public class CheckAlarmTime {
         boolean checkAlarmTimePreference = preferences.getBoolean(SettingsActivity.PREF_CHECK_ALARM_TIME, SettingsActivity.PREF_CHECK_ALARM_TIME_DEFAULT);
 
         if (checkAlarmTimePreference) {
-            registerCheckAlarmTime();
+            register();
         }
     }
 
-    public void registerCheckAlarmTime() {
-        Log.d(TAG, "registerCheckAlarmTime()");
+    public void register() {
+        Log.d(TAG, "register()");
 
-        Calendar checkAlarmTimeAt = calcCheckAlarmTimeAt();
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String checkAlarmTimeAtPreference = preferences.getString(SettingsActivity.PREF_CHECK_ALARM_TIME_AT, SettingsActivity.PREF_CHECK_ALARM_TIME_AT_DEFAULT);
+
+        register(checkAlarmTimeAtPreference);
+
+    }
+
+    private void register(String stringValue) {
+        Log.d(TAG, "register(stringValue=)" + stringValue);
+
+        Calendar checkAlarmTimeAt = calcNextOccurence(context, stringValue);
+        ;
 
         String action = ACTION_CHECK_ALARM_TIME;
         Log.i(TAG, "Setting system alarm at " + checkAlarmTimeAt.getTime().toString() + " with action " + action);
@@ -105,8 +116,8 @@ public class CheckAlarmTime {
         alarmManager.set(AlarmManager.RTC, checkAlarmTimeAt.getTimeInMillis(), operation);
     }
 
-    public void unregisterCheckAlarmTime() {
-        Log.d(TAG, "unregisterCheckAlarmTime()");
+    public void unregister() {
+        Log.d(TAG, "unregister()");
 
         if (operation != null) {
             // Method 1: standard
@@ -125,6 +136,11 @@ public class CheckAlarmTime {
                 operation2.cancel();
             }
         }
+    }
+
+    public void reregister(String stringValue) {
+        unregister();
+        register(stringValue);
     }
 
     private void registerNotificationDismiss(Calendar time) {
@@ -171,7 +187,7 @@ public class CheckAlarmTime {
         Log.d(TAG, "onCheckAlarmTime()");
 
         // Register for tomorrow
-        registerCheckAlarmTime();
+        register();
 
         // Find first calendar event
         GlobalManager globalManager = new GlobalManager(context);
@@ -294,41 +310,34 @@ public class CheckAlarmTime {
         mNotificationManager.cancel(NOTIFICATION_ID);
     }
 
-    @NonNull
-    private Calendar calcCheckAlarmTimeAt() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        String checkAlarmTimeAtPreference = preferences.getString(SettingsActivity.PREF_CHECK_ALARM_TIME_AT, SettingsActivity.PREF_CHECK_ALARM_TIME_AT_DEFAULT);
-
-        return calcNextOccurence(context, checkAlarmTimeAtPreference);
-    }
-
     /**
-     * Calculate the date and time of the next event that is occuring daily at {@code time}.
+     * Calculate the date and time of the next event that is occuring daily at {@code timePreference}.
      *
-     * @param context context
-     * @param time    a string representation of {@link TimePreference} value
+     * @param context        context
+     * @param timePreference a string representation of {@link TimePreference} value
      * @return
      */
     @NonNull
-    static public Calendar calcNextOccurence(Context context, String time) {
-        int hours = TimePreference.getHour(time);
-        int minutes = TimePreference.getMinute(time);
+    static public Calendar calcNextOccurence(Context context, String timePreference) {
+        int hours = TimePreference.getHour(timePreference);
+        int minutes = TimePreference.getMinute(timePreference);
 
         GlobalManager globalManager = new GlobalManager(context);
         Clock clock = globalManager.clock();
         Calendar now = clock.now();
 
-        Calendar checkAlarmTimeAt = now;
-        checkAlarmTimeAt.set(Calendar.HOUR_OF_DAY, hours);
-        checkAlarmTimeAt.set(Calendar.MINUTE, minutes);
-        checkAlarmTimeAt.set(Calendar.SECOND, 0);
-        checkAlarmTimeAt.set(Calendar.MILLISECOND, 0);
+        Calendar time = (Calendar) now.clone();
+        time.set(Calendar.HOUR_OF_DAY, hours);
+        time.set(Calendar.MINUTE, minutes);
+        time.set(Calendar.SECOND, 0);
+        time.set(Calendar.MILLISECOND, 0);
 
         // If in the past, then shift to tomorrow
-        if (checkAlarmTimeAt.before(now)) {
-            checkAlarmTimeAt.add(Calendar.DAY_OF_MONTH, 1);
+        if (time.before(now)) {
+            time.add(Calendar.DAY_OF_MONTH, 1);
         }
 
-        return checkAlarmTimeAt;
+        return time;
     }
+
 }

@@ -10,7 +10,6 @@ import android.media.MediaPlayer;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -67,7 +66,16 @@ public class NighttimeBell {
     public void register() {
         Log.d(TAG, "register()");
 
-        Calendar playNighttimeBellAt = calcNighttimeBellAt();
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String nighttimeBellAtPreference = preferences.getString(SettingsActivity.PREF_NIGHTTIME_BELL_AT, SettingsActivity.PREF_NIGHTTIME_BELL_AT_DEFAULT);
+
+        register(nighttimeBellAtPreference);
+    }
+
+    private void register(String stringValue) {
+        Log.d(TAG, "register(stringValue=)" + stringValue);
+
+        Calendar playNighttimeBellAt = CheckAlarmTime.calcNextOccurence(context, stringValue);
 
         String action = ACTION_PLAY;
         Log.i(TAG, "Setting system alarm at " + playNighttimeBellAt.getTime().toString() + " with action " + action);
@@ -100,6 +108,11 @@ public class NighttimeBell {
                 operation2.cancel();
             }
         }
+    }
+
+    public void reregister(String stringValue) {
+        unregister();
+        register(stringValue);
     }
 
     public void onReceive(Context context, Intent intent) {
@@ -139,7 +152,6 @@ public class NighttimeBell {
                 }
             });
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_NOTIFICATION);
-            mediaPlayer.setLooping(false);
             mediaPlayer.prepare();
             mediaPlayer.start();
         } catch (Exception e) {
@@ -161,11 +173,4 @@ public class NighttimeBell {
         return ringtoneUri;
     }
 
-    @NonNull
-    private Calendar calcNighttimeBellAt() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        String nighttimeBellAtPreference = preferences.getString(SettingsActivity.PREF_NIGHTTIME_BELL_AT, SettingsActivity.PREF_NIGHTTIME_BELL_AT_DEFAULT);
-
-        return CheckAlarmTime.calcNextOccurence(context, nighttimeBellAtPreference);
-    }
 }
