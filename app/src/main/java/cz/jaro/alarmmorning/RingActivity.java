@@ -479,7 +479,7 @@ public class RingActivity extends Activity implements RingInterface {
                 startSoundAsMedia(ringtoneUri);
                 soundMethod = 1;
             } catch (Exception e) {
-                Log.d(TAG, "Unable to play ringtone as media");
+                Log.d(TAG, "Unable to play ringtone as media", e);
             }
 
             if (soundMethod == 0) {
@@ -487,7 +487,7 @@ public class RingActivity extends Activity implements RingInterface {
                     startSoundAsRingtone(ringtoneUri);
                     soundMethod = 2;
                 } catch (Exception e) {
-                    Log.d(TAG, "Unable to play ringtone as ringtone");
+                    Log.d(TAG, "Unable to play ringtone as ringtone", e);
                 }
             }
 
