@@ -420,7 +420,7 @@ public class RingActivity extends Activity implements RingInterface {
         if (event != null) {
             String timeStr = Localization.timeToString(event.getBegin().getTime(), getBaseContext());
 
-            String nextCalendarText = event.getLocation() != null ?
+            String nextCalendarText = event.getLocation() != null && !event.getLocation().isEmpty()?
                     res.getString(R.string.next_calendar_with_location, timeStr, event.getTitle(), event.getLocation()) :
                     res.getString(R.string.next_calendar_without_location, timeStr, event.getTitle());
 

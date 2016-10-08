@@ -274,7 +274,7 @@ public class CheckAlarmTime {
 
         String meetingTimeText = Localization.timeToString(event.getBegin().get(Calendar.HOUR_OF_DAY), event.getBegin().get(Calendar.MINUTE), context);
         String contentText;
-        if (event.getLocation() != null) {
+        if (event.getLocation() != null && !event.getLocation().isEmpty()) {
             contentText = res.getString(R.string.notification_check_text_with_location, meetingTimeText, event.getTitle(), event.getLocation());
         } else {
             contentText = res.getString(R.string.notification_check_text_without_location, meetingTimeText, event.getTitle());
