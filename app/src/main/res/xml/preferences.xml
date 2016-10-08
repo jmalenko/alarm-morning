@@ -134,8 +134,9 @@
             android:key="pref_nighttime_bell_ringtone"
             android:title="@string/pref_title_nighttime_bell_ringtone"
             android:dependency="pref_nighttime_bell"
-            android:defaultValue="content://settings/system/notification_sound"
-            android:ringtoneType="notification"/>
+            android:defaultValue=""
+            android:showSilent="false"
+            android:ringtoneType="alarm"/>
 
     </PreferenceCategory>
 

@@ -5,9 +5,9 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.AssetFileDescriptor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.media.RingtoneManager;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -144,7 +144,16 @@ public class NighttimeBell {
         try {
             MediaPlayer mediaPlayer;
             mediaPlayer = new MediaPlayer();
-            mediaPlayer.setDataSource(context, ringtoneUri);
+
+            if (ringtoneUri != null) {
+                mediaPlayer.setDataSource(context, ringtoneUri);
+            } else {
+                // Play the Raw file
+                AssetFileDescriptor afd = context.getAssets().openFd(context.getResources().getResourceEntryName(R.raw.church_clock_strikes_3) + ".mp3");
+                mediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength()); // play this file only
+                afd.close();
+            }
+
             mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mp) {
@@ -156,10 +165,14 @@ public class NighttimeBell {
             mediaPlayer.prepare();
             mediaPlayer.start();
         } catch (Exception e) {
-            Log.e(TAG, "Unable to play nighttime bell ringtone as media");
+            Log.e(TAG, "Unable to play nighttime bell ringtone as media", e);
         }
     }
 
+    /**
+     *
+     * @return Ringtone Uri. Return null if the default value is set (meaning: play the Raw file instead of a ringtone).
+     */
     private Uri getRingtoneUri() {
         Uri ringtoneUri;
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -168,7 +181,7 @@ public class NighttimeBell {
             String ringtonePreference = preferences.getString(SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE, SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE_DEFAULT);
             ringtoneUri = ringtonePreference.equals(SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE_DEFAULT) ? null : Uri.parse(ringtonePreference);
         } else {
-            ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            ringtoneUri = null;
         }
 
         return ringtoneUri;

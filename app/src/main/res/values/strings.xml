@@ -59,6 +59,7 @@
     <string name="wizard_set_permissions_explanation"><![CDATA[
 <p>Alarm Morning needs the following permissions to provide full user experience:</p>
 <p><b>READ_CALENDAR</b> – to read the calendar events (the information about next appointment is shown while the alarm is ringing)</p>
+<p><b>WRITE_EXTERNAL_STORAGE</b> – to install new ringtone (the “Church bell” ringtone is used as default sound for nighttime bell)</p>
 ]]></string>
 
     <string name="wizard_done_title">You are all set</string>
@@ -138,4 +139,7 @@
     <!-- Preferences -->
     <string name="pref_summary_relative_time"><xliff:g id="hours" example="2">%1$d</xliff:g> hours and <xliff:g id="minutes" example="3">%2$d</xliff:g> minutes</string>
     <string name="pref_summary_time_preference"><xliff:g id="time" example="22:00">%1$s</xliff:g></string>
+
+    <!-- Files -->
+    <string name="alarmtone_title_church_bell">Church bell</string>
 </resources>

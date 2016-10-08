@@ -59,6 +59,7 @@
     <string name="wizard_set_permissions_explanation"><![CDATA[
 <p>Budík poskytuje nejlepší uživatelský zážitek s následujícími oprávněními:</p>
 <p><b>READ_CALENDAR</b> – pro čtení událostí v kalendáři (informace o následující schůzce je zobrazena když budík zvoní)</p>
+<p><b>WRITE_EXTERNAL_STORAGE</b> – pro instalaci nového zvuku (přednastavený zvuk “Kostelní zvon” zní při večerce)</p>
 ]]></string>
 
     <string name="wizard_done_title">Vše je připraveno</string>
@@ -138,4 +139,7 @@
     <!-- Preferences -->
     <string name="pref_summary_relative_time"><xliff:g id="hours" example="2">%1$d</xliff:g> hodin a <xliff:g id="minutes" example="3">%2$d</xliff:g> minut</string>
     <string name="pref_summary_time_preference"><xliff:g id="time" example="22:00">%1$s</xliff:g></string>
+
+    <!-- Files -->
+    <string name="alarmtone_title_church_bell">Kostelní zvon</string>
 </resources>

@@ -29,7 +29,11 @@ public class Wizard extends AppIntro {
 
     public static final boolean PREF_WIZARD_DEFAULT = false;
 
-    private static final String[] allPermissions = new String[]{Manifest.permission.READ_CALENDAR, Manifest.permission.WRITE_CALENDAR};
+    // Must be a subset of permissions in AndroidManifest.xml (the subset that requires the user to explicitly grant permission)
+    private static final String[] allPermissions = new String[]{
+            Manifest.permission.READ_CALENDAR,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +61,7 @@ public class Wizard extends AppIntro {
             Log.v(TAG, "Following permissions are not granted: " + missingPermissionsStr);
 
             addSlide(new SetPermissionSlide());
-            askForPermissions(new String[]{Manifest.permission.READ_CALENDAR, Manifest.permission.WRITE_CALENDAR}, 4);
+            askForPermissions(missingPermissions, 4);
             // TODO The AppIntro library disables swiping when using askForPermissions. Source: https://github.com/PaoloRotolo/AppIntro/issues/123
         } else {
             Log.v(TAG, "All permissions are granted. Skipping permission slide.");

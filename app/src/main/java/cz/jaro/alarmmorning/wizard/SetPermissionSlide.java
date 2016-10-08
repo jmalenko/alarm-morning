@@ -3,12 +3,14 @@ package cz.jaro.alarmmorning.wizard;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import cz.jaro.alarmmorning.R;
+import cz.jaro.alarmmorning.nighttimebell.CustomAlarmTone;
 
 public class SetPermissionSlide extends BaseFragment {
 
@@ -23,6 +25,15 @@ public class SetPermissionSlide extends BaseFragment {
         explanationTextView.setText(Html.fromHtml(getString(R.string.wizard_set_permissions_explanation)));
 
         return view;
+    }
+
+    @Override
+    public void onSlideDeselected() {
+        Log.i(TAG, "Installing files");
+        CustomAlarmTone customAlarmTone = new CustomAlarmTone(getContext());
+        customAlarmTone.install();
+
+        super.onSlideDeselected();
     }
 
     @Override

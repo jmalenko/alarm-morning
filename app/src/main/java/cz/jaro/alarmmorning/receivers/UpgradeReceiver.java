@@ -10,6 +10,7 @@ import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.WakeLocker;
 import cz.jaro.alarmmorning.checkalarmtime.CheckAlarmTime;
+import cz.jaro.alarmmorning.nighttimebell.CustomAlarmTone;
 import cz.jaro.alarmmorning.nighttimebell.NighttimeBell;
 
 /**
@@ -39,6 +40,10 @@ public class UpgradeReceiver extends BroadcastReceiver {
         Log.i(TAG, "Starting NighttimeBell on update");
         NighttimeBell nighttimeBell = NighttimeBell.getInstance(context);
         nighttimeBell.checkAndRegister();
+
+        Log.i(TAG, "Installing files");
+        CustomAlarmTone customAlarmTone = new CustomAlarmTone(context);
+        customAlarmTone.install();
 
         WakeLocker.release();
     }
