@@ -6,6 +6,8 @@ import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TimePicker;
 
 import cz.jaro.alarmmorning.GlobalManager;
@@ -48,6 +50,11 @@ public class SetTimeSlide extends BaseFragment implements TimePicker.OnTimeChang
         picker.setCurrentMinute(minute);
         picker.setIs24HourView(DateFormat.is24HourFormat(getActivity()));
         picker.setOnTimeChangedListener(this);
+
+        // Make the whole TimePicker visible
+        ScrollView scrollView = (ScrollView) view.findViewById(R.id.content_frame2);
+        LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
+        scrollView.setLayoutParams(params1);
 
         return view;
     }
