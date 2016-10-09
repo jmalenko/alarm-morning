@@ -149,7 +149,7 @@ public class NighttimeBell {
                 mediaPlayer.setDataSource(context, ringtoneUri);
             } else {
                 // Play the Raw file
-                AssetFileDescriptor afd = context.getAssets().openFd(context.getResources().getResourceEntryName(R.raw.church_clock_strikes_3) + ".mp3");
+                AssetFileDescriptor afd = context.getResources().openRawResourceFd(R.raw.church_clock_strikes_3);
                 mediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength()); // play this file only
                 afd.close();
             }
@@ -161,7 +161,7 @@ public class NighttimeBell {
                     mp.release();
                 }
             });
-            mediaPlayer.setAudioStreamType(AudioManager.STREAM_NOTIFICATION);
+            mediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
             mediaPlayer.prepare();
             mediaPlayer.start();
         } catch (Exception e) {

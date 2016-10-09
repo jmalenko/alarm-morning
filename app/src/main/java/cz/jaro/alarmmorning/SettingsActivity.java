@@ -108,7 +108,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
     public static final boolean PREF_NIGHTTIME_BELL_DEFAULT = true;
     public static final String PREF_NIGHTTIME_BELL_AT_DEFAULT = "22:00";
-    public static final String PREF_NIGHTTIME_BELL_RINGTONE_DEFAULT = "";
+    public static final String PREF_NIGHTTIME_BELL_RINGTONE_DEFAULT = "raw://church_clock_strikes_3";
 
     public static final int PREF_VOLUME_MAX = 10;
 

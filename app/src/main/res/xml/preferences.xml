@@ -134,7 +134,7 @@
             android:key="pref_nighttime_bell_ringtone"
             android:title="@string/pref_title_nighttime_bell_ringtone"
             android:dependency="pref_nighttime_bell"
-            android:defaultValue=""
+            android:defaultValue="raw://church_clock_strikes_3"
             android:showSilent="false"
             android:ringtoneType="alarm"/>
 
