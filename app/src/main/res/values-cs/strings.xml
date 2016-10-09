@@ -54,6 +54,12 @@
     <string name="snooze_alarm_on_device_flip">Odložit při obrázení vzůru nohama</string>
     <string name="dismiss_alarm_on_device_shake">Ukončit při zatřesení</string>
 
+    <string name="wizard_set_features_title">Nastavit pokročilé funkce budíku</string>
+    <string name="wizard_set_features_description">Každý večer ve 22:00 dělej…</string>
+
+    <string name="check_alarm_time">Zkontrolovat, že budík zazvoní aspoň 1 hodinu před začátkem první schůzky</string>
+    <string name="play_nighttime_bell">Zahrát zvuk (večerka)</string>
+
     <string name="wizard_set_permissions_title">Povolit oprávnění</string>
     <string name="wizard_set_permissions_description">V následujícím dialogu povolte oprávnění, která budík potřebuje.</string>
     <string name="wizard_set_permissions_explanation"><![CDATA[

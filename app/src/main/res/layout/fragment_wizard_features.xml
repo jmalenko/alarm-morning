@@ -1,0 +1,25 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical"
+    android:paddingLeft="32dp"
+    android:paddingRight="32dp">
+
+    <CheckBox
+        android:id="@+id/onCheckAlarmTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_large"
+        android:checked="true"
+        android:text="@string/check_alarm_time"/>
+
+    <CheckBox
+        android:id="@+id/onPlayNighttimeBell"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_large"
+        android:checked="true"
+        android:text="@string/play_nighttime_bell"/>
+
+</LinearLayout>

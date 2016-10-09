@@ -50,6 +50,8 @@ public class Wizard extends AppIntro {
 
         addSlide(new SetActionsSlide());
 
+        addSlide(new SetFeaturesSlide());
+
         // Show the "Set permissions" slide only when not all permissions are granted
         String[] missingPermissions = calcMissingPermissions();
         boolean allPermissionsGranted = missingPermissions.length == 0;
@@ -61,7 +63,7 @@ public class Wizard extends AppIntro {
             Log.v(TAG, "Following permissions are not granted: " + missingPermissionsStr);
 
             addSlide(new SetPermissionSlide());
-            askForPermissions(missingPermissions, 4);
+            askForPermissions(missingPermissions, fragments.size());
             // TODO The AppIntro library disables swiping when using askForPermissions. Source: https://github.com/PaoloRotolo/AppIntro/issues/123
         } else {
             Log.v(TAG, "All permissions are granted. Skipping permission slide.");

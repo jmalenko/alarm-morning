@@ -54,6 +54,12 @@
     <string name="snooze_alarm_on_device_flip">Snooze alarm on device flip</string>
     <string name="dismiss_alarm_on_device_shake">Dismiss alarm on device shake</string>
 
+    <string name="wizard_set_features_title">Set advanced alarm clock fetures</string>
+    <string name="wizard_set_features_description">Every evening at 10:00 PM do…</string>
+
+    <string name="check_alarm_time">Check that the alarm time is set at least 1 hour before the first appointment</string>
+    <string name="play_nighttime_bell">Play nighttime bell</string>
+
     <string name="wizard_set_permissions_title">Allow permissions</string>
     <string name="wizard_set_permissions_description">The following dialogues ask for the permissions the alarm clock needs.</string>
     <string name="wizard_set_permissions_explanation"><![CDATA[
