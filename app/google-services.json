@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "364161634444",
+    "firebase_url": "https://alarm-morning.firebaseio.com",
+    "project_id": "alarm-morning",
+    "storage_bucket": "alarm-morning.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:364161634444:android:a1dd086b62035781",
+        "android_client_info": {
+          "package_name": "cz.jaro.alarmmorning"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "364161634444-ka8oqui1trkfvn0amv01j4776luljtoo.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "cz.jaro.alarmmorning",
+            "certificate_hash": "43997AF591959738636BA543437104F4309F3FEF"
+          }
+        },
+        {
+          "client_id": "364161634444-8sr45oljc2fp7dlesi0vfjrmnig7p3qo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAZ9NTIP3VhmDIzdKiCqKnqsqH40DZBsVg"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "364161634444-8sr45oljc2fp7dlesi0vfjrmnig7p3qo.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

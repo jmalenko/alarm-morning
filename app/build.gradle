@@ -33,6 +33,9 @@ dependencies {
 
     compile 'com.github.paolorotolo:appintro:4.0.0'
 
+    compile 'com.google.firebase:firebase-core:9.6.1'
+    compile 'com.google.firebase:firebase-crash:9.6.1'
+
     // Required -- JUnit 4 framework
     testCompile 'junit:junit:4.12'
     // AssertJ
@@ -42,7 +45,7 @@ dependencies {
     // Optional -- Mockito framework
     testCompile 'org.mockito:mockito-core:1.10.19'
 
-    androidTestCompile 'com.android.support:support-annotations:23.3.0'
+    androidTestCompile 'com.android.support:support-annotations:24.0.0'
     androidTestCompile 'com.android.support.test:runner:0.4.1'
     androidTestCompile 'com.android.support.test:rules:0.4.1'
     // Optional -- Hamcrest library
@@ -52,3 +55,5 @@ dependencies {
     // Optional -- UI testing with UI Automator
     // androidTestCompile 'com.android.support.test.uiautomator:uiautomator-v18:2.1.1'
 }
+
+apply plugin: 'com.google.gms.google-services'

@@ -41,12 +41,16 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
+
 import cz.jaro.alarmmorning.wizard.Wizard;
 
 
 public class AlarmMorningActivity extends AppCompatActivity implements ActivityInterface {
 
     private static final String TAG = AlarmMorningActivity.class.getSimpleName();
+
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     public static final String ACTION_ALARM_SET = "ALARM_SET";
     public static final String ACTION_DISMISS_BEFORE_RINGING = "DISMISS_BEFORE_RINGING";
@@ -136,6 +140,12 @@ public class AlarmMorningActivity extends AppCompatActivity implements ActivityI
             Intent wizardIntent = new Intent(this, Wizard.class);
             startActivityForResult(wizardIntent, REQUEST_CODE_WIZARD);
         }
+
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+
+        Bundle payload = new Bundle();
+        payload.putString(FirebaseAnalytics.Param.VALUE, TAG);
+        mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.APP_OPEN, payload);
 
         setContentView(R.layout.activity_calendar);
 
