@@ -21,7 +21,7 @@ public class LocalizationTest extends AndroidTestCase {
     }
 
     public void test_dayOfWeekToString_en() {
-        setLocale("en", "EN");
+        setLocale("en", "US");
         Resources res = getContext().getResources();
 
         assertEquals("Sunday", Localization.dayOfWeekToString(res, Calendar.SUNDAY));
@@ -34,7 +34,7 @@ public class LocalizationTest extends AndroidTestCase {
     }
 
     public void test_dayOfWeekToStringShort_en() {
-        setLocale("en", "EN");
+        setLocale("en", "US");
         Resources res = getContext().getResources();
 
         assertEquals("Sun", Localization.dayOfWeekToStringShort(res, Calendar.SUNDAY));
@@ -72,8 +72,9 @@ public class LocalizationTest extends AndroidTestCase {
         assertEquals("Pá", Localization.dayOfWeekToStringShort(res, Calendar.FRIDAY));
         assertEquals("So", Localization.dayOfWeekToStringShort(res, Calendar.SATURDAY));
     }
+
     public void test_dayOfWeekToString_invalid() {
-        setLocale("en", "EN");
+        setLocale("en", "US");
         Resources res = getContext().getResources();
 
         try {
@@ -84,5 +85,57 @@ public class LocalizationTest extends AndroidTestCase {
         }
     }
 
+    public void test_weekStart_en() {
+        setLocale("en", "US");
+        com.ibm.icu.util.Calendar c = com.ibm.icu.util.Calendar.getInstance();
+
+        assertEquals(Calendar.SUNDAY, c.getFirstDayOfWeek());
+    }
+
+    public void test_weekStart_cs() {
+        setLocale("cs", "CZ");
+        com.ibm.icu.util.Calendar c = com.ibm.icu.util.Calendar.getInstance();
+
+        assertEquals(Calendar.MONDAY, c.getFirstDayOfWeek());
+    }
+
+    public void test_weekend_en() {
+        setLocale("en", "US");
+        com.ibm.icu.util.Calendar c = com.ibm.icu.util.Calendar.getInstance();
+
+        assertEquals(com.ibm.icu.util.Calendar.WEEKEND, c.getDayOfWeekType(Calendar.SUNDAY));
+        assertEquals(com.ibm.icu.util.Calendar.WEEKDAY, c.getDayOfWeekType(Calendar.MONDAY));
+        assertEquals(com.ibm.icu.util.Calendar.WEEKDAY, c.getDayOfWeekType(Calendar.TUESDAY));
+        assertEquals(com.ibm.icu.util.Calendar.WEEKDAY, c.getDayOfWeekType(Calendar.WEDNESDAY));
+        assertEquals(com.ibm.icu.util.Calendar.WEEKDAY, c.getDayOfWeekType(Calendar.THURSDAY));
+        assertEquals(com.ibm.icu.util.Calendar.WEEKDAY, c.getDayOfWeekType(Calendar.FRIDAY));
+        assertEquals(com.ibm.icu.util.Calendar.WEEKEND, c.getDayOfWeekType(Calendar.SATURDAY));
+    }
+
+    public void test_weekend_cs() {
+        setLocale("cs", "CZ");
+        com.ibm.icu.util.Calendar c = com.ibm.icu.util.Calendar.getInstance();
+
+        assertEquals(com.ibm.icu.util.Calendar.WEEKEND, c.getDayOfWeekType(Calendar.SUNDAY));
+        assertEquals(com.ibm.icu.util.Calendar.WEEKDAY, c.getDayOfWeekType(Calendar.MONDAY));
+        assertEquals(com.ibm.icu.util.Calendar.WEEKDAY, c.getDayOfWeekType(Calendar.TUESDAY));
+        assertEquals(com.ibm.icu.util.Calendar.WEEKDAY, c.getDayOfWeekType(Calendar.WEDNESDAY));
+        assertEquals(com.ibm.icu.util.Calendar.WEEKDAY, c.getDayOfWeekType(Calendar.THURSDAY));
+        assertEquals(com.ibm.icu.util.Calendar.WEEKDAY, c.getDayOfWeekType(Calendar.FRIDAY));
+        assertEquals(com.ibm.icu.util.Calendar.WEEKEND, c.getDayOfWeekType(Calendar.SATURDAY));
+    }
+
+    public void test_weekend_ir() {
+        setLocale("fa", "IR");
+        com.ibm.icu.util.Calendar c = com.ibm.icu.util.Calendar.getInstance();
+
+        assertEquals(com.ibm.icu.util.Calendar.WEEKDAY, c.getDayOfWeekType(Calendar.SUNDAY));
+        assertEquals(com.ibm.icu.util.Calendar.WEEKDAY, c.getDayOfWeekType(Calendar.MONDAY));
+        assertEquals(com.ibm.icu.util.Calendar.WEEKDAY, c.getDayOfWeekType(Calendar.TUESDAY));
+        assertEquals(com.ibm.icu.util.Calendar.WEEKDAY, c.getDayOfWeekType(Calendar.WEDNESDAY));
+        assertEquals(com.ibm.icu.util.Calendar.WEEKEND, c.getDayOfWeekType(Calendar.THURSDAY));
+        assertEquals(com.ibm.icu.util.Calendar.WEEKEND, c.getDayOfWeekType(Calendar.FRIDAY));
+        assertEquals(com.ibm.icu.util.Calendar.WEEKDAY, c.getDayOfWeekType(Calendar.SATURDAY));
+    }
 
 }
