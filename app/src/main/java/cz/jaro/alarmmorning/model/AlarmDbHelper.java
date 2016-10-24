@@ -31,6 +31,16 @@ public class AlarmDbHelper extends SQLiteOpenHelper {
     public static final String COLUMN_DAY_HOUR = "hour";
     public static final String COLUMN_DAY_MINUTE = "minute";
 
+    /**
+     * Hour of default alarm time. Used only to initialize configuration.
+     */
+    public static final int DEFAULT_ALARM_HOUR = 7;
+
+    /**
+     * Minute of default alarm time. Used only to initialize configuration.
+     */
+    public static final int DEFAULT_ALARM_MINUTE = 0;
+
     public AlarmDbHelper(Context context) {
         super(context, DATABASE_NAME, null, PATCHES.length);
     }
@@ -103,8 +113,8 @@ public class AlarmDbHelper extends SQLiteOpenHelper {
             // Initialize
             ContentValues values = new ContentValues();
             values.put(COLUMN_DEFAULTS_STATE, Defaults.STATE_DISABLED);
-            values.put(COLUMN_DEFAULTS_HOUR, 7);
-            values.put(COLUMN_DEFAULTS_MINUTE, 0);
+            values.put(COLUMN_DEFAULTS_HOUR, DEFAULT_ALARM_HOUR);
+            values.put(COLUMN_DEFAULTS_MINUTE, DEFAULT_ALARM_MINUTE);
             for (int dayOfWeek : AlarmDataSource.allDaysOfWeek) {
                 values.put(COLUMN_DEFAULTS_DAY_OF_WEEK, dayOfWeek);
                 database.insert(TABLE_DEFAULTS, null, values);
