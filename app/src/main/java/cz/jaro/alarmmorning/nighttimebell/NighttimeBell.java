@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import java.util.Calendar;
 
+import cz.jaro.alarmmorning.Analytics;
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.SettingsActivity;
 import cz.jaro.alarmmorning.SystemAlarm;
@@ -130,6 +131,7 @@ public class NighttimeBell {
 
     private void onPlay(Context context) {
         Log.d(TAG, "onPlay()");
+        new Analytics(context, Analytics.Event.Play_nighttime_bell, Analytics.Channel.Time, Analytics.ChannelName.Nighttime_bell).save();
 
         // Register for tomorrow
         register();
