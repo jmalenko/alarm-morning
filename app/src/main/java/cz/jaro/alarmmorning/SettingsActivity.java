@@ -122,6 +122,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
         bindPreferenceSummaryToValue(findPreference(PREF_RINGTONE));
         bindPreferenceSummaryToValue(findPreference(PREF_VOLUME));
+        bindPreferenceChangeListener(findPreference(PREF_VOLUME_INCREASING));
+        bindPreferenceChangeListener(findPreference(PREF_VIBRATE));
         bindPreferenceSummaryToValue(findPreference(PREF_SNOOZE_TIME));
         bindPreferenceSummaryToValue(findPreference(PREF_NEAR_FUTURE_TIME));
         bindPreferenceSummaryToValue(findPreference(PREF_ACTION_ON_BUTTON));
@@ -143,6 +145,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         prefCheckAlarmTime.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
+                analytics(preference, newValue);
+
                 boolean boolValue = (boolean) newValue;
                 CheckAlarmTime checkAlarmTime = CheckAlarmTime.getInstance(context);
                 if (boolValue) {
@@ -162,6 +166,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         prefNighttimeBell.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {
+                analytics(preference, newValue);
+
                 boolean boolValue = (boolean) newValue;
                 NighttimeBell nighttimeBell = NighttimeBell.getInstance(context);
                 if (boolValue) {
@@ -221,11 +227,14 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     /**
      * A preference value change listener that updates the preference's summary to reflect its new value.
      */
-    private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
+    private static OnPreferenceChangeListenerWithAnalytics sBindPreferenceSummaryToValueListener = new OnPreferenceChangeListenerWithAnalytics() {
         @Override
         public boolean onPreferenceChange(Preference preference, Object value) {
-            // Update summary
+            analytics(preference, value);
+            return updateSummary(preference, value);
+        }
 
+        public boolean updateSummary(Preference preference, Object value) {
             String stringValue = value.toString();
             String key = preference.getKey();
 
@@ -312,6 +321,16 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         }
     };
 
+    static void analytics(Preference preference, Object value) {
+        String stringValue = value.toString();
+        String key = preference.getKey();
+
+        Analytics analytics = new Analytics(preference.getContext(), Analytics.Event.Change_setting, Analytics.Channel.Activity, Analytics.ChannelName.Settings);
+        analytics.set(Analytics.Param.Preference_key, key);
+        analytics.set(Analytics.Param.Preference_value, stringValue);
+        analytics.save();
+    }
+
     public static int getRealVolume(double volumePreference, int maxVolume) {
         return (int) Math.ceil(((volumePreference / SettingsActivity.PREF_VOLUME_MAX) * maxVolume));
     }
@@ -325,7 +344,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
      */
     private static void bindPreferenceSummaryToValue(Preference preference) {
         // Set the listener to watch for value changes.
-        preference.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
+        bindPreferenceChangeListener(preference);
 
         // Trigger the listener immediately with the preference's current value.
         String key = preference.getKey();
@@ -354,7 +373,15 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         } else {
             throw new IllegalArgumentException("Unexpected argument " + key);
         }
-        sBindPreferenceSummaryToValueListener.onPreferenceChange(preference, newValue);
+        sBindPreferenceSummaryToValueListener.updateSummary(preference, newValue);
     }
 
+    private static void bindPreferenceChangeListener(Preference preference) {
+        preference.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
+    }
+}
+
+interface OnPreferenceChangeListenerWithAnalytics extends Preference.OnPreferenceChangeListener {
+
+    boolean updateSummary(Preference preference, Object value);
 }
