@@ -290,7 +290,8 @@ public class CheckAlarmTime {
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
                 .setSmallIcon(R.drawable.ic_alarm_white)
-                .setContentTitle(contentTitle);
+                .setContentTitle(contentTitle)
+                .setPriority(NotificationCompat.PRIORITY_MAX);
 
         String meetingTimeText = Localization.timeToString(event.getBegin().get(Calendar.HOUR_OF_DAY), event.getBegin().get(Calendar.MINUTE), context);
         String contentText;
