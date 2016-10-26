@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import cz.jaro.alarmmorning.Analytics;
 import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.WakeLocker;
 
@@ -20,8 +21,10 @@ public class TimeChangedReceiver extends BroadcastReceiver {
         WakeLocker.acquire(context);
 
         Log.v(TAG, "onReceive()");
-        Log.i(TAG, "Setting alarm on time change");
 
+        new Analytics(context, Analytics.Event.Start, Analytics.Channel.External, Analytics.ChannelName.TimeChange).setConfigurationInfo().save();
+
+        Log.i(TAG, "Setting alarm on time change");
         GlobalManager globalManager = new GlobalManager(context);
         globalManager.forceSetAlarm();
 

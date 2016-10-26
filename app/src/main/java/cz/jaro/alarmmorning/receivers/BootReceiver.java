@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import cz.jaro.alarmmorning.Analytics;
 import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.WakeLocker;
 import cz.jaro.alarmmorning.checkalarmtime.CheckAlarmTime;
@@ -22,6 +23,8 @@ public class BootReceiver extends BroadcastReceiver {
         WakeLocker.acquire(context);
 
         Log.v(TAG, "onReceive()");
+
+        new Analytics(context, Analytics.Event.Start, Analytics.Channel.External, Analytics.ChannelName.Boot).setConfigurationInfo().save();
 
         Log.i(TAG, "Setting alarm on boot");
         GlobalManager globalManager = new GlobalManager(context);

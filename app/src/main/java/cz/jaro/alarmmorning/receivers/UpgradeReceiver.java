@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import cz.jaro.alarmmorning.Analytics;
 import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.WakeLocker;
@@ -25,6 +26,8 @@ public class UpgradeReceiver extends BroadcastReceiver {
         WakeLocker.acquire(context);
 
         Log.v(TAG, "onReceive()");
+
+        new Analytics(context, Analytics.Event.Start, Analytics.Channel.External, Analytics.ChannelName.Upgrade).setConfigurationInfo().save();
 
         // Update default values of preferences
         PreferenceManager.setDefaultValues(context, R.xml.preferences, false);

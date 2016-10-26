@@ -1,15 +1,20 @@
 package cz.jaro.alarmmorning;
 
-import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.util.Log;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.security.SecureRandom;
@@ -17,6 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.Random;
+import java.util.TimeZone;
 
 import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.clock.SystemClock;
@@ -30,7 +36,7 @@ import cz.jaro.alarmmorning.model.Defaults;
  * For efficiency, everything is implemented as static.
  */
 public class Analytics {
-    private static final String TAG = AlarmMorningActivity.class.getSimpleName();
+    private static final String TAG = Analytics.class.getSimpleName();
 
     private static final String PREF_USER_ID = "user_id";
     private static final String PREF_USER_ID_UNSET = "";
@@ -81,12 +87,9 @@ public class Analytics {
         Appointment_location,
 
         Preference_key,
-        Preference_value;
+        Preference_value,
 
-        @Override
-        public String toString() {
-            return name().replace('_', ' ');
-        }
+        Configuration;
     }
 
     public enum Event {
@@ -116,8 +119,7 @@ public class Analytics {
 
         Play_nighttime_bell,
 
-        Boot, // TODO
-        Upgrade, // TODO
+        Start,
 
         Change_setting;
 
@@ -131,6 +133,7 @@ public class Analytics {
         Activity,
         Notification,
         Time,
+        External,
         Widget // TODO
     }
 
@@ -142,7 +145,11 @@ public class Analytics {
         Wizard, // TODO
         Check_alarm_time,
         Nighttime_bell,
-        Statistics; // TODO
+
+        Boot,
+        Upgrade,
+        TimeZoneChange,
+        TimeChange;
 
         @Override
         public String toString() {
@@ -309,6 +316,140 @@ public class Analytics {
         return this;
     }
 
+    public Analytics setConfigurationInfo() {
+        JSONObject conf = new JSONObject();
+
+        try {
+            // Settings
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
+
+            String ringtonePreference = preferences.getString(SettingsActivity.PREF_RINGTONE, SettingsActivity.PREF_RINGTONE_DEFAULT);
+            conf.put(SettingsActivity.PREF_RINGTONE, ringtonePreference);
+
+            int volumePreference = preferences.getInt(SettingsActivity.PREF_VOLUME, SettingsActivity.PREF_VOLUME_DEFAULT);
+            int volume = SettingsActivity.getRealVolume(volumePreference, 100);
+            conf.put(SettingsActivity.PREF_VOLUME, volume);
+
+            boolean increasing = preferences.getBoolean(SettingsActivity.PREF_VOLUME_INCREASING, SettingsActivity.PREF_VOLUME_INCREASING_DEFAULT);
+            conf.put(SettingsActivity.PREF_VOLUME_INCREASING, increasing);
+
+            boolean vibratePreference = preferences.getBoolean(SettingsActivity.PREF_VIBRATE, SettingsActivity.PREF_VIBRATE_DEFAULT);
+            conf.put(SettingsActivity.PREF_VIBRATE, vibratePreference);
+
+            int snoozeTime = preferences.getInt(SettingsActivity.PREF_SNOOZE_TIME, SettingsActivity.PREF_SNOOZE_TIME_DEFAULT);
+            conf.put(SettingsActivity.PREF_SNOOZE_TIME, snoozeTime);
+
+            int nearFutureMinutes = preferences.getInt(SettingsActivity.PREF_NEAR_FUTURE_TIME, SettingsActivity.PREF_NEAR_FUTURE_TIME_DEFAULT);
+            conf.put(SettingsActivity.PREF_NEAR_FUTURE_TIME, nearFutureMinutes);
+
+            boolean askPreference = preferences.getBoolean(SettingsActivity.PREF_ASK_TO_CHANGE_OTHER_WEEKDAYS_WIT_THE_SAME_ALARM_TIME, SettingsActivity.PREF_ASK_TO_CHANGE_OTHER_WEEKDAYS_WIT_THE_SAME_ALARM_TIME_DEFAULT);
+            conf.put(SettingsActivity.PREF_ASK_TO_CHANGE_OTHER_WEEKDAYS_WIT_THE_SAME_ALARM_TIME, askPreference);
+
+            int napTime = preferences.getInt(SettingsActivity.PREF_NAP_TIME, SettingsActivity.PREF_NAP_TIME_DEFAULT);
+            conf.put(SettingsActivity.PREF_NAP_TIME, napTime);
+
+            String buttonActionPreference = preferences.getString(SettingsActivity.PREF_ACTION_ON_BUTTON, SettingsActivity.PREF_ACTION_DEFAULT);
+            conf.put(SettingsActivity.PREF_ACTION_ON_BUTTON, SettingsActivity.actionCodeToString(buttonActionPreference));
+
+            String moveActionPreference = preferences.getString(SettingsActivity.PREF_ACTION_ON_BUTTON, SettingsActivity.PREF_ACTION_DEFAULT);
+            conf.put(SettingsActivity.PREF_ACTION_ON_MOVE, SettingsActivity.actionCodeToString(moveActionPreference));
+
+            String flipActionPreference = preferences.getString(SettingsActivity.PREF_ACTION_ON_BUTTON, SettingsActivity.PREF_ACTION_DEFAULT);
+            conf.put(SettingsActivity.PREF_ACTION_ON_FLIP, SettingsActivity.actionCodeToString(flipActionPreference));
+
+            String shakeActionPreference = preferences.getString(SettingsActivity.PREF_ACTION_ON_BUTTON, SettingsActivity.PREF_ACTION_DEFAULT);
+            conf.put(SettingsActivity.PREF_ACTION_ON_SHAKE, SettingsActivity.actionCodeToString(shakeActionPreference));
+
+            String proximityActionPreference = preferences.getString(SettingsActivity.PREF_ACTION_ON_BUTTON, SettingsActivity.PREF_ACTION_DEFAULT);
+            conf.put(SettingsActivity.PREF_ACTION_ON_PROXIMITY, SettingsActivity.actionCodeToString(proximityActionPreference));
+
+            boolean checkAlarmTimePreference = preferences.getBoolean(SettingsActivity.PREF_CHECK_ALARM_TIME, SettingsActivity.PREF_CHECK_ALARM_TIME_DEFAULT);
+            conf.put(SettingsActivity.PREF_CHECK_ALARM_TIME, checkAlarmTimePreference);
+
+            String checkAlarmTimeAtPreference = preferences.getString(SettingsActivity.PREF_CHECK_ALARM_TIME_AT, SettingsActivity.PREF_CHECK_ALARM_TIME_AT_DEFAULT);
+            conf.put(SettingsActivity.PREF_CHECK_ALARM_TIME_AT, checkAlarmTimeAtPreference);
+
+            int checkAlarmTimeGap = preferences.getInt(SettingsActivity.PREF_CHECK_ALARM_TIME_GAP, SettingsActivity.PREF_CHECK_ALARM_TIME_GAP_DEFAULT);
+            conf.put(SettingsActivity.PREF_CHECK_ALARM_TIME_GAP, checkAlarmTimeGap);
+
+            boolean nighttimeBellPreference = preferences.getBoolean(SettingsActivity.PREF_NIGHTTIME_BELL, SettingsActivity.PREF_NIGHTTIME_BELL_DEFAULT);
+            conf.put(SettingsActivity.PREF_NIGHTTIME_BELL, nighttimeBellPreference);
+
+            String nighttimeBellAtPreference = preferences.getString(SettingsActivity.PREF_NIGHTTIME_BELL_AT, SettingsActivity.PREF_NIGHTTIME_BELL_AT_DEFAULT);
+            conf.put(SettingsActivity.PREF_NIGHTTIME_BELL_AT, nighttimeBellAtPreference);
+
+            String nighttimeBellRingtonePreference = preferences.getString(SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE, SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE_DEFAULT);
+            conf.put(SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE, nighttimeBellRingtonePreference);
+
+            // Environment
+            conf.put("build_brand", Build.BRAND);
+            conf.put("build_device", Build.DEVICE);
+            conf.put("build_display", Build.DISPLAY);
+            conf.put("build_fingerprint", Build.FINGERPRINT);
+            conf.put("build_manufacturer", Build.MANUFACTURER);
+            conf.put("build_model", Build.MODEL);
+            conf.put("build_product", Build.PRODUCT);
+            conf.put("build_hardware", Build.HARDWARE);
+            conf.put("build_host", Build.HOST);
+            conf.put("build_id", Build.ID);
+            conf.put("build_user", Build.USER);
+            conf.put("build_board", Build.BOARD);
+            conf.put("build_serial", Build.SERIAL);
+
+            conf.put("build_version_base_os", Build.VERSION.BASE_OS);
+            conf.put("build_version_release", Build.VERSION.RELEASE);
+            conf.put("build_version_sdk_int", Build.VERSION.SDK_INT);
+
+            conf.put("buildConfig_application_id", BuildConfig.APPLICATION_ID);
+            conf.put("buildConfig_build_type", BuildConfig.BUILD_TYPE);
+            conf.put("buildConfig_debug", BuildConfig.DEBUG);
+            conf.put("buildConfig_flavor", BuildConfig.FLAVOR);
+            conf.put("buildConfig_version_code", BuildConfig.VERSION_CODE);
+            conf.put("buildConfig_version_name", BuildConfig.VERSION_NAME);
+
+            Configuration configuration = mContext.getResources().getConfiguration();
+            conf.put("configuration_mcc", configuration.mcc);
+            conf.put("configuration_mnc", configuration.mnc);
+            conf.put("configuration_uiMode", configuration.uiMode);
+            conf.put("configuration_locale", configuration.locale);
+
+            conf.put("settingsSystem_time_12_24", Settings.System.getString(mContext.getContentResolver(), Settings.System.TIME_12_24));
+            conf.put("settingsSystem_sys_prop_setting_version", Settings.System.getString(mContext.getContentResolver(), Settings.System.SYS_PROP_SETTING_VERSION));
+
+            Locale locale = Locale.getDefault();
+            conf.put("locale", locale.toString());
+
+            conf.put("locale_Country", locale.getCountry());
+            conf.put("locale_Language", locale.getLanguage());
+            conf.put("locale_Variant", locale.getVariant());
+
+//            conf.put("locale_DisplayCountry", locale.getDisplayCountry());
+//            conf.put("locale_DisplayLanguage", locale.getDisplayLanguage());
+//            conf.put("locale_DisplayVariant", locale.getDisplayVariant());
+//
+//            conf.put("locale_DisplayName", locale.getDisplayName());
+//            conf.put("locale_ISO3Country", locale.getISO3Country());
+//            conf.put("locale_ISO3Language", locale.getISO3Language());
+//
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//                conf.put("locale_Script", locale.getScript());
+//                conf.put("locale_DisplayScript", locale.getDisplayScript());
+//            }
+
+            TimeZone timeZone = TimeZone.getDefault();
+            conf.put("timeZone_ID", timeZone.getID());
+            conf.put("timeZone_DisplayName", timeZone.getDisplayName());
+            conf.put("timeZone_RawOffset", timeZone.getRawOffset());
+            conf.put("timeZone_DSTSavings", timeZone.getDSTSavings());
+        } catch (JSONException e) {
+            Log.w(TAG, "Cannot create configuration record", e);
+        }
+
+        mPayload.putSerializable(Param.Configuration.name(), conf.toString());
+
+        return this;
+    }
+
     public Analytics set(Param param, Serializable s) {
         mPayload.putSerializable(param.name(), s);
         return this;
@@ -333,7 +474,7 @@ public class Analytics {
     @Override
     public String toString() {
         return padLeft(Param.Datetime_UTC, 23) + " | " +
-                padRight(mEvent.toString(), 20) + " | " +
+                padRight(mEvent.name(), 20) + " | " +
                 padRight(Param.Channel, 20) + " | " +
                 padRight(Param.Channel_name, 20) + " | " +
                 padRight(Param.Alarm_date, 10) + " | " +
@@ -355,6 +496,8 @@ public class Analytics {
 
                 padRight(Param.Preference_key, 30) + " | " +
                 padRight(Param.Preference_value, 10) + " | " +
+
+                padRight(Param.Configuration, 10) + " | " +
 
                 padLeft(Param.Version, 3) + " | " +
                 padRight(Param.User_ID, USER_ID_LENGTH) + " | " +

@@ -112,6 +112,11 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
     public static final int PREF_VOLUME_MAX = 10;
 
+    public static final String SETTING_ACTION__NOTHING = "Nothing";
+    public static final String SETTING_ACTION__MUTE = "Mute";
+    public static final String SETTING_ACTION__SNOOZE = "Snooze";
+    public static final String SETTING_ACTION__DISMISS = "Dismiss";
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -333,6 +338,21 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
     public static int getRealVolume(double volumePreference, int maxVolume) {
         return (int) Math.ceil(((volumePreference / SettingsActivity.PREF_VOLUME_MAX) * maxVolume));
+    }
+
+    public static String actionCodeToString(String action) {
+        switch (action) {
+            case PREF_ACTION_NOTHING:
+                return SETTING_ACTION__NOTHING;
+            case PREF_ACTION_MUTE:
+                return SETTING_ACTION__MUTE;
+            case PREF_ACTION_SNOOZE:
+                return SETTING_ACTION__SNOOZE;
+            case PREF_ACTION_DISMISS:
+                return SETTING_ACTION__DISMISS;
+            default:
+                throw new IllegalArgumentException("Unexpected argument " + action);
+        }
     }
 
     /**
