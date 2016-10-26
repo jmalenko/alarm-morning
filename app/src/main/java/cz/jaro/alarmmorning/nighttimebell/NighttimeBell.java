@@ -58,9 +58,9 @@ public class NighttimeBell {
         Log.v(TAG, "checkAndRegister()");
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        boolean checkAlarmTimePreference = preferences.getBoolean(SettingsActivity.PREF_NIGHTTIME_BELL, SettingsActivity.PREF_NIGHTTIME_BELL_DEFAULT);
+        boolean nighttimeBellPreference = preferences.getBoolean(SettingsActivity.PREF_NIGHTTIME_BELL, SettingsActivity.PREF_NIGHTTIME_BELL_DEFAULT);
 
-        if (checkAlarmTimePreference) {
+        if (nighttimeBellPreference) {
             register();
         }
     }
