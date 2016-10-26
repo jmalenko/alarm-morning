@@ -461,11 +461,15 @@ public class GlobalManager {
      * 7. Handle calendar activity
      */
 
-    /**
-     * @param day
-     * @param dataSource
-     */
-    public void saveAlarmTime(Day day, AlarmDataSource dataSource) {
+    public void saveAlarmTime(Day day, AlarmDataSource dataSource, Analytics analytics) {
+        Log.d(TAG, "saveAlarmTime()");
+
+        analytics.setContext(context);
+        analytics.setEvent(Analytics.Event.Set_alarm);
+        analytics.setDay(day);
+        analytics.setDayOld(day);
+        analytics.save();
+
         Log.d(TAG, "saveAlarmTime()");
 
         if (day.getState() == Day.STATE_DISABLED)

@@ -7,6 +7,10 @@ import android.util.Log;
 
 import java.util.Calendar;
 
+import cz.jaro.alarmmorning.AlarmMorningActivity;
+import cz.jaro.alarmmorning.Analytics;
+
+import static cz.jaro.alarmmorning.Analytics.CHECK_ALARM_TIME_METHOD__QUICK;
 import static cz.jaro.alarmmorning.model.Day.VALUE_UNSET;
 
 /**
@@ -18,6 +22,8 @@ public class CheckAlarmTimeNotificationReceiver extends BroadcastReceiver {
 
     private static final String TAG = CheckAlarmTimeNotificationReceiver.class.getSimpleName();
 
+    public static final String ACTION_CHECK_ALARM_TIME_CLICK = "cz.jaro.alarmmorning.intent.action.CLICK";
+    public static final String ACTION_CHECK_ALARM_TIME_DELETE = "cz.jaro.alarmmorning.intent.action.DELETE";
     public static final String ACTION_CHECK_ALARM_TIME_SET_TO = "cz.jaro.alarmmorning.intent.action.SET_TO";
     public static final String ACTION_CHECK_ALARM_TIME_SET_DIALOG = "cz.jaro.alarmmorning.intent.action.SET_DIALOG";
 
@@ -29,20 +35,35 @@ public class CheckAlarmTimeNotificationReceiver extends BroadcastReceiver {
 
         Log.v(TAG, "onReceive() action=" + action);
 
-        // Read parameters from extra
-        long newAlarmTimeLong = intent.getLongExtra(EXTRA_NEW_ALARM_TIME, VALUE_UNSET);
-        if (newAlarmTimeLong == VALUE_UNSET) {
-            throw new IllegalArgumentException("The " + EXTRA_NEW_ALARM_TIME + " extra must be set");
-        }
+        if (action == ACTION_CHECK_ALARM_TIME_CLICK) {
+            new Analytics(context, Analytics.Event.Click, Analytics.Channel.Notification, Analytics.ChannelName.Check_alarm_time).save();
 
-        if (action == ACTION_CHECK_ALARM_TIME_SET_TO) {
+            Intent calendarIntent = new Intent(context, AlarmMorningActivity.class);
+            calendarIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(calendarIntent);
+        } else if (action == ACTION_CHECK_ALARM_TIME_DELETE) {
+            new Analytics(context, Analytics.Event.Hide, Analytics.Channel.Notification, Analytics.ChannelName.Check_alarm_time).save();
+        } else if (action == ACTION_CHECK_ALARM_TIME_SET_TO) {
+            // Read parameters from extra
+            long newAlarmTimeLong = intent.getLongExtra(EXTRA_NEW_ALARM_TIME, VALUE_UNSET);
+            if (newAlarmTimeLong == VALUE_UNSET) {
+                throw new IllegalArgumentException("The " + EXTRA_NEW_ALARM_TIME + " extra must be set");
+            }
+
             Calendar newAlarmTime = Calendar.getInstance();
             newAlarmTime.setTimeInMillis(newAlarmTimeLong);
 
             Log.i(TAG, "Set alarm time to " + newAlarmTime.getTime());
+            Analytics analytics = new Analytics().set(Analytics.Param.Check_alarm_time_method, CHECK_ALARM_TIME_METHOD__QUICK);
 
-            SetTimeActivity.save(context, newAlarmTime);
+            SetTimeActivity.save(context, newAlarmTime, analytics);
         } else if (action == ACTION_CHECK_ALARM_TIME_SET_DIALOG) {
+            // Read parameters from extra
+            long newAlarmTimeLong = intent.getLongExtra(EXTRA_NEW_ALARM_TIME, VALUE_UNSET);
+            if (newAlarmTimeLong == VALUE_UNSET) {
+                throw new IllegalArgumentException("The " + EXTRA_NEW_ALARM_TIME + " extra must be set");
+            }
+
             Log.i(TAG, "Show dialog to set alarm time");
 
             // Start activity

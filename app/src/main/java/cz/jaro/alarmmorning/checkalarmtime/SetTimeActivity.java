@@ -12,11 +12,13 @@ import android.widget.Toast;
 
 import java.util.Calendar;
 
+import cz.jaro.alarmmorning.Analytics;
 import cz.jaro.alarmmorning.CalendarFragment;
 import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.model.AlarmDataSource;
 import cz.jaro.alarmmorning.model.Day;
 
+import static cz.jaro.alarmmorning.Analytics.CHECK_ALARM_TIME_METHOD__DIALOG;
 import static cz.jaro.alarmmorning.RingActivity.ALARM_TIME;
 import static cz.jaro.alarmmorning.checkalarmtime.CheckAlarmTimeNotificationReceiver.EXTRA_NEW_ALARM_TIME;
 import static cz.jaro.alarmmorning.model.Day.VALUE_UNSET;
@@ -77,12 +79,14 @@ public class SetTimeActivity extends AppCompatActivity implements TimePickerDial
         saveAlarmTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
         saveAlarmTime.set(Calendar.MINUTE, minute);
 
-        save(this, saveAlarmTime);
+        Analytics analytics = new Analytics().set(Analytics.Param.Check_alarm_time_method, CHECK_ALARM_TIME_METHOD__DIALOG);
+
+        save(this, saveAlarmTime, analytics);
 
         finish();
     }
 
-    public static void save(Context context, Calendar saveAlarmTime) {
+    public static void save(Context context, Calendar saveAlarmTime, Analytics analytics) {
         AlarmDataSource dataSource = new AlarmDataSource(context);
         dataSource.open();
 
@@ -95,8 +99,11 @@ public class SetTimeActivity extends AppCompatActivity implements TimePickerDial
         day.setMinute(saveAlarmTime.get(Calendar.MINUTE));
 
         // Save
+        analytics.setChannel(Analytics.Channel.Notification);
+        analytics.setChannelName(Analytics.ChannelName.Check_alarm_time);
+
         GlobalManager globalManager = new GlobalManager(context);
-        globalManager.saveAlarmTime(day, dataSource);
+        globalManager.saveAlarmTime(day, dataSource, analytics);
 
         dataSource.close();
 

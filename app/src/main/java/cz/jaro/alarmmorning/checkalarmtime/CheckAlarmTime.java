@@ -14,7 +14,7 @@ import android.util.Log;
 
 import java.util.Calendar;
 
-import cz.jaro.alarmmorning.AlarmMorningActivity;
+import cz.jaro.alarmmorning.Analytics;
 import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.Localization;
 import cz.jaro.alarmmorning.R;
@@ -27,6 +27,10 @@ import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.graphics.TimePreference;
 import cz.jaro.alarmmorning.model.AlarmDataSource;
 import cz.jaro.alarmmorning.model.Day;
+
+import static cz.jaro.alarmmorning.Analytics.CHECK_ALARM_TIME_ACTION__DON_T_SHOW_NOTIFICATION;
+import static cz.jaro.alarmmorning.Analytics.CHECK_ALARM_TIME_ACTION__NO_APPOINTMENT;
+import static cz.jaro.alarmmorning.Analytics.CHECK_ALARM_TIME_ACTION__SHOW_NOTIFICATION;
 
 /**
  * This class implements the "check alarm time" feature. Specifically, the following check is (typically) run in the evening: compare the alarm time and time of
@@ -62,9 +66,9 @@ public class CheckAlarmTime {
     protected static final String ACTION_CHECK_ALARM_TIME = "CHECK_ALARM_TIME";
 
     /**
-     * Action meaning: Dismiss the notification. Note: the notification may have been already dismissed by the user.
+     * Action meaning: Automatically hide the notification (on a specified time). Note: the notification may have been already dismissed by the user.
      */
-    protected static final String ACTION_DISMISS_NOTIFICATION = "DISMISS_NOTIFICATION";
+    protected static final String ACTION_AUTO_HIDE_NOTIFICATION = "AUTO_HIDE_NOTIFICATION";
 
     private CheckAlarmTime(Context context) {
         this.context = context;
@@ -146,7 +150,7 @@ public class CheckAlarmTime {
     private void registerNotificationDismiss(Calendar time) {
         Log.d(TAG, "registerNotificationDismiss()");
 
-        String action = ACTION_DISMISS_NOTIFICATION;
+        String action = ACTION_AUTO_HIDE_NOTIFICATION;
         Log.i(TAG, "Setting system alarm at " + time.getTime().toString() + " with action " + action);
 
         intentDismissNotification = new Intent(context, CheckAlarmTimeAlarmReceiver.class);
@@ -164,8 +168,8 @@ public class CheckAlarmTime {
 
         if (action.equals(ACTION_CHECK_ALARM_TIME)) {
             onCheckAlarmTime();
-        } else if (action.equals(ACTION_DISMISS_NOTIFICATION)) {
-            onDismissNotification();
+        } else if (action.equals(ACTION_AUTO_HIDE_NOTIFICATION)) {
+            onAutoHideNotification();
         } else {
             throw new IllegalArgumentException("Unexpected argument " + action);
         }
@@ -221,6 +225,10 @@ public class CheckAlarmTime {
         int checkAlarmTimeGap = preferences.getInt(SettingsActivity.PREF_CHECK_ALARM_TIME_GAP, SettingsActivity.PREF_CHECK_ALARM_TIME_GAP_DEFAULT);
         Log.v(TAG, "checkAlarmTimeGap=" + checkAlarmTimeGap + " minutes");
 
+        Analytics analytics = new Analytics(context, Analytics.Event.Show, Analytics.Channel.Time, Analytics.ChannelName.Check_alarm_time);
+        analytics.setDay(day);
+        analytics.set(Analytics.Param.Check_alarm_time_gap, checkAlarmTimeGap);
+
         CalendarHelper calendarHelper = new CalendarHelper(context);
         CalendarEventFilter notAllDay = new CalendarEventFilter() {
             @Override
@@ -241,17 +249,30 @@ public class CheckAlarmTime {
                 Log.v(TAG, "      adjusted targetAlarmTime to " + targetAlarmTime.getTime());
             }
 
+            analytics.set(Analytics.Param.Appointment_begin, Analytics.calendarToTime(event.getBegin()));
+            analytics.set(Analytics.Param.Appointment_title, event.getTitle());
+            analytics.set(Analytics.Param.Appointment_location, event.getLocation());
+
             if (!day.isEnabled() || targetAlarmTime.before(alarmTime)) {
                 Log.d(TAG, "Appointment that needs and earlier alarm time found");
+                analytics.set(Analytics.Param.Check_alarm_time_action, CHECK_ALARM_TIME_ACTION__SHOW_NOTIFICATION);
 
                 showNotification(day, targetAlarmTime, checkAlarmTimeGap, event);
                 registerNotificationDismiss(targetAlarmTime);
+            } else {
+                analytics.set(Analytics.Param.Check_alarm_time_action, CHECK_ALARM_TIME_ACTION__DON_T_SHOW_NOTIFICATION);
             }
+        } else {
+            analytics.set(Analytics.Param.Check_alarm_time_action, CHECK_ALARM_TIME_ACTION__NO_APPOINTMENT);
         }
+
+        analytics.save();
     }
 
-    private void onDismissNotification() {
-        Log.d(TAG, "onDismissNotification()");
+    private void onAutoHideNotification() {
+        Log.d(TAG, "onAutoHideNotification()");
+        new Analytics(context, Analytics.Event.Hide, Analytics.Channel.Time, Analytics.ChannelName.Check_alarm_time).save();
+
         hideNotification();
     }
 
@@ -269,8 +290,7 @@ public class CheckAlarmTime {
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
                 .setSmallIcon(R.drawable.ic_alarm_white)
-                .setContentTitle(contentTitle)
-                .setAutoCancel(true);
+                .setContentTitle(contentTitle);
 
         String meetingTimeText = Localization.timeToString(event.getBegin().get(Calendar.HOUR_OF_DAY), event.getBegin().get(Calendar.MINUTE), context);
         String contentText;
@@ -281,9 +301,15 @@ public class CheckAlarmTime {
         }
         mBuilder.setContentText(contentText);
 
-        Intent intent = new Intent(context, AlarmMorningActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        Intent intent = new Intent(context, CheckAlarmTimeNotificationReceiver.class);
+        intent.setAction(CheckAlarmTimeNotificationReceiver.ACTION_CHECK_ALARM_TIME_CLICK);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.setContentIntent(pendingIntent);
+
+        Intent deleteIntent = new Intent(context, CheckAlarmTimeNotificationReceiver.class);
+        deleteIntent.setAction(CheckAlarmTimeNotificationReceiver.ACTION_CHECK_ALARM_TIME_DELETE);
+        PendingIntent deletePendingIntent = PendingIntent.getBroadcast(context, 1, deleteIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        mBuilder.setDeleteIntent(deletePendingIntent);
 
         String targetTimeText = Localization.timeToString(targetAlarmTime.get(Calendar.HOUR_OF_DAY), targetAlarmTime.get(Calendar.MINUTE), context);
         String setText = res.getString(R.string.notification_check_text_set_at, targetTimeText);

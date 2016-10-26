@@ -277,8 +277,10 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     }
 
     private void save(Day day) {
+        Analytics analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
+
         GlobalManager globalManager = new GlobalManager(getActivity());
-        globalManager.saveAlarmTime(day, dataSource);
+        globalManager.saveAlarmTime(day, dataSource, analytics);
 
         adapter.notifyItemChanged(position);
         updatePositionNextAlarm();
