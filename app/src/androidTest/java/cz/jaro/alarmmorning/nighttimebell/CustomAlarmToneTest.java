@@ -59,7 +59,7 @@ public class CustomAlarmToneTest extends AndroidTestCase {
         // Set the ringtone preference to the default
         mSharedPreferences
                 .edit()
-                .putString(SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE, SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE)
+                .putString(SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE, SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE_DEFAULT)
                 .commit();
 
         installAlarmTones();
