@@ -48,8 +48,10 @@ public class Analytics {
 
     public static final String DISABLED = "Disabled";
 
-    public static final String DAY_OF_WEEK_TYPE__WORKDAY = "Workday";
+    public static final String DAY_OF_WEEK_TYPE__WEEKDAY = "Weekday";
     public static final String DAY_OF_WEEK_TYPE__WEEKEND = "Weekend";
+    public static final String DAY_OF_WEEK_TYPE__WEEKEND_ONSET = "Weekend onset";
+    public static final String DAY_OF_WEEK_TYPE__WEEKEND_CEASE = "Weekend cease";
 
     public static final String ALARM_STATE__SET_TO_SPECIFIC = "Set to specific";
     public static final String ALARM_STATE__SET_TO_DEFAULT = "Set to default";
@@ -274,7 +276,7 @@ public class Analytics {
         com.ibm.icu.util.Calendar c = com.ibm.icu.util.Calendar.getInstance();
         int dayOfWeek = alarmTime.get(Calendar.DAY_OF_WEEK);
         int dayOfWeekType = c.getDayOfWeekType(dayOfWeek);
-        String dayOfWeekTypeString = dayOfWeekType == com.ibm.icu.util.Calendar.WEEKEND ? DAY_OF_WEEK_TYPE__WEEKEND : DAY_OF_WEEK_TYPE__WORKDAY;
+        String dayOfWeekTypeString = dayOfWeekType == com.ibm.icu.util.Calendar.WEEKEND ? DAY_OF_WEEK_TYPE__WEEKEND : DAY_OF_WEEK_TYPE__WEEKDAY;
         mPayload.putString(Param.Day_of_week_type.name(), dayOfWeekTypeString);
 
         String alarmStateString;
@@ -441,6 +443,13 @@ public class Analytics {
             conf.put("timeZone_DisplayName", timeZone.getDisplayName());
             conf.put("timeZone_RawOffset", timeZone.getRawOffset());
             conf.put("timeZone_DSTSavings", timeZone.getDSTSavings());
+
+            com.ibm.icu.util.Calendar cal = com.ibm.icu.util.Calendar.getInstance();
+            for (int dayOfWeek : AlarmDataSource.allDaysOfWeek) {
+                String dayOfWeekText = Localization.dayOfWeekToStringShort(mContext.getResources(), dayOfWeek);
+                int dayOfWeekType = cal.getDayOfWeekType(dayOfWeek);
+                conf.put("dayOfWeekType_" + dayOfWeek + "_" + dayOfWeekText, dayOfWeekTypeToString(dayOfWeekType));
+            }
         } catch (JSONException e) {
             Log.w(TAG, "Cannot create configuration record", e);
         }
@@ -448,6 +457,21 @@ public class Analytics {
         mPayload.putSerializable(Param.Configuration.name(), conf.toString());
 
         return this;
+    }
+
+    public static String dayOfWeekTypeToString(int dayOfWeekType) {
+            switch (dayOfWeekType) {
+                case com.ibm.icu.util.Calendar.WEEKDAY:
+                    return DAY_OF_WEEK_TYPE__WEEKDAY;
+                case com.ibm.icu.util.Calendar.WEEKEND:
+                    return DAY_OF_WEEK_TYPE__WEEKEND;
+                case com.ibm.icu.util.Calendar.WEEKEND_ONSET:
+                    return DAY_OF_WEEK_TYPE__WEEKEND_ONSET;
+                case com.ibm.icu.util.Calendar.WEEKEND_CEASE:
+                    return DAY_OF_WEEK_TYPE__WEEKEND_CEASE;
+                default:
+                    throw new IllegalStateException("Unsupported day of week type " + dayOfWeekType);
+            }
     }
 
     public Analytics set(Param param, Serializable s) {
