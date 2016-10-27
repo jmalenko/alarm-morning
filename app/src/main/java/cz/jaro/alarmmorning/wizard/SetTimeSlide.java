@@ -10,6 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TimePicker;
 
+import cz.jaro.alarmmorning.Analytics;
 import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.model.AlarmDataSource;
@@ -89,7 +90,9 @@ public class SetTimeSlide extends BaseFragment implements TimePicker.OnTimeChang
             boolean isWeekend = dayOfWeekType == com.ibm.icu.util.Calendar.WEEKEND;
             defaults.setState(isWeekend ? Defaults.STATE_DISABLED : Defaults.STATE_ENABLED);
 
-            globalManager.saveAlarmTimeDefault(defaults, dataSource);
+            Analytics analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Wizard);
+
+            globalManager.saveAlarmTimeDefault(defaults, dataSource, analytics);
         }
 
         dataSource.close();

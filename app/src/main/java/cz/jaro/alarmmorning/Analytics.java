@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.Random;
 import java.util.TimeZone;
@@ -95,7 +96,7 @@ public class Analytics {
     }
 
     public enum Event {
-        Set_default, // TODO
+        Set_default,
 
         Set_alarm,
         Ring, // TODO
@@ -147,7 +148,7 @@ public class Analytics {
         Notification,
         Time,
         External,
-        Widget // TODO
+        Widget
     }
 
     public enum ChannelName {
@@ -155,7 +156,7 @@ public class Analytics {
         Defaults, // TODO
         Settings, // TODO
         Ring, // TODO
-        Wizard, // TODO
+        Wizard,
 
         Widget_alarm_time,
 
@@ -221,18 +222,7 @@ public class Analytics {
         }
 
         if (day != null || defaults != null) {
-            Defaults defaults2 = day != null ? day.getDefaults() : defaults;
-
-            int hour = defaults2.getHour();
-            int minute = defaults2.getMinute();
-
-            Calendar now = now();
-            Calendar defaultAlarmTime = (Calendar) now.clone();
-            defaultAlarmTime.set(Calendar.HOUR_OF_DAY, hour);
-            defaultAlarmTime.set(Calendar.MINUTE, minute);
-
-            String defaultAlarmTimeString = calendarToTime(defaultAlarmTime);
-            mPayload.putString(Param.Default_alarm_time.name(), defaultAlarmTimeString);
+            setDefaults(day != null ? day.getDefaults() : defaults);
         }
     }
 
@@ -309,6 +299,8 @@ public class Analytics {
         }
         mPayload.putString(Param.Alarm_state.name(), alarmStateString);
 
+        setDefaults(day.getDefaults());
+
         return this;
     }
 
@@ -330,6 +322,62 @@ public class Analytics {
             mPayload.putString(Param.Alarm_time_old.name(), DISABLED);
         }
         return this;
+    }
+
+    public Analytics setDefaults(Defaults defaults) {
+        if (defaults.isEnabled()) {
+            String defaultAlarmTimeString = getDefaultsAlarmTimeString(defaults);
+            mPayload.putString(Param.Default_alarm_time.name(), defaultAlarmTimeString);
+        } else {
+            mPayload.putString(Param.Default_alarm_time.name(), DISABLED);
+        }
+
+        return this;
+    }
+
+    public Analytics setDefaultsAll(Defaults defaults) {
+        int dayOfWeek = defaults.getDayOfWeek();
+
+        GregorianCalendar calendar = new GregorianCalendar(1, 2, 2016); // February 2016 starts with Monday
+        calendar.add(Calendar.DATE, dayOfWeek + 5);
+        String dayOfWeekString = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.US);
+        mPayload.putString(Param.Day_of_week.name(), dayOfWeekString);
+
+        com.ibm.icu.util.Calendar c = com.ibm.icu.util.Calendar.getInstance();
+        int dayOfWeekType = c.getDayOfWeekType(dayOfWeek);
+        String dayOfWeekTypeString = dayOfWeekType == com.ibm.icu.util.Calendar.WEEKEND ? DAY_OF_WEEK_TYPE__WEEKEND : DAY_OF_WEEK_TYPE__WEEKDAY;
+        mPayload.putString(Param.Day_of_week_type.name(), dayOfWeekTypeString);
+
+        setDefaults(defaults);
+
+        // Load currently stored alarm time
+        AlarmDataSource dataSource = new AlarmDataSource(mContext);
+        dataSource.open();
+
+        Defaults defaultsOld = dataSource.loadDefault(dayOfWeek);
+
+        dataSource.close();
+
+        if (defaultsOld.isEnabled()) {
+            String defaultAlarmTimeString = getDefaultsAlarmTimeString(defaultsOld);
+            mPayload.putString(Param.Alarm_time_old.name(), defaultAlarmTimeString);
+        } else {
+            mPayload.putString(Param.Alarm_time_old.name(), DISABLED);
+        }
+
+        return this;
+    }
+
+    private String getDefaultsAlarmTimeString(Defaults defaults) {
+        int hour = defaults.getHour();
+        int minute = defaults.getMinute();
+
+        Calendar now = now();
+        Calendar defaultAlarmTime = (Calendar) now.clone();
+        defaultAlarmTime.set(Calendar.HOUR_OF_DAY, hour);
+        defaultAlarmTime.set(Calendar.MINUTE, minute);
+
+        return calendarToTime(defaultAlarmTime);
     }
 
     public Analytics setConfigurationInfo() {
@@ -474,18 +522,18 @@ public class Analytics {
     }
 
     public static String dayOfWeekTypeToString(int dayOfWeekType) {
-            switch (dayOfWeekType) {
-                case com.ibm.icu.util.Calendar.WEEKDAY:
-                    return DAY_OF_WEEK_TYPE__WEEKDAY;
-                case com.ibm.icu.util.Calendar.WEEKEND:
-                    return DAY_OF_WEEK_TYPE__WEEKEND;
-                case com.ibm.icu.util.Calendar.WEEKEND_ONSET:
-                    return DAY_OF_WEEK_TYPE__WEEKEND_ONSET;
-                case com.ibm.icu.util.Calendar.WEEKEND_CEASE:
-                    return DAY_OF_WEEK_TYPE__WEEKEND_CEASE;
-                default:
-                    throw new IllegalStateException("Unsupported day of week type " + dayOfWeekType);
-            }
+        switch (dayOfWeekType) {
+            case com.ibm.icu.util.Calendar.WEEKDAY:
+                return DAY_OF_WEEK_TYPE__WEEKDAY;
+            case com.ibm.icu.util.Calendar.WEEKEND:
+                return DAY_OF_WEEK_TYPE__WEEKEND;
+            case com.ibm.icu.util.Calendar.WEEKEND_ONSET:
+                return DAY_OF_WEEK_TYPE__WEEKEND_ONSET;
+            case com.ibm.icu.util.Calendar.WEEKEND_CEASE:
+                return DAY_OF_WEEK_TYPE__WEEKEND_CEASE;
+            default:
+                throw new IllegalStateException("Unsupported day of week type " + dayOfWeekType);
+        }
     }
 
     public Analytics set(Param param, Serializable s) {
@@ -520,9 +568,9 @@ public class Analytics {
                 padRight(Param.Day_of_week, 3) + " | " +
                 padRight(Param.Day_of_week_type, 7) + " | " +
                 padRight(Param.Alarm_state, 15) + " | " +
-                padLeft(Param.Default_alarm_time, 5) + " | " +
+                padLeft(Param.Default_alarm_time, 8) + " | " +
 
-                padLeft(Param.Alarm_time_old, 5) + " | " +
+                padLeft(Param.Alarm_time_old, 8) + " | " +
 
                 padRight(Param.Check_alarm_time_action, 23) + " | " +
                 padRight(Param.Check_alarm_time_gap, 3) + " | " +

@@ -93,8 +93,10 @@ public class DefaultsActivity extends AppCompatActivity implements View.OnCreate
     }
 
     private void save(Defaults defaults) {
+        Analytics analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Defaults);
+
         GlobalManager globalManager = new GlobalManager(this);
-        globalManager.saveAlarmTimeDefault(defaults, dataSource);
+        globalManager.saveAlarmTimeDefault(defaults, dataSource, analytics);
 
         adapter.notifyDataSetChanged();
     }

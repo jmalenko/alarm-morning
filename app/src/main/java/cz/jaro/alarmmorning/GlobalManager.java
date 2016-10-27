@@ -484,8 +484,13 @@ public class GlobalManager {
         onAlarmSet();
     }
 
-    public void saveAlarmTimeDefault(Defaults defaults, AlarmDataSource dataSource) {
+    public void saveAlarmTimeDefault(Defaults defaults, AlarmDataSource dataSource, Analytics analytics) {
         Log.d(TAG, "saveAlarmTimeDefault()");
+
+        analytics.setContext(context);
+        analytics.setEvent(Analytics.Event.Set_default);
+        analytics.setDefaultsAll(defaults);
+        analytics.save();
 
         String dayOfWeekText = Localization.dayOfWeekToStringShort(context.getResources(), defaults.getDayOfWeek());
         if (defaults.getState() == Defaults.STATE_ENABLED)
