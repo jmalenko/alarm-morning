@@ -82,6 +82,8 @@
         </receiver>
         <receiver android:name=".receivers.NotificationReceiver">
         </receiver>
+        <receiver android:name=".receivers.WidgetReceiver">
+        </receiver>
         <receiver android:name=".checkalarmtime.CheckAlarmTimeAlarmReceiver">
         </receiver>
         <receiver android:name=".checkalarmtime.CheckAlarmTimeNotificationReceiver">

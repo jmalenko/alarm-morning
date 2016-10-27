@@ -105,19 +105,30 @@ public class Analytics {
 
         Skipped_alarm, // TODO
 
-        Add, // TODO
+        /**
+         * When a notification or widget is clicked.
+         */
         Click,
-        Remove, // TODO
 
         /**
-         * Use just before calling {@link NotificationManager#notify(int, Notification)} }
+         * Use just before calling {@link NotificationManager#notify(int, Notification)}.
          */
         Show,
 
         /**
-         * Use when a notification is cancelled
+         * Use when a notification is cancelled, eg. in {@link NotificationManager#cancel(int)}.
          */
         Hide,
+
+        /**
+         * Use in {@link WidgetProvider#onEnabled(Context)}.
+         */
+        Add,
+
+        /**
+         * Use in {@link WidgetProvider#onDisabled(Context)}.
+         */
+        Remove,
 
         Play_nighttime_bell,
 
@@ -145,6 +156,9 @@ public class Analytics {
         Settings, // TODO
         Ring, // TODO
         Wizard, // TODO
+
+        Widget_alarm_time,
+
         Check_alarm_time,
         Nighttime_bell,
 

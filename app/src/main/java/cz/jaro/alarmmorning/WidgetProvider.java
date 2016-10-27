@@ -3,6 +3,7 @@ package cz.jaro.alarmmorning;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -14,6 +15,7 @@ import java.util.Calendar;
 
 import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.model.Day;
+import cz.jaro.alarmmorning.receivers.WidgetReceiver;
 
 /**
  * The widget.
@@ -22,7 +24,24 @@ public class WidgetProvider extends AppWidgetProvider {
 
     private static final String TAG = WidgetProvider.class.getSimpleName();
 
+    /**
+     * Hide the tomorrow's alarm time until it is nearer than this number of hours.
+     * <p>
+     * This is a negative number. Technically: hide until the actual time - alarm time > this constant.
+     */
     public static final int HIDE_TOMORROW_HOURS = -22;
+
+    @Override
+    public void onEnabled(Context context) {
+        super.onEnabled(context);
+        new Analytics(context, Analytics.Event.Add, Analytics.Channel.Widget, Analytics.ChannelName.Widget_alarm_time).save();
+    }
+
+    @Override
+    public void onDisabled(Context context) {
+        super.onDisabled(context);
+        new Analytics(context, Analytics.Event.Remove, Analytics.Channel.Widget, Analytics.ChannelName.Widget_alarm_time).save();
+    }
 
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         Log.v(TAG, "onUpdate()");
@@ -42,8 +61,9 @@ public class WidgetProvider extends AppWidgetProvider {
         Log.d(TAG, "updateContent()");
 
         // Launch activity
-        Intent intent = new Intent(context, AlarmMorningActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+        Intent intent = new Intent(context, WidgetReceiver.class);
+        intent.setAction(WidgetReceiver.ACTION_WIDGET_CLICK);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         views.setOnClickPendingIntent(R.id.widget_layout, pendingIntent);
 
         // Set content
