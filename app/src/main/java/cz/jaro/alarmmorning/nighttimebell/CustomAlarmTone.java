@@ -165,7 +165,7 @@ public class CustomAlarmTone {
             Log.d(TAG, "Copied alarm tone '" + title + "' to " + outAbsPath);
             Log.d(TAG, "URI is " + newUri.toString());
         } catch (Exception e) {
-            Log.e(TAG, "Error writing " + filename, e);
+            Log.w(TAG, "Error writing " + filename, e);
             isError = true;
         } finally {
             // Close the streams
