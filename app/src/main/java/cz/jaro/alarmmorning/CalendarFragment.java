@@ -504,16 +504,22 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
             case R.id.day_dismiss:
                 Log.i(TAG, "Dismiss");
+
+                Analytics analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
+
                 Context context = getActivity();
                 GlobalManager globalManager = new GlobalManager(context);
-                globalManager.onDismissBeforeRinging();
+                globalManager.onDismissBeforeRinging(analytics);
                 break;
 
             case R.id.day_snooze:
                 Log.i(TAG, "Snooze");
+
+                Analytics analytics2 = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
+
                 Context context2 = getActivity();
                 GlobalManager globalManager2 = new GlobalManager(context2);
-                globalManager2.onSnooze();
+                globalManager2.onSnooze(analytics2);
                 break;
         }
         return super.onContextItemSelected(item);

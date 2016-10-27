@@ -208,8 +208,10 @@ public class RingActivity extends Activity implements RingInterface {
 
         stopAll();
 
+        Analytics analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Ring);
+
         GlobalManager globalManager = new GlobalManager(context);
-        globalManager.onDismiss();
+        globalManager.onDismiss(analytics);
 
         finish();
     }
@@ -219,8 +221,10 @@ public class RingActivity extends Activity implements RingInterface {
 
         stopAll();
 
+        Analytics analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Ring);
+
         GlobalManager globalManager = new GlobalManager(context);
-        globalManager.onSnooze();
+        globalManager.onSnooze(analytics);
 
         finish();
     }

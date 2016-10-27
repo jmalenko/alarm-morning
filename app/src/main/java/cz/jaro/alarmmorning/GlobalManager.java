@@ -30,27 +30,34 @@ import cz.jaro.alarmmorning.model.Defaults;
 
 /**
  * The GlobalManager keeps the state of the application and communicates with the application components.
- * <p/>
- * The <b>state of the application</b> must be kept somewhere. Reasons:<br>
+ * <p>
+ * The <b>state of the application</b> must be kept somewhere. Reasons:
+ * <p>
  * 1. After booting, only the  receiver of next {@link SystemAlarm} is registered. This is the "minimal state of interaction with operating system" and the
  * operating system / user may bring the app to this state (e.g. operating system by destroying the activity if it is in the background, user cancelling the
- * notification).<br>
+ * notification).
+ * <p>
  * 2. There is no way to get the system alarm broadcast registered by this app (in the minimal state described above). Therefore, the reference must be kept
- * here (to allow its cancellation when user set earlier alarm). That is realized by methods {@link #getNextAction()}} and {@link
- * #setNextAction(NextAction)} which use the value stored in {@code SharedPreferences}.
+ * here (to allow its cancellation when user set earlier alarm). That is realized by methods {@link #getNextAction()}} and {@link #setNextAction(NextAction)}
+ * which use the value stored in {@code SharedPreferences}.
  * <p/>
- * The <b>communication among application components</b> must communicate.<br>
- * Then the user makes an action in one component, the other components must act accordingly. Also, the time events must be handled (alarm rings till next
- * alarm; if there are no alarm until horizon (because the user disabled all the alarms), check again just before the horizon (as the defaults may make an
- * alarm
+ * The <b>communication among application components</b>:
+ * <p>
+ * When the user makes an action in one component, the other components must act accordingly. Also, the time events must be handled (alarm rings till next
+ * alarm; if there are no alarm until horizon (because the user disabled all the alarms), check again just before the horizon (as the defaults may make an alarm
  * appear).
  * <p/>
- * The <b>components of the application</b> are:<br>
- * 1. State of the alarm ("was it dimissed?")<br>
- * 2. The registered System alarm<br>
- * 3. Notification<br>
- * 4. Ring activity (when alarm is ringing)<br>
- * 5. App activity<br>
+ * The <b>components of the application</b> are:
+ * <p>
+ * 1. State of the alarm ("was it dimissed?")
+ * <p>
+ * 2. The registered System alarm
+ * <p>
+ * 3. Notification
+ * <p>
+ * 4. Ring activity (when alarm is ringing)
+ * <p>
+ * 5. App activity
  */
 public class GlobalManager {
 
@@ -92,7 +99,7 @@ public class GlobalManager {
         return new SystemClock();
     }
 
-    protected Day getDayWithNextAlarmToRing() {
+    public Day getDayWithNextAlarmToRing() {
         Log.v(TAG, "getDayWithNextAlarmToRing()");
 
         AlarmDataSource dataSource = new AlarmDataSource(context);
@@ -299,11 +306,15 @@ public class GlobalManager {
     }
 
     /**
-     * Algorithm:<br>
-     *     1. if the alarmTime is for last alarm then return the state of last alarm (same as {@link #getState()})<br>
-     *     2. if the alarmTime is in the set of dismissed alarms then return {@link #STATE_DISMISSED}<br>
-     *     3. if the alarmTime is in past then return {@link #STATE_DISMISSED}<br>
-     *     4. if the alarmTime is in future then return {@link #STATE_FUTURE}
+     * Algorithm:
+     * <p>
+     * 1. if the alarmTime is for last alarm then return the state of last alarm (same as {@link #getState()})
+     * <p>
+     * 2. if the alarmTime is in the set of dismissed alarms then return {@link #STATE_DISMISSED}
+     * <p>
+     * 3. if the alarmTime is in past then return {@link #STATE_DISMISSED}
+     * <p>
+     * 4. if the alarmTime is in future then return {@link #STATE_FUTURE}
      *
      * @param alarmTime
      * @return
@@ -379,7 +390,7 @@ public class GlobalManager {
                 Log.w(TAG, "The next system alarm changed while the app was not running.\n" +
                         "   Persisted is action=" + nextActionPersisted.action + ", time=" + nextActionPersisted.time.getTime() + ", alarmTime=" + nextActionPersisted.alarmTime.getTime() + "\n" +
                         "   Current is   action=" + nextAction.action + ", time=" + nextAction.time.getTime() + ", alarmTime=" + nextAction.alarmTime.getTime());
-                // More precisely: ... while the app was not running (e.g. because it was being upgraded or the device was off)
+                // e.g. because it was being upgraded or the device was off
 
                 List<Calendar> skippedAlarmTimes = new ArrayList<>();
 
@@ -397,10 +408,14 @@ public class GlobalManager {
                 if (!skippedAlarmTimes.isEmpty()) {
                     Log.i(TAG, "  The following alarm times were skipped: " + Localization.dateTimesToString(skippedAlarmTimes, context));
 
+                    Analytics analytics = new Analytics(context, Analytics.Event.Skipped_alarm, Analytics.Channel.Time, Analytics.ChannelName.Alarm);
+                    analytics.set(Analytics.Param.Skipped_alarm_times, skippedAlarmTimes.toString());
+                    analytics.save();
+
                     SystemNotification systemNotification = SystemNotification.getInstance(context);
                     systemNotification.notifySkippedAlarms(skippedAlarmTimes.size());
 
-                    lastAlarmTime = skippedAlarmTimes.get(skippedAlarmTimes.size()-1);
+                    lastAlarmTime = skippedAlarmTimes.get(skippedAlarmTimes.size() - 1);
                 }
             }
         }
@@ -434,7 +449,8 @@ public class GlobalManager {
 
     /**
      * Check if the time is in past minutes minutes.
-     * @param time time
+     *
+     * @param time    time
      * @param minutes minutes
      * @return true if the time is in the period &lt;now - minutes ; now&gt;
      */
@@ -469,8 +485,6 @@ public class GlobalManager {
         analytics.setDay(day);
         analytics.setDayOld(day);
         analytics.save();
-
-        Log.d(TAG, "saveAlarmTime()");
 
         if (day.getState() == Day.STATE_DISABLED)
             Log.i(TAG, "Disable alarm on " + day.getDateTime().getTime());
@@ -556,6 +570,10 @@ public class GlobalManager {
     private void onNearFuture(boolean callSystemAlarm) {
         Log.d(TAG, "onNearFuture(callSystemAlarm=" + callSystemAlarm + ")");
 
+        Analytics analytics = new Analytics(context, Analytics.Event.Show, Analytics.Channel.Notification, Analytics.ChannelName.Alarm);
+        analytics.setDay(getDayWithNextAlarmToRing());
+        analytics.save();
+
         if (isRingingOrSnoozed()) {
             Log.i(TAG, "The previous alarm is still ringing. Ignoring this event.");
 
@@ -578,8 +596,14 @@ public class GlobalManager {
         systemNotification.onNearFuture();
     }
 
-    public void onDismissBeforeRinging() {
+    public void onDismissBeforeRinging(Analytics analytics) {
         Log.d(TAG, "onDismissBeforeRinging()");
+
+        analytics.setContext(context);
+        analytics.setEvent(Analytics.Event.Dismiss);
+        analytics.set(Analytics.Param.Dismiss_type, Analytics.DISMISS__BEFORE);
+        analytics.setDay(getDayWithNextAlarmToRing());
+        analytics.save();
 
         setState(STATE_DISMISSED_BEFORE_RINGING, getAlarmTimeOfRingingAlarm());
         addDismissedAlarm(getAlarmTimeOfRingingAlarm());
@@ -642,6 +666,12 @@ public class GlobalManager {
             setState(STATE_RINGING, getAlarmTimeOfRingingAlarm());
         }
 
+        Analytics analytics = new Analytics(context, Analytics.Event.Ring, Analytics.Channel.Time, Analytics.ChannelName.Alarm);
+        analytics.setDay(getDayWithNextAlarmToRing());
+        // TODO Analytics - add number of snoozes
+        // TODO Analytics - add device location
+        analytics.save();
+
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
         systemAlarm.onRing();
 
@@ -660,8 +690,14 @@ public class GlobalManager {
         updateCalendarActivity(context, AlarmMorningActivity.ACTION_RING);
     }
 
-    public void onDismiss() {
+    public void onDismiss(Analytics analytics) {
         Log.d(TAG, "onDismiss()");
+
+        analytics.setContext(context);
+        analytics.setEvent(Analytics.Event.Dismiss);
+        analytics.set(Analytics.Param.Dismiss_type, Analytics.DISMISS__AFTER);
+        analytics.setDay(getDayWithNextAlarmToRing());
+        analytics.save();
 
         if (getState() == STATE_SNOOZED) {
             SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
@@ -688,8 +724,14 @@ public class GlobalManager {
         }
     }
 
-    public void onSnooze() {
+    public void onSnooze(Analytics analytics) {
         Log.d(TAG, "onSnooze()");
+
+        analytics.setContext(context);
+        analytics.setEvent(Analytics.Event.Snooze);
+        analytics.setDay(getDayWithNextAlarmToRing());
+        // TODO Analytics - add number of snoozes
+        analytics.save();
 
         setState(STATE_SNOOZED, getAlarmTimeOfRingingAlarm());
 
@@ -712,6 +754,15 @@ public class GlobalManager {
      */
     public void onAlarmCancel() {
         Log.d(TAG, "onAlarmCancel()");
+
+        int state = getState();
+        if (state == STATE_SNOOZED || state == STATE_RINGING) {
+            Analytics analytics = new Analytics(context, Analytics.Event.Dismiss, Analytics.Channel.Time, Analytics.ChannelName.Alarm);
+            analytics.set(Analytics.Param.Dismiss_type, Analytics.DISMISS__AUTO);
+            analytics.setDay(getDayWithNextAlarmToRing());
+            analytics.save();
+            // FIXME Analytics - Situation: Alarm at 9:00 is snoozed. Currently the events are in the order 1. Set alarm to 10:00, 2. Dismiss alarm at 9:00. Expected: The order should be switched. Moreover, currently there is time 10:00 with the Dismiss record, which is not correct as the alarm at 9:00 is dismissed.
+        }
 
         SystemNotification systemNotification = SystemNotification.getInstance(context);
         systemNotification.onAlarmCancel();

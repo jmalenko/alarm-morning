@@ -49,6 +49,10 @@ public class Analytics {
 
     public static final String DISABLED = "Disabled";
 
+    public static final String DISMISS__BEFORE = "Before";
+    public static final String DISMISS__AFTER = "After";
+    public static final String DISMISS__AUTO = "Auto";
+
     public static final String DAY_OF_WEEK_TYPE__WEEKDAY = "Weekday";
     public static final String DAY_OF_WEEK_TYPE__WEEKEND = "Weekend";
     public static final String DAY_OF_WEEK_TYPE__WEEKEND_ONSET = "Weekend onset";
@@ -77,9 +81,11 @@ public class Analytics {
         Day_of_week,
         Day_of_week_type,
         Alarm_state,
-        Default_alarm_time, // TODO
+        Default_alarm_time,
 
         Alarm_time_old,
+        Skipped_alarm_times,
+        Dismiss_type,
 
         Check_alarm_time_action,
         Check_alarm_time_gap,
@@ -99,12 +105,11 @@ public class Analytics {
         Set_default,
 
         Set_alarm,
-        Ring, // TODO
-        Snooze, // TODO
-        Dismiss, // TODO
-        Auto_dismiss, // TODO
+        Ring,
+        Snooze,
+        Dismiss,
 
-        Skipped_alarm, // TODO
+        Skipped_alarm,
 
         /**
          * When a notification or widget is clicked.
@@ -153,10 +158,12 @@ public class Analytics {
 
     public enum ChannelName {
         Calendar,
-        Defaults, // TODO
-        Settings, // TODO
-        Ring, // TODO
+        Defaults,
+        Settings,
+        Ring,
         Wizard,
+
+        Alarm,
 
         Widget_alarm_time,
 
@@ -560,7 +567,7 @@ public class Analytics {
     @Override
     public String toString() {
         return padLeft(Param.Datetime_UTC, 23) + " | " +
-                padRight(mEvent.name(), 20) + " | " +
+                padRight(mEvent.toString(), 20) + " | " +
                 padRight(Param.Channel, 20) + " | " +
                 padRight(Param.Channel_name, 20) + " | " +
                 padRight(Param.Alarm_date, 10) + " | " +
@@ -571,6 +578,8 @@ public class Analytics {
                 padLeft(Param.Default_alarm_time, 8) + " | " +
 
                 padLeft(Param.Alarm_time_old, 8) + " | " +
+                padRight(Param.Skipped_alarm_times, 20) + " | " +
+                padRight(Param.Dismiss_type, 6) + " | " +
 
                 padRight(Param.Check_alarm_time_action, 23) + " | " +
                 padRight(Param.Check_alarm_time_gap, 3) + " | " +

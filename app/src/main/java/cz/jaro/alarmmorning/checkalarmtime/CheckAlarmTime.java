@@ -228,6 +228,7 @@ public class CheckAlarmTime {
         Analytics analytics = new Analytics(context, Analytics.Event.Show, Analytics.Channel.Time, Analytics.ChannelName.Check_alarm_time);
         analytics.setDay(day);
         analytics.set(Analytics.Param.Check_alarm_time_gap, checkAlarmTimeGap);
+        // TODO Analytics - add device location
 
         CalendarHelper calendarHelper = new CalendarHelper(context);
         CalendarEventFilter notAllDay = new CalendarEventFilter() {

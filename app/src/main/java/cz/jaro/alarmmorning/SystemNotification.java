@@ -89,8 +89,9 @@ public class SystemNotification {
         String contentText = res.getString(R.string.notification_text_future);
         mBuilder.setContentText(contentText);
 
-        Intent intent = new Intent(context, AlarmMorningActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        Intent intent = new Intent(context, NotificationReceiver.class);
+        intent.setAction(NotificationReceiver.ACTION_CLICK_NOTIFICATION);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.setContentIntent(pendingIntent);
 
         String dismissText = res.getString(R.string.action_dismiss);
@@ -117,10 +118,13 @@ public class SystemNotification {
         String contentText = res.getString(R.string.notification_text_ringing);
         mBuilder.setContentText(contentText);
 
-        Intent intent = new Intent(context, RingActivity.class);
         GlobalManager globalManager = new GlobalManager(context);
+
+        Intent intent = new Intent(context, NotificationReceiver.class);
+        intent.setAction(NotificationReceiver.ACTION_CLICK_NOTIFICATION);
+        intent.putExtra(NotificationReceiver.EXTRA_ACTIVITY, NotificationReceiver.EXTRA_ACTIVITY__RING);
         intent.putExtra(RingActivity.ALARM_TIME, globalManager.getAlarmTimeOfRingingAlarm()); // We must pass this to the activity as it might have been destroyed
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.setContentIntent(pendingIntent);
 
         String dismissText = res.getString(R.string.action_dismiss);
@@ -154,8 +158,9 @@ public class SystemNotification {
         String contentText = res.getString(R.string.notification_text_snoozed, ringAfterSnoozeTimeText);
         mBuilder.setContentText(contentText);
 
-        Intent intent = new Intent(context, AlarmMorningActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        Intent intent = new Intent(context, NotificationReceiver.class);
+        intent.setAction(NotificationReceiver.ACTION_CLICK_NOTIFICATION);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.setContentIntent(pendingIntent);
 
         String dismissText = res.getString(R.string.action_dismiss);
@@ -190,8 +195,9 @@ public class SystemNotification {
         String contentText = res.getString(R.string.notification_text_cancelled);
         mBuilder.setContentText(contentText);
 
-        Intent intent = new Intent(context, AlarmMorningActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        Intent intent = new Intent(context, NotificationReceiver.class);
+        intent.setAction(NotificationReceiver.ACTION_CLICK_NOTIFICATION);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.setContentIntent(pendingIntent);
 
         NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
