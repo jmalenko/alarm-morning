@@ -413,9 +413,6 @@ public class Analytics {
             int nearFutureMinutes = preferences.getInt(SettingsActivity.PREF_NEAR_FUTURE_TIME, SettingsActivity.PREF_NEAR_FUTURE_TIME_DEFAULT);
             conf.put(SettingsActivity.PREF_NEAR_FUTURE_TIME, nearFutureMinutes);
 
-            boolean askPreference = preferences.getBoolean(SettingsActivity.PREF_ASK_TO_CHANGE_OTHER_WEEKDAYS_WIT_THE_SAME_ALARM_TIME, SettingsActivity.PREF_ASK_TO_CHANGE_OTHER_WEEKDAYS_WIT_THE_SAME_ALARM_TIME_DEFAULT);
-            conf.put(SettingsActivity.PREF_ASK_TO_CHANGE_OTHER_WEEKDAYS_WIT_THE_SAME_ALARM_TIME, askPreference);
-
             int napTime = preferences.getInt(SettingsActivity.PREF_NAP_TIME, SettingsActivity.PREF_NAP_TIME_DEFAULT);
             conf.put(SettingsActivity.PREF_NAP_TIME, napTime);
 

@@ -65,11 +65,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     public static final String PREF_NEAR_FUTURE_TIME = "pref_near_future_time";
 
     /**
-     * Value is boolean.
-     */
-    public static final String PREF_ASK_TO_CHANGE_OTHER_WEEKDAYS_WIT_THE_SAME_ALARM_TIME = "pref_ask_to_change_other_weekdays_with_the_same_alarm_time";
-
-    /**
      * Value is in minutes.
      */
     public static final String PREF_NAP_TIME = "pref_nap_time";
@@ -100,7 +95,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     public static final int PREF_SNOOZE_TIME_DEFAULT = 10;
     public static final int PREF_NEAR_FUTURE_TIME_DEFAULT = 120;
     public static final String PREF_ACTION_DEFAULT = PREF_ACTION_NOTHING;
-    public static final boolean PREF_ASK_TO_CHANGE_OTHER_WEEKDAYS_WIT_THE_SAME_ALARM_TIME_DEFAULT = true;
     public static final int PREF_NAP_TIME_DEFAULT = 30;
     public static final boolean PREF_CHECK_ALARM_TIME_DEFAULT = true;
     public static final String PREF_CHECK_ALARM_TIME_AT_DEFAULT = "22:00";

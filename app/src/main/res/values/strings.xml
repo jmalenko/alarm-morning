@@ -16,9 +16,7 @@
     <string name="title_activity_defaults">Default alarms</string>
 
     <string name="change_others_title">Set alarm to <xliff:g id="time" example="07:00">%1$s</xliff:g> on <xliff:g id="dayOfWeek" example="Sat">%2$s</xliff:g> too?</string>
-    <string name="change_others_message">This quickly changes other weekdays with the same alarm time to the new alarm time.</string>
     <string name="change_others_yes">Set</string>
-    <string name="change_others_no">No</string>
 
     <string name="menu_default_header">Alarms at <xliff:g id="time" example="07:00">%1$s</xliff:g> on <xliff:g id="dayOfWeek" example="Sat">%2$s</xliff:g></string>
     <string name="menu_default_header_disabled">Alarms disabled on <xliff:g id="dayOfWeek" example="Sat">%1$s</xliff:g></string>

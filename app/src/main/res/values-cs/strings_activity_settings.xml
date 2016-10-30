@@ -57,9 +57,5 @@
 
     <string name="pref_title_advanced_settings">Pokročilá nastavení</string>
 
-    <string name="pref_title_ask_to_change_other_weekdays_with_the_same_alarm_time">Zeptat se na změnu podobných budíků</string>
-    <string name="pref_summaryoff_ask_to_change_other_weekdays_with_the_same_alarm_time">Zeptat se, zda také změnit čas budíku v ostních dnech, které byly nasteveny na původní čas.</string>
-    <string name="pref_summaryon_ask_to_change_other_weekdays_with_the_same_alarm_time">Neptat se, zda také změnit čas budíku v ostních dnech, které byly nasteveny na původní čas.</string>
-
     <string name="pref_title_nap_time">Délka zdřímnutí</string>
 </resources>

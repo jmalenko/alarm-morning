@@ -57,9 +57,5 @@
 
     <string name="pref_title_advanced_settings">Advanced settings</string>
 
-    <string name="pref_title_ask_to_change_other_weekdays_with_the_same_alarm_time">Ask to change similar default alarm times</string>
-    <string name="pref_summaryoff_ask_to_change_other_weekdays_with_the_same_alarm_time">Ask to change the alarm time on other weekdays with the same original alarm time. This happens when changing default alarm time and there are such other weekdays.</string>
-    <string name="pref_summaryon_ask_to_change_other_weekdays_with_the_same_alarm_time">Don\'t ask to change the alarm time on other weekdays with the same original alarm time. This happens when changing default alarm time and there are such other weekdays.</string>
-
     <string name="pref_title_nap_time">Nap time</string>
 </resources>

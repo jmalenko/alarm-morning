@@ -1,11 +1,9 @@
 package cz.jaro.alarmmorning;
 
 import android.app.TimePickerDialog;
-import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.support.v7.app.AlertDialog;
+import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -38,6 +36,8 @@ public class DefaultsActivity extends AppCompatActivity implements View.OnCreate
     private List<Integer> otherWeekdaysWithTheSameAlarmTime;
 
     protected int firstDayOfWeek;
+
+    private Snackbar snackbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,6 +116,12 @@ public class DefaultsActivity extends AppCompatActivity implements View.OnCreate
     }
 
     private void showTimePicker() {
+        // Hide snackbar
+        if (snackbar != null && snackbar.isShownOrQueued()) {
+            snackbar.dismiss();
+        }
+
+        // Show time picker
         TimePickerFragment fragment = new TimePickerFragment();
 
         fragment.setOnTimeSetListener(this);
@@ -212,12 +218,6 @@ public class DefaultsActivity extends AppCompatActivity implements View.OnCreate
     private void calculateChangeOtherDays() {
         otherWeekdaysWithTheSameAlarmTime = new ArrayList<>();
 
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean askPreference = preferences.getBoolean(SettingsActivity.PREF_ASK_TO_CHANGE_OTHER_WEEKDAYS_WIT_THE_SAME_ALARM_TIME, SettingsActivity.PREF_ASK_TO_CHANGE_OTHER_WEEKDAYS_WIT_THE_SAME_ALARM_TIME_DEFAULT);
-
-        if (!askPreference)
-            return;
-
         for (int i = 0; i < AlarmDataSource.allDaysOfWeek.length; i++) {
             int j = (firstDayOfWeek + i) % AlarmDataSource.allDaysOfWeek.length;
             int dayOfWeek = AlarmDataSource.allDaysOfWeek[j];
@@ -242,32 +242,21 @@ public class DefaultsActivity extends AppCompatActivity implements View.OnCreate
             }
             String title = getResources().getString(R.string.change_others_title, timeText, days);
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle(title)
-                    .setMessage(getString(R.string.change_others_message))
-                    .setPositiveButton(getString(R.string.change_others_yes), dialogClickListener)
-                    .setNegativeButton(getString(R.string.change_others_no), dialogClickListener)
-                    .show();
+            snackbar = Snackbar.make(getCurrentFocus(), title, Snackbar.LENGTH_INDEFINITE);
+            snackbar.setAction(getString(R.string.change_others_yes), snackbarClickListener);
+            snackbar.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.primary_dark));
+            snackbar.show();
         }
     }
 
-    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+    View.OnClickListener snackbarClickListener = new View.OnClickListener() {
         @Override
-        public void onClick(DialogInterface dialog, int which) {
-            switch (which) {
-                case DialogInterface.BUTTON_POSITIVE:
-                    // Yes button clicked
-                    for (int dayOfWeek : otherWeekdaysWithTheSameAlarmTime) {
-                        Defaults defaults2 = defaults.clone();
-                        defaults2.setDayOfWeek(dayOfWeek);
+        public void onClick(View v) {
+            for (int dayOfWeek : otherWeekdaysWithTheSameAlarmTime) {
+                Defaults defaults2 = defaults.clone();
+                defaults2.setDayOfWeek(dayOfWeek);
 
-                        save(defaults2);
-                    }
-                    break;
-
-                case DialogInterface.BUTTON_NEGATIVE:
-                    // Nothing
-                    break;
+                save(defaults2);
             }
         }
     };

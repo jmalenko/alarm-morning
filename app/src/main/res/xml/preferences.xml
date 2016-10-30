@@ -149,13 +149,6 @@
             android:title="@string/pref_title_advanced_settings"
             android:defaultValue="0">
 
-            <CheckBoxPreference
-                android:key="pref_ask_to_change_other_weekdays_with_the_same_alarm_time"
-                android:title="@string/pref_title_ask_to_change_other_weekdays_with_the_same_alarm_time"
-                android:defaultValue="true"
-                android:summaryOff="@string/pref_summaryoff_ask_to_change_other_weekdays_with_the_same_alarm_time"
-                android:summaryOn="@string/pref_summaryon_ask_to_change_other_weekdays_with_the_same_alarm_time"/>
-
             <cz.jaro.alarmmorning.graphics.RelativeTimePreference
                 android:key="pref_nap_time"
                 android:title="@string/pref_title_nap_time"

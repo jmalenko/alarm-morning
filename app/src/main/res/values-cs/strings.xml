@@ -16,9 +16,7 @@
     <string name="title_activity_defaults">Pravidla pro dny</string>
 
     <string name="change_others_title">Nastavit budík na <xliff:g id="time" example="07:00">%1$s</xliff:g> také v <xliff:g id="dayOfWeek" example="Sat">%2$s</xliff:g>?</string>
-    <string name="change_others_message">Tímto rychle změníte budík i v ostatní dny, které mají nasavený stejný čas.</string>
     <string name="change_others_yes">Nastavit</string>
-    <string name="change_others_no">Ne</string>
 
     <string name="menu_default_header">Budík v <xliff:g id="time" example="07:00">%1$s</xliff:g> každé <xliff:g id="dayOfWeek" example="Sat">%2$s</xliff:g></string>
     <string name="menu_default_header_disabled">Budík je vypnutý každé <xliff:g id="dayOfWeek" example="Sat">%1$s</xliff:g></string>
