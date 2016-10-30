@@ -144,18 +144,11 @@
         android:key="pref_category_other"
         android:title="@string/pref_category_other_title">
 
-        <PreferenceScreen
-            android:key="@string/pref_title_advanced_settings"
-            android:title="@string/pref_title_advanced_settings"
-            android:defaultValue="0">
-
-            <cz.jaro.alarmmorning.graphics.RelativeTimePreference
-                android:key="pref_nap_time"
-                android:title="@string/pref_title_nap_time"
-                android:defaultValue="30"
-                custom:maxHour="6"/>
-
-        </PreferenceScreen>
+        <cz.jaro.alarmmorning.graphics.RelativeTimePreference
+            android:key="pref_nap_time"
+            android:title="@string/pref_title_nap_time"
+            android:defaultValue="30"
+            custom:maxHour="6"/>
 
     </PreferenceCategory>
 </PreferenceScreen>
