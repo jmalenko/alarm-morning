@@ -68,6 +68,8 @@ public class Analytics {
     public static final String CHECK_ALARM_TIME_METHOD__QUICK = "Quick";
     public static final String CHECK_ALARM_TIME_METHOD__DIALOG = "Dialog";
 
+    public static final String TARGET__WIZARD = "Wizard";
+
     public enum Param {
         Version,
         User_ID,
@@ -97,6 +99,8 @@ public class Analytics {
 
         Preference_key,
         Preference_value,
+
+        Target,
 
         Configuration;
     }

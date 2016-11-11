@@ -150,5 +150,8 @@
             android:defaultValue="30"
             custom:maxHour="6"/>
 
+        <Preference
+            android:key="pref_start_wizard"
+            android:title="@string/pref_title_start_wizard"/>
     </PreferenceCategory>
 </PreferenceScreen>

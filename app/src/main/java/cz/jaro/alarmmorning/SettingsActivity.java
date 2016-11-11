@@ -1,6 +1,7 @@
 package cz.jaro.alarmmorning;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.media.Ringtone;
@@ -26,6 +27,7 @@ import cz.jaro.alarmmorning.graphics.AppCompatPreferenceActivity;
 import cz.jaro.alarmmorning.graphics.RelativeTimePreference;
 import cz.jaro.alarmmorning.graphics.TimePreference;
 import cz.jaro.alarmmorning.nighttimebell.NighttimeBell;
+import cz.jaro.alarmmorning.wizard.Wizard;
 
 public class SettingsActivity extends AppCompatPreferenceActivity {
 
@@ -89,6 +91,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     public static final String PREF_NIGHTTIME_BELL_RINGTONE = "pref_nighttime_bell_ringtone";
 
     public static final String PREF_HOLIDAY = "pref_holiday";
+
+    public static final String PREF_START_WIZARD = "pref_start_wizard";
 
     public static final String PREF_RINGTONE_DEFAULT = "";
     public static final int PREF_VOLUME_DEFAULT = 8;
@@ -181,6 +185,23 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     Log.i(TAG, "Stopping NighttimeBell");
                     nighttimeBell.unregister();
                 }
+                return true;
+            }
+        });
+
+        Preference prefStartWizard = (Preference) findPreference(PREF_START_WIZARD);
+        prefStartWizard.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                Analytics analytics = new Analytics(preference.getContext(), Analytics.Event.Start,
+                        Analytics.Channel.Activity, Analytics.ChannelName.Settings);
+                analytics.set(Analytics.Param.Target, Analytics.TARGET__WIZARD);
+                analytics.save();
+
+                Intent intent = new Intent(context, Wizard.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+
                 return true;
             }
         });
