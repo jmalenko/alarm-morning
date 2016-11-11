@@ -42,6 +42,7 @@
 
     <string name="wizard_welcome_title">Vítejte v Budíku</string>
     <string name="wizard_welcome_description">Provedeme vás základním nastavením. Všechna nastavení mohou být změněna později.</string>
+    <string name="wizard_welcome_overwrite_warning">Vaše stávající nastavení bude přepsáno.</string>
 
     <string name="wizard_set_time_title">Nastavit čas</string>
     <string name="wizard_set_time_description_top">V kolik hodin má budík zazvonit v pracovní dny?</string>

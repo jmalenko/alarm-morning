@@ -42,6 +42,7 @@
 
     <string name="wizard_welcome_title">Welcome to Alarm Morning</string>
     <string name="wizard_welcome_description">We will guide you through a basic setup. All the settings can be changed later.</string>
+    <string name="wizard_welcome_overwrite_warning">Your current settings will be overwritten.</string>
 
     <string name="wizard_set_time_title">Set alarm time</string>
     <string name="wizard_set_time_description_top">When do you want the alarm clock to go off on workdays?</string>
