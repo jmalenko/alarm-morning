@@ -134,8 +134,7 @@ public class AlarmMorningActivity extends AppCompatActivity implements ActivityI
         super.onCreate(savedInstanceState);
 
         // Possibly run the wizard
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        boolean wizardPreference = preferences.getBoolean(Wizard.PREF_WIZARD, Wizard.PREF_WIZARD_DEFAULT);
+        boolean wizardPreference = Wizard.loadWizardFinished(getBaseContext());
         if (!wizardPreference) {
             Intent wizardIntent = new Intent(this, Wizard.class);
             startActivityForResult(wizardIntent, REQUEST_CODE_WIZARD);
