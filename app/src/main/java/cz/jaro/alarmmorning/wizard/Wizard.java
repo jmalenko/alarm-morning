@@ -46,7 +46,7 @@ public class Wizard extends AppIntro {
 
         addSlide(new SetTimeSlide());
 
-        // TODO Add slide - Set holiday calendar, description "The alarm will not ring on holiday."
+        addSlide(new SetHolidayRegionSlide());
 
         addSlide(new SetActionsSlide());
 

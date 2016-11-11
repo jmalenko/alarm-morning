@@ -26,6 +26,8 @@
     <!-- Settings activity -->
     <string name="title_activity_settings">Nastavení</string>
 
+    <string name="holidays_none">Žádné</string>
+
     <!-- Ring activity -->
     <string name="title_activity_ring">Budík</string>
 
@@ -44,6 +46,9 @@
     <string name="wizard_set_time_title">Nastavit čas</string>
     <string name="wizard_set_time_description_top">V kolik hodin má budík zazvonit v pracovní dny?</string>
     <string name="wizard_set_time_description_bottom">O víkendu bude budík vypnutý.</string>
+
+    <string name="wizard_set_holidays_title">Nastavit svátky</string>
+    <string name="wizard_set_holidays_description">Ve svátek je budík vyplnutý. Zvolte svou zemi.</string>
 
     <string name="wizard_set_actions_title">Nastavit akce při zvonění</string>
     <string name="wizard_set_actions_description">Také můžete reagovat na stisk klávesy nebo senzor vzdálenosti.</string>

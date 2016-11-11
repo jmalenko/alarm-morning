@@ -88,6 +88,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     public static final String PREF_NIGHTTIME_BELL_AT = "pref_nighttime_bell_at";
     public static final String PREF_NIGHTTIME_BELL_RINGTONE = "pref_nighttime_bell_ringtone";
 
+    public static final String PREF_HOLIDAY = "pref_holiday";
+
     public static final String PREF_RINGTONE_DEFAULT = "";
     public static final int PREF_VOLUME_DEFAULT = 8;
     public static final boolean PREF_VOLUME_INCREASING_DEFAULT = true;
@@ -103,6 +105,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     public static final boolean PREF_NIGHTTIME_BELL_DEFAULT = true;
     public static final String PREF_NIGHTTIME_BELL_AT_DEFAULT = "22:00";
     public static final String PREF_NIGHTTIME_BELL_RINGTONE_DEFAULT = "raw://church_clock_strikes_3";
+
+    public static final String PREF_HOLIDAY_NONE = "-NONE";
+    public static final String PREF_HOLIDAY_DEFAULT = PREF_HOLIDAY_NONE;
 
     public static final int PREF_VOLUME_MAX = 10;
 

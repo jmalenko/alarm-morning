@@ -26,6 +26,8 @@
     <!-- Settings activity -->
     <string name="title_activity_settings">Settings</string>
 
+    <string name="holidays_none">None</string>
+
     <!-- Ring activity -->
     <string name="title_activity_ring">Alarm</string>
 
@@ -44,6 +46,9 @@
     <string name="wizard_set_time_title">Set alarm time</string>
     <string name="wizard_set_time_description_top">When do you want the alarm clock to go off on workdays?</string>
     <string name="wizard_set_time_description_bottom">On weekends, the alarm clock will be disabled.</string>
+
+    <string name="wizard_set_holidays_title">Set holidays</string>
+    <string name="wizard_set_holidays_description">On holidays, the alarm will be disabled. Select your country.</string>
 
     <string name="wizard_set_actions_title">Set actions while ringing</string>
     <string name="wizard_set_actions_description">There are also events related to key press and proximity sensor.</string>
