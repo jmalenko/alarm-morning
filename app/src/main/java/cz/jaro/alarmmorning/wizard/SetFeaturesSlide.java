@@ -72,6 +72,6 @@ public class SetFeaturesSlide extends BaseFragment {
 
     @Override
     public int getDefaultBackgroundColor() {
-        return getResources().getColor(R.color.Blue_Grey_700);
+        return getResources().getColor(R.color.Blue_Grey_750);
     }
 }

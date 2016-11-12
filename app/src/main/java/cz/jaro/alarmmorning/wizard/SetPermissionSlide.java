@@ -53,6 +53,6 @@ public class SetPermissionSlide extends BaseFragment {
 
     @Override
     public int getDefaultBackgroundColor() {
-        return getResources().getColor(R.color.Blue_Grey_800);
+        return getResources().getColor(R.color.Blue_Grey_850);
     }
 }

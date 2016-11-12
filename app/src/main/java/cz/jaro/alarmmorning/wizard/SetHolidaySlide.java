@@ -112,7 +112,7 @@ public class SetHolidaySlide extends BaseFragment {
 
     @Override
     public int getDefaultBackgroundColor() {
-        return getResources().getColor(R.color.Blue_Grey_500);
+        return getResources().getColor(R.color.Blue_Grey_650);
     }
 
 }

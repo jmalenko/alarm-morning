@@ -16,6 +16,12 @@
     <color name="divider">#B6B6B6</color>
     -->
 
+    <!-- Wizard -->
+    <color name="Blue_Grey_550">#5A7683</color>      <!-- Blend Blue Grey 500 and Blue Grey 600 -->
+    <color name="Blue_Grey_650">#4D646F</color>      <!-- Blend Blue Grey 600 and Blue Grey 700 -->
+    <color name="Blue_Grey_750">#3E515A</color>      <!-- Blend Blue Grey 700 and Blue Grey 800 -->
+    <color name="Blue_Grey_850">#2F3D44</color>      <!-- Blend Blue Grey 800 and Blue Grey 900 -->
+
     <!-- Widget -->
     <color name="widget_background_overlay">#33000000</color>
 
