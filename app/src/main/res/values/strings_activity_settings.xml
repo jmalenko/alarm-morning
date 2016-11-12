@@ -57,5 +57,7 @@
 
     <string name="pref_title_nap_time">Nap time</string>
 
+    <string name="pref_title_holiday">Holidays</string>
+
     <string name="pref_title_start_wizard">Start wizard…</string>
 </resources>

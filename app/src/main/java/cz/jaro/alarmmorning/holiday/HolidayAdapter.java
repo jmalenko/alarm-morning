@@ -44,4 +44,14 @@ public class HolidayAdapter extends ArrayAdapter<String> {
                 return holidayCalendar.getId();
         }
     }
+
+    public int getPositionForId(String id) {
+        if (id.equals(SettingsActivity.PREF_HOLIDAY_NONE)) return 0;
+        int position = 1;
+        for (HolidayCalendar c : HolidayCalendar.values()) {
+            if (id.equals(c.getId())) return position;
+            position++;
+        }
+        throw new IllegalStateException("Cannot find HolidayCalendar with id " + id);
+    }
 }

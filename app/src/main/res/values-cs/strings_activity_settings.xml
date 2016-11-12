@@ -57,5 +57,7 @@
 
     <string name="pref_title_nap_time">Délka zdřímnutí</string>
 
+    <string name="pref_title_holiday">Svátky</string>
+
     <string name="pref_title_start_wizard">Spustit průvodce nastavením…</string>
 </resources>

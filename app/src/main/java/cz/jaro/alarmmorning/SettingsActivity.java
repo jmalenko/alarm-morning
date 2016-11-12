@@ -26,6 +26,7 @@ import cz.jaro.alarmmorning.checkalarmtime.CheckAlarmTime;
 import cz.jaro.alarmmorning.graphics.AppCompatPreferenceActivity;
 import cz.jaro.alarmmorning.graphics.RelativeTimePreference;
 import cz.jaro.alarmmorning.graphics.TimePreference;
+import cz.jaro.alarmmorning.holiday.HolidayHelper;
 import cz.jaro.alarmmorning.nighttimebell.NighttimeBell;
 import cz.jaro.alarmmorning.wizard.Wizard;
 
@@ -144,6 +145,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         bindPreferenceSummaryToValue(findPreference(PREF_NIGHTTIME_BELL_AT));
         bindPreferenceSummaryToValue(findPreference(PREF_NIGHTTIME_BELL_RINGTONE));
         bindPreferenceSummaryToValue(findPreference(PREF_NAP_TIME));
+        bindPreferenceSummaryToValue(findPreference(PREF_HOLIDAY));
 
         final Context context = this;
 
@@ -325,6 +327,11 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 CharSequence summaryText = res.getTextArray(R.array.actionArray)[intValue];
 
                 preference.setSummary(summaryText);
+            } else if (key.equals(PREF_HOLIDAY)) {
+                Context context = preference.getContext();
+                String summaryText = HolidayHelper.preferenceToDisplayName(context, stringValue);
+
+                preference.setSummary(summaryText);
             } else {
                 // For all other preferences, set the summary to the value's simple string representation.
                 preference.setSummary(stringValue);
@@ -410,6 +417,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             newValue = defaultSharedPreferences.getString(preference.getKey(), PREF_NIGHTTIME_BELL_RINGTONE_DEFAULT);
         } else if (key.equals(PREF_NAP_TIME)) {
             newValue = defaultSharedPreferences.getInt(preference.getKey(), PREF_NAP_TIME_DEFAULT);
+        } else if (key.equals(PREF_HOLIDAY)) {
+            newValue = defaultSharedPreferences.getString(preference.getKey(), PREF_HOLIDAY_DEFAULT);
         } else {
             throw new IllegalArgumentException("Unexpected argument " + key);
         }

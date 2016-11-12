@@ -150,6 +150,11 @@
             android:defaultValue="30"
             custom:maxHour="6"/>
 
+        <cz.jaro.alarmmorning.graphics.HolidayPreference
+            android:key="pref_holiday"
+            android:defaultValue="-NONE"
+            android:title="@string/pref_title_holiday"/>
+
         <Preference
             android:key="pref_start_wizard"
             android:title="@string/pref_title_start_wizard"/>
