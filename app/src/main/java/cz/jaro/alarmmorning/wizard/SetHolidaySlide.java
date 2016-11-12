@@ -26,9 +26,9 @@ import de.jollyday.Holiday;
 import de.jollyday.HolidayCalendar;
 import de.jollyday.HolidayManager;
 
-public class SetHolidayRegionSlide extends BaseFragment {
+public class SetHolidaySlide extends BaseFragment {
 
-    private static final String TAG = SetHolidayRegionSlide.class.getSimpleName();
+    private static final String TAG = SetHolidaySlide.class.getSimpleName();
 
     Spinner holidaySpinner;
     HolidayAdapter holidayAdapter;
@@ -60,7 +60,7 @@ public class SetHolidayRegionSlide extends BaseFragment {
 
         holidaySpinner = (Spinner) getView().findViewById(R.id.countrySpinner);
         int position = holidaySpinner.getSelectedItemPosition();
-        String holidayCalendarPreferenceString = HolidayAdapter.positionToPreferenceString(position);
+        String holidayCalendarPreferenceString = holidayAdapter.positionToPreferenceString(position);
 
         // Save holiday
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());

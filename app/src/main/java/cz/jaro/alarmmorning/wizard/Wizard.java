@@ -47,7 +47,7 @@ public class Wizard extends AppIntro {
 
         addSlide(new SetTimeSlide());
 
-        addSlide(new SetHolidayRegionSlide());
+        addSlide(new SetHolidaySlide());
 
         addSlide(new SetActionsSlide());
 

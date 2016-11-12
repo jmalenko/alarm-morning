@@ -35,7 +35,7 @@ public class HolidayAdapter extends ArrayAdapter<String> {
         }
     }
 
-    public static String positionToPreferenceString(int position) {
+    public String positionToPreferenceString(int position) {
         switch (position) {
             case 0:
                 return SettingsActivity.PREF_HOLIDAY_NONE;

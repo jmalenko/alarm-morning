@@ -65,7 +65,7 @@ public class HolidayPreference extends DialogPreference {
 
         if (positiveResult) {
             int position = holidaySpinner.getSelectedItemPosition();
-            String selectedValue = HolidayAdapter.positionToPreferenceString(position);
+            String selectedValue = holidayAdapter.positionToPreferenceString(position);
 
             if (callChangeListener(selectedValue)) {
                 mSelectedValue = selectedValue;
