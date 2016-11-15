@@ -75,9 +75,9 @@ public class SetHolidaySlide extends BaseFragment {
             int year = new SystemClock().now().get(Calendar.YEAR);
 
             HolidayCalendar holidayCalendar = HolidayHelper.getHolidayCalendar(getContext());
-            HolidayManager holidayManager2 = HolidayManager.getInstance(holidayCalendar);
+            HolidayManager holidayManager = HolidayManager.getInstance(holidayCalendar);
 
-            Set<Holiday> holidays = holidayManager2.getHolidays(year);
+            Set<Holiday> holidays = holidayManager.getHolidays(year);
             List<Holiday> orederedHolidays = new ArrayList<Holiday>(holidays);
             Collections.sort(orederedHolidays, new Comparator<Holiday>() {
                 @Override
