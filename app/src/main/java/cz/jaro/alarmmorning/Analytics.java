@@ -302,7 +302,7 @@ public class Analytics {
             case Day.STATE_ENABLED:
                 alarmStateString = ALARM_STATE__SET_TO_SPECIFIC;
                 break;
-            case Day.STATE_DEFAULT:
+            case Day.STATE_RULE:
                 alarmStateString = ALARM_STATE__SET_TO_DEFAULT;
                 break;
             default:

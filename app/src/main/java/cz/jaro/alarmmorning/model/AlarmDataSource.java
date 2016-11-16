@@ -105,7 +105,7 @@ public class AlarmDataSource {
         if (day == null) {
             day = new Day();
             day.setDate(new GregorianCalendar(date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DAY_OF_MONTH)));
-            day.setState(Day.STATE_DEFAULT);
+            day.setState(Day.STATE_RULE);
             day.setHour(Day.VALUE_UNSET);
             day.setMinute(Day.VALUE_UNSET);
         }

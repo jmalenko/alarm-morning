@@ -41,7 +41,7 @@ public class Day {
     /**
      * Value of the {@code state} field indicating the default state.
      */
-    public static final int STATE_DEFAULT = 2; // TODO Rename to STATE_RULE, rename context menu in calendar to "Revert to rule"
+    public static final int STATE_RULE = 2;
 
     /**
      * Value of the {@code hour} and {@code minute} fields indicating "value was not set".
@@ -57,7 +57,7 @@ public class Day {
      * The states are:<br/>
      * {@link #STATE_DISABLED} = as default<br/>
      * {@link #STATE_ENABLED} = set (to particular time)<br/>
-     * {@link #STATE_DEFAULT} = unset (disabled)<br/>
+     * {@link #STATE_RULE} = unset (disabled)<br/>
      */
     private int state;
 
@@ -137,7 +137,7 @@ public class Day {
      */
     public boolean isEnabled() {
         return state == STATE_ENABLED ||
-                (state == STATE_DEFAULT && !isHoliday() && defaults.isEnabled());
+                (state == STATE_RULE && !isHoliday() && defaults.isEnabled());
     }
 
     /**
@@ -148,7 +148,7 @@ public class Day {
      * @return hour of the alarm (that should be used if the alarm is enabled)
      */
     public int getHourX() {
-        if (!isValid() || state == STATE_DEFAULT)
+        if (!isValid() || state == STATE_RULE)
             return defaults.getHour();
         else
             return hour;
@@ -162,7 +162,7 @@ public class Day {
      * @return minute of the alarm
      */
     public int getMinuteX() {
-        if (!isValid() || state == STATE_DEFAULT)
+        if (!isValid() || state == STATE_RULE)
             return defaults.getMinute();
         else
             return minute;
@@ -205,7 +205,7 @@ public class Day {
      */
     public void reverse() {
         switch (getState()) {
-            case STATE_DEFAULT:
+            case STATE_RULE:
                 setState(defaults.isEnabled() ? STATE_DISABLED : STATE_ENABLED);
                 break;
 
@@ -255,18 +255,18 @@ public class Day {
      * <p/>
      * Technically, if<br>
      * 1. the default is enabled and
-     * 2. the day state uses the time from default (the state is {@link Day#STATE_DEFAULT}) and<br>
+     * 2. the day state uses the time from default (the state is {@link Day#STATE_RULE}) and<br>
      * 3. the day is changed to disabled and<br>
      * 4. back to enabled (to {@link Day#STATE_ENABLED}),<br>
      * then this method returns true. On technical level, it could be argued that the alarm is changed since the state is {@link Day#STATE_ENABLED} and not
-     * {@link Day#STATE_DEFAULT}.
+     * {@link Day#STATE_RULE}.
      *
      * @return false if the alarm time on this date is changed (compared to default)
      */
     public boolean sameAsDefault() {
         return (state == STATE_ENABLED && getDefaults().getState() == Defaults.STATE_ENABLED && hour == defaults.getHour() && minute == defaults.getMinute()) ||
                 (state == STATE_DISABLED && getDefaults().getState() == Defaults.STATE_DISABLED) ||
-                state == STATE_DEFAULT;
+                state == STATE_RULE;
     }
 
     public boolean isHoliday() {

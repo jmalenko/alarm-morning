@@ -133,7 +133,7 @@ public class AlarmDataSourceTest extends AndroidTestCase {
         Calendar dateWithoutRecord = new GregorianCalendar(YEAR - 1, MONTH, DAY);
         Day day = dataSource.loadDayDeep(dateWithoutRecord);
 
-        assertEquals(Day.STATE_DEFAULT, day.getState());
+        assertEquals(Day.STATE_RULE, day.getState());
         assertEquals(dateWithoutRecord.getTime().toString(), day.getDate().getTime().toString());
         assertEquals(dateWithoutRecord, day.getDate());
         assertEquals(Day.VALUE_UNSET, day.getHour());

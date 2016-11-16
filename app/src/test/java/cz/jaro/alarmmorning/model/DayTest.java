@@ -49,7 +49,7 @@ public class DayTest {
     @Test
     public void DefaultDisabledDayDefault() {
         defaults.setState(Defaults.STATE_DISABLED);
-        day.setState(Day.STATE_DEFAULT);
+        day.setState(Day.STATE_RULE);
 
         assertThat(day.isEnabled(), is(false));
         assertThat(day.getHourX(), is(HOUR_DEFAULT));
@@ -91,7 +91,7 @@ public class DayTest {
     @Test
     public void DefaultEnabledDayDefault() {
         defaults.setState(Defaults.STATE_ENABLED);
-        day.setState(Day.STATE_DEFAULT);
+        day.setState(Day.STATE_RULE);
 
         assertThat(day.isEnabled(), is(true));
         assertThat(day.getHourX(), is(HOUR_DEFAULT));

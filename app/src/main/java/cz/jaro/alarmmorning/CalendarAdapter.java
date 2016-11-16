@@ -92,7 +92,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         viewHolder.getTextTime().setEnabled(enabled);
 
         String stateText;
-        if (day.isHoliday() && day.getState() == Day.STATE_DEFAULT) {
+        if (day.isHoliday() && day.getState() == Day.STATE_RULE) {
             stateText = res.getString(R.string.holiday);
         } else {
             if (state == GlobalManager.STATE_FUTURE) {
@@ -115,7 +115,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         viewHolder.getTextState().setText(stateText);
 
         String messageText;
-        if (day.isHoliday() && day.getState() == Day.STATE_DEFAULT) {
+        if (day.isHoliday() && day.getState() == Day.STATE_RULE) {
             messageText = day.holidayName();
         } else {
             if (fragment.positionWithNextAlarm(position)) {

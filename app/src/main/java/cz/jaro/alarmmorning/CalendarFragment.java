@@ -447,7 +447,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 //            if (state != GlobalManager.STATE_UNDEFINED) {
                 if (state == GlobalManager.STATE_FUTURE) {
                     disable.setVisible(day.isEnabled());
-                    revert.setVisible(day.getState() != Day.STATE_DEFAULT);
+                    revert.setVisible(day.getState() != Day.STATE_RULE);
                     dismiss.setVisible(position == 0 && day.isEnabled() && globalManager.afterNearFuture(day.getDateTime()));
                     snooze.setVisible(false);
                 } else if (state == GlobalManager.STATE_RINGING) {
@@ -470,13 +470,13 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
                 }
 //            } else {
 //                disable.setVisible(day.isEnabled());
-//                revert.setVisible(day.getState() != Day.STATE_DEFAULT);
+//                revert.setVisible(day.getState() != Day.STATE_RULE);
 //                dismiss.setVisible(false);
 //                snooze.setVisible(false);
 //            }
 //        } else {
 //            disable.setVisible(day.isEnabled());
-//            revert.setVisible(day.getState() != Day.STATE_DEFAULT);
+//            revert.setVisible(day.getState() != Day.STATE_RULE);
 //            dismiss.setVisible(false);
 //            snooze.setVisible(false);
 //        }
@@ -498,7 +498,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
             case R.id.day_revert:
                 Log.i(TAG, "Revert");
-                day.setState(Day.STATE_DEFAULT);
+                day.setState(Day.STATE_RULE);
                 save(day);
                 break;
 
