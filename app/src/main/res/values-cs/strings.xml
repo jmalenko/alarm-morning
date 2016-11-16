@@ -10,7 +10,7 @@
     <string name="menu_day_header_disabled">Budík je vypnutý dne <xliff:g id="dayOfWeek" example="Sat">%1$s</xliff:g>, <xliff:g id="date" example="23/12">%2$s</xliff:g></string>
     <string name="menu_day_set_time">Nastavit čas</string>
     <string name="menu_day_disable">Vypnout</string>
-    <string name="menu_day_revert">Vrátit na čas z pravidla</string>
+    <string name="menu_day_revert">Vrátit na čas podle pravidla</string>
 
     <!-- Default activity -->
     <string name="title_activity_defaults">Pravidla pro dny</string>

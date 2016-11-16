@@ -10,7 +10,7 @@
     <string name="menu_day_header_disabled">Alarm disabled on <xliff:g id="dayOfWeek" example="Sat">%1$s</xliff:g>, <xliff:g id="date" example="23/12">%2$s</xliff:g></string>
     <string name="menu_day_set_time">Set time</string>
     <string name="menu_day_disable">Disable</string>
-    <string name="menu_day_revert">Revert to default</string>
+    <string name="menu_day_revert">Revert to time by rule</string>
 
     <!-- Default activity -->
     <string name="title_activity_defaults">Default alarms</string>
