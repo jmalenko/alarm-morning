@@ -328,8 +328,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
                 preference.setSummary(summaryText);
             } else if (key.equals(PREF_HOLIDAY)) {
-                Context context = preference.getContext();
-                String summaryText = HolidayHelper.preferenceToDisplayName(context, stringValue);
+                String summaryText = HolidayHelper.getInstance().preferenceToDisplayName(stringValue);
 
                 preference.setSummary(summaryText);
             } else {

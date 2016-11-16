@@ -1,14 +1,11 @@
 package cz.jaro.alarmmorning.model;
 
-import android.app.Application;
 import android.content.Context;
 
 import java.util.Calendar;
 
 import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.holiday.HolidayHelper;
-import de.jollyday.HolidayCalendar;
-import de.jollyday.HolidayManager;
 
 /**
  * Represents the alarm clock setting for a particular date. The default values are inherited from
@@ -270,37 +267,12 @@ public class Day {
     }
 
     public boolean isHoliday() {
-        Context context = findContext();
-        if (HolidayHelper.useHoliday(context)) {
-            HolidayCalendar holidayCalendar = HolidayHelper.getHolidayCalendar(context);
-            HolidayManager holidayManager = HolidayManager.getInstance(holidayCalendar);
-            return holidayManager.isHoliday(getDate());
-        } else {
-            return false;
-        }
+        HolidayHelper holidayHelper = HolidayHelper.getInstance();
+        return holidayHelper.isHoliday(getDate());
     }
 
-    public String holidayName() {
-        Context context = findContext();
-        if (HolidayHelper.useHoliday(context)) {
-            HolidayCalendar holidayCalendar = HolidayHelper.getHolidayCalendar(context);
-            HolidayManager holidayManager = HolidayManager.getInstance(holidayCalendar);
-
-            String holidayName = HolidayHelper.getHolidayName(holidayManager, getDate());
-            return holidayName;
-        } else {
-            return null;
-        }
-    }
-
-    private Context findContext() { // TODO Refactor to HolidayHepler
-        try {
-            Application application = (Application) Class.forName("android.app.ActivityThread")
-                    .getMethod("currentApplication").invoke(null, (Object[]) null);
-            Context context = application.getApplicationContext();
-            return context;
-        } catch (Exception e) {
-            throw new IllegalStateException("Cannot get context", e);
-        }
+    public String getHolidayDescription() {
+        HolidayHelper holidayHelper = HolidayHelper.getInstance();
+        return holidayHelper.getHolidayDescription(getDate());
     }
 }

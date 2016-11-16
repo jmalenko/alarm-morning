@@ -116,7 +116,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
 
         String messageText;
         if (day.isHoliday() && day.getState() == Day.STATE_RULE) {
-            messageText = day.holidayName();
+            messageText = day.getHolidayDescription();
         } else {
             if (fragment.positionWithNextAlarm(position)) {
                 long diff = day.getTimeToRing(fragment.clock());

@@ -71,30 +71,12 @@ public class SetHolidaySlide extends BaseFragment {
         editor.commit();
 
         // Debug log
-        if (HolidayHelper.useHoliday(getContext())) {
-            int year = new SystemClock().now().get(Calendar.YEAR);
+        HolidayHelper holidayHelper = HolidayHelper.getInstance();
+        if (holidayHelper.useHoliday()) {
+            List<Holiday> holidays = holidayHelper.listHolidays();
 
-            HolidayCalendar holidayCalendar = HolidayHelper.getHolidayCalendar(getContext());
-            HolidayManager holidayManager = HolidayManager.getInstance(holidayCalendar);
-
-            Set<Holiday> holidays = holidayManager.getHolidays(year);
-            List<Holiday> orederedHolidays = new ArrayList<Holiday>(holidays);
-            Collections.sort(orederedHolidays, new Comparator<Holiday>() {
-                @Override
-                public int compare(Holiday lhs, Holiday rhs) {
-                    if (lhs.getDate().equals(rhs.getDate())) {
-                        return 0;
-                    } else {
-                        if (lhs.getDate().isBefore(rhs.getDate()))
-                            return -1;
-                        else
-                            return 1;
-                    }
-                }
-            });
-
-            Log.d(TAG, "Holidays in " + holidayCalendarPreferenceString + " in " + year);
-            for (Holiday h : orederedHolidays) {
+            Log.d(TAG, "Holidays in " + holidayCalendarPreferenceString + " in next year");
+            for (Holiday h : holidays) {
                 Log.v(TAG, "   " + h.toString());
             }
         }

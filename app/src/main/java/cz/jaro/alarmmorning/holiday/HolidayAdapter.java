@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.widget.ArrayAdapter;
 
+import java.util.List;
+
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.SettingsActivity;
 import de.jollyday.HolidayCalendar;
@@ -28,7 +30,8 @@ public class HolidayAdapter extends ArrayAdapter<String> {
         add(muteText);
 
         // Countries
-        for (HolidayCalendar c : HolidayCalendar.values()) {
+        List<HolidayCalendar> holidayCalendars = HolidayHelper.getInstance().listHolidayCalendars();
+        for (HolidayCalendar c : holidayCalendars) {
             ResourceUtil resourceUtil = new ResourceUtil();
             String countryDescription = resourceUtil.getCountryDescription(c.getId());
             add(countryDescription);
@@ -40,7 +43,8 @@ public class HolidayAdapter extends ArrayAdapter<String> {
             case 0:
                 return SettingsActivity.PREF_HOLIDAY_NONE;
             default:
-                HolidayCalendar holidayCalendar = HolidayCalendar.values()[position - 1];
+                List<HolidayCalendar> holidayCalendars = HolidayHelper.getInstance().listHolidayCalendars();
+                HolidayCalendar holidayCalendar = holidayCalendars.get(position - 1);
                 return holidayCalendar.getId();
         }
     }
@@ -48,7 +52,8 @@ public class HolidayAdapter extends ArrayAdapter<String> {
     public int getPositionForId(String id) {
         if (id.equals(SettingsActivity.PREF_HOLIDAY_NONE)) return 0;
         int position = 1;
-        for (HolidayCalendar c : HolidayCalendar.values()) {
+        List<HolidayCalendar> holidayCalendars = HolidayHelper.getInstance().listHolidayCalendars();
+        for (HolidayCalendar c : holidayCalendars) {
             if (id.equals(c.getId())) return position;
             position++;
         }
