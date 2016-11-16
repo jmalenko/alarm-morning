@@ -87,44 +87,52 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         GlobalManager globalManager = new GlobalManager(fragment.getActivity());
         int state = globalManager.getState(day.getDateTime());
 
-        boolean enabled = true;
+        boolean enabled;
         enabled = state != GlobalManager.STATE_DISMISSED_BEFORE_RINGING && state != GlobalManager.STATE_DISMISSED;
         viewHolder.getTextTime().setEnabled(enabled);
 
         String stateText;
-        if (state == GlobalManager.STATE_FUTURE) {
-            stateText = day.sameAsDefault() ? "" : res.getString(R.string.alarm_state_changed);
-        } else if (state == GlobalManager.STATE_DISMISSED_BEFORE_RINGING) {
-            if (day.isPassed(fragment.clock()))
-                stateText = res.getString(R.string.alarm_state_passed);
-            else
-                stateText = res.getString(R.string.alarm_state_dismissed_before_ringing);
-        } else if (state == GlobalManager.STATE_RINGING) {
-            stateText = res.getString(R.string.alarm_state_ringing);
-        } else if (state == GlobalManager.STATE_SNOOZED) {
-            stateText = res.getString(R.string.alarm_state_snoozed);
-        } else if (state == GlobalManager.STATE_DISMISSED) {
-            stateText = res.getString(R.string.alarm_state_passed);
+        if (day.isHoliday() && day.getState() == Day.STATE_DEFAULT) {
+            stateText = res.getString(R.string.holiday);
         } else {
-            throw new IllegalArgumentException("Unexpected argument " + state);
+            if (state == GlobalManager.STATE_FUTURE) {
+                stateText = day.sameAsDefault() && !day.isHoliday() ? "" : res.getString(R.string.alarm_state_changed);
+            } else if (state == GlobalManager.STATE_DISMISSED_BEFORE_RINGING) {
+                if (day.isPassed(fragment.clock()))
+                    stateText = res.getString(R.string.alarm_state_passed);
+                else
+                    stateText = res.getString(R.string.alarm_state_dismissed_before_ringing);
+            } else if (state == GlobalManager.STATE_RINGING) {
+                stateText = res.getString(R.string.alarm_state_ringing);
+            } else if (state == GlobalManager.STATE_SNOOZED) {
+                stateText = res.getString(R.string.alarm_state_snoozed);
+            } else if (state == GlobalManager.STATE_DISMISSED) {
+                stateText = res.getString(R.string.alarm_state_passed);
+            } else {
+                throw new IllegalArgumentException("Unexpected argument " + state);
+            }
         }
         viewHolder.getTextState().setText(stateText);
 
         String messageText;
-        if (fragment.positionWithNextAlarm(position)) {
-            long diff = day.getTimeToRing(fragment.clock());
-
-            TimeDifference timeDifference = TimeDifference.split(diff);
-
-            if (timeDifference.days > 0) {
-                messageText = res.getString(R.string.time_to_ring_message_days, timeDifference.days, timeDifference.hours);
-            } else if (timeDifference.hours > 0) {
-                messageText = res.getString(R.string.time_to_ring_message_hours, timeDifference.hours, timeDifference.minutes);
-            } else {
-                messageText = res.getString(R.string.time_to_ring_message_minutes, timeDifference.minutes, timeDifference.seconds);
-            }
+        if (day.isHoliday() && day.getState() == Day.STATE_DEFAULT) {
+            messageText = day.holidayName();
         } else {
-            messageText = "";
+            if (fragment.positionWithNextAlarm(position)) {
+                long diff = day.getTimeToRing(fragment.clock());
+
+                TimeDifference timeDifference = TimeDifference.split(diff);
+
+                if (timeDifference.days > 0) {
+                    messageText = res.getString(R.string.time_to_ring_message_days, timeDifference.days, timeDifference.hours);
+                } else if (timeDifference.hours > 0) {
+                    messageText = res.getString(R.string.time_to_ring_message_hours, timeDifference.hours, timeDifference.minutes);
+                } else {
+                    messageText = res.getString(R.string.time_to_ring_message_minutes, timeDifference.minutes, timeDifference.seconds);
+                }
+            } else {
+                messageText = "";
+            }
         }
         viewHolder.getTextComment().setText(messageText);
     }

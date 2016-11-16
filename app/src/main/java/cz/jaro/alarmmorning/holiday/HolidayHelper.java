@@ -5,9 +5,16 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.preference.PreferenceManager;
 
+import org.joda.time.LocalDate;
+
+import java.util.Calendar;
+import java.util.Set;
+
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.SettingsActivity;
+import de.jollyday.Holiday;
 import de.jollyday.HolidayCalendar;
+import de.jollyday.HolidayManager;
 import de.jollyday.util.ResourceUtil;
 
 /**
@@ -57,4 +64,30 @@ public class HolidayHelper {
             return res.getString(R.string.holidays_none);
         }
     }
+
+    public static String getHolidayName(HolidayManager holidayManager, Calendar date) {
+        int year = date.get(Calendar.YEAR);
+        Set<Holiday> holidays = holidayManager.getHolidays(year);
+        for (Holiday h : holidays) {
+            if (compareDates(date, h.getDate())) {
+                return h.getDescription();
+            }
+        }
+        throw new IllegalStateException("Cannot find holiday for date " + date);
+    }
+
+    private static boolean compareDates(Calendar date1, LocalDate date2) {
+        int year1 = date1.get(Calendar.YEAR);
+        int month1 = date1.get(Calendar.MONTH) + 1;
+        int day1 = date1.get(Calendar.DAY_OF_MONTH);
+
+        int year2 = date2.getYear();
+        int month2 = date2.getMonthOfYear();
+        int day2 = date2.getDayOfMonth();
+
+        return year1 == year2
+                && month1 == month2
+                && day1 == day2;
+    }
+
 }

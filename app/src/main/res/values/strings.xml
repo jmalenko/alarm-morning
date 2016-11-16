@@ -125,6 +125,7 @@
     <string name="time_to_ring_message_minutes"><xliff:g id="minutes" example="3">%1$d</xliff:g>m <xliff:g id="seconds" example="4">%2$d</xliff:g>s</string>
 
     <string name="tomorrow">Tomorrow</string>
+    <string name="holiday">Holiday</string>
 
     <!-- Descriptions for accessibility -->
     <string name="drawer_open">Open navigation drawer</string>
