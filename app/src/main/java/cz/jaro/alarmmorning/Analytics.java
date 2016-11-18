@@ -23,16 +23,19 @@ import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 import java.util.TimeZone;
 
 import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.clock.SystemClock;
+import cz.jaro.alarmmorning.holiday.HolidayHelper;
 import cz.jaro.alarmmorning.model.AlarmDataSource;
 import cz.jaro.alarmmorning.model.Day;
 import cz.jaro.alarmmorning.model.Defaults;
 import cz.jaro.alarmmorning.wizard.Wizard;
+import de.jollyday.Holiday;
 
 /**
  * This class supports logging for analytics.
@@ -525,6 +528,17 @@ public class Analytics {
                 String dayOfWeekText = Localization.dayOfWeekToStringShort(mContext.getResources(), dayOfWeek);
                 int dayOfWeekType = cal.getDayOfWeekType(dayOfWeek);
                 conf.put("dayOfWeekType_" + dayOfWeek + "_" + dayOfWeekText, dayOfWeekTypeToString(dayOfWeekType));
+            }
+
+            // Holidays
+            HolidayHelper holidayHelper = HolidayHelper.getInstance();
+            if (holidayHelper.useHoliday()) {
+                List<Holiday> holidays = holidayHelper.listHolidays();
+
+                int counter = 1;
+                for (Holiday h : holidays) {
+                    conf.put("holiday_" + counter++, h.toString());
+                }
             }
 
             // Permissions
