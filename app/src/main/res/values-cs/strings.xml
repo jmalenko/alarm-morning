@@ -27,6 +27,7 @@
     <string name="title_activity_settings">Nastavení</string>
 
     <string name="holidays_none">Žádné</string>
+    <string name="holidays_list_title">Seznam svátků:</string>
 
     <!-- Ring activity -->
     <string name="title_activity_ring">Budík</string>

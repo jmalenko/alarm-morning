@@ -61,14 +61,18 @@ public class HolidayHelper {
     }
 
     public HolidayCalendar getHolidayCalendar() {
+        String holidayPreference = getHolidayPreference();
+        return getHolidayCalendar(holidayPreference);
+    }
+
+    public HolidayCalendar getHolidayCalendar(String holidayCalendarId) {
         if (useHoliday()) {
-            String holidayPreference = getHolidayPreference();
             for (HolidayCalendar c : HolidayCalendar.values()) {
-                if (c.getId().equals(holidayPreference)) {
+                if (c.getId().equals(holidayCalendarId)) {
                     return c;
                 }
             }
-            throw new IllegalStateException("Cannot find HolidayCalendar with id " + holidayPreference);
+            throw new IllegalStateException("Cannot find HolidayCalendar with id " + holidayCalendarId);
         } else {
             return null;
         }
@@ -106,10 +110,31 @@ public class HolidayHelper {
     /**
      * Get list of {@link Holiday}s, from today (including) till the same day next year (excluding), sorted by date.
      *
+     * @param holidayCalendarId Id of HolidayCalendar to use
+     * @return list of {@link Holiday}s
+     */
+    public List<Holiday> listHolidays(String holidayCalendarId) {
+        HolidayCalendar holidayCalendar = HolidayHelper.getInstance().getHolidayCalendar(holidayCalendarId);
+        return listHolidays(holidayCalendar);
+    }
+
+    /**
+     * Get list of {@link Holiday}s, from today (including) till the same day next year (excluding), sorted by date.
+     *
      * @return list of {@link Holiday}s
      */
     public List<Holiday> listHolidays() {
         HolidayCalendar holidayCalendar = HolidayHelper.getInstance().getHolidayCalendar();
+        return listHolidays(holidayCalendar);
+    }
+
+    /**
+     * Get list of {@link Holiday}s, from today (including) till the same day next year (excluding), sorted by date.
+     *
+     * @param holidayCalendar HolidayCalendar to use
+     * @return list of {@link Holiday}s
+     */
+    private List<Holiday> listHolidays(HolidayCalendar holidayCalendar) {
         HolidayManager holidayManager = HolidayManager.getInstance(holidayCalendar);
 
         // Add all the holidays this year and next year
