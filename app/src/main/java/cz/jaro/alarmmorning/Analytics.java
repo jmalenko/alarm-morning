@@ -468,9 +468,11 @@ public class Analytics {
             conf.put("build_board", Build.BOARD);
             conf.put("build_serial", Build.SERIAL);
 
-            conf.put("build_version_base_os", Build.VERSION.BASE_OS);
             conf.put("build_version_release", Build.VERSION.RELEASE);
             conf.put("build_version_sdk_int", Build.VERSION.SDK_INT);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                conf.put("build_version_base_os", Build.VERSION.BASE_OS);
+            }
 
             conf.put("buildConfig_application_id", BuildConfig.APPLICATION_ID);
             conf.put("buildConfig_build_type", BuildConfig.BUILD_TYPE);
