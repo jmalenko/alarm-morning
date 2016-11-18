@@ -4,11 +4,13 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -30,6 +32,7 @@ import cz.jaro.alarmmorning.clock.SystemClock;
 import cz.jaro.alarmmorning.model.AlarmDataSource;
 import cz.jaro.alarmmorning.model.Day;
 import cz.jaro.alarmmorning.model.Defaults;
+import cz.jaro.alarmmorning.wizard.Wizard;
 
 /**
  * This class supports logging for analytics.
@@ -490,6 +493,7 @@ public class Analytics {
             conf.put("settingsSystem_time_12_24", Settings.System.getString(mContext.getContentResolver(), Settings.System.TIME_12_24));
             conf.put("settingsSystem_sys_prop_setting_version", Settings.System.getString(mContext.getContentResolver(), Settings.System.SYS_PROP_SETTING_VERSION));
 
+            // Locale
             Locale locale = Locale.getDefault();
             conf.put("locale", locale.toString());
 
@@ -521,6 +525,12 @@ public class Analytics {
                 String dayOfWeekText = Localization.dayOfWeekToStringShort(mContext.getResources(), dayOfWeek);
                 int dayOfWeekType = cal.getDayOfWeekType(dayOfWeek);
                 conf.put("dayOfWeekType_" + dayOfWeek + "_" + dayOfWeekText, dayOfWeekTypeToString(dayOfWeekType));
+            }
+
+            // Permissions
+            for (String permission : Wizard.allPermissions) {
+                int permissionCheck = ContextCompat.checkSelfPermission(getContext(), permission);
+                conf.put("permission_" + permission, permissionCheckToString(permissionCheck));
             }
         } catch (JSONException e) {
             Log.w(TAG, "Cannot create configuration record", e);
@@ -670,5 +680,16 @@ public class Analytics {
     public static String calendarToTime(Calendar calendar) {
         SimpleDateFormat sdfTime = new SimpleDateFormat(TIME_FORMAT);
         return sdfTime.format(calendar.getTime());
+    }
+
+    public String permissionCheckToString(int permissionCheck) {
+        switch (permissionCheck) {
+            case PackageManager.PERMISSION_GRANTED:
+                return "granted";
+            case PackageManager.PERMISSION_DENIED:
+                return "denied";
+            default:
+                throw new IllegalStateException("Unsupported permissionCheck " + permissionCheck);
+        }
     }
 }
