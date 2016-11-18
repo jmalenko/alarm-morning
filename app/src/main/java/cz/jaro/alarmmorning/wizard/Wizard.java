@@ -80,7 +80,7 @@ public class Wizard extends AppIntro {
         ArrayList<String> missingPermissions = new ArrayList<>();
 
         for (String permission : allPermissions) {
-            int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CALENDAR);
+            int permissionCheck = ContextCompat.checkSelfPermission(this, permission);
             if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
                 missingPermissions.add(permission);
             }
