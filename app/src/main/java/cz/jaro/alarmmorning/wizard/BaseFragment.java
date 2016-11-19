@@ -8,9 +8,7 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.DisplayMetrics;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -76,7 +74,7 @@ public abstract class BaseFragment extends Fragment implements ISlideSelectionLi
             if (descriptionColor != 0) {
                 description2View.setTextColor(descriptionColor);
             }
-            if (getContentLayoutId() == 0) { // if no content then add bottom margin descriptionBottom
+            if (getContentLayoutId() == 0) { // if no content then add bottom margin to descriptionBottom
                 final int marginBottomAddDp = 64;
                 int px = dpToPx(marginBottomAddDp);
 
@@ -96,6 +94,11 @@ public abstract class BaseFragment extends Fragment implements ISlideSelectionLi
             View newLayout = layoutInflater.inflate(getContentLayoutId(), null, false);
 
             scrollView.addView(newLayout);
+        } else {
+            // Ignore content's layout_weight (useful on small displaye when the descriptions are long)
+            ScrollView scrollView = (ScrollView) view.findViewById(R.id.content_frame2);
+            LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
+            scrollView.setLayoutParams(params1);
         }
 
         return view;
