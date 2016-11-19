@@ -209,6 +209,8 @@ public class Localization {
 
     /**
      * Converts a date to text in <i>very</i> short format.
+     * <p>
+     * Sample: 11/21 (for November 21 2016).
      *
      * @param resources resources
      * @param date      date
@@ -238,6 +240,8 @@ public class Localization {
 
     /**
      * Converts a date to text in full format.
+     * <p>
+     * Sample: Monday, November 21 2016.
      *
      * @param resources resources
      * @param date      date
