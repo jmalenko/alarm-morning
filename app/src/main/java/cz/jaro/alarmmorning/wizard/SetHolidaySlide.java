@@ -8,13 +8,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Spinner;
 
 import java.util.List;
 
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.SettingsActivity;
-import cz.jaro.alarmmorning.holiday.HolidayAdapter;
+import cz.jaro.alarmmorning.graphics.HolidaySelector;
 import cz.jaro.alarmmorning.holiday.HolidayHelper;
 import de.jollyday.Holiday;
 
@@ -22,19 +21,16 @@ public class SetHolidaySlide extends BaseFragment {
 
     private static final String TAG = SetHolidaySlide.class.getSimpleName();
 
-    Spinner holidaySpinner;
-    HolidayAdapter holidayAdapter;
+    private HolidaySelector holidaySelector;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
 
-        holidaySpinner = (Spinner) view.findViewById(R.id.holidaySpinner1);
-
-        holidayAdapter = new HolidayAdapter(getContext(), R.layout.simple_spinner_item);
-        holidayAdapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
-        holidaySpinner.setAdapter(holidayAdapter);
+        holidaySelector = (HolidaySelector) view.findViewById(R.id.holidaySelector);
+        holidaySelector.setPath(SettingsActivity.PREF_HOLIDAY_NONE);
+        holidaySelector.setListVisibility(View.GONE);
 
         // TODO Wizard - Preselect holiday calendar
 
@@ -43,16 +39,14 @@ public class SetHolidaySlide extends BaseFragment {
 
     @Override
     protected int getContentLayoutId() {
-        return R.layout.fragment_wizard_holiday_region;
+        return R.layout.fragment_wizard_holiday;
     }
 
     @Override
     public void onSlideDeselected() {
         Log.v(TAG, "onSlideDeselected()");
 
-        holidaySpinner = (Spinner) getView().findViewById(R.id.holidaySpinner1);
-        int position = holidaySpinner.getSelectedItemPosition();
-        String holidayCalendarPreferenceString = holidayAdapter.positionToPreferenceString(position);
+        String holidayCalendarPreferenceString = holidaySelector.getPath();
 
         // Save holiday
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
