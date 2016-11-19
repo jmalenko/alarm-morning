@@ -10,21 +10,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Spinner;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.SettingsActivity;
-import cz.jaro.alarmmorning.clock.SystemClock;
 import cz.jaro.alarmmorning.holiday.HolidayAdapter;
 import cz.jaro.alarmmorning.holiday.HolidayHelper;
 import de.jollyday.Holiday;
-import de.jollyday.HolidayCalendar;
-import de.jollyday.HolidayManager;
 
 public class SetHolidaySlide extends BaseFragment {
 
@@ -38,7 +30,7 @@ public class SetHolidaySlide extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
 
-        holidaySpinner = (Spinner) view.findViewById(R.id.countrySpinner);
+        holidaySpinner = (Spinner) view.findViewById(R.id.holidaySpinner1);
 
         holidayAdapter = new HolidayAdapter(getContext(), R.layout.simple_spinner_item);
         holidayAdapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
@@ -58,7 +50,7 @@ public class SetHolidaySlide extends BaseFragment {
     public void onSlideDeselected() {
         Log.v(TAG, "onSlideDeselected()");
 
-        holidaySpinner = (Spinner) getView().findViewById(R.id.countrySpinner);
+        holidaySpinner = (Spinner) getView().findViewById(R.id.holidaySpinner1);
         int position = holidaySpinner.getSelectedItemPosition();
         String holidayCalendarPreferenceString = holidayAdapter.positionToPreferenceString(position);
 
