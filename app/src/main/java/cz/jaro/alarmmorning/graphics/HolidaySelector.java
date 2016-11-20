@@ -42,6 +42,8 @@ public class HolidaySelector extends LinearLayout implements AdapterView.OnItemS
 
     private boolean[] spinnerInitialized = new boolean[3]; // which spinners have been initialized
 
+    private int listOfHolidaysVisibility = View.VISIBLE;
+
     public HolidaySelector(Context context) {
         this(context, null);
     }
@@ -188,7 +190,7 @@ public class HolidaySelector extends LinearLayout implements AdapterView.OnItemS
         Resources res = getContext().getResources();
 
         HolidayHelper holidayHelper = HolidayHelper.getInstance();
-        if (holidayHelper.useHoliday(path)) {
+        if (listOfHolidaysVisibility == View.VISIBLE && holidayHelper.useHoliday(path)) {
             List<Holiday> holidays = holidayHelper.listHolidays(path);
 
             StringBuffer str = new StringBuffer();
@@ -237,6 +239,6 @@ public class HolidaySelector extends LinearLayout implements AdapterView.OnItemS
     }
 
     public void setListVisibility(int visibility) {
-        listOfHolidays.setVisibility(visibility);
+        listOfHolidaysVisibility = visibility;
     }
 }
