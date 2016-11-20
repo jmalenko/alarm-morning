@@ -16,7 +16,6 @@ import java.util.List;
 
 import cz.jaro.alarmmorning.Localization;
 import cz.jaro.alarmmorning.R;
-import cz.jaro.alarmmorning.SettingsActivity;
 import cz.jaro.alarmmorning.holiday.HolidayAdapter;
 import cz.jaro.alarmmorning.holiday.HolidayHelper;
 import de.jollyday.Holiday;
@@ -41,8 +40,7 @@ public class HolidaySelector extends LinearLayout implements AdapterView.OnItemS
     private LinearLayout listOfHolidays;
     private TextView listOfHolidaysDetails;
 
-    private int mSpinnerCount = 3; // how many Spinners are on the UI
-    private int mSpinnerInitializedCount = 0; // how many Spinners have been initialized
+    private boolean[] spinnerInitialized = new boolean[3]; // which spinners have been initialized
 
     public HolidaySelector(Context context) {
         this(context, null);
@@ -79,21 +77,20 @@ public class HolidaySelector extends LinearLayout implements AdapterView.OnItemS
         adapter3.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
         spinner3.setAdapter(adapter3);
         spinner3.setOnItemSelectedListener(this);
-
-        // Update view
-        updateView(SettingsActivity.PREF_HOLIDAY_NONE);
     }
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        String parentId = parent == spinner1 ? "1" : (parent == spinner2 ? "2" : "3");
-        Log.v(TAG, "onItemSelected(parent=" + parentId + ")");
+        int spinnerId = parent == spinner1 ? 1 : (parent == spinner2 ? 2 : 3);
+        Log.v(TAG, "onItemSelected(spinnerId=" + spinnerId + ")");
 
         // Hack for problem: an undesirable onItemSelected() is triggered whilst the Spinner is initializing. This means that code which is intended to
         // execute ONLY when a user physically makes a selection is prematurely executed.
         // Source: http://stackoverflow.com/questions/5624825/spinner-onitemselected-executes-when-it-is-not-suppose-to/5918177#5918177
-        if (mSpinnerInitializedCount < mSpinnerCount) {
-            mSpinnerInitializedCount++;
+        // Addendum: After refactoring to a View, the initialization of all the spinners is not done at once. It is done just before the first usage in the
+        // code. Therefore we need to store the initialization state of each spinner.
+        if (!spinnerInitialized[spinnerId-1]) {
+            spinnerInitialized[spinnerId-1] = true;
             return;
         }
 
@@ -165,7 +162,6 @@ public class HolidaySelector extends LinearLayout implements AdapterView.OnItemS
                     position = 0;
                 }
 
-                changed = false;
                 if (position != spinner.getSelectedItemPosition()) changed = true;
                 if (View.VISIBLE != spinner.getVisibility()) changed = true;
 
