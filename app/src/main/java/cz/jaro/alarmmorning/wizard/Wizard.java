@@ -33,7 +33,9 @@ public class Wizard extends AppIntro {
     // Must be a subset of permissions in AndroidManifest.xml (the subset that requires the user to explicitly grant permission)
     public static final String[] allPermissions = new String[]{
             Manifest.permission.READ_CALENDAR,
-            Manifest.permission.WRITE_EXTERNAL_STORAGE
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.INTERNET
     };
 
     @Override

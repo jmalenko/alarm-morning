@@ -72,6 +72,8 @@
 <p>Alarm Morning needs the following permissions to provide full user experience:</p>
 <p><b>READ_CALENDAR</b> – to read the calendar events (the information about next appointment is shown while the alarm is ringing)</p>
 <p><b>WRITE_EXTERNAL_STORAGE</b> – to install new ringtone (the “Church bell” ringtone is used as default sound for nighttime bell)</p>
+<p><b>ACCESS_FINE_LOCATION</b> – to get the location (the location determines the holidays in your region)</p>
+<p><b>INTERNET</b> – to use network (to update the list of holidays)</p>
 ]]></string>
 
     <string name="wizard_done_title">You are all set</string>
