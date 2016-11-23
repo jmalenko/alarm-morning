@@ -67,7 +67,7 @@ public class CustomAlarmTone {
                 boolean status = copyRawFile(R.raw.church_clock_strikes_3, mContext.getString(R.string.alarmtone_title_church_bell), true);
 
                 if (status) {
-                    // Remember that files were copied
+                    // Remember that files were installed
                     SharedPreferences.Editor editor = preferences.edit();
                     editor.putBoolean(PREF_FILES_INSTALLED, true);
                     editor.commit();
