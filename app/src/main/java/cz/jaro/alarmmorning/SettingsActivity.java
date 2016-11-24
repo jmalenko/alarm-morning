@@ -121,6 +121,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     public static final String SETTING_ACTION__SNOOZE = "Snooze";
     public static final String SETTING_ACTION__DISMISS = "Dismiss";
 
+    private static final int REQUEST_CODE_WIZARD = 1;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -201,8 +203,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 analytics.save();
 
                 Intent intent = new Intent(context, Wizard.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
+                startActivityForResult(intent, REQUEST_CODE_WIZARD);
 
                 return true;
             }
@@ -249,6 +250,15 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             return true;
         }
         return super.onMenuItemSelected(featureId, item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_CODE_WIZARD) {
+            if (resultCode == RESULT_OK) {
+                finish();
+            }
+        }
     }
 
     /**
