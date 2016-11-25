@@ -61,7 +61,7 @@
     <string name="dismiss_alarm_on_device_shake">Dismiss alarm on device shake</string>
 
     <string name="wizard_set_features_title">Set advanced alarm clock fetures</string>
-    <string name="wizard_set_features_description">Every evening at 10:00 PM do…</string>
+    <string name="wizard_set_features_description">Every evening at <xliff:g id="time" example="22:00">%1$s</xliff:g> do…</string>
 
     <string name="check_alarm_time">Check that the alarm time is set at least 1 hour before the first appointment</string>
     <string name="play_nighttime_bell">Play nighttime bell (taps bugle call)</string>

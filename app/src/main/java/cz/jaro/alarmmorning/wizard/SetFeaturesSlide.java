@@ -6,8 +6,10 @@ import android.preference.PreferenceManager;
 import android.widget.CheckBox;
 
 import cz.jaro.alarmmorning.Analytics;
+import cz.jaro.alarmmorning.Localization;
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.SettingsActivity;
+import cz.jaro.alarmmorning.graphics.TimePreference;
 
 public class SetFeaturesSlide extends BaseFragment {
 
@@ -67,7 +69,10 @@ public class SetFeaturesSlide extends BaseFragment {
 
     @Override
     protected String getDescriptionTop() {
-        return getString(R.string.wizard_set_features_description);
+        int hour = TimePreference.getHour(SettingsActivity.PREF_CHECK_ALARM_TIME_AT_DEFAULT);
+        int minute = TimePreference.getMinute(SettingsActivity.PREF_CHECK_ALARM_TIME_AT_DEFAULT);
+        String timeText = Localization.timeToString(hour, minute, getContext());
+        return getResources().getString(R.string.wizard_set_features_description, timeText);
     }
 
     @Override
