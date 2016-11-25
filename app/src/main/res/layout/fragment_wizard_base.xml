@@ -9,7 +9,7 @@
     <TextView
         android:id="@+id/title"
         android:layout_width="wrap_content"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_weight="3"
         android:gravity="center"
@@ -22,7 +22,7 @@
     <TextView
         android:id="@+id/description1"
         android:layout_width="wrap_content"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_weight="1"
         android:gravity="center"
@@ -33,7 +33,7 @@
 
     <ScrollView
         android:id="@+id/content_frame2"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="5"
         android:gravity="center">
@@ -42,7 +42,7 @@
     <TextView
         android:id="@+id/description2"
         android:layout_width="wrap_content"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_weight="1"
         android:gravity="center"

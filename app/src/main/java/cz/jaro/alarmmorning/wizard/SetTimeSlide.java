@@ -2,6 +2,7 @@ package cz.jaro.alarmmorning.wizard;
 
 import android.app.AlarmManager;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -67,9 +68,12 @@ public class SetTimeSlide extends BaseFragment implements TimePicker.OnTimeChang
         picker.setOnTimeChangedListener(this);
 
         // Make the whole TimePicker visible
-        ScrollView scrollView = (ScrollView) view.findViewById(R.id.content_frame2);
-        LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
-        scrollView.setLayoutParams(params1);
+        int screenSize = getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK;
+        if (screenSize == Configuration.SCREENLAYOUT_SIZE_NORMAL) {
+            ScrollView scrollView = (ScrollView) view.findViewById(R.id.content_frame2);
+            LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
+            scrollView.setLayoutParams(params1);
+        }
 
         return view;
     }
