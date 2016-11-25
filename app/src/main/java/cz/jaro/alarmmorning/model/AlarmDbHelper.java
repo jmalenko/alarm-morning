@@ -32,12 +32,12 @@ public class AlarmDbHelper extends SQLiteOpenHelper {
     public static final String COLUMN_DAY_MINUTE = "minute";
 
     /**
-     * Hour of default alarm time. Used only to initialize configuration.
+     * Hour of default alarm time. Used to initialize configuration.
      */
     public static final int DEFAULT_ALARM_HOUR = 7;
 
     /**
-     * Minute of default alarm time. Used only to initialize configuration.
+     * Minute of default alarm time. Used to initialize configuration.
      */
     public static final int DEFAULT_ALARM_MINUTE = 0;
 
