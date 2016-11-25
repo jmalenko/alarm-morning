@@ -72,8 +72,6 @@ public class Wizard extends AppIntro {
             Log.v(TAG, "All permissions are granted. Skipping permission slide.");
         }
 
-        // TODO Add slide - Add widget to home screen
-
         addSlide(new SetDoneSlide());
     }
 
