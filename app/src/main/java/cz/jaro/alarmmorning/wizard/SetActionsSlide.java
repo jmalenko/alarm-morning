@@ -8,11 +8,12 @@ import cz.jaro.alarmmorning.Analytics;
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.SettingsActivity;
 
+/**
+ * When run repeatedly, behaves as run for the first time.
+ */
 public class SetActionsSlide extends BaseFragment {
 
     private static final String TAG = SetActionsSlide.class.getSimpleName();
-
-    // TODO When run from Settings - preset from current settings
 
     @Override
     protected int getContentLayoutId() {

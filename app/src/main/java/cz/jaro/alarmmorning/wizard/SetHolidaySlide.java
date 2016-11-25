@@ -29,10 +29,16 @@ public class SetHolidaySlide extends BaseFragment {
         View view = super.onCreateView(inflater, container, savedInstanceState);
 
         holidaySelector = (HolidaySelector) view.findViewById(R.id.holidaySelector);
-        holidaySelector.setPath(SettingsActivity.PREF_HOLIDAY_NONE);
         holidaySelector.setListVisibility(View.GONE);
 
-        // TODO Wizard - Preselect holiday calendar
+        // Preset
+        String path;
+        if (Wizard.loadWizardFinished(getContext())) {
+            path = HolidayHelper.getInstance().getHolidayPreference();
+        } else {
+            path = SettingsActivity.PREF_HOLIDAY_NONE;
+        }
+        holidaySelector.setPath(path);
 
         return view;
     }

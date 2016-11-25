@@ -11,11 +11,12 @@ import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.SettingsActivity;
 import cz.jaro.alarmmorning.graphics.TimePreference;
 
+/**
+ * When run repeatedly, behaves as run for the first time.
+ */
 public class SetFeaturesSlide extends BaseFragment {
 
     private static final String TAG = SetFeaturesSlide.class.getSimpleName();
-
-    // TODO When run from Settings - preset from current settings
 
     @Override
     protected int getContentLayoutId() {
