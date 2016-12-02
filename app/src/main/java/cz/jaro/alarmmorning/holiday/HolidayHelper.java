@@ -32,12 +32,19 @@ import de.jollyday.HolidayCalendar;
 import de.jollyday.HolidayManager;
 import de.jollyday.util.ResourceUtil;
 
+import static cz.jaro.alarmmorning.holiday.HolidayHelper.PATH_TOP;
+
 /**
  * Helper class to work with Holidays.
  */
 public class HolidayHelper {
 
     private static final String TAG = HolidayHelper.class.getSimpleName();
+
+    public static final String PATH_TOP = "";
+    public static final String PATH_SEPARATOR = ".";
+
+    public static final String STRING_PATH_SEPARATOR = " – ";
 
     private static HolidayHelper instance;
     private Context context;
@@ -53,26 +60,37 @@ public class HolidayHelper {
         return instance;
     }
 
+    /**
+     * Return the identifier of a region that is used to determine holidays.
+     *
+     * @return the path identifier of a region
+     */
     public String getHolidayPreference() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         String holidayPreference = preferences.getString(SettingsActivity.PREF_HOLIDAY, SettingsActivity.PREF_HOLIDAY_DEFAULT);
+        // TODO If the region path does not exist (because the library stopped supporting it or it disappeared) then use the first existing super-region
         return holidayPreference;
     }
 
+    /**
+     * Check whether holidays are enabaled by user.
+     *
+     * @return true if the user enabled holidays
+     */
     public boolean useHoliday() {
         return useHoliday(getHolidayPreference());
     }
 
     public boolean useHoliday(String value) {
-        return !value.equals(SettingsActivity.PREF_HOLIDAY_NONE) && !value.isEmpty();
+        return !value.equals(SettingsActivity.PREF_HOLIDAY_NONE);
     }
 
-    public HolidayCalendar getHolidayCalendar() {
+    private HolidayCalendar getHolidayCalendar() {
         String holidayPreference = getHolidayPreference();
         return getHolidayCalendar(holidayPreference);
     }
 
-    public HolidayCalendar getHolidayCalendar(String path) {
+    private HolidayCalendar getHolidayCalendar(String path) {
         String[] ids = path.split("\\.");
 
         if (useHoliday()) {
@@ -90,7 +108,7 @@ public class HolidayHelper {
     /**
      * Get list of {@link Holiday}s, from today (including) till the same day next year (excluding), sorted by date.
      *
-     * @param path Region path
+     * @param path path identifier of a region
      * @return list of {@link Holiday}s
      */
     public List<Holiday> listHolidays(String path) {
@@ -156,6 +174,12 @@ public class HolidayHelper {
         return orderedHolidays;
     }
 
+    /**
+     * Formats the region identifier to a string that can be presented to user. Separates the level by a dash. Uses real names of regions and respects locales.
+     *
+     * @param path path identifier of a region
+     * @return string region name presentable to a user
+     */
     public String preferenceToDisplayName(String path) {
         if (useHoliday(path)) {
             StringBuffer displayName = new StringBuffer();
@@ -172,8 +196,17 @@ public class HolidayHelper {
 
             Map<String, CalendarHierarchy> children = calendarHierarchy.getChildren();
             for (int i = 1; i < ids.length; i++) {
-                displayName.append(" – ");
-                displayName.append(children.get(ids[i]).getDescription());
+                String id = ids[i];
+                CalendarHierarchy child = children.get(id);
+
+                if (child == null) {
+                    String prefix = pathPrefix(path, i);
+                    throw new IllegalStateException("Prefix " + prefix + " has no id " + id + " in path " + path);
+                }
+
+
+                displayName.append(STRING_PATH_SEPARATOR);
+                displayName.append(child.getDescription());
 
                 children = children.get(ids[i]).getChildren();
             }
@@ -185,6 +218,13 @@ public class HolidayHelper {
         }
     }
 
+    /**
+     * Return a holiday name.
+     *
+     * @param date Date
+     * @return holida name
+     * @throws IllegalStateException if it's not holiday on the date
+     */
     public String getHolidayDescription(Calendar date) {
         if (useHoliday()) {
             HolidayCalendar holidayCalendar = HolidayHelper.getInstance().getHolidayCalendar();
@@ -217,6 +257,12 @@ public class HolidayHelper {
                 && day1 == day2;
     }
 
+    /**
+     * Check if the date is a holiday.
+     *
+     * @param date Date
+     * @return true if it's holiday on the date
+     */
     public boolean isHoliday(Calendar date) {
         if (useHoliday()) {
             HolidayCalendar holidayCalendar = HolidayHelper.getInstance().getHolidayCalendar();
@@ -245,6 +291,12 @@ public class HolidayHelper {
         }
     }
 
+    /**
+     * Returns the number of levels of a region identifier.
+     *
+     * @param path path identifier of a region
+     * @return number of levels in the path
+     */
     public int pathLength(String path) {
         Log.v(TAG, "pathLength(parentPath=" + path + ")");
         int length;
@@ -254,6 +306,13 @@ public class HolidayHelper {
         return length;
     }
 
+    /**
+     * Returns an ID of a super-region in a region identifier.
+     *
+     * @param path  path identifier of a region
+     * @param index level of the super-region
+     * @return id of the super-region
+     */
     public String pathPart(String path, int index) {
         Log.d(TAG, "pathPart(parentPath=" + path + ", index=" + index + ")");
         String part = path.split("\\.")[index - 1];
@@ -261,17 +320,24 @@ public class HolidayHelper {
         return part;
     }
 
+    /**
+     * Return a super-region of a region.
+     *
+     * @param path  path identifier of a region
+     * @param level level of the super-region.
+     * @return path identifying a region
+     */
     public String pathPrefix(String path, int level) {
         Log.d(TAG, "pathPrefix(parentPath=" + path + ", level=" + level + ")");
 
         if (level == 0) {
             Log.v(TAG, "pathPrefix=\"\"");
-            return "";
+            return PATH_TOP;
         }
 
         int pos = -1;
         int counter = 0;
-        while ((pos = path.indexOf(".", pos + 1)) != -1) {
+        while ((pos = path.indexOf(PATH_SEPARATOR, pos + 1)) != -1) {
             counter++;
             if (counter == level) {
                 String prefix = path.substring(0, pos);
@@ -284,19 +350,51 @@ public class HolidayHelper {
         return path;
     }
 
-    public List<Region> list() {
-        return list("");
+    /**
+     * Check if a region identifier is valid.
+     *
+     * @param path path identifier of a region
+     * @return true if a region with such <code>path</code> exists
+     */
+    public boolean isPathValid(String path) {
+        try {
+            Map<String, CalendarHierarchy> children = pathInfo(path);
+            return true;
+        } catch (IllegalStateException e) {
+            return false;
+        }
     }
 
+    /**
+     * Lists the regions at top level.
+     *
+     * @return list of regions
+     */
+    public List<Region> list() {
+        return list(PATH_TOP);
+    }
+
+    /**
+     * Checks if a region has subregions.
+     *
+     * @param path path identifier of a region
+     * @return true if the region has subregions
+     */
     public boolean hasSubregions(String path) {
         return !list(path).isEmpty();
     }
 
+    /**
+     * Lists the subregions of a region identified by <code>path</code>.
+     *
+     * @param path path identifier of a region
+     * @return list of regions
+     */
     public List<Region> list(String path) {
         Log.v(TAG, "List region " + path);
         List<Region> list;
 
-        if (path.equals("") || path.equals(SettingsActivity.PREF_HOLIDAY_NONE)) {
+        if (path.equals(PATH_TOP)) {
             list = listTopCountries();
         } else {
             list = listSubregions(path);
@@ -317,7 +415,7 @@ public class HolidayHelper {
 
         for (HolidayCalendar c : HolidayCalendar.values()) {
             Region region = new Region();
-            region.parentPath = "";
+            region.parentPath = PATH_TOP;
             region.id = c.getId();
             region.description = resourceUtil.getCountryDescription(c.getId());
 
@@ -327,23 +425,42 @@ public class HolidayHelper {
         return list;
     }
 
+    /**
+     * @throws IllegalStateException if the path doesn't exist
+     */
     private Map<String, CalendarHierarchy> pathInfo(String path) {
         Log.d(TAG, "pathInfo(path=" + path + ")");
         ResourceUtil resourceUtil = new ResourceUtil();
 
         String[] ids = path.split("\\.");
 
-        Log.v(TAG, " " + ids[0] + " " + resourceUtil.getCountryDescription(ids[0]));
+        String id = ids[0];
+        Log.v(TAG, " " + id + " " + resourceUtil.getCountryDescription(id));
 
-        HolidayManager holidayManager = HolidayManager.getInstance(ids[0]);
+        HolidayManager holidayManager;
+
+        try {
+            holidayManager = HolidayManager.getInstance(id);
+        } catch (IllegalStateException e) {
+            // Country does not exist
+            throw new IllegalStateException("Prefix " + id + " does not exist in path " + path);
+        }
 
         CalendarHierarchy calendarHierarchy = holidayManager.getCalendarHierarchy();
         Map<String, CalendarHierarchy> children = calendarHierarchy.getChildren();
 
         for (int i = 1; i < ids.length; i++) {
-            Log.v(TAG, " " + ids[i] + " " + children.get(ids[i]).getDescription());
+            id = ids[i];
+            CalendarHierarchy child = children.get(id);
 
-            children = children.get(ids[i]).getChildren();
+            if (child == null) {
+                String prefix = pathPrefix(path, i);
+                throw new IllegalStateException("Prefix " + prefix + " has no id " + id + " in path " + path);
+            }
+
+            Log.v(TAG, " " + id + " " + child.getDescription());
+
+            children = child.getChildren();
         }
 
         return children;
@@ -373,6 +490,9 @@ public class HolidayHelper {
 
 }
 
+/**
+ * Region represents a region. Region has an {@link #id} and a path identifying the parent region in {@link #parentPath}.
+ */
 class Region {
 
     String parentPath;
@@ -380,14 +500,14 @@ class Region {
     String description;
 
     boolean isTop() {
-        return parentPath == "";
+        return parentPath == PATH_TOP;
     }
 
     String getFullPath() {
         if (isTop()) {
             return id;
         } else {
-            return parentPath + "." + id;
+            return parentPath + HolidayHelper.PATH_SEPARATOR + id;
         }
     }
 }
