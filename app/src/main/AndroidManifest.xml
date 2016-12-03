@@ -67,7 +67,8 @@
                 android:resource="@xml/widget_info"/>
         </receiver>
 
-        <receiver android:name=".receivers.AlarmReceiver"/>
+        <receiver android:name=".receivers.AlarmReceiver">
+        </receiver>
         <receiver android:name=".receivers.BootReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
