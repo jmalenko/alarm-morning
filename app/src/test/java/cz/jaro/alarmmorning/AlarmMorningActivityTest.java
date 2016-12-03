@@ -38,7 +38,7 @@ public class AlarmMorningActivityTest {
 
     public static final String TEST_PREFERENCE_NAME = "test_preference_name";
 
-    static private void setLocale(Activity activity, String language, String country) {
+    public static void setLocale(Activity activity, String language, String country) {
         Locale locale = new Locale(language, country);
         // update locale for date formatters
         Locale.setDefault(locale);
