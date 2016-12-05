@@ -9,6 +9,7 @@ import android.util.Log;
 
 import java.util.Calendar;
 
+import cz.jaro.alarmmorning.AlarmMorningActivity;
 import cz.jaro.alarmmorning.Analytics;
 import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.Localization;
@@ -30,7 +31,10 @@ public class SetAlarmByVoiceActivity extends Activity {
 
     private int hour;
     private int minute;
+    private int seconds;
     private boolean ok;
+
+    // TODO Google Now allows cancelling the timer (that was just set).
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -45,28 +49,17 @@ public class SetAlarmByVoiceActivity extends Activity {
             Log.w(TAG, "Intent is null");
             ok = false;
         } else if (AlarmClock.ACTION_SET_ALARM.equals(intent.getAction())) {
-            // Read parameters
-            if (intent.hasExtra(AlarmClock.EXTRA_HOUR)) {
-                hour = intent.getIntExtra(AlarmClock.EXTRA_HOUR, VALUE_UNSET);
-                if (hour == VALUE_UNSET) {
-                    Log.w(TAG, "Invalid hour value \"" + hour + "\"");
-                    ok = false;
-                }
-            } else {
-                Log.w(TAG, "Extra missing: hour");
-                ok = false;
+            hour = readParam(intent, AlarmClock.EXTRA_HOUR);
+            minute = readParam(intent, AlarmClock.EXTRA_MINUTES);
+        } else if (AlarmClock.ACTION_SET_TIMER.equals(intent.getAction())) {
+            // If the extra is not specified then show all timers. (This is not mentioned in the reference.)
+            if (!intent.hasExtra(AlarmClock.EXTRA_LENGTH)) {
+                Intent calendarIntent = new Intent(this, AlarmMorningActivity.class);
+                startActivity(calendarIntent);
+                finish();
+                return;
             }
-
-            if (intent.hasExtra(AlarmClock.EXTRA_MINUTES)) {
-                minute = intent.getIntExtra(AlarmClock.EXTRA_MINUTES, VALUE_UNSET);
-                if (minute == VALUE_UNSET) {
-                    Log.w(TAG, "Invalid minute value \"" + hour + "\"");
-                    ok = false;
-                }
-            } else {
-                Log.w(TAG, "Extra missing: minute");
-                ok = false;
-            }
+            seconds = readParam(intent, AlarmClock.EXTRA_LENGTH);
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (!isVoiceInteraction()) {
                 Log.w(TAG, "Not voice interaction");
@@ -113,6 +106,24 @@ public class SetAlarmByVoiceActivity extends Activity {
         blink.initiateFinish();
     }
 
+    private int readParam(Intent intent, String extraName) {
+        if (intent.hasExtra(extraName)) {
+            int value = intent.getIntExtra(extraName, VALUE_UNSET);
+            if (value != VALUE_UNSET) {
+                return value;
+            } else {
+                Log.w(TAG, "Invalid extra value \"" + extraName + "\"");
+                ok = false;
+                ok = false;
+                return VALUE_UNSET;
+            }
+        } else {
+            Log.w(TAG, "Extra missing: " + extraName);
+            ok = false;
+            return VALUE_UNSET;
+        }
+    }
+
     private void saveTime() {
         GlobalManager globalManager = new GlobalManager(getBaseContext());
         Clock clock = globalManager.clock();
@@ -120,10 +131,33 @@ public class SetAlarmByVoiceActivity extends Activity {
 
         // Calculate alarm time
         alarmTime = (Calendar) now.clone();
-        alarmTime.set(Calendar.HOUR_OF_DAY, hour);
-        alarmTime.set(Calendar.MINUTE, minute);
-        if (alarmTime.before(now)) {
-            alarmTime.add(Calendar.DATE, 1);
+
+        Intent intent = getIntent();
+        switch (intent.getAction()) {
+            case AlarmClock.ACTION_SET_ALARM:
+                alarmTime.set(Calendar.HOUR_OF_DAY, hour);
+                alarmTime.set(Calendar.MINUTE, minute);
+                if (alarmTime.before(now)) {
+                    alarmTime.add(Calendar.DATE, 1);
+                }
+                break;
+            case AlarmClock.ACTION_SET_TIMER:
+                if (120 <= seconds) {
+                    alarmTime.add(Calendar.SECOND, seconds);
+                    alarmTime.add(Calendar.SECOND, 0);
+                } else {
+                    alarmTime.add(Calendar.SECOND, seconds);
+                    if (alarmTime.get(Calendar.SECOND) <= 30) {
+                        alarmTime.set(Calendar.SECOND, 0);
+                        if (alarmTime.before(now)) {
+                            alarmTime.add(Calendar.MINUTE, 1);
+                        }
+                    } else {
+                        alarmTime.set(Calendar.SECOND, 0);
+                        alarmTime.add(Calendar.MINUTE, 1);
+                    }
+                }
+                break;
         }
 
         // Save
