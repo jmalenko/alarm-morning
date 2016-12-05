@@ -83,6 +83,8 @@
     <string name="title_activity_set_alarm_by_voice">Morning alarm by voice</string>
 
     <string name="blink_set">Set alarm at</string>
+    <string name="blink_snooze">Snoozed until</string>
+    <string name="blink_dismiss">Dismissed</string>
     <string name="blink_invalid">Invalid command</string>
 
     <!-- Notification -->

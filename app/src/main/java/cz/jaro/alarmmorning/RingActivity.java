@@ -32,6 +32,7 @@ import java.util.Set;
 import cz.jaro.alarmmorning.calendar.CalendarEvent;
 import cz.jaro.alarmmorning.calendar.CalendarHelper;
 import cz.jaro.alarmmorning.clock.Clock;
+import cz.jaro.alarmmorning.graphics.Blink;
 import cz.jaro.alarmmorning.graphics.SlideButton;
 import cz.jaro.alarmmorning.receivers.AlarmReceiver;
 import cz.jaro.alarmmorning.sensor.Flip;
@@ -213,7 +214,9 @@ public class RingActivity extends Activity implements RingInterface {
         GlobalManager globalManager = new GlobalManager(context);
         globalManager.onDismiss(analytics);
 
-        finish();
+        Blink blink = new Blink(this);
+        blink.setMessageText(R.string.blink_dismiss);
+        blink.initiateFinish();
     }
 
     public void doSnooze(Context context) {
@@ -224,9 +227,13 @@ public class RingActivity extends Activity implements RingInterface {
         Analytics analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Ring);
 
         GlobalManager globalManager = new GlobalManager(context);
-        globalManager.onSnooze(analytics);
+        Calendar ringAfterSnoozeTime = globalManager.onSnooze(analytics);
 
-        finish();
+        Blink blink = new Blink(this);
+        blink.setMessageText(R.string.blink_snooze);
+        String timeStr = Localization.timeToString(ringAfterSnoozeTime.getTime(), getBaseContext());
+        blink.setTimeText(timeStr);
+        blink.initiateFinish();
     }
 
     public void doMute() {

@@ -724,7 +724,12 @@ public class GlobalManager {
         }
     }
 
-    public void onSnooze(Analytics analytics) {
+    /**
+     *
+     * @param analytics
+     * @return time when the alarm will ring again
+     */
+    public Calendar onSnooze(Analytics analytics) {
         Log.d(TAG, "onSnooze()");
 
         analytics.setContext(context);
@@ -746,6 +751,8 @@ public class GlobalManager {
         updateRingingActivity(context, RingActivity.ACTION_HIDE_ACTIVITY);
 
         updateCalendarActivity(context, AlarmMorningActivity.ACTION_SNOOZE);
+
+        return ringAfterSnoozeTime;
     }
 
     /**

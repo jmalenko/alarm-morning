@@ -83,6 +83,8 @@
     <string name="title_activity_set_alarm_by_voice">Budík ovládaný hlasem</string>
 
     <string name="blink_set">Nastaven budík na</string>
+    <string name="blink_snooze">Odložen na</string>
+    <string name="blink_dismiss">Ukončený</string>
     <string name="blink_invalid">Špatný příkaz</string>
 
     <!-- Notification -->
