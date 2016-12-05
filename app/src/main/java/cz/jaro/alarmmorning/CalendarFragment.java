@@ -103,17 +103,16 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     public void onResume() {
         super.onResume();
 
+        Calendar today2 = getToday(clock());
+        if (!today.equals(today2)) {
+            today = today2;
+        }
+
         // handler for refreshing the content
         handler.start(runnable, Calendar.SECOND);
 
-        Calendar today2 = getToday(clock());
-
-        if (!today.equals(today2)) {
-            today = today2;
-            adapter.notifyDataSetChanged();
-        } else {
-            adapter.notifyItemChanged(positionNextAlarm);
-        }
+        // Refresh all the alarm times. Solves this scenario: Given displayed calendar, when set alarm by voice, then the calendar must refresh.
+        adapter.notifyDataSetChanged();
     }
 
     @Override

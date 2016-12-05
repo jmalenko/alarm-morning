@@ -180,6 +180,8 @@ public class Analytics {
         Check_alarm_time,
         Nighttime_bell,
 
+        Voice,
+
         Boot,
         Upgrade,
         TimeZoneChange,

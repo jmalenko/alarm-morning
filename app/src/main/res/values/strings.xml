@@ -79,6 +79,12 @@
     <string name="wizard_done_title">You are all set</string>
     <string name="wizard_done_description">Sleep well and don\'t worry about alarm clock management.</string>
 
+    <!-- Set alarm by voice -->
+    <string name="title_activity_set_alarm_by_voice">Morning alarm by voice</string>
+
+    <string name="blink_set">Set alarm at</string>
+    <string name="blink_invalid">Invalid command</string>
+
     <!-- Notification -->
     <string name="notification_title">Alarm at <xliff:g id="time" example="07:00">%1$s</xliff:g></string>
     <string name="notification_text_future">Touch to view all alarms</string>

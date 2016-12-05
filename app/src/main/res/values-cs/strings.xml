@@ -79,6 +79,12 @@
     <string name="wizard_done_title">Vše je připraveno</string>
     <string name="wizard_done_description">Přejeme klidný spánek a ať se nemusíte starat o nastavování budíku.</string>
 
+    <!-- Set alarm by voice -->
+    <string name="title_activity_set_alarm_by_voice">Budík ovládaný hlasem</string>
+
+    <string name="blink_set">Nastaven budík na</string>
+    <string name="blink_invalid">Špatný příkaz</string>
+
     <!-- Notification -->
     <string name="notification_title">Budík v <xliff:g id="time" example="07:00">%1$s</xliff:g></string>
     <string name="notification_text_future">Zobraz všechny budíky</string>

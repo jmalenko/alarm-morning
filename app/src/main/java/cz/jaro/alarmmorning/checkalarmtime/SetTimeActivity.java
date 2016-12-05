@@ -80,6 +80,8 @@ public class SetTimeActivity extends AppCompatActivity implements TimePickerDial
         saveAlarmTime.set(Calendar.MINUTE, minute);
 
         Analytics analytics = new Analytics().set(Analytics.Param.Check_alarm_time_method, CHECK_ALARM_TIME_METHOD__DIALOG);
+        analytics.setChannel(Analytics.Channel.Notification);
+        analytics.setChannelName(Analytics.ChannelName.Check_alarm_time);
 
         save(this, saveAlarmTime, analytics);
 
@@ -87,6 +89,10 @@ public class SetTimeActivity extends AppCompatActivity implements TimePickerDial
     }
 
     public static void save(Context context, Calendar saveAlarmTime, Analytics analytics) {
+        save(context, saveAlarmTime, analytics, true);
+    }
+
+    public static void save(Context context, Calendar saveAlarmTime, Analytics analytics, boolean showToast) {
         AlarmDataSource dataSource = new AlarmDataSource(context);
         dataSource.open();
 
@@ -99,17 +105,16 @@ public class SetTimeActivity extends AppCompatActivity implements TimePickerDial
         day.setMinute(saveAlarmTime.get(Calendar.MINUTE));
 
         // Save
-        analytics.setChannel(Analytics.Channel.Notification);
-        analytics.setChannelName(Analytics.ChannelName.Check_alarm_time);
-
         GlobalManager globalManager = new GlobalManager(context);
         globalManager.saveAlarmTime(day, dataSource, analytics);
 
         dataSource.close();
 
         // Show toast
-        String toastText = CalendarFragment.formatToastText(context.getResources(), globalManager.clock(), day);
-        Toast.makeText(context, toastText, Toast.LENGTH_LONG).show();
+        if (showToast) {
+            String toastText = CalendarFragment.formatToastText(context.getResources(), globalManager.clock(), day);
+            Toast.makeText(context, toastText, Toast.LENGTH_LONG).show();
+        }
     }
 
     @Override
