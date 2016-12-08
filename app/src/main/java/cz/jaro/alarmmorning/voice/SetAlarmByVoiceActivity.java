@@ -32,6 +32,7 @@ public class SetAlarmByVoiceActivity extends Activity {
     private int hour;
     private int minute;
     private int seconds;
+    private boolean skip_ui;
     private boolean ok;
 
     // TODO Google Now allows cancelling the timer (that was just set).
@@ -51,6 +52,7 @@ public class SetAlarmByVoiceActivity extends Activity {
         } else if (AlarmClock.ACTION_SET_ALARM.equals(intent.getAction())) {
             hour = readParam(intent, AlarmClock.EXTRA_HOUR);
             minute = readParam(intent, AlarmClock.EXTRA_MINUTES);
+            skip_ui = intent.getBooleanExtra(AlarmClock.EXTRA_SKIP_UI, false);
         } else if (AlarmClock.ACTION_SET_TIMER.equals(intent.getAction())) {
             // If the extra is not specified then show all timers. (This is not mentioned in the reference.)
             if (!intent.hasExtra(AlarmClock.EXTRA_LENGTH)) {
@@ -60,6 +62,7 @@ public class SetAlarmByVoiceActivity extends Activity {
                 return;
             }
             seconds = readParam(intent, AlarmClock.EXTRA_LENGTH);
+            skip_ui = intent.getBooleanExtra(AlarmClock.EXTRA_SKIP_UI, false);
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (!isVoiceInteraction()) {
                 Log.w(TAG, "Not voice interaction");
@@ -77,33 +80,37 @@ public class SetAlarmByVoiceActivity extends Activity {
     protected void onResume() {
         super.onResume();
 
-        Blink blink = new Blink(this);
+        if (!skip_ui) {
+            Blink blink = new Blink(this);
 
-        if (ok) {
-            // Speak the action through the App Indexing API
-//            Thing alarm = new Thing.Builder()
-//                    .setName("Alarm for 4:00 PM")
-//                    .setDescription("Alarm set for 4:00 PM, with the 'Argon' ringtone"
-//                            + " and vibrate turned on.")
-//                    .setUrl(APP_URI)
-//                    .build();
+            if (ok) {
+                // Speak the action through the App Indexing API
+//                Thing alarm = new Thing.Builder()
+//                        .setName("Alarm for 4:00 PM")
+//                        .setDescription("Alarm set for 4:00 PM, with the 'Argon' ringtone"
+//                                + " and vibrate turned on.")
+//                        .setUrl(APP_URI)
+//                        .build();
 //
-//            Action setAlarmAction = new Action.Builder(Action.TYPE_ADD)
-//                    .setObject(alarm)
-//                    .setActionStatus(Action.STATUS_TYPE_COMPLETED)
-//                    .build();
+//                Action setAlarmAction = new Action.Builder(Action.TYPE_ADD)
+//                        .setObject(alarm)
+//                        .setActionStatus(Action.STATUS_TYPE_COMPLETED)
+//                        .build();
 //
-//            AppIndex.AppIndexApi.end(mClient, setAlarmAction);
+//                AppIndex.AppIndexApi.end(mClient, setAlarmAction);
 
-            // Blink and finish activity
-            blink.setMessageText(R.string.blink_set);
-            String timeStr = Localization.timeToString(alarmTime.getTime(), getBaseContext());
-            blink.setTimeText(timeStr);
+                // Blink and finish activity
+                blink.setMessageText(R.string.blink_set);
+                String timeStr = Localization.timeToString(alarmTime.getTime(), getBaseContext());
+                blink.setTimeText(timeStr);
+            } else {
+                blink.setMessageText(R.string.blink_invalid);
+            }
+
+            blink.initiateFinish();
         } else {
-            blink.setMessageText(R.string.blink_invalid);
+            finish();
         }
-
-        blink.initiateFinish();
     }
 
     private int readParam(Intent intent, String extraName) {
