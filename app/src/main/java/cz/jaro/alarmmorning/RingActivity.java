@@ -87,6 +87,8 @@ public class RingActivity extends Activity implements RingInterface {
 
     private SlideButton dismissButton;
 
+    private Blink blink;
+
     static {
         b_intentFilter = new IntentFilter();
         b_intentFilter.addAction(ACTION_HIDE_ACTIVITY);
@@ -99,9 +101,11 @@ public class RingActivity extends Activity implements RingInterface {
             Log.d(TAG, "onReceive() action=" + action);
 
             if (action.equals(ACTION_HIDE_ACTIVITY)) {
-                stopAll();
+                if (blink == null) { // The action (snooze, dismiss) was NOT started by this activity
+                    stopAll();
 
-                finish();
+                    finish();
+                }
             }
         }
     };
@@ -211,10 +215,11 @@ public class RingActivity extends Activity implements RingInterface {
 
         Analytics analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Ring);
 
+        blink = new Blink(this);
+
         GlobalManager globalManager = new GlobalManager(context);
         globalManager.onDismiss(analytics);
 
-        Blink blink = new Blink(this);
         blink.setMessageText(R.string.blink_dismiss);
         blink.initiateFinish();
     }
@@ -226,10 +231,11 @@ public class RingActivity extends Activity implements RingInterface {
 
         Analytics analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Ring);
 
+        blink = new Blink(this);
+
         GlobalManager globalManager = new GlobalManager(context);
         Calendar ringAfterSnoozeTime = globalManager.onSnooze(analytics);
 
-        Blink blink = new Blink(this);
         blink.setMessageText(R.string.blink_snooze);
         String timeStr = Localization.timeToString(ringAfterSnoozeTime.getTime(), getBaseContext());
         blink.setTimeText(timeStr);

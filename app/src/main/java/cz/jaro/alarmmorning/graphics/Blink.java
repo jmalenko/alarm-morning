@@ -11,7 +11,7 @@ import cz.jaro.alarmmorning.R;
  * Blinks a message, waits a moment and then finishes the activity.
  */
 public class Blink {
-    private static final int DELAY_MILLIS = 1500;
+    private static final int DELAY_MILLIS = 500;
 
     private final Activity activity;
 
