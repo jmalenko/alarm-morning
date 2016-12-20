@@ -54,7 +54,7 @@ public class CheckAlarmTimeNotificationReceiver extends BroadcastReceiver {
             newAlarmTime.setTimeInMillis(newAlarmTimeLong);
 
             Log.i(TAG, "Set alarm time to " + newAlarmTime.getTime());
-            Analytics analytics = new Analytics().set(Analytics.Param.Check_alarm_time_method, CHECK_ALARM_TIME_METHOD__QUICK);
+            Analytics analytics = new Analytics(Analytics.Channel.Notification, Analytics.ChannelName.Check_alarm_time).set(Analytics.Param.Check_alarm_time_method, CHECK_ALARM_TIME_METHOD__QUICK);
 
             SetTimeActivity.save(context, newAlarmTime, analytics);
         } else if (action == ACTION_CHECK_ALARM_TIME_SET_DIALOG) {
