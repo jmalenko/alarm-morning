@@ -95,7 +95,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
     public static final String PREF_START_WIZARD = "pref_start_wizard";
 
-    public static final String PREF_RINGTONE_DEFAULT = "";
+    public static final String PREF_RINGTONE_DEFAULT = "content://settings/system/alarm_alert";
     public static final int PREF_VOLUME_DEFAULT = 8;
     public static final boolean PREF_VOLUME_INCREASING_DEFAULT = true;
     public static final boolean PREF_VIBRATE_DEFAULT = true;
@@ -258,6 +258,11 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             if (resultCode == RESULT_OK) {
                 finish();
             }
+        } else {
+            // Propagate to RingtonePreference
+            // TODO Add condition: the RingtonePreference was changed
+            RingtonePreference ringtonePreference = (RingtonePreference) findPreference(PREF_RINGTONE);
+            ringtonePreference.onActivityResult(requestCode, resultCode, data);
         }
     }
 
