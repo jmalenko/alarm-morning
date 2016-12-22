@@ -173,7 +173,7 @@ public class SystemAlarm {
     }
 
     protected boolean nextActionShouldChange() {
-        Log.v(TAG, "nextActionSh ouldChange()");
+        Log.v(TAG, "nextActionShouldChange()");
 
         GlobalManager globalManager = new GlobalManager(context);
 
