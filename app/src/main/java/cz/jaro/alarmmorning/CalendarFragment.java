@@ -392,11 +392,13 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
     @Override
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-        day.setState(Day.STATE_ENABLED);
-        day.setHour(hourOfDay);
-        day.setMinute(minute);
+        if (view.isShown()) {
+            day.setState(Day.STATE_ENABLED);
+            day.setHour(hourOfDay);
+            day.setMinute(minute);
 
-        save(day);
+            save(day);
+        }
     }
 
     /*

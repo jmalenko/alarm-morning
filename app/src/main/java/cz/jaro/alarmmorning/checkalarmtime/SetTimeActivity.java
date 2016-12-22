@@ -74,18 +74,20 @@ public class SetTimeActivity extends AppCompatActivity implements TimePickerDial
 
     @Override
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-        Log.v(TAG, "onTimeSet()");
-        Calendar saveAlarmTime = (Calendar) newAlarmTime.clone();
-        saveAlarmTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
-        saveAlarmTime.set(Calendar.MINUTE, minute);
+        if (view.isShown()) {
+            Log.v(TAG, "onTimeSet()");
+            Calendar saveAlarmTime = (Calendar) newAlarmTime.clone();
+            saveAlarmTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
+            saveAlarmTime.set(Calendar.MINUTE, minute);
 
-        Analytics analytics = new Analytics().set(Analytics.Param.Check_alarm_time_method, CHECK_ALARM_TIME_METHOD__DIALOG);
-        analytics.setChannel(Analytics.Channel.Notification);
-        analytics.setChannelName(Analytics.ChannelName.Check_alarm_time);
+            Analytics analytics = new Analytics().set(Analytics.Param.Check_alarm_time_method, CHECK_ALARM_TIME_METHOD__DIALOG);
+            analytics.setChannel(Analytics.Channel.Notification);
+            analytics.setChannelName(Analytics.ChannelName.Check_alarm_time);
 
-        save(this, saveAlarmTime, analytics);
+            save(this, saveAlarmTime, analytics);
 
-        finish();
+            finish();
+        }
     }
 
     public static void save(Context context, Calendar saveAlarmTime, Analytics analytics) {

@@ -137,7 +137,9 @@ public class DefaultsActivity extends AppCompatActivity implements View.OnCreate
 
     @Override
     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-        saveThisAndOthers(Defaults.STATE_ENABLED, hourOfDay, minute);
+        if (view.isShown()) {
+            saveThisAndOthers(Defaults.STATE_ENABLED, hourOfDay, minute);
+        }
     }
 
     private void saveThisAndOthers(int state, int hour, int minute) {
