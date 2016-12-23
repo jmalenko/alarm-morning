@@ -15,7 +15,6 @@ import java.util.Calendar;
 import cz.jaro.alarmmorning.Analytics;
 import cz.jaro.alarmmorning.CalendarFragment;
 import cz.jaro.alarmmorning.GlobalManager;
-import cz.jaro.alarmmorning.model.AlarmDataSource;
 import cz.jaro.alarmmorning.model.Day;
 
 import static cz.jaro.alarmmorning.Analytics.CHECK_ALARM_TIME_METHOD__DIALOG;
@@ -95,11 +94,10 @@ public class SetTimeActivity extends AppCompatActivity implements TimePickerDial
     }
 
     public static void save(Context context, Calendar saveAlarmTime, Analytics analytics, boolean showToast) {
-        AlarmDataSource dataSource = new AlarmDataSource(context);
-        dataSource.open();
+        GlobalManager globalManager = GlobalManager.getInstance();
 
         // Load
-        Day day = dataSource.loadDayDeep(saveAlarmTime);
+        Day day = globalManager.loadDay(saveAlarmTime);
 
         // Update
         day.setState(Day.STATE_ENABLED);
@@ -107,10 +105,7 @@ public class SetTimeActivity extends AppCompatActivity implements TimePickerDial
         day.setMinute(saveAlarmTime.get(Calendar.MINUTE));
 
         // Save
-        GlobalManager globalManager = new GlobalManager(context);
-        globalManager.saveAlarmTime(day, dataSource, analytics);
-
-        dataSource.close();
+        globalManager.saveAlarmTime(day, analytics);
 
         // Show toast
         if (showToast) {

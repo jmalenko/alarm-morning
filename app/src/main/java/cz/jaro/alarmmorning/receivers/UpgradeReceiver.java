@@ -33,7 +33,7 @@ public class UpgradeReceiver extends BroadcastReceiver {
         PreferenceManager.setDefaultValues(context, R.xml.preferences, false);
 
         Log.i(TAG, "Setting alarm on update");
-        GlobalManager globalManager = new GlobalManager(context);
+        GlobalManager globalManager = GlobalManager.getInstance();
         globalManager.forceSetAlarm();
 
         Log.i(TAG, "Starting CheckAlarmTime on update");

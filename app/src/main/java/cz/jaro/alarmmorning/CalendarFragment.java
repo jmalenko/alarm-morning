@@ -29,7 +29,6 @@ import java.util.Calendar;
 import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.graphics.RecyclerViewWithContextMenu;
 import cz.jaro.alarmmorning.graphics.SimpleDividerItemDecoration;
-import cz.jaro.alarmmorning.model.AlarmDataSource;
 import cz.jaro.alarmmorning.model.Day;
 
 /**
@@ -38,8 +37,6 @@ import cz.jaro.alarmmorning.model.Day;
 public class CalendarFragment extends Fragment implements View.OnClickListener, TimePickerDialog.OnTimeSetListener {
 
     private static final String TAG = CalendarFragment.class.getSimpleName();
-
-    private AlarmDataSource dataSource;
 
     protected CalendarAdapter adapter;
 
@@ -90,9 +87,6 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
         registerForContextMenu(recyclerView);
 
-        dataSource = new AlarmDataSource(activityInterface.getContextI());
-        dataSource.open();
-
         today = getToday(clock());
         updatePositionNextAlarm();
 
@@ -120,13 +114,6 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         super.onPause();
 
         handler.stop();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        dataSource.close();
     }
 
     /*
@@ -198,7 +185,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
         if (!today.equals(today2)) {
             int diffInDays = -1;
-            for (int i = 1; i < AlarmDataSource.HORIZON_DAYS; i++) {
+            for (int i = 1; i < GlobalManager.HORIZON_DAYS; i++) {
                 Calendar date = addDays(today, i);
                 if (today2.equals(date)) {
                     diffInDays = i;
@@ -222,13 +209,13 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
      */
 
     protected Clock clock() {
-        GlobalManager globalManager = new GlobalManager(getActivity());
+        GlobalManager globalManager = GlobalManager.getInstance();
         Clock clock = globalManager.clock();
         return clock;
     }
 
     private int calcPositionNextAlarm() {
-        GlobalManager globalManager = new GlobalManager(getActivity());
+        GlobalManager globalManager = GlobalManager.getInstance();
         Day day = globalManager.getDayWithNextAlarmToRing();
 
         if (day == null) {
@@ -242,7 +229,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     private int dayToPosition(Day day) {
         Calendar date = clock().now();
 
-        for (int daysInAdvance = 0; daysInAdvance < AlarmDataSource.HORIZON_DAYS; daysInAdvance++, date.add(Calendar.DATE, 1)) {
+        for (int daysInAdvance = 0; daysInAdvance < GlobalManager.HORIZON_DAYS; daysInAdvance++, date.add(Calendar.DATE, 1)) {
             if (RingActivity.onTheSameDate(day.getDate(), date)) {
                 return daysInAdvance;
             }
@@ -278,8 +265,8 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     private void save(Day day) {
         Analytics analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
 
-        GlobalManager globalManager = new GlobalManager(getActivity());
-        globalManager.saveAlarmTime(day, dataSource, analytics);
+        GlobalManager globalManager = GlobalManager.getInstance();
+        globalManager.saveAlarmTime(day, analytics);
 
         adapter.notifyItemChanged(position);
         updatePositionNextAlarm();
@@ -314,8 +301,9 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     }
 
     public Day loadPosition(int position) {
+        GlobalManager globalManager = GlobalManager.getInstance();
         Calendar date = addDays(today, position);
-        Day day = dataSource.loadDayDeep(date);
+        Day day = globalManager.loadDay(date);
         return day;
     }
 
@@ -366,7 +354,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         // Preset time
         Calendar now = clock().now();
 
-        GlobalManager globalManager = new GlobalManager(getActivity());
+        GlobalManager globalManager = GlobalManager.getInstance();
         int state = globalManager.getState(day.getDateTime());
         boolean presetNap = position == 0 && (day.isEnabled() ?
                 (state == GlobalManager.STATE_SNOOZED || state == GlobalManager.STATE_DISMISSED || state == GlobalManager.STATE_DISMISSED_BEFORE_RINGING)
@@ -443,7 +431,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         MenuItem snooze = menu.findItem(R.id.day_snooze);
 
 //        if (position == 0) {
-            GlobalManager globalManager = new GlobalManager(getActivity());
+            GlobalManager globalManager = GlobalManager.getInstance();
             int state = globalManager.getState(day.getDateTime());
 //            if (state != GlobalManager.STATE_UNDEFINED) {
                 if (state == GlobalManager.STATE_FUTURE) {
@@ -509,7 +497,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
                 Analytics analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
 
                 Context context = getActivity();
-                GlobalManager globalManager = new GlobalManager(context);
+                GlobalManager globalManager = GlobalManager.getInstance();
                 globalManager.onDismissBeforeRinging(analytics);
                 break;
 
@@ -519,7 +507,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
                 Analytics analytics2 = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
 
                 Context context2 = getActivity();
-                GlobalManager globalManager2 = new GlobalManager(context2);
+                GlobalManager globalManager2 = GlobalManager.getInstance();
                 globalManager2.onSnooze(analytics2);
                 break;
         }

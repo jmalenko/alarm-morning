@@ -1,10 +1,11 @@
 package cz.jaro.alarmmorning.model;
 
 import android.test.AndroidTestCase;
-import android.test.RenamingDelegatingContext;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+
+import cz.jaro.alarmmorning.GlobalManager;
 
 public class AlarmDataSourceTest extends AndroidTestCase {
 
@@ -20,16 +21,14 @@ public class AlarmDataSourceTest extends AndroidTestCase {
     public static final int HOUR_DEFAULT = 7;
     public static final int MINUTE_DEFAULT = 0;
 
-    private AlarmDataSource dataSource;
+    private GlobalManager globalManager;
     private Defaults defaults;
     private Day day;
 
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        RenamingDelegatingContext context = new RenamingDelegatingContext(getContext(), "test_");
-        dataSource = new AlarmDataSource(context);
-        dataSource.open();
+        globalManager = GlobalManager.getInstance();
 
         defaults = new Defaults();
         defaults.setState(Defaults.STATE_ENABLED);
@@ -45,16 +44,6 @@ public class AlarmDataSourceTest extends AndroidTestCase {
         day.setDefaults(defaults);
     }
 
-    @Override
-    public void tearDown() throws Exception {
-        dataSource.close();
-        super.tearDown();
-    }
-
-    public void testPreConditions() {
-        assertNotNull(dataSource);
-    }
-
     public void test_Defaults_2writes() {
         // save 1st object
 
@@ -64,9 +53,9 @@ public class AlarmDataSourceTest extends AndroidTestCase {
         defaults1a.setHour(HOUR_DEFAULT);
         defaults1a.setMinute(MINUTE_DEFAULT);
 
-        dataSource.saveDefault(defaults1a);
+        globalManager.saveDefault(defaults1a);
 
-        Defaults defaults1b = dataSource.loadDefault(defaults1a.getDayOfWeek());
+        Defaults defaults1b = globalManager.loadDefault(defaults1a.getDayOfWeek());
 
         assertEquals(defaults1a.getState(), defaults1b.getState());
         assertEquals(defaults1a.getDayOfWeek(), defaults1b.getDayOfWeek());
@@ -81,9 +70,9 @@ public class AlarmDataSourceTest extends AndroidTestCase {
         defaults2a.setHour(HOUR_DEFAULT + 1);
         defaults2a.setMinute(MINUTE_DEFAULT + 1);
 
-        dataSource.saveDefault(defaults2a);
+        globalManager.saveDefault(defaults2a);
 
-        Defaults defaults2b = dataSource.loadDefault(defaults2a.getDayOfWeek());
+        Defaults defaults2b = globalManager.loadDefault(defaults2a.getDayOfWeek());
 
         assertEquals(defaults2a.getState(), defaults2b.getState());
         assertEquals(defaults2a.getDayOfWeek(), defaults2b.getDayOfWeek());
@@ -100,9 +89,9 @@ public class AlarmDataSourceTest extends AndroidTestCase {
         day1a.setHour(HOUR_DEFAULT);
         day1a.setMinute(MINUTE_DEFAULT);
 
-        dataSource.saveDay(day1a);
+        globalManager.saveDay(day1a);
 
-        Day day1b = dataSource.loadDayDeep(day1a.getDate());
+        Day day1b = globalManager.loadDay(day1a.getDate());
 
         assertEquals(day1a.getState(), day1b.getState());
         assertEquals(day1a.getDate(), day1b.getDate());
@@ -118,9 +107,9 @@ public class AlarmDataSourceTest extends AndroidTestCase {
         day2a.setHour(HOUR_DEFAULT + 1);
         day2a.setMinute(MINUTE_DEFAULT + 1);
 
-        dataSource.saveDay(day2a);
+        globalManager.saveDay(day2a);
 
-        Day day2b = dataSource.loadDayDeep(day2a.getDate());
+        Day day2b = globalManager.loadDay(day2a.getDate());
 
         assertEquals(day2a.getState(), day2b.getState());
         assertEquals(day2a.getDate(), day2b.getDate());
@@ -131,7 +120,7 @@ public class AlarmDataSourceTest extends AndroidTestCase {
 
     public void test_Day_load_notStored() {
         Calendar dateWithoutRecord = new GregorianCalendar(YEAR - 1, MONTH, DAY);
-        Day day = dataSource.loadDayDeep(dateWithoutRecord);
+        Day day = globalManager.loadDay(dateWithoutRecord);
 
         assertEquals(Day.STATE_RULE, day.getState());
         assertEquals(dateWithoutRecord.getTime().toString(), day.getDate().getTime().toString());

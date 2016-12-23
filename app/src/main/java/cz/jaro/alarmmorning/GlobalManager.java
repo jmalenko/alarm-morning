@@ -49,7 +49,7 @@ import cz.jaro.alarmmorning.model.Defaults;
  * <p/>
  * The <b>components of the application</b> are:
  * <p>
- * 1. State of the alarm ("was it dimissed?")
+ * 1. State of the alarm ("was it dismissed?")
  * <p>
  * 2. The registered System alarm
  * <p>
@@ -61,6 +61,8 @@ import cz.jaro.alarmmorning.model.Defaults;
  */
 public class GlobalManager {
 
+    public static final int HORIZON_DAYS = 30;
+
     /*
      * Technical information
      * =====================
@@ -70,12 +72,14 @@ public class GlobalManager {
      * next (or later) day), this is the state of such an alarm.
      * 2. Time of next system alarm. This is used for cancelling the system alarm.
      *
-     * Communication with mdules
-     * =========================
+     * Communication with modules
+     * ==========================
      *
      * Activities (both AlarmMorningActivity and RingActivity)
      * Everything the activities need to persist is persisted in GlobalManager.
      * Reason: the BroadcastReceiver (an persistence at the module level) cannot be used since the activity may not be running.
+     *
+     * Singleton and Context managements was inspired by https://nfrolov.wordpress.com/2014/08/16/android-sqlitedatabase-locking-and-multi-threading/
      */
 
     private static final String TAG = GlobalManager.class.getSimpleName();
@@ -87,12 +91,22 @@ public class GlobalManager {
     public static final int STATE_DISMISSED = 4;
     public static final int STATE_DISMISSED_BEFORE_RINGING = 5;
 
-    private Context context;
-
     private static final int RECENT_PERIOD = 30; // minutes
 
-    public GlobalManager(Context context) {
-        this.context = context;
+    private static GlobalManager instance;
+
+    private AlarmDataSource dataSource;
+
+    private GlobalManager() {
+        Context context = AlarmMorningApplication.getAppContext();
+        dataSource = new AlarmDataSource(context);
+        dataSource.open();
+    }
+
+    public static synchronized GlobalManager getInstance() {
+        if (instance == null)
+            instance = new GlobalManager();
+        return instance;
     }
 
     public Clock clock() {
@@ -102,28 +116,20 @@ public class GlobalManager {
     public Day getDayWithNextAlarmToRing() {
         Log.v(TAG, "getDayWithNextAlarmToRing()");
 
-        AlarmDataSource dataSource = new AlarmDataSource(context);
-        dataSource.open();
-
         Day day;
         if (isRingingOrSnoozed()) {
             Log.v(TAG, "   loading the ringing or snoozed alarm");
-            day = dataSource.loadDayDeep(clock().now());
+            day = dataSource.loadDay(clock().now());
         } else {
-            day = dataSource.getNextAlarm(clock(), new DayFilter() {
+            day = getNextAlarm(clock(), new DayFilter() {
                 @Override
                 public boolean match(Day day) {
                     Log.v(TAG, "   checking filter condition for " + day.getDateTime().getTime());
                     int state = getState(day.getDateTime());
-                    if (state != GlobalManager.STATE_DISMISSED_BEFORE_RINGING && state != GlobalManager.STATE_DISMISSED) {
-                        return true;
-                    }
-                    return false;
+                    return state != GlobalManager.STATE_DISMISSED_BEFORE_RINGING && state != GlobalManager.STATE_DISMISSED;
                 }
             });
         }
-
-        dataSource.close();
 
         return day;
     }
@@ -170,6 +176,7 @@ public class GlobalManager {
     }
 
     public boolean afterNearFuture(Calendar alarmTime) {
+        Context context = AlarmMorningApplication.getAppContext();
         Calendar now = clock().now();
 
         Calendar nearFutureTime = SystemAlarm.getNearFutureTime(context, alarmTime);
@@ -211,6 +218,7 @@ public class GlobalManager {
     protected NextAction getNextAction() {
         Log.v(TAG, "getNextAction()");
 
+        Context context = AlarmMorningApplication.getAppContext();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         String action = preferences.getString(PERSIST_ACTION, ACTION_UNDEFINED);
         long timeInMS = preferences.getLong(PERSIST_TIME, TIME_UNDEFINED);
@@ -232,6 +240,7 @@ public class GlobalManager {
     public void setNextAction(NextAction nextAction) {
         Log.v(TAG, "setNextAction(action=" + nextAction.action + ", time=" + nextAction.time.getTime() + ", alarmTime=" + (nextAction.alarmTime != null ? nextAction.alarmTime.getTime() : "null") + ")");
 
+        Context context = AlarmMorningApplication.getAppContext();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = preferences.edit();
 
@@ -244,6 +253,7 @@ public class GlobalManager {
 
     private int getState() {
         Log.v(TAG, "getState()");
+        Context context = AlarmMorningApplication.getAppContext();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 
         int state = preferences.getInt(PERSIST_STATE, STATE_UNDEFINED);
@@ -254,6 +264,7 @@ public class GlobalManager {
     public Calendar getAlarmTimeOfRingingAlarm() {
         Log.v(TAG, "getAlarmTimeOfRingingAlarm()");
 
+        Context context = AlarmMorningApplication.getAppContext();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 
         long stateAlarmTimeInMS = preferences.getLong(PERSIST_STATE_OF_ALARM_TIME, TIME_UNDEFINED);
@@ -266,6 +277,7 @@ public class GlobalManager {
     public void setState(int state, Calendar alarmTime) {
         Log.v(TAG, "setState(state=" + state + ", alarmTime=" + alarmTime.getTime() + ")");
 
+        Context context = AlarmMorningApplication.getAppContext();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = preferences.edit();
 
@@ -279,6 +291,7 @@ public class GlobalManager {
         Log.v(TAG, "getDismissedAlarm()");
 
         try {
+            Context context = AlarmMorningApplication.getAppContext();
             JSONArray dismissedAlarmsJSON = JSONSharedPreferences.loadJSONArray(context, PERSIST_DISMISSED);
             Set<Long> dismissedAlarms = jsonToSet(dismissedAlarmsJSON);
             return dismissedAlarms;
@@ -302,6 +315,7 @@ public class GlobalManager {
             Log.e(TAG, "      " + new Date(alarmTime2) + ")");
         }
 
+        Context context = AlarmMorningApplication.getAppContext();
         JSONSharedPreferences.saveJSONArray(context, PERSIST_DISMISSED, new JSONArray(dismissedAlarms));
     }
 
@@ -373,6 +387,7 @@ public class GlobalManager {
     public void forceSetAlarm() {
         Log.d(TAG, "forceSetAlarm()");
 
+        Context context = AlarmMorningApplication.getAppContext();
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
 
         SystemAlarmClock systemAlarmClock = SystemAlarmClock.getInstance(context);
@@ -401,7 +416,7 @@ public class GlobalManager {
                 Calendar from = nextActionPersisted.alarmTime;
                 from.add(Calendar.SECOND, 1);
 
-                List<Calendar> alarmTimes = AlarmDataSource.getAlarmsInPeriod(context, from, clock().now());
+                List<Calendar> alarmTimes = getAlarmsInPeriod(from, clock().now());
 
                 skippedAlarmTimes.addAll(alarmTimes);
 
@@ -477,9 +492,10 @@ public class GlobalManager {
      * 7. Handle calendar activity
      */
 
-    public void saveAlarmTime(Day day, AlarmDataSource dataSource, Analytics analytics) {
+    public void saveAlarmTime(Day day, Analytics analytics) {
         Log.d(TAG, "saveAlarmTime()");
 
+        Context context = AlarmMorningApplication.getAppContext();
         analytics.setContext(context);
         analytics.setEvent(Analytics.Event.Set_alarm);
         analytics.setDay(day);
@@ -498,9 +514,10 @@ public class GlobalManager {
         onAlarmSet();
     }
 
-    public void saveAlarmTimeDefault(Defaults defaults, AlarmDataSource dataSource, Analytics analytics) {
+    public void saveAlarmTimeDefault(Defaults defaults, Analytics analytics) {
         Log.d(TAG, "saveAlarmTimeDefault()");
 
+        Context context = AlarmMorningApplication.getAppContext();
         analytics.setContext(context);
         analytics.setEvent(Analytics.Event.Set_default);
         analytics.setDefaultsAll(defaults);
@@ -524,6 +541,7 @@ public class GlobalManager {
     private void onAlarmSet() {
         Log.d(TAG, "onAlarmSet()");
 
+        Context context = AlarmMorningApplication.getAppContext();
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
 
         if (systemAlarm.nextActionShouldChange()) {
@@ -538,6 +556,8 @@ public class GlobalManager {
 
     private void onAlarmSetNew(SystemAlarm systemAlarm) {
         Log.d(TAG, "onAlarmSetNew()");
+
+        Context context = AlarmMorningApplication.getAppContext();
 
         // register next system alarm
         systemAlarm.onAlarmSet();
@@ -570,6 +590,8 @@ public class GlobalManager {
     private void onNearFuture(boolean callSystemAlarm) {
         Log.d(TAG, "onNearFuture(callSystemAlarm=" + callSystemAlarm + ")");
 
+        Context context = AlarmMorningApplication.getAppContext();
+
         Analytics analytics = new Analytics(context, Analytics.Event.Show, Analytics.Channel.Notification, Analytics.ChannelName.Alarm);
         analytics.setDay(getDayWithNextAlarmToRing());
         analytics.save();
@@ -598,6 +620,8 @@ public class GlobalManager {
 
     public void onDismissBeforeRinging(Analytics analytics) {
         Log.d(TAG, "onDismissBeforeRinging()");
+
+        Context context = AlarmMorningApplication.getAppContext();
 
         analytics.setContext(context);
         analytics.setEvent(Analytics.Event.Dismiss);
@@ -634,6 +658,8 @@ public class GlobalManager {
     public void onAlarmTimeOfEarlyDismissedAlarm() {
         Log.d(TAG, "onAlarmTimeOfEarlyDismissedAlarm()");
 
+        Context context = AlarmMorningApplication.getAppContext();
+
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
         systemAlarm.onAlarmTimeOfEarlyDismissedAlarm();
 
@@ -650,6 +676,8 @@ public class GlobalManager {
 
     public void onRing() {
         Log.d(TAG, "onRing()");
+
+        Context context = AlarmMorningApplication.getAppContext();
 
         boolean isNew = getNextAction().time.equals(getNextAction().alarmTime); // otherwise the alarm is resumed after snoozing
 
@@ -693,6 +721,8 @@ public class GlobalManager {
     public void onDismiss(Analytics analytics) {
         Log.d(TAG, "onDismiss()");
 
+        Context context = AlarmMorningApplication.getAppContext();
+
         analytics.setContext(context);
         analytics.setEvent(Analytics.Event.Dismiss);
         analytics.set(Analytics.Param.Dismiss_type, Analytics.DISMISS__AFTER);
@@ -725,12 +755,13 @@ public class GlobalManager {
     }
 
     /**
-     *
      * @param analytics
      * @return time when the alarm will ring again
      */
     public Calendar onSnooze(Analytics analytics) {
         Log.d(TAG, "onSnooze()");
+
+        Context context = AlarmMorningApplication.getAppContext();
 
         analytics.setContext(context);
         analytics.setEvent(Analytics.Event.Snooze);
@@ -762,6 +793,8 @@ public class GlobalManager {
     public void onAlarmCancel() {
         Log.d(TAG, "onAlarmCancel()");
 
+        Context context = AlarmMorningApplication.getAppContext();
+
         int state = getState();
         if (state == STATE_SNOOZED || state == STATE_RINGING) {
             Analytics analytics = new Analytics(context, Analytics.Event.Dismiss, Analytics.Channel.Time, Analytics.ChannelName.Alarm);
@@ -785,6 +818,7 @@ public class GlobalManager {
     public Calendar getRingAfterSnoozeTime(Clock clock) {
         Log.d(TAG, "getRingAfterSnoozeTime()");
 
+        Context context = AlarmMorningApplication.getAppContext();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         int snoozeTime = preferences.getInt(SettingsActivity.PREF_SNOOZE_TIME, SettingsActivity.PREF_SNOOZE_TIME_DEFAULT);
 
@@ -829,6 +863,109 @@ public class GlobalManager {
         Intent intent = new Intent(context, AlarmMorningActivity.class);
         intent.setAction(action);
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+    }
+
+    public Defaults loadDefault(int dayOfWeek) {
+        return dataSource.loadDefault(dayOfWeek);
+    }
+
+    public void saveDefault(Defaults defaults) {
+        dataSource.saveDefault(defaults);
+    }
+
+    public Day loadDay(Calendar date) {
+        return dataSource.loadDay(date);
+    }
+
+    public void saveDay(Day day) {
+        dataSource.saveDay(day);
+    }
+
+    /**
+     * Return the alarm time.
+     *
+     * @param clock clock
+     * @return next alarm time. Return null if the is no alarm in the next {@link #HORIZON_DAYS} days.
+     */
+    public Calendar getNextAlarm(Clock clock) {
+        Day day = getNextAlarm(clock, null);
+        if (day != null) {
+            Calendar alarmTime = day.getDateTime();
+            Log.v(TAG, "Next alarm is at " + alarmTime.getTime().toString());
+            return alarmTime;
+        } else {
+            Log.v(TAG, "Next alarm is never");
+            return null;
+        }
+    }
+
+    /**
+     * Return the nearest Day with alarm such that the Day matches the filter. The filter that such a Day is enabled and not in past is also checked.
+     *
+     * @param clock clock
+     * @return nearest Day with alarm. Return null if the is no alarm in the next {@link #HORIZON_DAYS} days.
+     */
+    public Day getNextAlarm(Clock clock, DayFilter filter) {
+        Calendar date = clock.now();
+
+        for (int daysInAdvance = 0; daysInAdvance < HORIZON_DAYS; daysInAdvance++, date.add(Calendar.DATE, 1)) {
+            Day day = loadDay(date);
+
+            if (!day.isEnabled()) {
+                continue;
+            }
+
+            if (day.isPassed(clock)) {
+                continue;
+            }
+
+            if (filter != null && !filter.match(day)) {
+                continue;
+            }
+
+            Log.v(TAG, "   The day that satisfies filter is " + day.getDate().getTime());
+            return day;
+        }
+
+        Log.v(TAG, "Next alarm is never");
+        return null;
+    }
+
+    /**
+     * Return the alarm times in the specified period.
+     *
+     * @param from beginning of the period
+     * @param to   end of the period
+     * @return alarm times, including the borders
+     */
+    public List<Calendar> getAlarmsInPeriod(Calendar from, Calendar to) {
+        Log.d(TAG, "getAlarmsInPeriod(from=" + from.getTime() + ", to=" + to.getTime() + ")");
+
+        List<Calendar> alarmTimes = new ArrayList<>();
+
+        for (Calendar date = (Calendar) from.clone(); date.before(to); date.add(Calendar.DATE, 1)) {
+            Day day = loadDay(date);
+
+            if (!day.isEnabled()) {
+                continue;
+            }
+
+            // handle the alarmTimes on the first (alarmTimes before beginning of period) and last day (after the end of period)
+            Calendar alarmTime = day.getDateTime();
+            if (alarmTime.before(from))
+                continue;
+            if (to.before(alarmTime))
+                continue;
+
+            alarmTimes.add(alarmTime);
+        }
+
+        Log.d(TAG, "   There are " + alarmTimes.size() + " alarmTimes");
+        for (Calendar alarmTime : alarmTimes) {
+            Log.d(TAG, "   " + alarmTime.getTime());
+        }
+
+        return alarmTimes;
     }
 
 }

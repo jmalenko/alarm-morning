@@ -14,7 +14,7 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+*/
 package cz.jaro.alarmmorning;
 
 import android.app.Activity;
@@ -42,7 +42,6 @@ import android.view.View;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import cz.jaro.alarmmorning.wizard.Wizard;
-
 
 public class AlarmMorningActivity extends AppCompatActivity implements ActivityInterface {
 
@@ -207,7 +206,7 @@ public class AlarmMorningActivity extends AppCompatActivity implements ActivityI
         super.onResume();
 
         // Redirect to ring activity if ringing
-        GlobalManager globalManager = new GlobalManager(this);
+        GlobalManager globalManager = GlobalManager.getInstance();
         if (globalManager.isRinging()) {
             globalManager.startRingingActivity(this);
         }

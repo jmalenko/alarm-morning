@@ -110,7 +110,7 @@ public class SystemAlarmClock {
     private void register() {
         Log.v(TAG, "register()");
 
-        GlobalManager globalManager = new GlobalManager(context);
+        GlobalManager globalManager = GlobalManager.getInstance();
         Day day = globalManager.getDayWithNextAlarmToRing();
 
         if (day != null) {

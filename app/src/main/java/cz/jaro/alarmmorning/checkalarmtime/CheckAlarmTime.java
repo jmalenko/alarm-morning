@@ -25,7 +25,6 @@ import cz.jaro.alarmmorning.calendar.CalendarEventFilter;
 import cz.jaro.alarmmorning.calendar.CalendarHelper;
 import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.graphics.TimePreference;
-import cz.jaro.alarmmorning.model.AlarmDataSource;
 import cz.jaro.alarmmorning.model.Day;
 
 import static cz.jaro.alarmmorning.Analytics.CHECK_ALARM_TIME_ACTION__DON_T_SHOW_NOTIFICATION;
@@ -107,7 +106,6 @@ public class CheckAlarmTime {
         Log.d(TAG, "register(stringValue=)" + stringValue);
 
         Calendar checkAlarmTimeAt = calcNextOccurence(context, stringValue);
-        ;
 
         String action = ACTION_CHECK_ALARM_TIME;
         Log.i(TAG, "Setting system alarm at " + checkAlarmTimeAt.getTime().toString() + " with action " + action);
@@ -194,7 +192,7 @@ public class CheckAlarmTime {
         register();
 
         // Find first calendar event
-        GlobalManager globalManager = new GlobalManager(context);
+        GlobalManager globalManager = GlobalManager.getInstance();
         Clock clock = globalManager.clock();
 
         Calendar tomorrowStart = clock.now();
@@ -211,14 +209,9 @@ public class CheckAlarmTime {
         Log.v(TAG, "tomorrowNoon=" + tomorrowNoon.getTime());
 
         // Load tomorrow's alarm time
-        AlarmDataSource dataSource = new AlarmDataSource(context);
-        dataSource.open();
-
-        Day day = dataSource.loadDayDeep(tomorrowStart);
+        Day day = globalManager.loadDay(tomorrowStart);
         Calendar alarmTime = day.getDateTime();
         Log.v(TAG, "alarmTime=" + alarmTime.getTime());
-
-        dataSource.close();
 
         // Load gap
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -350,7 +343,7 @@ public class CheckAlarmTime {
         int hours = TimePreference.getHour(timePreference);
         int minutes = TimePreference.getMinute(timePreference);
 
-        GlobalManager globalManager = new GlobalManager(context);
+        GlobalManager globalManager = GlobalManager.getInstance();
         Clock clock = globalManager.clock();
         Calendar now = clock.now();
 

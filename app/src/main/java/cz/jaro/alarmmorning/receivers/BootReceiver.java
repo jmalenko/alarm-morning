@@ -27,7 +27,7 @@ public class BootReceiver extends BroadcastReceiver {
         new Analytics(context, Analytics.Event.Start, Analytics.Channel.External, Analytics.ChannelName.Boot).setConfigurationInfo().save();
 
         Log.i(TAG, "Setting alarm on boot");
-        GlobalManager globalManager = new GlobalManager(context);
+        GlobalManager globalManager = GlobalManager.getInstance();
         globalManager.forceSetAlarm();
 
         Log.i(TAG, "Starting CheckAlarmTime on boot");

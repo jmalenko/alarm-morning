@@ -38,7 +38,7 @@ public class SystemNotification {
     }
 
     private NotificationCompat.Builder buildNotification() {
-        GlobalManager globalManager = new GlobalManager(context);
+        GlobalManager globalManager = GlobalManager.getInstance();
         Day day = globalManager.getDayWithNextAlarmToRing();
 
         Resources res = context.getResources();
@@ -118,7 +118,7 @@ public class SystemNotification {
         String contentText = res.getString(R.string.notification_text_ringing);
         mBuilder.setContentText(contentText);
 
-        GlobalManager globalManager = new GlobalManager(context);
+        GlobalManager globalManager = GlobalManager.getInstance();
 
         Intent intent = new Intent(context, NotificationReceiver.class);
         intent.setAction(NotificationReceiver.ACTION_CLICK_NOTIFICATION);
@@ -183,7 +183,7 @@ public class SystemNotification {
 
         NotificationCompat.Builder mBuilder = buildNotification();
 
-        GlobalManager globalManager = new GlobalManager(context);
+        GlobalManager globalManager = GlobalManager.getInstance();
         Calendar alarmTime = globalManager.getAlarmTimeOfRingingAlarm();
 
         Resources res = context.getResources();

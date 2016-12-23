@@ -25,7 +25,7 @@ public class TimeZoneChangedReceiver extends BroadcastReceiver {
         new Analytics(context, Analytics.Event.Start, Analytics.Channel.External, Analytics.ChannelName.TimeZoneChange).setConfigurationInfo().save();
 
         Log.i(TAG, "Setting alarm on time zone change");
-        GlobalManager globalManager = new GlobalManager(context);
+        GlobalManager globalManager = GlobalManager.getInstance();
         globalManager.forceSetAlarm();
 
         WakeLocker.release();

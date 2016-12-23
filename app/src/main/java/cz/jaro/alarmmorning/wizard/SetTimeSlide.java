@@ -102,16 +102,15 @@ public class SetTimeSlide extends BaseFragment implements TimePicker.OnTimeChang
     }
 
     private boolean presetTimeFromDefaults() {
+        GlobalManager globalManager = GlobalManager.getInstance();
+
         // Use the median alarm time of enabled workdays (of defaults)
         List<Integer> times = new ArrayList<>();
-
-        AlarmDataSource dataSource = new AlarmDataSource(getContext());
-        dataSource.open();
 
         for (int i = 0; i < AlarmDataSource.allDaysOfWeek.length; i++) {
             int dayOfWeek = AlarmDataSource.allDaysOfWeek[i];
 
-            Defaults defaults = dataSource.loadDefault(dayOfWeek);
+            Defaults defaults = globalManager.loadDefault(dayOfWeek);
 
             if (defaults.getState() == Defaults.STATE_DISABLED)
                 continue;
@@ -126,8 +125,6 @@ public class SetTimeSlide extends BaseFragment implements TimePicker.OnTimeChang
             int time = RelativeTimePreference.hourAndMinuteToValue(defaults.getHour(), defaults.getMinute());
             times.add(time);
         }
-
-        dataSource.close();
 
         return setTimeFromMedian(times);
     }
@@ -205,7 +202,7 @@ public class SetTimeSlide extends BaseFragment implements TimePicker.OnTimeChang
         for (int day = 1; day <= 30; day++) {
             // Find first calendar event
             Context context = getContext();
-            GlobalManager globalManager = new GlobalManager(context);
+            GlobalManager globalManager = GlobalManager.getInstance();
             Clock clock = globalManager.clock();
 
             java.util.Calendar dayStart = clock.now();
@@ -265,10 +262,7 @@ public class SetTimeSlide extends BaseFragment implements TimePicker.OnTimeChang
 
     @Override
     public void onSlideDeselected() {
-        AlarmDataSource dataSource = new AlarmDataSource(getContext());
-        dataSource.open();
-
-        GlobalManager globalManager = new GlobalManager(getContext());
+        GlobalManager globalManager = GlobalManager.getInstance();
 
         Defaults defaults = new Defaults();
         defaults.setHour(hourOfDay);
@@ -284,10 +278,8 @@ public class SetTimeSlide extends BaseFragment implements TimePicker.OnTimeChang
 
             Analytics analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Wizard);
 
-            globalManager.saveAlarmTimeDefault(defaults, dataSource, analytics);
+            globalManager.saveAlarmTimeDefault(defaults, analytics);
         }
-
-        dataSource.close();
     }
 
     @Override

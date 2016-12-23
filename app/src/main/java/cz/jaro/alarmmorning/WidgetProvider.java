@@ -3,7 +3,6 @@ package cz.jaro.alarmmorning;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -67,7 +66,7 @@ public class WidgetProvider extends AppWidgetProvider {
         views.setOnClickPendingIntent(R.id.widget_layout, pendingIntent);
 
         // Set content
-        GlobalManager globalManager = new GlobalManager(context);
+        GlobalManager globalManager = GlobalManager.getInstance();
         Day day = globalManager.getDayWithNextAlarmToRing();
 
         int iconSrcId;

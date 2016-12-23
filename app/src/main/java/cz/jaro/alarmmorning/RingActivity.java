@@ -217,7 +217,7 @@ public class RingActivity extends Activity implements RingInterface {
 
         blink = new Blink(this);
 
-        GlobalManager globalManager = new GlobalManager(context);
+        GlobalManager globalManager = GlobalManager.getInstance();
         globalManager.onDismiss(analytics);
 
         blink.setMessageText(R.string.blink_dismiss);
@@ -233,7 +233,7 @@ public class RingActivity extends Activity implements RingInterface {
 
         blink = new Blink(this);
 
-        GlobalManager globalManager = new GlobalManager(context);
+        GlobalManager globalManager = GlobalManager.getInstance();
         Calendar ringAfterSnoozeTime = globalManager.onSnooze(analytics);
 
         blink.setMessageText(R.string.blink_snooze);
@@ -801,7 +801,7 @@ public class RingActivity extends Activity implements RingInterface {
     }
 
     public Clock clock() {
-        GlobalManager globalManager = new GlobalManager(this);
+        GlobalManager globalManager = GlobalManager.getInstance();
         return globalManager.clock();
     }
 

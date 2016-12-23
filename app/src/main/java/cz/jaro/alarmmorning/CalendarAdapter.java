@@ -10,7 +10,6 @@ import android.widget.TextView;
 
 import java.util.Calendar;
 
-import cz.jaro.alarmmorning.model.AlarmDataSource;
 import cz.jaro.alarmmorning.model.Day;
 
 /**
@@ -84,7 +83,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         }
         viewHolder.getTextTime().setText(timeText);
 
-        GlobalManager globalManager = new GlobalManager(fragment.getActivity());
+        GlobalManager globalManager = GlobalManager.getInstance();
         int state = globalManager.getState(day.getDateTime());
 
         boolean enabled;
@@ -142,7 +141,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
      */
     @Override
     public int getItemCount() {
-        return AlarmDataSource.HORIZON_DAYS;
+        return GlobalManager.HORIZON_DAYS;
     }
 
 

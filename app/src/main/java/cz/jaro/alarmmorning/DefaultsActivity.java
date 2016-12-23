@@ -30,8 +30,6 @@ public class DefaultsActivity extends AppCompatActivity implements View.OnCreate
     private DefaultsAdapter adapter;
     private RecyclerView recyclerView;
 
-    private AlarmDataSource dataSource;
-
     private Defaults defaults;
     private List<Integer> otherWeekdaysWithTheSameAlarmTime;
 
@@ -70,21 +68,12 @@ public class DefaultsActivity extends AppCompatActivity implements View.OnCreate
         // This app uses 0 = Sunday, ... , 6 = Saturday
         firstDayOfWeek--;
         Log.v(TAG, "First day of week is " + firstDayOfWeek);
-
-        dataSource = new AlarmDataSource(this);
-        dataSource.open();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        dataSource.close();
     }
 
     public Defaults loadPosition(int position) {
+        GlobalManager globalManager = GlobalManager.getInstance();
         int dayOfWeek = positionToDayOfWeek(position);
-        Defaults defaults = dataSource.loadDefault(dayOfWeek);
+        Defaults defaults = globalManager.loadDefault(dayOfWeek);
         return defaults;
     }
 
@@ -95,8 +84,8 @@ public class DefaultsActivity extends AppCompatActivity implements View.OnCreate
     private void save(Defaults defaults) {
         Analytics analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Defaults);
 
-        GlobalManager globalManager = new GlobalManager(this);
-        globalManager.saveAlarmTimeDefault(defaults, dataSource, analytics);
+        GlobalManager globalManager = GlobalManager.getInstance();
+        globalManager.saveAlarmTimeDefault(defaults, analytics);
 
         adapter.notifyDataSetChanged();
     }
@@ -218,12 +207,14 @@ public class DefaultsActivity extends AppCompatActivity implements View.OnCreate
      * Create list of weekdays to change.
      */
     private void calculateChangeOtherDays() {
+        GlobalManager globalManager = GlobalManager.getInstance();
+
         otherWeekdaysWithTheSameAlarmTime = new ArrayList<>();
 
         for (int i = 0; i < AlarmDataSource.allDaysOfWeek.length; i++) {
             int j = (firstDayOfWeek + i) % AlarmDataSource.allDaysOfWeek.length;
             int dayOfWeek = AlarmDataSource.allDaysOfWeek[j];
-            Defaults defaults2 = dataSource.loadDefault(dayOfWeek);
+            Defaults defaults2 = globalManager.loadDefault(dayOfWeek);
             boolean sameAlarmTime = defaults2.getState() == defaults.getState() &&
                     defaults2.getHour() == defaults.getHour() &&
                     defaults2.getMinute() == defaults.getMinute();

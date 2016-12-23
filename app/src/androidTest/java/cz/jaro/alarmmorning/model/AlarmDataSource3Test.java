@@ -1,11 +1,12 @@
 package cz.jaro.alarmmorning.model;
 
 import android.test.AndroidTestCase;
-import android.test.RenamingDelegatingContext;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
+
+import cz.jaro.alarmmorning.GlobalManager;
 
 import static cz.jaro.alarmmorning.model.AlarmDataSourceTest.DAY;
 import static cz.jaro.alarmmorning.model.AlarmDataSourceTest.HOUR_DAY;
@@ -17,14 +18,12 @@ public class AlarmDataSource3Test extends AndroidTestCase {
 
     private static final int DAYS = 20;
 
-    private AlarmDataSource dataSource;
+    private GlobalManager globalManager;
 
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        RenamingDelegatingContext context = new RenamingDelegatingContext(getContext(), "test_");
-        dataSource = new AlarmDataSource(context);
-        dataSource.open();
+        globalManager = GlobalManager.getInstance();
 
         for (int i = 0; i < DAYS; i++) {
             Day day = new Day();
@@ -32,24 +31,18 @@ public class AlarmDataSource3Test extends AndroidTestCase {
             day.setDate(new GregorianCalendar(YEAR, MONTH, DAY + i));
             day.setHour(HOUR_DAY);
             day.setMinute(MINUTE_DAY);
-            dataSource.saveDay(day);
+            globalManager.saveDay(day);
         }
     }
 
-    @Override
-    public void tearDown() throws Exception {
-        dataSource.close();
-        super.tearDown();
-    }
-
     public void testPreConditions() {
-        assertNotNull(dataSource);
+        assertNotNull(globalManager);
     }
 
     public void test_getAlarmsInPeriod_empty() {
         Calendar from = new GregorianCalendar(YEAR, MONTH - 1, DAY);
         Calendar to = new GregorianCalendar(YEAR, MONTH - 1, DAY + 10);
-        List<Calendar> alarmTimes = dataSource.getAlarmsInPeriod(from, to);
+        List<Calendar> alarmTimes = globalManager.getAlarmsInPeriod(from, to);
 
         assertEquals(alarmTimes.isEmpty(), true);
     }
@@ -57,7 +50,7 @@ public class AlarmDataSource3Test extends AndroidTestCase {
     public void test_getAlarmsInPeriod_empty2() {
         Calendar from = new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DAY - 2, MINUTE_DAY);
         Calendar to = new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DAY - 1, MINUTE_DAY);
-        List<Calendar> alarmTimes = dataSource.getAlarmsInPeriod(from, to);
+        List<Calendar> alarmTimes = globalManager.getAlarmsInPeriod(from, to);
 
         assertEquals(alarmTimes.isEmpty(), true);
     }
@@ -65,7 +58,7 @@ public class AlarmDataSource3Test extends AndroidTestCase {
     public void test_getAlarmsInPeriod_empty3() {
         Calendar from = new GregorianCalendar(YEAR, MONTH, DAY - 1, 0, 0);
         Calendar to = new GregorianCalendar(YEAR, MONTH, DAY, 0, 0);
-        List<Calendar> alarmTimes = dataSource.getAlarmsInPeriod(from, to);
+        List<Calendar> alarmTimes = globalManager.getAlarmsInPeriod(from, to);
 
         assertEquals(alarmTimes.isEmpty(), true);
     }
@@ -73,7 +66,7 @@ public class AlarmDataSource3Test extends AndroidTestCase {
     public void test_getAlarmsInPeriod_one_day() {
         Calendar from = new GregorianCalendar(YEAR, MONTH, DAY, 0, 0);
         Calendar to = new GregorianCalendar(YEAR, MONTH, DAY + 1, 0, 0);
-        List<Calendar> alarmTimes = dataSource.getAlarmsInPeriod(from, to);
+        List<Calendar> alarmTimes = globalManager.getAlarmsInPeriod(from, to);
 
         assertEquals(alarmTimes.size(), 1);
 
@@ -90,7 +83,7 @@ public class AlarmDataSource3Test extends AndroidTestCase {
     public void test_getAlarmsInPeriod_one_minute() {
         Calendar from = new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DAY, MINUTE_DAY - 1);
         Calendar to = new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DAY, MINUTE_DAY + 1);
-        List<Calendar> alarmTimes = dataSource.getAlarmsInPeriod(from, to);
+        List<Calendar> alarmTimes = globalManager.getAlarmsInPeriod(from, to);
 
         assertEquals(alarmTimes.size(), 1);
 
@@ -107,7 +100,7 @@ public class AlarmDataSource3Test extends AndroidTestCase {
     public void test_getAlarmsInPeriod_one_leftBorder() {
         Calendar from = new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DAY, MINUTE_DAY);
         Calendar to = new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DAY, MINUTE_DAY + 1);
-        List<Calendar> alarmTimes = dataSource.getAlarmsInPeriod(from, to);
+        List<Calendar> alarmTimes = globalManager.getAlarmsInPeriod(from, to);
 
         assertEquals(alarmTimes.size(), 1);
 
@@ -124,7 +117,7 @@ public class AlarmDataSource3Test extends AndroidTestCase {
     public void test_getAlarmsInPeriod_one_rightBorder() {
         Calendar from = new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DAY, MINUTE_DAY-1);
         Calendar to = new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DAY, MINUTE_DAY);
-        List<Calendar> alarmTimes = dataSource.getAlarmsInPeriod(from, to);
+        List<Calendar> alarmTimes = globalManager.getAlarmsInPeriod(from, to);
 
         assertEquals(alarmTimes.size(), 1);
 
@@ -141,7 +134,7 @@ public class AlarmDataSource3Test extends AndroidTestCase {
     public void test_getAlarmsInPeriod_two_day() {
         Calendar from = new GregorianCalendar(YEAR, MONTH, DAY, 0, 0);
         Calendar to = new GregorianCalendar(YEAR, MONTH, DAY + 2, 0, 0);
-        List<Calendar> alarmTimes = dataSource.getAlarmsInPeriod(from, to);
+        List<Calendar> alarmTimes = globalManager.getAlarmsInPeriod(from, to);
 
         assertEquals(alarmTimes.size(), 2);
 
@@ -167,7 +160,7 @@ public class AlarmDataSource3Test extends AndroidTestCase {
     public void test_getAlarmsInPeriod_three_day() {
         Calendar from = new GregorianCalendar(YEAR, MONTH, DAY, 0, 0);
         Calendar to = new GregorianCalendar(YEAR, MONTH, DAY + 3, 0, 0);
-        List<Calendar> alarmTimes = dataSource.getAlarmsInPeriod(from, to);
+        List<Calendar> alarmTimes = globalManager.getAlarmsInPeriod(from, to);
 
         assertEquals(alarmTimes.size(), 3);
 
@@ -202,7 +195,7 @@ public class AlarmDataSource3Test extends AndroidTestCase {
     public void test_getAlarmsInPeriod_all() {
         Calendar from = new GregorianCalendar(YEAR - 1, MONTH, DAY);
         Calendar to = new GregorianCalendar(YEAR + 1, MONTH, DAY);
-        List<Calendar> alarmTimes = dataSource.getAlarmsInPeriod(from, to);
+        List<Calendar> alarmTimes = globalManager.getAlarmsInPeriod(from, to);
 
         assertEquals(alarmTimes.size(), DAYS);
 

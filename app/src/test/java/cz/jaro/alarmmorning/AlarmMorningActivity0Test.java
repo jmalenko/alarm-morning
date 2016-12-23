@@ -76,7 +76,7 @@ public class AlarmMorningActivity0Test {
         recyclerView.measure(0, 0);
         recyclerView.layout(0, 0, 100, 10000);
 
-        assertThat(recyclerView.getChildCount()).isEqualTo(AlarmDataSource.HORIZON_DAYS);
+        assertThat(recyclerView.getChildCount()).isEqualTo(GlobalManager.HORIZON_DAYS);
 
         for (int position = 0; position < recyclerView.getChildCount(); position++) {
             View item = recyclerView.getChildAt(position);

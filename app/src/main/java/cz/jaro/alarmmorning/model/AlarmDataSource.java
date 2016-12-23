@@ -9,13 +9,9 @@ import android.util.Log;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.List;
-
-import cz.jaro.alarmmorning.clock.Clock;
 
 /**
  * Store objects to a database.
@@ -32,10 +28,7 @@ public class AlarmDataSource {
     private static final String[] allColumnsDefaults = {AlarmDbHelper.COLUMN_DEFAULTS_ID, AlarmDbHelper.COLUMN_DEFAULTS_DAY_OF_WEEK, AlarmDbHelper.COLUMN_DEFAULTS_STATE, AlarmDbHelper.COLUMN_DEFAULTS_HOUR, AlarmDbHelper.COLUMN_DEFAULTS_MINUTE};
     private static final String[] allColumnsDay = {AlarmDbHelper.COLUMN_DAY_ID, AlarmDbHelper.COLUMN_DAY_DATE, AlarmDbHelper.COLUMN_DAY_STATE, AlarmDbHelper.COLUMN_DAY_HOUR, AlarmDbHelper.COLUMN_DAY_MINUTE};
 
-
     public static final int[] allDaysOfWeek = new int[]{Calendar.SUNDAY, Calendar.MONDAY, Calendar.TUESDAY, Calendar.WEDNESDAY, Calendar.THURSDAY, Calendar.FRIDAY, Calendar.SATURDAY};
-
-    public static final int HORIZON_DAYS = 30;
 
     /**
      * Initialize the object.
@@ -57,6 +50,8 @@ public class AlarmDataSource {
 
     /**
      * Close the open database.
+     * <p>
+     * Note: The database should be never called. Source: https://nfrolov.wordpress.com/2014/08/16/android-sqlitedatabase-locking-and-multi-threading/
      */
     public void close() {
         dbHelper.close();
@@ -99,8 +94,8 @@ public class AlarmDataSource {
      * @param date identifier of the object
      * @return The retrieved object
      */
-    public Day loadDayDeep(Calendar date) {
-        Day day = loadDay(date);
+    public Day loadDay(Calendar date) {
+        Day day = loadDayShallow(date);
 
         if (day == null) {
             day = new Day();
@@ -119,12 +114,11 @@ public class AlarmDataSource {
 
     /**
      * Retrieve a {@code Day} object from the database.
-     * <p/>
      *
      * @param date identifier of the object
      * @return The retrieved object
      */
-    private Day loadDay(Calendar date) {
+    private Day loadDayShallow(Calendar date) {
         Day day;
 
         String dateText = dateToText(date);
@@ -174,134 +168,6 @@ public class AlarmDataSource {
             Log.e(TAG, "Unable to parse date from string: " + dateText);
             throw new RuntimeException("Invalid date format", e);
         }
-    }
-
-    /**
-     * Return the alarm time.
-     *
-     * @param clock clock
-     * @return next alarm time
-     */
-    public Calendar getNextAlarm(Clock clock) {
-        Day day = getNextAlarm(clock, null);
-        if (day != null) {
-            Calendar alarmTime = day.getDateTime();
-            Log.v(TAG, "Next alarm is at " + alarmTime.getTime().toString());
-            return alarmTime;
-        } else {
-            Log.v(TAG, "Next alarm is never");
-            return null;
-        }
-    }
-
-    /**
-     * Return the nearest Day with alarm such that the Day matches the filter. The filter that such a Day is enabled and not in past is also checked.
-     *
-     * @param clock clock
-     * @return nearest Day with alarm
-     */
-    public Day getNextAlarm(Clock clock, DayFilter filter) {
-        Calendar date = clock.now();
-
-        for (int daysInAdvance = 0; daysInAdvance < HORIZON_DAYS; daysInAdvance++, date.add(Calendar.DATE, 1)) {
-            Day day = loadDayDeep(date);
-
-            if (!day.isEnabled()) {
-                continue;
-            }
-
-            if (day.isPassed(clock)) {
-                continue;
-            }
-
-            if (filter != null && !filter.match(day)) {
-                continue;
-            }
-
-            Log.v(TAG, "   The day that satisfies filter is " + day.getDate().getTime());
-            return day;
-        }
-
-        Log.v(TAG, "Next alarm is never");
-        return null;
-    }
-
-    /**
-     * Return the alarm time of the next alarm.
-     * <p/>
-     * This is a helper method that opens the database.
-     *
-     * @param context context
-     * @param clock   clock
-     * @return next alarm time
-     */
-    public static Calendar getNextAlarm(Context context, Clock clock) {
-        AlarmDataSource datasource = new AlarmDataSource(context);
-        datasource.open();
-
-        Calendar alarmTime = datasource.getNextAlarm(clock);
-
-        datasource.close();
-
-        return alarmTime;
-    }
-
-    /**
-     * Return the alarm times in the specified period.
-     *
-     * @param from beginning of the period
-     * @param to   end of the period
-     * @return alarm times, including the borders
-     */
-    public List<Calendar> getAlarmsInPeriod(Calendar from, Calendar to) {
-        Log.d(TAG, "getAlarmsInPeriod(from=" + from.getTime() + ", to=" + to.getTime() + ")");
-
-        List<Calendar> alarmTimes = new ArrayList<>();
-
-        for (Calendar date = (Calendar) from.clone(); date.before(to) ; date.add(Calendar.DATE, 1)) {
-            Day day = loadDayDeep(date);
-
-            if (!day.isEnabled()) {
-                continue;
-            }
-
-            // handle the alarmTimes on the first (alarmTimes before beginning of period) and last day (after the end of period)
-            Calendar alarmTime = day.getDateTime();
-            if (alarmTime.before(from))
-                continue;
-            if (to.before(alarmTime))
-                continue;
-
-            alarmTimes.add(alarmTime);
-        }
-
-        Log.d(TAG, "   There are " + alarmTimes.size() + " alarmTimes");
-        for (Calendar alarmTime : alarmTimes) {
-            Log.d(TAG, "   " + alarmTime.getTime());
-        }
-
-        return alarmTimes;
-    }
-
-    /**
-     * Return the alarm times in the specified period.
-     * <p/>
-     * This is a helper method that opens the database.
-     *
-     * @param context context
-     * @param from    beginning of the period
-     * @param to      end of the period
-     * @return alarm times, including the borders
-     */
-    public static List<Calendar> getAlarmsInPeriod(Context context, Calendar from, Calendar to) {
-        AlarmDataSource datasource = new AlarmDataSource(context);
-        datasource.open();
-
-        List<Calendar> alarmTimes = datasource.getAlarmsInPeriod(from, to);
-
-        datasource.close();
-
-        return alarmTimes;
     }
 
     private Defaults cursorToDefaults(Cursor cursor) {

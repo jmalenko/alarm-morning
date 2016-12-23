@@ -13,7 +13,6 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import cz.jaro.alarmmorning.clock.Clock;
-import cz.jaro.alarmmorning.model.AlarmDataSource;
 import cz.jaro.alarmmorning.receivers.AlarmReceiver;
 
 /**
@@ -32,7 +31,7 @@ public class SystemAlarm {
     private PendingIntent operation;
 
     /**
-     * Action meaning: Set system alarm for next action. (Currently, all alarms are unset in the next {@link AlarmDataSource#HORIZON_DAYS} days.)
+     * Action meaning: Set system alarm for next action. (Currently, all alarms are unset in the next {@link GlobalManager#HORIZON_DAYS} days.)
      */
     protected static final String ACTION_SET_SYSTEM_ALARM = "SET_SYSTEM_ALARM";
 
@@ -102,7 +101,7 @@ public class SystemAlarm {
     private void saveNextAction(NextAction nextAction) {
         Log.d(TAG, "setNextAction()");
 
-        GlobalManager globalManager = new GlobalManager(context);
+        GlobalManager globalManager = GlobalManager.getInstance();
         globalManager.setNextAction(nextAction);
     }
 
@@ -116,7 +115,7 @@ public class SystemAlarm {
             // Method 2: try to recreate the operation
             Log.d(TAG, "Recreating operation when cancelling system alarm");
 
-            GlobalManager globalManager = new GlobalManager(context);
+            GlobalManager globalManager = GlobalManager.getInstance();
             NextAction nextAction2 = globalManager.getNextAction();
 
             Intent intent2 = new Intent(context, AlarmReceiver.class);
@@ -136,7 +135,7 @@ public class SystemAlarm {
      */
 
     private void initialize() {
-        GlobalManager globalManager = new GlobalManager(context);
+        GlobalManager globalManager = GlobalManager.getInstance();
         Clock clock = globalManager.clock();
 
         NextAction nextAction = calcNextAction(clock);
@@ -153,7 +152,8 @@ public class SystemAlarm {
 
         Calendar now = clock.now();
 
-        Calendar alarmTime = AlarmDataSource.getNextAlarm(context, clock);
+        GlobalManager globalManager = GlobalManager.getInstance();
+        Calendar alarmTime = globalManager.getNextAlarm(clock);
 
         if (alarmTime == null) {
             Calendar resetTime = getResetTime(now);
@@ -175,7 +175,7 @@ public class SystemAlarm {
     protected boolean nextActionShouldChange() {
         Log.v(TAG, "nextActionShouldChange()");
 
-        GlobalManager globalManager = new GlobalManager(context);
+        GlobalManager globalManager = GlobalManager.getInstance();
 
         Clock clock = globalManager.clock();
         NextAction nextAction = calcNextAction(clock);
@@ -218,7 +218,7 @@ public class SystemAlarm {
 
         Log.i(TAG, "Acting on system alarm. action=" + action);
 
-        GlobalManager globalManager = new GlobalManager(context);
+        GlobalManager globalManager = GlobalManager.getInstance();
 
         if (action.equals(ACTION_SET_SYSTEM_ALARM)) {
             globalManager.onAlarmTimeOfEarlyDismissedAlarm();
@@ -249,10 +249,10 @@ public class SystemAlarm {
     public void onNearFuture() {
         Log.d(TAG, "onNearFuture()");
 
-        GlobalManager globalManager = new GlobalManager(context);
+        GlobalManager globalManager = GlobalManager.getInstance();
         Clock clock = globalManager.clock();
 
-        Calendar alarmTime = AlarmDataSource.getNextAlarm(context, clock);
+        Calendar alarmTime = globalManager.getNextAlarm(clock);
         assert alarmTime != null;
         registerSystemAlarm(ACTION_RING, alarmTime, alarmTime);
     }
@@ -262,7 +262,7 @@ public class SystemAlarm {
 
         cancelSystemAlarm();
 
-        GlobalManager globalManager = new GlobalManager(context);
+        GlobalManager globalManager = GlobalManager.getInstance();
         Calendar alarmTime = globalManager.getAlarmTimeOfRingingAlarm();
 
         registerSystemAlarm(ACTION_ALARM_TIME_OF_EARLY_DISMISSED_ALARM, alarmTime, alarmTime);
@@ -285,7 +285,7 @@ public class SystemAlarm {
 
         cancelSystemAlarm();
 
-        GlobalManager globalManager = new GlobalManager(context);
+        GlobalManager globalManager = GlobalManager.getInstance();
         Calendar alarmTimeOfRingingAlarm = globalManager.getAlarmTimeOfRingingAlarm();
 
         registerSystemAlarm(ACTION_RING, ringAfterSnoozeTime, alarmTimeOfRingingAlarm);

@@ -1,11 +1,11 @@
 package cz.jaro.alarmmorning.model;
 
 import android.test.AndroidTestCase;
-import android.test.RenamingDelegatingContext;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.clock.FixedClock;
 
 import static cz.jaro.alarmmorning.model.AlarmDataSourceTest.DAY;
@@ -16,7 +16,7 @@ import static cz.jaro.alarmmorning.model.AlarmDataSourceTest.YEAR;
 
 public class AlarmDataSource2Test extends AndroidTestCase {
 
-    private AlarmDataSource dataSource;
+    private GlobalManager globalManager;
 
     private Day day0;
     private Day day1;
@@ -25,16 +25,14 @@ public class AlarmDataSource2Test extends AndroidTestCase {
     @Override
     public void setUp() throws Exception {
         super.setUp();
-        RenamingDelegatingContext context = new RenamingDelegatingContext(getContext(), "test_");
-        dataSource = new AlarmDataSource(context);
-        dataSource.open();
+        globalManager = GlobalManager.getInstance();
 
         day0 = new Day();
         day0.setState(Day.STATE_ENABLED);
         day0.setDate(new GregorianCalendar(YEAR, MONTH, DAY));
         day0.setHour(HOUR_DAY);
         day0.setMinute(MINUTE_DAY);
-        dataSource.saveDay(day0);
+        globalManager.saveDay(day0);
 
         // day1 = day0 + 8 days
         day1 = new Day();
@@ -42,7 +40,7 @@ public class AlarmDataSource2Test extends AndroidTestCase {
         day1.setDate(new GregorianCalendar(YEAR, MONTH, DAY + 8));
         day1.setHour(HOUR_DAY + 1);
         day1.setMinute(MINUTE_DAY + 1);
-        dataSource.saveDay(day1);
+        globalManager.saveDay(day1);
 
         // day2 = day0 + 16 days
         day2 = new Day();
@@ -50,23 +48,17 @@ public class AlarmDataSource2Test extends AndroidTestCase {
         day2.setDate(new GregorianCalendar(YEAR, MONTH, DAY + 16));
         day2.setHour(HOUR_DAY + 2);
         day2.setMinute(MINUTE_DAY + 2);
-        dataSource.saveDay(day2);
-    }
-
-    @Override
-    public void tearDown() throws Exception {
-        dataSource.close();
-        super.tearDown();
+        globalManager.saveDay(day2);
     }
 
     public void testPreConditions() {
-        assertNotNull(dataSource);
-        assertTrue("", 8 <= AlarmDataSource.HORIZON_DAYS);
+        assertNotNull(globalManager);
+        assertTrue("", 8 <= GlobalManager.HORIZON_DAYS);
     }
 
     public void test_before0() {
         FixedClock clock = new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DAY, MINUTE_DAY)).addMinute(-1);
-        Calendar nextAlarm = dataSource.getNextAlarm(clock);
+        Calendar nextAlarm = globalManager.getNextAlarm(clock);
 
         assertEquals("next alarm on " + clock.now().getTime().toString(), day0.getDateTime().getTime().toString(), nextAlarm.getTime().toString());
         assertEquals(YEAR, nextAlarm.get(Calendar.YEAR));
@@ -80,7 +72,7 @@ public class AlarmDataSource2Test extends AndroidTestCase {
 
     public void test_after0() {
         FixedClock clock = new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DAY, MINUTE_DAY)).addMinute(1);
-        Calendar nextAlarm = dataSource.getNextAlarm(clock);
+        Calendar nextAlarm = globalManager.getNextAlarm(clock);
 
         assertEquals("next alarm on " + clock.now().getTime().toString(), day1.getDateTime().getTime().toString(), nextAlarm.getTime().toString());
         assertEquals(YEAR, nextAlarm.get(Calendar.YEAR));
@@ -94,7 +86,7 @@ public class AlarmDataSource2Test extends AndroidTestCase {
 
     public void test_before1() {
         FixedClock clock = new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY + 8, HOUR_DAY + 1, MINUTE_DAY + 1)).addMinute(-1);
-        Calendar nextAlarm = dataSource.getNextAlarm(clock);
+        Calendar nextAlarm = globalManager.getNextAlarm(clock);
 
         assertEquals("next alarm on " + clock.now().getTime().toString(), day1.getDateTime().getTime().toString(), nextAlarm.getTime().toString());
         assertEquals(YEAR, nextAlarm.get(Calendar.YEAR));
@@ -108,7 +100,7 @@ public class AlarmDataSource2Test extends AndroidTestCase {
 
     public void test_after1() {
         FixedClock clock = new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY + 8, HOUR_DAY + 1, MINUTE_DAY + 1)).addMinute(1);
-        Calendar nextAlarm = dataSource.getNextAlarm(clock);
+        Calendar nextAlarm = globalManager.getNextAlarm(clock);
 
         assertEquals("next alarm on " + clock.now().getTime().toString(), day2.getDateTime().getTime().toString(), nextAlarm.getTime().toString());
         assertEquals(YEAR, nextAlarm.get(Calendar.YEAR));
@@ -122,7 +114,7 @@ public class AlarmDataSource2Test extends AndroidTestCase {
 
     public void test_before2() {
         FixedClock clock = new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY + 16, HOUR_DAY + 2, MINUTE_DAY + 2)).addMinute(-1);
-        Calendar nextAlarm = dataSource.getNextAlarm(clock);
+        Calendar nextAlarm = globalManager.getNextAlarm(clock);
 
         assertEquals("next alarm on " + clock.now().getTime().toString(), day2.getDateTime().getTime().toString(), nextAlarm.getTime().toString());
         assertEquals(YEAR, nextAlarm.get(Calendar.YEAR));
@@ -142,11 +134,11 @@ public class AlarmDataSource2Test extends AndroidTestCase {
             defaults.setState(Defaults.STATE_DISABLED);
             defaults.setHour(1);
             defaults.setMinute(2);
-            dataSource.saveDefault(defaults);
+            globalManager.saveDefault(defaults);
         }
 
         FixedClock clock = new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY + 16, HOUR_DAY + 2, MINUTE_DAY + 2)).addMinute(1);
-        Calendar nextAlarm = dataSource.getNextAlarm(clock);
+        Calendar nextAlarm = globalManager.getNextAlarm(clock);
 
         assertNull(nextAlarm);
     }

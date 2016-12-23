@@ -132,7 +132,7 @@ public class SetAlarmByVoiceActivity extends Activity {
     }
 
     private void saveTime() {
-        GlobalManager globalManager = new GlobalManager(getBaseContext());
+        GlobalManager globalManager = GlobalManager.getInstance();
         Clock clock = globalManager.clock();
         Calendar now = clock.now();
 

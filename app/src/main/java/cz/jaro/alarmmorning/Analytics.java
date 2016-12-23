@@ -108,7 +108,7 @@ public class Analytics {
 
         Target,
 
-        Configuration;
+        Configuration
     }
 
     public enum Event {
@@ -323,14 +323,10 @@ public class Analytics {
         return this;
     }
 
-    public Analytics setDayOld(Day day) {
+    Analytics setDayOld(Day day) {
         // Load currently stored alarm time
-        AlarmDataSource dataSource = new AlarmDataSource(mContext);
-        dataSource.open();
-
-        Day dayOld = dataSource.loadDayDeep(day.getDate());
-
-        dataSource.close();
+        GlobalManager globalManager = GlobalManager.getInstance();
+        Day dayOld = globalManager.loadDay(day.getDate());
 
         if (dayOld.isEnabled()) {
             Calendar alarmTime = dayOld.getDateTime();
@@ -370,12 +366,8 @@ public class Analytics {
         setDefaults(defaults);
 
         // Load currently stored alarm time
-        AlarmDataSource dataSource = new AlarmDataSource(mContext);
-        dataSource.open();
-
-        Defaults defaultsOld = dataSource.loadDefault(dayOfWeek);
-
-        dataSource.close();
+        GlobalManager globalManager = GlobalManager.getInstance();
+        Defaults defaultsOld = globalManager.loadDefault(dayOfWeek);
 
         if (defaultsOld.isEnabled()) {
             String defaultAlarmTimeString = getDefaultsAlarmTimeString(defaultsOld);

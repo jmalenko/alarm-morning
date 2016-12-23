@@ -148,7 +148,7 @@ public class HolidayHelper {
         }
 
         // Filter: keep only holidays in next year
-        GlobalManager globalManager = new GlobalManager(context);
+        GlobalManager globalManager = GlobalManager.getInstance();
         Calendar from = CalendarFragment.getToday(globalManager.clock());
         Calendar to = (Calendar) from.clone();
         to.add(Calendar.YEAR, 1);

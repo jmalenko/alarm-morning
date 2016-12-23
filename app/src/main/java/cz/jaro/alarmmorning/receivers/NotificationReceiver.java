@@ -33,7 +33,7 @@ public class NotificationReceiver extends BroadcastReceiver {
 
         Log.v(TAG, "onReceive() action=" + action);
 
-        GlobalManager globalManager = new GlobalManager(context);
+        GlobalManager globalManager = GlobalManager.getInstance();
 
         if (action == ACTION_CLICK_NOTIFICATION) {
             Analytics analytics = new Analytics(context, Analytics.Event.Click, Analytics.Channel.Notification, Analytics.ChannelName.Alarm);

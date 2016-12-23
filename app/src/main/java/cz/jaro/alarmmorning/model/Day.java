@@ -1,9 +1,8 @@
 package cz.jaro.alarmmorning.model;
 
-import android.content.Context;
-
 import java.util.Calendar;
 
+import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.holiday.HolidayHelper;
 
@@ -220,14 +219,14 @@ public class Day {
      * Checks if this is the next alarm. Specifically: there is no other alarm between now and
      * alarm time.
      *
-     * @param context context
      * @param clock   clock
      * @return true if this is the next alarm
      */
-    public boolean isNextAlarm(Context context, Clock clock) {
+    public boolean isNextAlarm(Clock clock) {
         Calendar alarmTime1 = getDateTime();
 
-        Calendar alarmTime2 = AlarmDataSource.getNextAlarm(context, clock);
+        GlobalManager globalManager = GlobalManager.getInstance();
+        Calendar alarmTime2 = globalManager.getNextAlarm(clock);
 
         return alarmTime1.equals(alarmTime2);
     }

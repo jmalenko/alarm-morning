@@ -6,10 +6,6 @@ import org.junit.Test;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-import cz.jaro.alarmmorning.model.AlarmDataSource;
-import cz.jaro.alarmmorning.model.Day;
-import cz.jaro.alarmmorning.model.Defaults;
-
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
