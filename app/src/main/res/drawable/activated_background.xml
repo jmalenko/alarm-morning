@@ -4,8 +4,8 @@
     <!-- This is used when the Navigation Item is checked -->
     <!--<item android:drawable="@color/bright_foreground_disabled_material_dark" android:state_checked="true" />-->
     <!--<item android:drawable="@color/accent" android:state_checked="true" />-->
-    <item android:drawable="@color/white_overlay" android:state_checked="true" />
+    <item android:drawable="@color/white_overlay" android:state_checked="true"/>
     <!-- This is the default background -->
-    <item android:drawable="@android:color/transparent" />
+    <item android:drawable="@android:color/transparent"/>
 
 </selector>

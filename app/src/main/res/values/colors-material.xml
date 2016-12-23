@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!--Source https://material.google.com/style/color.html#color-color-palette -->
-    
+
     <color name="Red_50">#FFEBEE</color>       <!-- Red 50 -->
     <color name="Red_100">#FFCDD2</color>      <!-- Red 100 -->
     <color name="Red_200">#EF9A9A</color>      <!-- Red 200 -->
