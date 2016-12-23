@@ -17,7 +17,7 @@
     <string name="pref_summaryon_vibrate">Vibruje</string>
 
     <string name="pref_title_snooze_time">Délka odložení</string>
-    <string name="pref_summary_snooze_time"><xliff:g id="minutes" example="3">%1$</xliff:g>d minut</string>
+    <string name="pref_summary_snooze_time"><xliff:g id="minutes" example="3">%1$d</xliff:g>d minut</string>
 
     <string name="pref_title_near_future_time">Oznámení před budíkem</string>
 
