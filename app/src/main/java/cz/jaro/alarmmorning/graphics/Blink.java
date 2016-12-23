@@ -40,7 +40,7 @@ public class Blink {
 
     private void disappearActivity() {
         activity.finish();
-        activity.overridePendingTransition(0, R.anim.fade_out);
+        activity.overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
     }
 
     public void setTimeText(int resid) {
