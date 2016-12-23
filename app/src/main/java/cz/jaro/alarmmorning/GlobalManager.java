@@ -882,6 +882,46 @@ public class GlobalManager {
     }
 
     /**
+     * Return the identifier of a region that is used to determine holidays.
+     *
+     * @return the path identifier of a region
+     */
+    public String loadHoliday() {
+        Log.v(TAG, "loadHoliday()");
+
+        Context context = AlarmMorningApplication.getAppContext();
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String holidayPreference = preferences.getString(SettingsActivity.PREF_HOLIDAY, SettingsActivity.PREF_HOLIDAY_DEFAULT);
+
+        // TODO If the region path does not exist (because the library stopped supporting it or it disappeared) then use the first existing super-region
+
+        return holidayPreference;
+    }
+
+    /**
+     * Save the identifier of the region that is used to determine holidays.
+     *
+     * @param holidayPreference the path identifier of a region
+     */
+    public void saveHoliday(String holidayPreference) {
+        Log.d(TAG, "saveHoliday(holidayPreference=" + holidayPreference + ")");
+
+        Context context = AlarmMorningApplication.getAppContext();
+
+        // Save
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = preferences.edit();
+
+        editor.putString(SettingsActivity.PREF_HOLIDAY, holidayPreference);
+
+        editor.commit();
+
+        // Reset alarm
+        onAlarmSet();
+    }
+
+    /**
      * Return the alarm time.
      *
      * @param clock clock

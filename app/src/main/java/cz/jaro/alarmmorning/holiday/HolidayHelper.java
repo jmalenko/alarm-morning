@@ -4,7 +4,6 @@ import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 import org.joda.time.LocalDate;
@@ -61,24 +60,13 @@ public class HolidayHelper {
     }
 
     /**
-     * Return the identifier of a region that is used to determine holidays.
-     *
-     * @return the path identifier of a region
-     */
-    public String getHolidayPreference() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        String holidayPreference = preferences.getString(SettingsActivity.PREF_HOLIDAY, SettingsActivity.PREF_HOLIDAY_DEFAULT);
-        // TODO If the region path does not exist (because the library stopped supporting it or it disappeared) then use the first existing super-region
-        return holidayPreference;
-    }
-
-    /**
      * Check whether holidays are enabaled by user.
      *
      * @return true if the user enabled holidays
      */
     public boolean useHoliday() {
-        return useHoliday(getHolidayPreference());
+        GlobalManager globalManager = GlobalManager.getInstance();
+        return useHoliday(globalManager.loadHoliday());
     }
 
     public boolean useHoliday(String value) {
@@ -86,14 +74,14 @@ public class HolidayHelper {
     }
 
     private HolidayCalendar getHolidayCalendar() {
-        String holidayPreference = getHolidayPreference();
+        GlobalManager globalManager = GlobalManager.getInstance();
+        String holidayPreference = globalManager.loadHoliday();
         return getHolidayCalendar(holidayPreference);
     }
 
     private HolidayCalendar getHolidayCalendar(String path) {
-        String[] ids = path.split("\\.");
-
-        if (useHoliday()) {
+        if (useHoliday(path)) {
+            String[] ids = path.split("\\.");
             for (HolidayCalendar c : HolidayCalendar.values()) {
                 if (c.getId().equals(ids[0])) {
                     return c;
@@ -122,8 +110,9 @@ public class HolidayHelper {
      * @return list of {@link Holiday}s
      */
     public List<Holiday> listHolidays() {
+        GlobalManager globalManager = GlobalManager.getInstance();
         HolidayCalendar holidayCalendar = HolidayHelper.getInstance().getHolidayCalendar();
-        return listHolidays(holidayCalendar, getHolidayPreference());
+        return listHolidays(holidayCalendar, globalManager.loadHoliday());
     }
 
     /**

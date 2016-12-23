@@ -273,7 +273,19 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         @Override
         public boolean onPreferenceChange(Preference preference, Object value) {
             analytics(preference, value);
-            return updateSummary(preference, value);
+            action(preference, value);
+            updateSummary(preference, value);
+            return true;
+        }
+
+        void action(Preference preference, Object value) {
+            String stringValue = value.toString();
+            String key = preference.getKey();
+
+            if (key.equals(PREF_HOLIDAY)) {
+                GlobalManager globalManager = GlobalManager.getInstance();
+                globalManager.saveHoliday(stringValue);
+            }
         }
 
         public boolean updateSummary(Preference preference, Object value) {

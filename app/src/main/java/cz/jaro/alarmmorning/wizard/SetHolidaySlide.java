@@ -1,8 +1,6 @@
 package cz.jaro.alarmmorning.wizard;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,6 +9,7 @@ import android.view.ViewGroup;
 
 import java.util.List;
 
+import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.SettingsActivity;
 import cz.jaro.alarmmorning.graphics.HolidaySelector;
@@ -32,13 +31,14 @@ public class SetHolidaySlide extends BaseFragment {
         holidaySelector.setListVisibility(View.GONE);
 
         // Preset
-        String path;
+        String holidayPreference;
         if (Wizard.loadWizardFinished(getContext())) {
-            path = HolidayHelper.getInstance().getHolidayPreference();
+            GlobalManager globalManager = GlobalManager.getInstance();
+            holidayPreference = globalManager.loadHoliday();
         } else {
-            path = SettingsActivity.PREF_HOLIDAY_NONE;
+            holidayPreference = SettingsActivity.PREF_HOLIDAY_NONE;
         }
-        holidaySelector.setPath(path);
+        holidaySelector.setPath(holidayPreference);
 
         return view;
     }
@@ -54,13 +54,12 @@ public class SetHolidaySlide extends BaseFragment {
 
         String holidayCalendarPreferenceString = holidaySelector.getPath();
 
+        // Analytics
+        SetFeaturesSlide.analytics(getContext(), SettingsActivity.PREF_HOLIDAY, holidayCalendarPreferenceString);
+
         // Save holiday
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-        SharedPreferences.Editor editor = preferences.edit();
-
-        SetFeaturesSlide.savePreference(getContext(), editor, SettingsActivity.PREF_HOLIDAY, holidayCalendarPreferenceString);
-
-        editor.commit();
+        GlobalManager globalManager = GlobalManager.getInstance();
+        globalManager.saveHoliday(holidayCalendarPreferenceString);
 
         // Debug log
         HolidayHelper holidayHelper = HolidayHelper.getInstance();
