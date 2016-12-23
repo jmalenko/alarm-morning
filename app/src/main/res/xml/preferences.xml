@@ -102,14 +102,14 @@
         <cz.jaro.alarmmorning.graphics.TimePreference
             android:key="pref_check_alarm_time_at"
             android:title="@string/pref_title_check_alarm_time_at"
-            android:dependency="pref_check_alarm_time"
-            android:defaultValue="22:00"/>
+            android:defaultValue="22:00"
+            android:dependency="pref_check_alarm_time"/>
 
         <cz.jaro.alarmmorning.graphics.RelativeTimePreference
             android:key="pref_check_alarm_time_gap"
             android:title="@string/pref_title_check_alarm_time_gap"
-            android:dependency="pref_check_alarm_time"
-            android:defaultValue="60"/>
+            android:defaultValue="60"
+            android:dependency="pref_check_alarm_time"/>
 
     </PreferenceCategory>
 
@@ -127,16 +127,16 @@
         <cz.jaro.alarmmorning.graphics.TimePreference
             android:key="pref_nighttime_bell_at"
             android:title="@string/pref_title_nighttime_bell_at"
-            android:dependency="pref_nighttime_bell"
-            android:defaultValue="22:00"/>
+            android:defaultValue="22:00"
+            android:dependency="pref_nighttime_bell"/>
 
         <RingtonePreference
             android:key="pref_nighttime_bell_ringtone"
             android:title="@string/pref_title_nighttime_bell_ringtone"
-            android:dependency="pref_nighttime_bell"
             android:defaultValue="raw://church_clock_strikes_3"
-            android:showSilent="false"
-            android:ringtoneType="alarm"/>
+            android:dependency="pref_nighttime_bell"
+            android:ringtoneType="alarm"
+            android:showSilent="false"/>
 
     </PreferenceCategory>
 
@@ -152,8 +152,8 @@
 
         <cz.jaro.alarmmorning.graphics.HolidayPreference
             android:key="pref_holiday"
-            android:defaultValue="-NONE"
-            android:title="@string/pref_title_holiday"/>
+            android:title="@string/pref_title_holiday"
+            android:defaultValue="-NONE"/>
 
         <Preference
             android:key="pref_start_wizard"

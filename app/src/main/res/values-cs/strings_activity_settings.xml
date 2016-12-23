@@ -6,7 +6,7 @@
     <string name="pref_ringtone_silent">Žádný</string>
 
     <string name="pref_title_volume">Hlasitost</string>
-    <string name="pref_summary_volume"><xliff:g id="level" example="80">%1$d</xliff:g>%%</string>
+    <string name="pref_summary_volume"><xliff:g example="80" id="level">%1$d</xliff:g>%%</string>
 
     <string name="pref_title_volume_increasing">Vzrůstající hlasitost</string>
     <string name="pref_summaryoff_volume_increasing">Hlasitost se nemění</string>
@@ -17,7 +17,7 @@
     <string name="pref_summaryon_vibrate">Vibruje</string>
 
     <string name="pref_title_snooze_time">Délka odložení</string>
-    <string name="pref_summary_snooze_time"><xliff:g id="minutes" example="3">%1$d</xliff:g>d minut</string>
+    <string name="pref_summary_snooze_time"><xliff:g example="3" id="minutes">%1$d</xliff:g>d minut</string>
 
     <string name="pref_title_near_future_time">Oznámení před budíkem</string>
 

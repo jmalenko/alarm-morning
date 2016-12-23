@@ -1,4 +1,5 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="horizontal">
@@ -9,8 +10,8 @@
         android:layout_height="40dp"
         android:background="@color/primary_dark"
         android:gravity="center"
-        android:textSize="@dimen/text_size_day_of_week"
         android:paddingTop="@dimen/margin_tiny"
+        android:textSize="@dimen/text_size_day_of_week"
         />
 
     <TextView
@@ -32,8 +33,8 @@
         android:layout_toLeftOf="@id/textTimeCal"
         android:background="@color/primary_dark"
         android:gravity="center"
-        android:textSize="@dimen/text_size_date"
         android:paddingBottom="@dimen/margin_tiny"
+        android:textSize="@dimen/text_size_date"
         />
 
     <TextView
@@ -43,27 +44,27 @@
         android:layout_alignParentRight="true"
         android:layout_marginRight="@dimen/margin_medium"
         android:layout_toRightOf="@id/textTimeCal"
-        android:gravity="end"
-        android:textAlignment="textEnd"
-        android:paddingTop="@dimen/margin_small"
-        android:maxLines="1"
         android:ellipsize="end"
+        android:gravity="end"
+        android:maxLines="1"
+        android:paddingTop="@dimen/margin_small"
+        android:textAlignment="textEnd"
         />
 
     <TextView
         android:id="@+id/textComment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_below="@id/textState"
         android:layout_marginRight="@dimen/margin_medium"
         android:layout_toRightOf="@id/textTimeCal"
-        android:layout_alignParentBottom="true"
-        android:gravity="end"
-        android:textAlignment="textEnd"
-        android:paddingBottom="@dimen/margin_small"
-        android:maxLines="1"
         android:ellipsize="end"
+        android:gravity="end"
+        android:maxLines="1"
+        android:paddingBottom="@dimen/margin_small"
+        android:textAlignment="textEnd"
         />
 
 </RelativeLayout>

@@ -1,4 +1,5 @@
-<CheckedTextView android:id="@android:id/text1"
+<CheckedTextView
+    android:id="@android:id/text1"
     style="@style/spinnerDropDownItemStyle"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"

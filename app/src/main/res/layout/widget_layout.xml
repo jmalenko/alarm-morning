@@ -3,8 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
     android:background="@drawable/widget_background"
+    android:gravity="center"
     android:orientation="vertical">
 
     <ImageView
@@ -21,28 +21,28 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="@dimen/margin_tiny"
-        android:textColor="@android:color/white"
+        android:ellipsize="marquee"
+        android:maxLines="1"
         android:shadowColor="#7F000000"
-        android:shadowRadius="2"
         android:shadowDx="0"
         android:shadowDy="2"
-        android:maxLines="1"
-        android:ellipsize="marquee"
+        android:shadowRadius="2"
         android:text="08:00"
-        android:textAlignment="center"/>
+        android:textAlignment="center"
+        android:textColor="@android:color/white"/>
 
     <TextView
         android:id="@+id/alarm_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:textColor="@android:color/white"
+        android:ellipsize="marquee"
+        android:maxLines="1"
         android:shadowColor="#7F000000"
-        android:shadowRadius="2"
         android:shadowDx="0"
         android:shadowDy="2"
-        android:maxLines="1"
-        android:ellipsize="marquee"
+        android:shadowRadius="2"
         android:text="Mon"
-        android:textAlignment="center"/>
+        android:textAlignment="center"
+        android:textColor="@android:color/white"/>
 </LinearLayout>

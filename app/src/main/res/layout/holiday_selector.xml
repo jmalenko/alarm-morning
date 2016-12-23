@@ -10,10 +10,10 @@
         android:id="@+id/holidaySpinner1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_medium"
         android:layout_marginLeft="@dimen/margin_medium"
         android:layout_marginRight="@dimen/margin_medium"
         android:layout_marginTop="@dimen/margin_large"
-        android:layout_marginBottom="@dimen/margin_medium"
         android:spinnerMode="dialog"
         android:text="Germany"/>
 
@@ -21,9 +21,9 @@
         android:id="@+id/holidaySpinner2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_medium"
         android:layout_marginLeft="@dimen/margin_medium"
         android:layout_marginRight="@dimen/margin_medium"
-        android:layout_marginBottom="@dimen/margin_medium"
         android:spinnerMode="dialog"
         android:text="Bavaria"/>
 
@@ -31,9 +31,9 @@
         android:id="@+id/holidaySpinner3"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_medium"
         android:layout_marginLeft="@dimen/margin_medium"
         android:layout_marginRight="@dimen/margin_medium"
-        android:layout_marginBottom="@dimen/margin_medium"
         android:spinnerMode="dialog"
         android:text="Munich"/>
 

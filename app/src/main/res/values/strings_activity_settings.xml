@@ -6,7 +6,7 @@
     <string name="pref_ringtone_silent">Silent</string>
 
     <string name="pref_title_volume">Volume</string>
-    <string name="pref_summary_volume"><xliff:g id="level" example="80">%1$d</xliff:g>%%</string>
+    <string name="pref_summary_volume"><xliff:g example="80" id="level">%1$d</xliff:g>%%</string>
 
     <string name="pref_title_volume_increasing">Increasing volume</string>
     <string name="pref_summaryoff_volume_increasing">Don\'t increase volume</string>
@@ -17,7 +17,7 @@
     <string name="pref_summaryon_vibrate">Vibrate when ringing</string>
 
     <string name="pref_title_snooze_time">Snooze time</string>
-    <string name="pref_summary_snooze_time"><xliff:g id="minutes" example="3">%1$d</xliff:g> minutes</string>
+    <string name="pref_summary_snooze_time"><xliff:g example="3" id="minutes">%1$d</xliff:g> minutes</string>
 
     <string name="pref_title_near_future_time">Show notification before alarm</string>
 
