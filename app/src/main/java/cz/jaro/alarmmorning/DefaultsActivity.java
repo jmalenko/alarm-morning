@@ -85,7 +85,7 @@ public class DefaultsActivity extends AppCompatActivity implements View.OnCreate
         Analytics analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Defaults);
 
         GlobalManager globalManager = GlobalManager.getInstance();
-        globalManager.saveAlarmTimeDefault(defaults, analytics);
+        globalManager.saveDefault(defaults, analytics);
 
         adapter.notifyDataSetChanged();
     }

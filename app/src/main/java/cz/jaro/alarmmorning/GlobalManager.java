@@ -492,8 +492,12 @@ public class GlobalManager {
      * 7. Handle calendar activity
      */
 
-    public void saveAlarmTime(Day day, Analytics analytics) {
-        Log.d(TAG, "saveAlarmTime()");
+    public Day loadDay(Calendar date) {
+        return dataSource.loadDay(date);
+    }
+
+    public void saveDay(Day day, Analytics analytics) {
+        Log.d(TAG, "saveDay()");
 
         Context context = AlarmMorningApplication.getAppContext();
         analytics.setContext(context);
@@ -514,8 +518,12 @@ public class GlobalManager {
         onAlarmSet();
     }
 
-    public void saveAlarmTimeDefault(Defaults defaults, Analytics analytics) {
-        Log.d(TAG, "saveAlarmTimeDefault()");
+    public Defaults loadDefault(int dayOfWeek) {
+        return dataSource.loadDefault(dayOfWeek);
+    }
+
+    public void saveDefault(Defaults defaults, Analytics analytics) {
+        Log.d(TAG, "saveDefault()");
 
         Context context = AlarmMorningApplication.getAppContext();
         analytics.setContext(context);
@@ -863,22 +871,6 @@ public class GlobalManager {
         Intent intent = new Intent(context, AlarmMorningActivity.class);
         intent.setAction(action);
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
-    }
-
-    public Defaults loadDefault(int dayOfWeek) {
-        return dataSource.loadDefault(dayOfWeek);
-    }
-
-    public void saveDefault(Defaults defaults) {
-        dataSource.saveDefault(defaults);
-    }
-
-    public Day loadDay(Calendar date) {
-        return dataSource.loadDay(date);
-    }
-
-    public void saveDay(Day day) {
-        dataSource.saveDay(day);
     }
 
     /**

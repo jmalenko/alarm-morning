@@ -105,7 +105,7 @@ public class SetTimeActivity extends AppCompatActivity implements TimePickerDial
         day.setMinute(saveAlarmTime.get(Calendar.MINUTE));
 
         // Save
-        globalManager.saveAlarmTime(day, analytics);
+        globalManager.saveDay(day, analytics);
 
         // Show toast
         if (showToast) {
