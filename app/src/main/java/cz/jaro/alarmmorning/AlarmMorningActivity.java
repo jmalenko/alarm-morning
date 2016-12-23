@@ -19,13 +19,11 @@ package cz.jaro.alarmmorning;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.app.FragmentManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -43,11 +41,9 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 
 import cz.jaro.alarmmorning.wizard.Wizard;
 
-public class AlarmMorningActivity extends AppCompatActivity implements ActivityInterface {
+public class AlarmMorningActivity extends AppCompatActivity {
 
     private static final String TAG = AlarmMorningActivity.class.getSimpleName();
-
-    private FirebaseAnalytics mFirebaseAnalytics;
 
     public static final String ACTION_ALARM_SET = "ALARM_SET";
     public static final String ACTION_DISMISS_BEFORE_RINGING = "DISMISS_BEFORE_RINGING";
@@ -108,18 +104,25 @@ public class AlarmMorningActivity extends AppCompatActivity implements ActivityI
 
             if (mFragment instanceof CalendarFragment) {
                 CalendarFragment calendarFragment = (CalendarFragment) mFragment;
-                if (action.equals(ACTION_ALARM_SET)) {
-                    calendarFragment.onAlarmSet();
-                } else if (action.equals(ACTION_DISMISS_BEFORE_RINGING)) {
-                    calendarFragment.onDismissBeforeRinging();
-                } else if (action.equals(ACTION_ALARM_TIME_OF_EARLY_DISMISSED_ALARM)) {
-                    calendarFragment.onAlarmTimeOfEarlyDismissedAlarm();
-                } else if (action.equals(ACTION_RING)) {
-                    calendarFragment.onRing();
-                } else if (action.equals(ACTION_DISMISS)) {
-                    calendarFragment.onDismiss();
-                } else if (action.equals(ACTION_SNOOZE)) {
-                    calendarFragment.onSnooze();
+                switch (action) {
+                    case ACTION_ALARM_SET:
+                        calendarFragment.onAlarmSet();
+                        break;
+                    case ACTION_DISMISS_BEFORE_RINGING:
+                        calendarFragment.onDismissBeforeRinging();
+                        break;
+                    case ACTION_ALARM_TIME_OF_EARLY_DISMISSED_ALARM:
+                        calendarFragment.onAlarmTimeOfEarlyDismissedAlarm();
+                        break;
+                    case ACTION_RING:
+                        calendarFragment.onRing();
+                        break;
+                    case ACTION_DISMISS:
+                        calendarFragment.onDismiss();
+                        break;
+                    case ACTION_SNOOZE:
+                        calendarFragment.onSnooze();
+                        break;
                 }
             }
         }
@@ -137,7 +140,7 @@ public class AlarmMorningActivity extends AppCompatActivity implements ActivityI
             startActivityForResult(wizardIntent, REQUEST_CODE_WIZARD);
         }
 
-        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        FirebaseAnalytics mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         Bundle payload = new Bundle();
         payload.putString(FirebaseAnalytics.Param.VALUE, TAG);
@@ -179,8 +182,7 @@ public class AlarmMorningActivity extends AppCompatActivity implements ActivityI
         bManager.registerReceiver(bReceiver, s_intentFilterInternal);
 
         if (savedInstanceState == null) {
-            CalendarFragment calendarFragment = new CalendarFragment();
-            mFragment = calendarFragment;
+            mFragment = new CalendarFragment();
             getFragmentManager().beginTransaction().replace(R.id.content_frame, mFragment).commit();
 
             // Highlight the menu item
@@ -213,14 +215,10 @@ public class AlarmMorningActivity extends AppCompatActivity implements ActivityI
     }
 
     private void setupDrawerContent(NavigationView navigationView) {
-        navigationView.setNavigationItemSelectedListener(
-                new NavigationView.OnNavigationItemSelectedListener() {
-                    @Override
-                    public boolean onNavigationItemSelected(MenuItem menuItem) {
-                        onOptionsItemSelected(menuItem);
-                        return true;
-                    }
-                });
+        navigationView.setNavigationItemSelectedListener(menuItem -> {
+            onOptionsItemSelected(menuItem);
+            return true;
+        });
 
         MenuItem calendarMenuItem = mNavigationView.getMenu().getItem(0);
         setFragmentTitle(calendarMenuItem.getTitle());
@@ -280,8 +278,7 @@ public class AlarmMorningActivity extends AppCompatActivity implements ActivityI
                 return true;
 
             case R.id.navigation_calendar:
-                CalendarFragment calendarFragment = new CalendarFragment();
-                mFragment = calendarFragment;
+                mFragment = new CalendarFragment();
 
                 // Insert the mFragment by replacing any existing mFragment
                 getFragmentManager().beginTransaction().replace(R.id.content_frame, mFragment).commit();
@@ -329,30 +326,4 @@ public class AlarmMorningActivity extends AppCompatActivity implements ActivityI
         // Pass any configuration change to the drawer toggls
         mDrawerToggle.onConfigurationChanged(newConfig);
     }
-
-    @Override
-    public Context getContextI() {
-        return this;
-    }
-
-    @Override
-    public FragmentManager getFragmentManagerI() {
-        return getFragmentManager();
-    }
-
-    @Override
-    public Resources getResourcesI() {
-        return getResources();
-    }
-
-}
-
-interface ActivityInterface {
-
-    Context getContextI();
-
-    FragmentManager getFragmentManagerI();
-
-    Resources getResourcesI();
-
 }

@@ -17,8 +17,8 @@ public class NighttimeBellAlarmReceiver extends BroadcastReceiver {
     /**
      * Delegate to NighttimeBell class.
      *
-     * @param context
-     * @param intent
+     * @param context Context
+     * @param intent  Intent
      */
     @Override
     public void onReceive(Context context, Intent intent) {

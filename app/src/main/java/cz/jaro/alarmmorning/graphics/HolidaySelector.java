@@ -232,7 +232,7 @@ public class HolidaySelector extends LinearLayout implements AdapterView.OnItemS
     /**
      * Set the path.
      *
-     * @param path
+     * @param path Path
      */
     public void setPath(String path) {
         updateView(path);

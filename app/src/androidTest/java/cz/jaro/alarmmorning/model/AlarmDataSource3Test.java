@@ -6,6 +6,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import cz.jaro.alarmmorning.Analytics;
 import cz.jaro.alarmmorning.GlobalManager;
 
 import static cz.jaro.alarmmorning.model.AlarmDataSourceTest.DAY;
@@ -24,6 +25,7 @@ public class AlarmDataSource3Test extends AndroidTestCase {
     public void setUp() throws Exception {
         super.setUp();
         globalManager = GlobalManager.getInstance();
+        Analytics analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
 
         for (int i = 0; i < DAYS; i++) {
             Day day = new Day();
@@ -31,7 +33,7 @@ public class AlarmDataSource3Test extends AndroidTestCase {
             day.setDate(new GregorianCalendar(YEAR, MONTH, DAY + i));
             day.setHour(HOUR_DAY);
             day.setMinute(MINUTE_DAY);
-            globalManager.saveDay(day);
+            globalManager.saveDay(day, analytics);
         }
     }
 
@@ -115,7 +117,7 @@ public class AlarmDataSource3Test extends AndroidTestCase {
     }
 
     public void test_getAlarmsInPeriod_one_rightBorder() {
-        Calendar from = new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DAY, MINUTE_DAY-1);
+        Calendar from = new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DAY, MINUTE_DAY - 1);
         Calendar to = new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DAY, MINUTE_DAY);
         List<Calendar> alarmTimes = globalManager.getAlarmsInPeriod(from, to);
 

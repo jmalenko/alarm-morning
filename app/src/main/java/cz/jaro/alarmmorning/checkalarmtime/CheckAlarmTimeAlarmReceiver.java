@@ -17,8 +17,8 @@ public class CheckAlarmTimeAlarmReceiver extends BroadcastReceiver {
     /**
      * Delegate to CheckAlarmTime class.
      *
-     * @param context
-     * @param intent
+     * @param context Context
+     * @param intent  Intent
      */
     @Override
     public void onReceive(Context context, Intent intent) {

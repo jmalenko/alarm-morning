@@ -676,17 +676,17 @@ public class Analytics {
     }
 
     public static String calendarToUTC(Calendar calendar) {
-        SimpleDateFormat sdfTime = new SimpleDateFormat(DATE_FORMAT_UTC);
+        SimpleDateFormat sdfTime = new SimpleDateFormat(DATE_FORMAT_UTC, Locale.US);
         return sdfTime.format(calendar.getTime());
     }
 
     public static String calendarToDate(Calendar calendar) {
-        SimpleDateFormat sdfTime = new SimpleDateFormat(DATE_FORMAT);
+        SimpleDateFormat sdfTime = new SimpleDateFormat(DATE_FORMAT, Locale.US);
         return sdfTime.format(calendar.getTime());
     }
 
     public static String calendarToTime(Calendar calendar) {
-        SimpleDateFormat sdfTime = new SimpleDateFormat(TIME_FORMAT);
+        SimpleDateFormat sdfTime = new SimpleDateFormat(TIME_FORMAT, Locale.US);
         return sdfTime.format(calendar.getTime());
     }
 

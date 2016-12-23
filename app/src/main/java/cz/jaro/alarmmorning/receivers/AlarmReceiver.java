@@ -19,8 +19,8 @@ public class AlarmReceiver extends BroadcastReceiver {
     /**
      * The wake lock must be received when the used ends the RingActivity. That is done in {@link RingActivity#stopAll()}
      *
-     * @param context
-     * @param intent
+     * @param context Context
+     * @param intent  Intent
      */
     @Override
     public void onReceive(Context context, Intent intent) {

@@ -155,7 +155,7 @@ public class CustomAlarmTone {
             if (setAsDefault) {
                 // Update the preference if set to default
                 String ringtonePreference = preferences.getString(SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE, SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE_DEFAULT);
-                if (ringtonePreference == null || ringtonePreference.equals(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM).toString())) {
+                if (ringtonePreference.equals(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM).toString())) {
                     editor.putString(SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE, newUri.toString());
                 }
             }

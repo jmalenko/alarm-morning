@@ -27,7 +27,6 @@ public class SystemAlarm {
     private Context context;
     private AlarmManager alarmManager;
 
-    private Intent intent;
     private PendingIntent operation;
 
     /**
@@ -67,7 +66,7 @@ public class SystemAlarm {
 
         saveNextAction(nextAction);
 
-        intent = new Intent(context, AlarmReceiver.class);
+        Intent intent = new Intent(context, AlarmReceiver.class);
         intent.setAction(nextAction.action);
 
         operation = PendingIntent.getBroadcast(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);

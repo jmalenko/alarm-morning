@@ -22,7 +22,7 @@ import com.github.paolorotolo.appintro.ISlideSelectionListener;
 import cz.jaro.alarmmorning.R;
 
 /**
- * Created by jmalenko on 11.8.2016.
+ * Parent fragment for all fragments in the {@link Wizard}.
  */
 public abstract class BaseFragment extends Fragment implements ISlideSelectionListener, ISlideBackgroundColorHolder {
 

@@ -17,7 +17,7 @@ import com.github.paolorotolo.appintro.AppIntro;
 import java.util.ArrayList;
 
 /**
- * Created by jmalenko on 11.8.2016.
+ * Wizard contains several fragments that allow the user to quickly configure the app.
  */
 public class Wizard extends AppIntro {
 
@@ -59,9 +59,9 @@ public class Wizard extends AppIntro {
         String[] missingPermissions = calcMissingPermissions();
         boolean allPermissionsGranted = missingPermissions.length == 0;
         if (!allPermissionsGranted) {
-            StringBuffer missingPermissionsStr = new StringBuffer(missingPermissions[0]);
+            StringBuilder missingPermissionsStr = new StringBuilder(missingPermissions[0]);
             for (int i = 1; i < missingPermissions.length; i++) {
-                missingPermissionsStr.append(", " + missingPermissions[i]);
+                missingPermissionsStr.append(", ").append(missingPermissions[i]);
             }
             Log.v(TAG, "Following permissions are not granted: " + missingPermissionsStr);
 

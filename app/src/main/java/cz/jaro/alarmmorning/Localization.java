@@ -64,7 +64,7 @@ public class Localization {
     private static String dayOfWeekToShortStringAlgo(int dayOfWeek) {
         Calendar date = Calendar.getInstance();
         date.set(Calendar.DAY_OF_WEEK, dayOfWeek);
-        SimpleDateFormat sdf = new SimpleDateFormat("E");
+        SimpleDateFormat sdf = new SimpleDateFormat("E", Locale.US);
         sdf.setCalendar(date);
         return sdf.format(date.getTime());
     }
@@ -115,7 +115,7 @@ public class Localization {
     private static String dayOfWeekToStringAlgo(int dayOfWeek) {
         Calendar date = Calendar.getInstance();
         date.set(Calendar.DAY_OF_WEEK, dayOfWeek);
-        SimpleDateFormat sdf = new SimpleDateFormat("EEEE");
+        SimpleDateFormat sdf = new SimpleDateFormat("EEEE", Locale.US);
         sdf.setCalendar(date);
         return sdf.format(date.getTime());
     }
@@ -191,7 +191,7 @@ public class Localization {
      * @return the time as string
      */
     private static String timeToStringFormat(Date date, String format) {
-        SimpleDateFormat sdf = new SimpleDateFormat(format);
+        SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.US);
         return sdf.format(date);
     }
 

@@ -121,13 +121,10 @@ public class GlobalManager {
             Log.v(TAG, "   loading the ringing or snoozed alarm");
             day = dataSource.loadDay(clock().now());
         } else {
-            day = getNextAlarm(clock(), new DayFilter() {
-                @Override
-                public boolean match(Day day) {
-                    Log.v(TAG, "   checking filter condition for " + day.getDateTime().getTime());
-                    int state = getState(day.getDateTime());
-                    return state != GlobalManager.STATE_DISMISSED_BEFORE_RINGING && state != GlobalManager.STATE_DISMISSED;
-                }
+            day = getNextAlarm(clock(), day1 -> {
+                Log.v(TAG, "   checking filter condition for " + day1.getDateTime().getTime());
+                int state = getState(day1.getDateTime());
+                return state != GlobalManager.STATE_DISMISSED_BEFORE_RINGING && state != GlobalManager.STATE_DISMISSED;
             });
         }
 
@@ -168,11 +165,7 @@ public class GlobalManager {
 
     private boolean afterNearFuture() {
         NextAction nextAction = getNextAction();
-        if (nextAction.alarmTime != null) {
-            return afterNearFuture(nextAction.alarmTime);
-        } else {
-            return false;
-        }
+        return nextAction.alarmTime != null && afterNearFuture(nextAction.alarmTime);
     }
 
     public boolean afterNearFuture(Calendar alarmTime) {
@@ -297,7 +290,7 @@ public class GlobalManager {
             return dismissedAlarms;
         } catch (JSONException e) {
             Log.w(TAG, "Error getting dismissed alarms", e);
-            return new HashSet<Long>();
+            return new HashSet<>();
         }
     }
 
@@ -320,6 +313,8 @@ public class GlobalManager {
     }
 
     /**
+     * Decides the state of the alarm.
+     * <p>
      * Algorithm:
      * <p>
      * 1. if the alarmTime is for last alarm then return the state of last alarm (same as {@link #getState()})
@@ -330,8 +325,8 @@ public class GlobalManager {
      * <p>
      * 4. if the alarmTime is in future then return {@link #STATE_FUTURE}
      *
-     * @param alarmTime
-     * @return
+     * @param alarmTime Alarm time
+     * @return The state of the alarm
      */
     public int getState(Calendar alarmTime) {
         Log.v(TAG, "getState(alarmTime=" + alarmTime.getTime() + ")");
@@ -348,7 +343,7 @@ public class GlobalManager {
 
         // Condition 2
         Set<Long> dismissedAlarms = getDismissedAlarms();
-        if (dismissedAlarms.contains(alarmTime)) {
+        if (dismissedAlarms.contains(alarmTime.getTimeInMillis())) {
             Log.v(TAG, "   is among dismissed => DISMISSED");
             return STATE_DISMISSED;
         }
@@ -365,7 +360,7 @@ public class GlobalManager {
     }
 
     private Set<Long> jsonToSet(JSONArray jsonArray) throws JSONException {
-        Set<Long> set = new HashSet<Long>(jsonArray.length());
+        Set<Long> set = new HashSet<>(jsonArray.length());
         for (int i = 0; i < jsonArray.length(); i++) {
             set.add(jsonArray.getLong(i));
         }
@@ -401,7 +396,7 @@ public class GlobalManager {
             NextAction nextAction = systemAlarm.calcNextAction(clock());
             NextAction nextActionPersisted = getNextAction();
 
-            if (nextActionPersisted.action != ACTION_UNDEFINED) {
+            if (!nextActionPersisted.action.equals(ACTION_UNDEFINED)) {
                 Log.w(TAG, "The next system alarm changed while the app was not running.\n" +
                         "   Persisted is action=" + nextActionPersisted.action + ", time=" + nextActionPersisted.time.getTime() + ", alarmTime=" + nextActionPersisted.alarmTime.getTime() + "\n" +
                         "   Current is   action=" + nextAction.action + ", time=" + nextAction.time.getTime() + ", alarmTime=" + nextAction.alarmTime.getTime());
@@ -763,8 +758,8 @@ public class GlobalManager {
     }
 
     /**
-     * @param analytics
-     * @return time when the alarm will ring again
+     * @param analytics Analytics with filled {@link Analytics.Channel} and {@link Analytics.ChannelName} fields. Other fields will be filled by this method.
+     * @return Time when the alarm will ring again
      */
     public Calendar onSnooze(Analytics analytics) {
         Log.d(TAG, "onSnooze()");

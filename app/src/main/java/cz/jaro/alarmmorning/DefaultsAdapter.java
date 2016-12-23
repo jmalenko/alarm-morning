@@ -20,7 +20,7 @@ public class DefaultsAdapter extends RecyclerView.Adapter<DefaultsAdapter.Defaul
     /**
      * Initialize the Adapter.
      *
-     * @param activity
+     * @param activity Activity that contains the widget that uses this adapter
      */
     public DefaultsAdapter(DefaultsActivity activity) {
         this.activity = activity;

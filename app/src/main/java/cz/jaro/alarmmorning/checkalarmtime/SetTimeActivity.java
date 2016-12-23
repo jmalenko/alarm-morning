@@ -2,7 +2,6 @@ package cz.jaro.alarmmorning.checkalarmtime;
 
 import android.app.TimePickerDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.format.DateFormat;
@@ -63,11 +62,7 @@ public class SetTimeActivity extends AppCompatActivity implements TimePickerDial
         int minute = newAlarmTime.get(Calendar.MINUTE);
 
         TimePickerDialog timePickerDialog = new TimePickerDialog(this, this, hourOfDay, minute, DateFormat.is24HourFormat(this));
-        timePickerDialog.setOnDismissListener(new DialogInterface.OnDismissListener() { // Not that the Cancel button is handled via OnDismissListener
-            public void onDismiss(DialogInterface dialog) {
-                finish();
-            }
-        });
+        timePickerDialog.setOnDismissListener(dialog -> finish()); // The Cancel button is handled via OnDismissListener
         timePickerDialog.show();
     }
 

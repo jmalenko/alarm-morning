@@ -8,7 +8,7 @@ public abstract class CalendarEventFilter {
     /**
      * Decide whether an {@code event} satisfies a condition. The condition is implemented in the body of this method.
      *
-     * @param event
+     * @param event Event
      * @return true if the {@code event} matches match
      */
     public abstract boolean match(CalendarEvent event);

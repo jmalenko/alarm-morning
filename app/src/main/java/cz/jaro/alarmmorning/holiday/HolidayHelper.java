@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -48,7 +47,7 @@ public class HolidayHelper {
     private static HolidayHelper instance;
     private Context context;
 
-    HolidayHelper() {
+    private HolidayHelper() {
         context = findContext();
     }
 
@@ -152,13 +151,9 @@ public class HolidayHelper {
         }
 
         // Sort
-        List<Holiday> orderedHolidays = new ArrayList<Holiday>(holidays);
-        Collections.sort(orderedHolidays, new Comparator<Holiday>() {
-            @Override
-            public int compare(Holiday lhs, Holiday rhs) {
-                return lhs.getDate().compareTo(rhs.getDate());
-            }
-        });
+        List<Holiday> orderedHolidays = new ArrayList<>(holidays);
+        Collections.sort(orderedHolidays,
+                (lhs, rhs) -> lhs.getDate().compareTo(rhs.getDate()));
 
         return orderedHolidays;
     }
@@ -171,7 +166,7 @@ public class HolidayHelper {
      */
     public String preferenceToDisplayName(String path) {
         if (useHoliday(path)) {
-            StringBuffer displayName = new StringBuffer();
+            StringBuilder displayName = new StringBuilder();
 
             String[] ids = path.split("\\.");
 
@@ -489,7 +484,7 @@ class Region {
     String description;
 
     boolean isTop() {
-        return parentPath == PATH_TOP;
+        return parentPath.equals(PATH_TOP);
     }
 
     String getFullPath() {

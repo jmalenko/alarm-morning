@@ -35,52 +35,63 @@ public class NotificationReceiver extends BroadcastReceiver {
 
         GlobalManager globalManager = GlobalManager.getInstance();
 
-        if (action == ACTION_CLICK_NOTIFICATION) {
-            Analytics analytics = new Analytics(context, Analytics.Event.Click, Analytics.Channel.Notification, Analytics.ChannelName.Alarm);
-            analytics.setDay(globalManager.getDayWithNextAlarmToRing());
-            analytics.save();
+        switch (action) {
+            case ACTION_CLICK_NOTIFICATION: {
+                Analytics analytics = new Analytics(context, Analytics.Event.Click, Analytics.Channel.Notification, Analytics.ChannelName.Alarm);
+                analytics.setDay(globalManager.getDayWithNextAlarmToRing());
+                analytics.save();
 
-            String activity = intent.getStringExtra(NotificationReceiver.EXTRA_ACTIVITY);
-            if (activity == null) {
-                Intent calendarIntent = new Intent(context, AlarmMorningActivity.class);
-                calendarIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                context.startActivity(calendarIntent);
-            } else if (activity.equals(NotificationReceiver.EXTRA_ACTIVITY__RING)) {
-                Intent ringIntent = new Intent(context, RingActivity.class);
-                ringIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.putExtra(RingActivity.ALARM_TIME, intent.getSerializableExtra(RingActivity.ALARM_TIME));
-                context.startActivity(ringIntent);
-            } else {
-                throw new IllegalArgumentException("Unexpected argument " + activity);
+                String activity = intent.getStringExtra(NotificationReceiver.EXTRA_ACTIVITY);
+                if (activity == null) {
+                    Intent calendarIntent = new Intent(context, AlarmMorningActivity.class);
+                    calendarIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    context.startActivity(calendarIntent);
+                } else if (activity.equals(NotificationReceiver.EXTRA_ACTIVITY__RING)) {
+                    Intent ringIntent = new Intent(context, RingActivity.class);
+                    ringIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.putExtra(RingActivity.ALARM_TIME, intent.getSerializableExtra(RingActivity.ALARM_TIME));
+                    context.startActivity(ringIntent);
+                } else {
+                    throw new IllegalArgumentException("Unexpected argument " + activity);
+                }
+                break;
             }
-        } else if (action == ACTION_DELETE_NOTIFICATION) {
-            Analytics analytics = new Analytics(context, Analytics.Event.Hide, Analytics.Channel.Notification, Analytics.ChannelName.Alarm);
-            analytics.setDay(globalManager.getDayWithNextAlarmToRing());
-            analytics.save();
+            case ACTION_DELETE_NOTIFICATION: {
+                Analytics analytics = new Analytics(context, Analytics.Event.Hide, Analytics.Channel.Notification, Analytics.ChannelName.Alarm);
+                analytics.setDay(globalManager.getDayWithNextAlarmToRing());
+                analytics.save();
 
-            deleteNotification(context);
-        } else if (action == ACTION_DISMISS_BEFORE_RINGING) {
-            Log.i(TAG, "Dismiss");
+                deleteNotification();
+                break;
+            }
+            case ACTION_DISMISS_BEFORE_RINGING: {
+                Log.i(TAG, "Dismiss");
 
-            Analytics analytics = new Analytics(Analytics.Channel.Notification, Analytics.ChannelName.Alarm);
+                Analytics analytics = new Analytics(Analytics.Channel.Notification, Analytics.ChannelName.Alarm);
 
-            globalManager.onDismissBeforeRinging(analytics);
-        } else if (action == ACTION_DISMISS) {
-            Log.i(TAG, "Dismiss");
+                globalManager.onDismissBeforeRinging(analytics);
+                break;
+            }
+            case ACTION_DISMISS: {
+                Log.i(TAG, "Dismiss");
 
-            Analytics analytics = new Analytics(Analytics.Channel.Notification, Analytics.ChannelName.Alarm);
+                Analytics analytics = new Analytics(Analytics.Channel.Notification, Analytics.ChannelName.Alarm);
 
-            globalManager.onDismiss(analytics);
-        } else if (action == ACTION_SNOOZE) {
-            Log.i(TAG, "Snooze");
+                globalManager.onDismiss(analytics);
+                break;
+            }
+            case ACTION_SNOOZE: {
+                Log.i(TAG, "Snooze");
 
-            Analytics analytics = new Analytics(Analytics.Channel.Notification, Analytics.ChannelName.Alarm);
+                Analytics analytics = new Analytics(Analytics.Channel.Notification, Analytics.ChannelName.Alarm);
 
-            globalManager.onSnooze(analytics);
+                globalManager.onSnooze(analytics);
+                break;
+            }
         }
     }
 
-    private void deleteNotification(Context context) {
+    private void deleteNotification() {
         Log.v(TAG, "deleteNotification()");
         Log.i(TAG, "Delete notification");
     }

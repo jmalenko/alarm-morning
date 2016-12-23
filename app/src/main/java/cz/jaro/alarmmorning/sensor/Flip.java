@@ -16,7 +16,7 @@ public class Flip extends SensorEventDetector {
 
     private static final String TAG = Flip.class.getSimpleName();
 
-    private final float THRESHOLD = 5; // when the device is still facing up and flips, the value goes from 9.81 do -9.81
+    private final static float THRESHOLD = 5; // when the device is still facing up and flips, the value goes from 9.81 do -9.81
 
     private boolean mInitialized;
     private boolean mUp;

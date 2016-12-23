@@ -85,8 +85,6 @@ public class RingActivity extends Activity implements RingInterface {
     LocalBroadcastManager bManager;
     private static IntentFilter b_intentFilter;
 
-    private SlideButton dismissButton;
-
     private Blink blink;
 
     static {
@@ -137,12 +135,9 @@ public class RingActivity extends Activity implements RingInterface {
             // Code below is to handle presses of Volume up or Volume down.
             // Without this, after pressing volume buttons, the navigation bar will show up and won't hide.
             final View decorView = getWindow().getDecorView();
-            decorView.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
-                @Override
-                public void onSystemUiVisibilityChange(int visibility) {
-                    if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
-                        decorView.setSystemUiVisibility(flags);
-                    }
+            decorView.setOnSystemUiVisibilityChangeListener(visibility -> {
+                if ((visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0) {
+                    decorView.setSystemUiVisibility(flags);
                 }
             });
         }
@@ -156,13 +151,8 @@ public class RingActivity extends Activity implements RingInterface {
             this.mAlarmTime = alarmTime;
         }
 
-        dismissButton = (SlideButton) findViewById(R.id.dismissButton);
-        dismissButton.setSlideButtonListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onDismiss(view);
-            }
-        });
+        SlideButton dismissButton = (SlideButton) findViewById(R.id.dismissButton);
+        dismissButton.setSlideButtonListener(this::onDismiss);
 
         startAll();
     }
@@ -200,15 +190,15 @@ public class RingActivity extends Activity implements RingInterface {
 
     public void onDismiss(View view) {
         Log.i(TAG, "Dismiss");
-        doDismiss(view.getContext());
+        doDismiss();
     }
 
     public void onSnooze(View view) {
         Log.i(TAG, "Snooze");
-        doSnooze(view.getContext());
+        doSnooze();
     }
 
-    public void doDismiss(Context context) {
+    public void doDismiss() {
         Log.d(TAG, "doDismiss()");
 
         stopAll();
@@ -224,7 +214,7 @@ public class RingActivity extends Activity implements RingInterface {
         blink.initiateFinish();
     }
 
-    public void doSnooze(Context context) {
+    public void doSnooze() {
         Log.d(TAG, "doSnooze()");
 
         stopAll();
@@ -370,13 +360,7 @@ public class RingActivity extends Activity implements RingInterface {
         handlerContent.start();
     }
 
-    private Runnable runnableContent = new Runnable() {
-        @Override
-        public void run() {
-            updateContent();
-        }
-    };
-    private HandlerOnClockChange handlerContent = new HandlerOnClockChange(runnableContent, Calendar.MINUTE);
+    private HandlerOnClockChange handlerContent = new HandlerOnClockChange(this::updateContent, Calendar.MINUTE);
 
     private void stopContent() {
         Log.d(TAG, "stopContent()");
@@ -823,12 +807,12 @@ public class RingActivity extends Activity implements RingInterface {
 
             case SettingsActivity.PREF_ACTION_SNOOZE:
                 Log.i(TAG, "Snooze");
-                doSnooze(getBaseContext());
+                doSnooze();
                 return;
 
             case SettingsActivity.PREF_ACTION_DISMISS:
                 Log.i(TAG, "Dismiss");
-                doDismiss(getBaseContext());
+                doDismiss();
                 return;
 
             default:

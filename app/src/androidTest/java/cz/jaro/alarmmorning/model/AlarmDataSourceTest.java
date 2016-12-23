@@ -5,6 +5,7 @@ import android.test.AndroidTestCase;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+import cz.jaro.alarmmorning.Analytics;
 import cz.jaro.alarmmorning.GlobalManager;
 
 public class AlarmDataSourceTest extends AndroidTestCase {
@@ -22,26 +23,13 @@ public class AlarmDataSourceTest extends AndroidTestCase {
     public static final int MINUTE_DEFAULT = 0;
 
     private GlobalManager globalManager;
-    private Defaults defaults;
-    private Day day;
+    private Analytics analytics;
 
     @Override
     public void setUp() throws Exception {
         super.setUp();
         globalManager = GlobalManager.getInstance();
-
-        defaults = new Defaults();
-        defaults.setState(Defaults.STATE_ENABLED);
-        defaults.setDayOfWeek(DAY_OF_WEEK);
-        defaults.setHour(HOUR_DEFAULT);
-        defaults.setMinute(MINUTE_DEFAULT);
-
-        day = new Day();
-        day.setState(Day.STATE_ENABLED);
-        day.setDate(new GregorianCalendar(YEAR, MONTH, DAY));
-        day.setHour(HOUR_DAY);
-        day.setMinute(MINUTE_DAY);
-        day.setDefaults(defaults);
+        analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
     }
 
     public void test_Defaults_2writes() {
@@ -53,7 +41,7 @@ public class AlarmDataSourceTest extends AndroidTestCase {
         defaults1a.setHour(HOUR_DEFAULT);
         defaults1a.setMinute(MINUTE_DEFAULT);
 
-        globalManager.saveDefault(defaults1a);
+        globalManager.saveDefault(defaults1a, analytics);
 
         Defaults defaults1b = globalManager.loadDefault(defaults1a.getDayOfWeek());
 
@@ -70,7 +58,7 @@ public class AlarmDataSourceTest extends AndroidTestCase {
         defaults2a.setHour(HOUR_DEFAULT + 1);
         defaults2a.setMinute(MINUTE_DEFAULT + 1);
 
-        globalManager.saveDefault(defaults2a);
+        globalManager.saveDefault(defaults2a, analytics);
 
         Defaults defaults2b = globalManager.loadDefault(defaults2a.getDayOfWeek());
 
@@ -89,7 +77,7 @@ public class AlarmDataSourceTest extends AndroidTestCase {
         day1a.setHour(HOUR_DEFAULT);
         day1a.setMinute(MINUTE_DEFAULT);
 
-        globalManager.saveDay(day1a);
+        globalManager.saveDay(day1a, analytics);
 
         Day day1b = globalManager.loadDay(day1a.getDate());
 
@@ -107,7 +95,7 @@ public class AlarmDataSourceTest extends AndroidTestCase {
         day2a.setHour(HOUR_DEFAULT + 1);
         day2a.setMinute(MINUTE_DEFAULT + 1);
 
-        globalManager.saveDay(day2a);
+        globalManager.saveDay(day2a, analytics);
 
         Day day2b = globalManager.loadDay(day2a.getDate());
 

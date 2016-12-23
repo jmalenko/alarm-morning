@@ -1,12 +1,7 @@
 package cz.jaro.alarmmorning;
 
-/**
- * Created by ext93831 on 26.1.2016.
- */
-
 import android.app.Fragment;
 import android.app.TimePickerDialog;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -32,7 +27,7 @@ import cz.jaro.alarmmorning.graphics.SimpleDividerItemDecoration;
 import cz.jaro.alarmmorning.model.Day;
 
 /**
- * Fragment that appears in the "content_frame"
+ * Fragment that appears in the "content_frame".
  */
 public class CalendarFragment extends Fragment implements View.OnClickListener, TimePickerDialog.OnTimeSetListener {
 
@@ -41,7 +36,6 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     protected CalendarAdapter adapter;
 
     private RecyclerView recyclerView;
-    private RecyclerView.LayoutManager layoutManager;
 
     private Calendar today;
     private Day day;
@@ -51,12 +45,6 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     private static final int POSITION_UNSET = -1;
 
     private HandlerOnClockChange handler = new HandlerOnClockChange();
-    private Runnable runnable = new Runnable() {
-        @Override
-        public void run() {
-            onSystemTimeChange();
-        }
-    };
 
     public CalendarFragment() {
         // Empty constructor required for fragment subclasses
@@ -69,11 +57,10 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         recyclerView = (RecyclerView) rootView.findViewById(R.id.calendar_recycler_view);
 
         // use a linear layout manager
-        layoutManager = new LinearLayoutManager(getActivity());
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
 
         // specify an adapter
-        ActivityInterface activityInterface = (ActivityInterface) getActivity();
         adapter = new CalendarAdapter(this);
         recyclerView.setAdapter(adapter);
 
@@ -103,7 +90,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         }
 
         // handler for refreshing the content
-        handler.start(runnable, Calendar.SECOND);
+        handler.start(this::onSystemTimeChange, Calendar.SECOND);
 
         // Refresh all the alarm times. Solves this scenario: Given displayed calendar, when set alarm by voice, then the calendar must refresh.
         adapter.notifyDataSetChanged();
@@ -496,7 +483,6 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
                 Analytics analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
 
-                Context context = getActivity();
                 GlobalManager globalManager = GlobalManager.getInstance();
                 globalManager.onDismissBeforeRinging(analytics);
                 break;
@@ -506,7 +492,6 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
                 Analytics analytics2 = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
 
-                Context context2 = getActivity();
                 GlobalManager globalManager2 = GlobalManager.getInstance();
                 globalManager2.onSnooze(analytics2);
                 break;

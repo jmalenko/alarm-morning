@@ -27,15 +27,12 @@ public class HandlerOnClockChange extends Handler {
 
     private Runnable runnable;
 
-    private final Runnable runnableOnClockChange = new Runnable() {
-        @Override
-        public void run() {
-            Log.d(TAG, "Clock (and time unit) changed");
+    private final Runnable runnableOnClockChange = () -> {
+        Log.d(TAG, "Clock (and time unit) changed");
 
-            runRunnable();
+        runRunnable();
 
-            registerNextClockChange();
-        }
+        registerNextClockChange();
     };
 
     private boolean isRunning;

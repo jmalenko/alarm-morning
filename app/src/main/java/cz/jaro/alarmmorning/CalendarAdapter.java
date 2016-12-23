@@ -24,7 +24,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
     /**
      * Initialize the Adapter.
      *
-     * @param fragment
+     * @param fragment Fragment that contains the widget that uses this adapter
      */
     public CalendarAdapter(CalendarFragment fragment) {
         this.fragment = fragment;

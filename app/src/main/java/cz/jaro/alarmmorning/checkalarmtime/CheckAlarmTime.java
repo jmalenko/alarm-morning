@@ -52,11 +52,7 @@ public class CheckAlarmTime {
     private Context context;
     private AlarmManager alarmManager;
 
-    private Intent intent;
     private PendingIntent operation;
-
-    private Intent intentDismissNotification;
-    private PendingIntent operationDismissNotification;
 
     /**
      * Action meaning: Check alarm time of the next alarm: compare it with the 1st calendar instance. If it is too close, offer the user to quickly change the
@@ -105,12 +101,12 @@ public class CheckAlarmTime {
     private void register(String stringValue) {
         Log.d(TAG, "register(stringValue=)" + stringValue);
 
-        Calendar checkAlarmTimeAt = calcNextOccurence(context, stringValue);
+        Calendar checkAlarmTimeAt = calcNextOccurence(stringValue);
 
         String action = ACTION_CHECK_ALARM_TIME;
         Log.i(TAG, "Setting system alarm at " + checkAlarmTimeAt.getTime().toString() + " with action " + action);
 
-        intent = new Intent(context, CheckAlarmTimeAlarmReceiver.class);
+        Intent intent = new Intent(context, CheckAlarmTimeAlarmReceiver.class);
         intent.setAction(action);
 
         operation = PendingIntent.getBroadcast(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -151,10 +147,10 @@ public class CheckAlarmTime {
         String action = ACTION_AUTO_HIDE_NOTIFICATION;
         Log.i(TAG, "Setting system alarm at " + time.getTime().toString() + " with action " + action);
 
-        intentDismissNotification = new Intent(context, CheckAlarmTimeAlarmReceiver.class);
+        Intent intentDismissNotification = new Intent(context, CheckAlarmTimeAlarmReceiver.class);
         intentDismissNotification.setAction(action);
 
-        operationDismissNotification = PendingIntent.getBroadcast(context, 1, intentDismissNotification, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent operationDismissNotification = PendingIntent.getBroadcast(context, 1, intentDismissNotification, PendingIntent.FLAG_UPDATE_CURRENT);
 
         alarmManager.set(AlarmManager.RTC, time.getTimeInMillis(), operationDismissNotification);
     }
@@ -164,12 +160,15 @@ public class CheckAlarmTime {
 
         Log.i(TAG, "Acting on CheckAlarmTime. action=" + action);
 
-        if (action.equals(ACTION_CHECK_ALARM_TIME)) {
-            onCheckAlarmTime();
-        } else if (action.equals(ACTION_AUTO_HIDE_NOTIFICATION)) {
-            onAutoHideNotification();
-        } else {
-            throw new IllegalArgumentException("Unexpected argument " + action);
+        switch (action) {
+            case ACTION_CHECK_ALARM_TIME:
+                onCheckAlarmTime();
+                break;
+            case ACTION_AUTO_HIDE_NOTIFICATION:
+                onAutoHideNotification();
+                break;
+            default:
+                throw new IllegalArgumentException("Unexpected argument " + action);
         }
     }
 
@@ -332,14 +331,13 @@ public class CheckAlarmTime {
     }
 
     /**
-     * Calculate the date and time of the next event that is occuring daily at {@code timePreference}.
+     * Calculate the date and time of the next event that is occurring daily at {@code timePreference}.
      *
-     * @param context        context
      * @param timePreference a string representation of {@link TimePreference} value
-     * @return
+     * @return Calendar with next event
      */
     @NonNull
-    static public Calendar calcNextOccurence(Context context, String timePreference) {
+    static public Calendar calcNextOccurence(String timePreference) {
         int hours = TimePreference.getHour(timePreference);
         int minutes = TimePreference.getMinute(timePreference);
 

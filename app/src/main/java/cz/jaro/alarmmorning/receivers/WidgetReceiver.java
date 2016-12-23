@@ -23,7 +23,7 @@ public class WidgetReceiver extends AppWidgetProvider {
 
         Log.v(TAG, "onReceive() action=" + action);
 
-        if (action == ACTION_WIDGET_CLICK) {
+        if (action.equals(ACTION_WIDGET_CLICK)) {
             new Analytics(context, Analytics.Event.Click, Analytics.Channel.Widget, Analytics.ChannelName.Widget_alarm_time).save();
 
             Intent calendarIntent = new Intent(context, AlarmMorningActivity.class);

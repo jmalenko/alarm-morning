@@ -7,7 +7,7 @@ import android.os.Bundle;
 import android.text.format.DateFormat;
 
 /**
- * Created by ext93831 on 29.12.2015.
+ * A dialog for choosing time.
  */
 public class TimePickerFragment extends DialogFragment {
 

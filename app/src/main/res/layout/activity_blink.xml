@@ -15,7 +15,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:gravity="center"
-        android:text="Set alarm at XXX XXX"
+        android:text="Set alarm at"
         android:textSize="48sp"/>
 
     <TextView

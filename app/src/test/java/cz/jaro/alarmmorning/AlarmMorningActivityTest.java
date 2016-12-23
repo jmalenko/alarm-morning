@@ -194,7 +194,7 @@ public class AlarmMorningActivityTest {
 
             String dayOfWeekText = Localization.dayOfWeekToStringShort(res, AlarmDataSource.allDaysOfWeek[(position + 1) % AlarmDataSource.allDaysOfWeek.length]); // week starts with Monday
 
-            assertThat(new Integer(position).toString() + textDayOfWeek.getText()).isEqualTo(new Integer(position).toString() + dayOfWeekText);
+            assertThat(Integer.toString(position) + textDayOfWeek.getText()).isEqualTo(Integer.toString(position) + dayOfWeekText);
         }
     }
 

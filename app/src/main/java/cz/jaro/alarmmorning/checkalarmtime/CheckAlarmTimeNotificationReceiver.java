@@ -35,51 +35,58 @@ public class CheckAlarmTimeNotificationReceiver extends BroadcastReceiver {
 
         Log.v(TAG, "onReceive() action=" + action);
 
-        if (action == ACTION_CHECK_ALARM_TIME_CLICK) {
-            new Analytics(context, Analytics.Event.Click, Analytics.Channel.Notification, Analytics.ChannelName.Check_alarm_time).save();
+        switch (action) {
+            case ACTION_CHECK_ALARM_TIME_CLICK:
+                new Analytics(context, Analytics.Event.Click, Analytics.Channel.Notification, Analytics.ChannelName.Check_alarm_time).save();
 
-            Intent calendarIntent = new Intent(context, AlarmMorningActivity.class);
-            calendarIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.startActivity(calendarIntent);
-        } else if (action == ACTION_CHECK_ALARM_TIME_DELETE) {
-            new Analytics(context, Analytics.Event.Hide, Analytics.Channel.Notification, Analytics.ChannelName.Check_alarm_time).save();
-        } else if (action == ACTION_CHECK_ALARM_TIME_SET_TO) {
-            // Read parameters from extra
-            long newAlarmTimeLong = intent.getLongExtra(EXTRA_NEW_ALARM_TIME, VALUE_UNSET);
-            if (newAlarmTimeLong == VALUE_UNSET) {
-                throw new IllegalArgumentException("The " + EXTRA_NEW_ALARM_TIME + " extra must be set");
+                Intent calendarIntent = new Intent(context, AlarmMorningActivity.class);
+                calendarIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(calendarIntent);
+                break;
+            case ACTION_CHECK_ALARM_TIME_DELETE:
+                new Analytics(context, Analytics.Event.Hide, Analytics.Channel.Notification, Analytics.ChannelName.Check_alarm_time).save();
+                break;
+            case ACTION_CHECK_ALARM_TIME_SET_TO: {
+                // Read parameters from extra
+                long newAlarmTimeLong = intent.getLongExtra(EXTRA_NEW_ALARM_TIME, VALUE_UNSET);
+                if (newAlarmTimeLong == VALUE_UNSET) {
+                    throw new IllegalArgumentException("The " + EXTRA_NEW_ALARM_TIME + " extra must be set");
+                }
+
+                Calendar newAlarmTime = Calendar.getInstance();
+                newAlarmTime.setTimeInMillis(newAlarmTimeLong);
+
+                Log.i(TAG, "Set alarm time to " + newAlarmTime.getTime());
+                Analytics analytics = new Analytics(Analytics.Channel.Notification, Analytics.ChannelName.Check_alarm_time).set(Analytics.Param.Check_alarm_time_method, CHECK_ALARM_TIME_METHOD__QUICK);
+
+                SetTimeActivity.save(context, newAlarmTime, analytics);
+                break;
             }
+            case ACTION_CHECK_ALARM_TIME_SET_DIALOG: {
+                // Read parameters from extra
+                long newAlarmTimeLong = intent.getLongExtra(EXTRA_NEW_ALARM_TIME, VALUE_UNSET);
+                if (newAlarmTimeLong == VALUE_UNSET) {
+                    throw new IllegalArgumentException("The " + EXTRA_NEW_ALARM_TIME + " extra must be set");
+                }
 
-            Calendar newAlarmTime = Calendar.getInstance();
-            newAlarmTime.setTimeInMillis(newAlarmTimeLong);
+                Log.i(TAG, "Show dialog to set alarm time");
 
-            Log.i(TAG, "Set alarm time to " + newAlarmTime.getTime());
-            Analytics analytics = new Analytics(Analytics.Channel.Notification, Analytics.ChannelName.Check_alarm_time).set(Analytics.Param.Check_alarm_time_method, CHECK_ALARM_TIME_METHOD__QUICK);
+                // Start activity
+                Intent dialogIntent = new Intent(context, SetTimeActivity.class);
+                dialogIntent.putExtra(CheckAlarmTimeNotificationReceiver.EXTRA_NEW_ALARM_TIME, newAlarmTimeLong);
+                dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                dialogIntent.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+                dialogIntent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+                dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                context.startActivity(dialogIntent);
 
-            SetTimeActivity.save(context, newAlarmTime, analytics);
-        } else if (action == ACTION_CHECK_ALARM_TIME_SET_DIALOG) {
-            // Read parameters from extra
-            long newAlarmTimeLong = intent.getLongExtra(EXTRA_NEW_ALARM_TIME, VALUE_UNSET);
-            if (newAlarmTimeLong == VALUE_UNSET) {
-                throw new IllegalArgumentException("The " + EXTRA_NEW_ALARM_TIME + " extra must be set");
+                // Collapse Android notification tray
+                Intent it = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
+                context.sendBroadcast(it);
+                break;
             }
-
-            Log.i(TAG, "Show dialog to set alarm time");
-
-            // Start activity
-            Intent dialogIntent = new Intent(context, SetTimeActivity.class);
-            dialogIntent.putExtra(CheckAlarmTimeNotificationReceiver.EXTRA_NEW_ALARM_TIME, newAlarmTimeLong);
-            dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            dialogIntent.addFlags(Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
-            dialogIntent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
-            dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-            context.startActivity(dialogIntent);
-
-            // Collapse Android notification tray
-            Intent it = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
-            context.sendBroadcast(it);
-        } else {
-            throw new IllegalArgumentException("Unexpected argument " + action);
+            default:
+                throw new IllegalArgumentException("Unexpected argument " + action);
         }
 
         // Hide notification

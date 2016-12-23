@@ -138,13 +138,7 @@ public class WidgetProvider extends AppWidgetProvider {
      */
 
     private Context context;
-    private Runnable runnable = new Runnable() {
-        @Override
-        public void run() {
-            onDateChange();
-        }
-    };
-    private HandlerOnClockChange handler = new HandlerOnClockChange(runnable, Calendar.HOUR_OF_DAY);
+    private HandlerOnClockChange handler = new HandlerOnClockChange(this::onDateChange, Calendar.HOUR_OF_DAY);
 
     @Override
     public void onReceive(Context context, Intent intent) {

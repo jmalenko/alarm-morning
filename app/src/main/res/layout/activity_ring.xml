@@ -44,9 +44,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="@dimen/margin_medium"
         android:layout_marginLeft="@dimen/margin_medium"
         android:layout_marginRight="@dimen/margin_medium"
+        android:layout_marginTop="@dimen/margin_medium"
         android:gravity="center"
         android:text="Next appointment: 8:00 Dentist"
         />
@@ -70,6 +70,7 @@
             android:layout_gravity="center_horizontal"
             android:layout_marginBottom="@dimen/margin_medium"
             android:background="@drawable/snooze_button"
+            android:contentDescription="@string/action_snooze"
             android:onClick="onSnooze"
             />
 

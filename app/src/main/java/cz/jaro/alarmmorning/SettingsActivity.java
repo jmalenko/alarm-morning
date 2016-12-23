@@ -153,60 +153,51 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
         // Start/stop CheckAlarmTime
 
-        Preference prefCheckAlarmTime = (Preference) findPreference(PREF_CHECK_ALARM_TIME);
-        prefCheckAlarmTime.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object newValue) {
-                analytics(preference, newValue);
+        Preference prefCheckAlarmTime = findPreference(PREF_CHECK_ALARM_TIME);
+        prefCheckAlarmTime.setOnPreferenceChangeListener((preference, newValue) -> {
+            analytics(preference, newValue);
 
-                boolean boolValue = (boolean) newValue;
-                CheckAlarmTime checkAlarmTime = CheckAlarmTime.getInstance(context);
-                if (boolValue) {
-                    Log.i(TAG, "Starting CheckAlarmTime");
-                    checkAlarmTime.register();
-                } else {
-                    Log.i(TAG, "Stopping CheckAlarmTime");
-                    checkAlarmTime.unregister();
-                }
-                return true;
+            boolean boolValue = (boolean) newValue;
+            CheckAlarmTime checkAlarmTime = CheckAlarmTime.getInstance(context);
+            if (boolValue) {
+                Log.i(TAG, "Starting CheckAlarmTime");
+                checkAlarmTime.register();
+            } else {
+                Log.i(TAG, "Stopping CheckAlarmTime");
+                checkAlarmTime.unregister();
             }
+            return true;
         });
 
         // Start/stop NighttimeBell
 
-        Preference prefNighttimeBell = (Preference) findPreference(PREF_NIGHTTIME_BELL);
-        prefNighttimeBell.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-            @Override
-            public boolean onPreferenceChange(Preference preference, Object newValue) {
-                analytics(preference, newValue);
+        Preference prefNighttimeBell = findPreference(PREF_NIGHTTIME_BELL);
+        prefNighttimeBell.setOnPreferenceChangeListener((preference, newValue) -> {
+            analytics(preference, newValue);
 
-                boolean boolValue = (boolean) newValue;
-                NighttimeBell nighttimeBell = NighttimeBell.getInstance(context);
-                if (boolValue) {
-                    Log.i(TAG, "Starting NighttimeBell");
-                    nighttimeBell.register();
-                } else {
-                    Log.i(TAG, "Stopping NighttimeBell");
-                    nighttimeBell.unregister();
-                }
-                return true;
+            boolean boolValue = (boolean) newValue;
+            NighttimeBell nighttimeBell = NighttimeBell.getInstance(context);
+            if (boolValue) {
+                Log.i(TAG, "Starting NighttimeBell");
+                nighttimeBell.register();
+            } else {
+                Log.i(TAG, "Stopping NighttimeBell");
+                nighttimeBell.unregister();
             }
+            return true;
         });
 
-        Preference prefStartWizard = (Preference) findPreference(PREF_START_WIZARD);
-        prefStartWizard.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                Analytics analytics = new Analytics(preference.getContext(), Analytics.Event.Start,
-                        Analytics.Channel.Activity, Analytics.ChannelName.Settings);
-                analytics.set(Analytics.Param.Target, Analytics.TARGET__WIZARD);
-                analytics.save();
+        Preference prefStartWizard = findPreference(PREF_START_WIZARD);
+        prefStartWizard.setOnPreferenceClickListener(preference -> {
+            Analytics analytics = new Analytics(preference.getContext(), Analytics.Event.Start,
+                    Analytics.Channel.Activity, Analytics.ChannelName.Settings);
+            analytics.set(Analytics.Param.Target, Analytics.TARGET__WIZARD);
+            analytics.save();
 
-                Intent intent = new Intent(context, Wizard.class);
-                startActivityForResult(intent, REQUEST_CODE_WIZARD);
+            Intent intent = new Intent(context, Wizard.class);
+            startActivityForResult(intent, REQUEST_CODE_WIZARD);
 
-                return true;
-            }
+            return true;
         });
     }
 
@@ -347,7 +338,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
                 preference.setSummary(summaryText);
             } else if (key.equals(PREF_ACTION_ON_BUTTON) || key.equals(PREF_ACTION_ON_MOVE) || key.equals(PREF_ACTION_ON_FLIP) || key.equals(PREF_ACTION_ON_SHAKE) || key.equals(PREF_ACTION_ON_PROXIMITY)) {
-                int intValue = new Integer(stringValue);
+                int intValue = Integer.valueOf(stringValue);
 
                 Context context = preference.getContext();
                 Resources res = context.getResources();
@@ -423,30 +414,46 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         String key = preference.getKey();
         SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(preference.getContext());
         Object newValue;
-        if (key.equals(PREF_RINGTONE)) {
-            newValue = defaultSharedPreferences.getString(preference.getKey(), PREF_RINGTONE_DEFAULT);
-        } else if (key.equals(PREF_VOLUME)) {
-            newValue = defaultSharedPreferences.getInt(preference.getKey(), PREF_VOLUME_DEFAULT);
-        } else if (key.equals(PREF_SNOOZE_TIME)) {
-            newValue = defaultSharedPreferences.getInt(preference.getKey(), PREF_SNOOZE_TIME_DEFAULT);
-        } else if (key.equals(PREF_NEAR_FUTURE_TIME)) {
-            newValue = defaultSharedPreferences.getInt(preference.getKey(), PREF_NEAR_FUTURE_TIME_DEFAULT);
-        } else if (key.equals(PREF_ACTION_ON_BUTTON) || key.equals(PREF_ACTION_ON_MOVE) || key.equals(PREF_ACTION_ON_FLIP) || key.equals(PREF_ACTION_ON_SHAKE) || key.equals(PREF_ACTION_ON_PROXIMITY)) {
-            newValue = defaultSharedPreferences.getString(preference.getKey(), PREF_ACTION_DEFAULT);
-        } else if (key.equals(PREF_CHECK_ALARM_TIME_AT)) {
-            newValue = defaultSharedPreferences.getString(preference.getKey(), PREF_CHECK_ALARM_TIME_AT_DEFAULT);
-        } else if (key.equals(PREF_CHECK_ALARM_TIME_GAP)) {
-            newValue = defaultSharedPreferences.getInt(preference.getKey(), PREF_CHECK_ALARM_TIME_GAP_DEFAULT);
-        } else if (key.equals(PREF_NIGHTTIME_BELL_AT)) {
-            newValue = defaultSharedPreferences.getString(preference.getKey(), PREF_NIGHTTIME_BELL_AT_DEFAULT);
-        } else if (key.equals(PREF_NIGHTTIME_BELL_RINGTONE)) {
-            newValue = defaultSharedPreferences.getString(preference.getKey(), PREF_NIGHTTIME_BELL_RINGTONE_DEFAULT);
-        } else if (key.equals(PREF_NAP_TIME)) {
-            newValue = defaultSharedPreferences.getInt(preference.getKey(), PREF_NAP_TIME_DEFAULT);
-        } else if (key.equals(PREF_HOLIDAY)) {
-            newValue = defaultSharedPreferences.getString(preference.getKey(), PREF_HOLIDAY_DEFAULT);
-        } else {
-            throw new IllegalArgumentException("Unexpected argument " + key);
+        switch (key) {
+            case PREF_RINGTONE:
+                newValue = defaultSharedPreferences.getString(preference.getKey(), PREF_RINGTONE_DEFAULT);
+                break;
+            case PREF_VOLUME:
+                newValue = defaultSharedPreferences.getInt(preference.getKey(), PREF_VOLUME_DEFAULT);
+                break;
+            case PREF_SNOOZE_TIME:
+                newValue = defaultSharedPreferences.getInt(preference.getKey(), PREF_SNOOZE_TIME_DEFAULT);
+                break;
+            case PREF_NEAR_FUTURE_TIME:
+                newValue = defaultSharedPreferences.getInt(preference.getKey(), PREF_NEAR_FUTURE_TIME_DEFAULT);
+                break;
+            case PREF_ACTION_ON_BUTTON:
+            case PREF_ACTION_ON_MOVE:
+            case PREF_ACTION_ON_FLIP:
+            case PREF_ACTION_ON_SHAKE:
+            case PREF_ACTION_ON_PROXIMITY:
+                newValue = defaultSharedPreferences.getString(preference.getKey(), PREF_ACTION_DEFAULT);
+                break;
+            case PREF_CHECK_ALARM_TIME_AT:
+                newValue = defaultSharedPreferences.getString(preference.getKey(), PREF_CHECK_ALARM_TIME_AT_DEFAULT);
+                break;
+            case PREF_CHECK_ALARM_TIME_GAP:
+                newValue = defaultSharedPreferences.getInt(preference.getKey(), PREF_CHECK_ALARM_TIME_GAP_DEFAULT);
+                break;
+            case PREF_NIGHTTIME_BELL_AT:
+                newValue = defaultSharedPreferences.getString(preference.getKey(), PREF_NIGHTTIME_BELL_AT_DEFAULT);
+                break;
+            case PREF_NIGHTTIME_BELL_RINGTONE:
+                newValue = defaultSharedPreferences.getString(preference.getKey(), PREF_NIGHTTIME_BELL_RINGTONE_DEFAULT);
+                break;
+            case PREF_NAP_TIME:
+                newValue = defaultSharedPreferences.getInt(preference.getKey(), PREF_NAP_TIME_DEFAULT);
+                break;
+            case PREF_HOLIDAY:
+                newValue = defaultSharedPreferences.getString(preference.getKey(), PREF_HOLIDAY_DEFAULT);
+                break;
+            default:
+                throw new IllegalArgumentException("Unexpected argument " + key);
         }
         sBindPreferenceSummaryToValueListener.updateSummary(preference, newValue);
     }

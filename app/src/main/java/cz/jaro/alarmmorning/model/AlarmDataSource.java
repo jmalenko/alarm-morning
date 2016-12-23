@@ -12,6 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 
 /**
  * Store objects to a database.
@@ -19,7 +20,7 @@ import java.util.GregorianCalendar;
 public class AlarmDataSource {
     private static final String TAG = AlarmDataSource.class.getSimpleName();
 
-    private final SimpleDateFormat iso8601Format = new SimpleDateFormat("yyyy-MM-dd");
+    private final SimpleDateFormat iso8601Format = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
 
     private SQLiteDatabase database;
     private AlarmDbHelper dbHelper;
@@ -195,30 +196,40 @@ public class AlarmDataSource {
     }
 
     private String DBtoString() {
-        StringBuffer str = new StringBuffer();
+        StringBuilder str = new StringBuilder();
 
         Cursor cursor = database.query(AlarmDbHelper.TABLE_DEFAULTS, allColumnsDefaults, null, null, null, null, null);
-        str.append("Table Defaults, rows " + cursor.getCount() + "\n");
+        str.append("Table Defaults, rows ").append(cursor.getCount()).append("\n");
         str.append("id|DoW|Sta| H | M \n");
         str.append("--+---+---+---+-- \n");
 
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             Defaults defaults = cursorToDefaults(cursor);
-            str.append(" " + defaults.getId() + " | " + defaults.getDayOfWeek() + " | " + defaults.getState() + " | " + defaults.getHour() + " | " + defaults.getMinute() + "\n");
+            str.
+                    append(" ").append(defaults.getId()).
+                    append(" | ").append(defaults.getDayOfWeek()).
+                    append(" | ").append(defaults.getState()).
+                    append(" | ").append(defaults.getHour()).
+                    append(" | ").append(defaults.getMinute()).append("\n");
             cursor.moveToNext();
         }
         cursor.close();
 
         cursor = database.query(AlarmDbHelper.TABLE_DAY, allColumnsDay, null, null, null, null, null);
-        str.append("Table Day, rows " + cursor.getCount() + "\n");
+        str.append("Table Day, rows ").append(cursor.getCount()).append("\n");
         str.append("id| Date       |Sta| H | M \n");
         str.append("--+------------+---+---+---\n");
 
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
             Day day = cursorToDay(cursor);
-            str.append(" " + day.getId() + " | " + dateToText(day.getDate()) + " | " + day.getState() + " | " + day.getHour() + " | " + day.getMinute() + "\n");
+            str.
+                    append(" ").append(day.getId()).
+                    append(" | ").append(dateToText(day.getDate())).
+                    append(" | ").append(day.getState()).
+                    append(" | ").append(day.getHour()).
+                    append(" | ").append(day.getMinute()).append("\n");
             cursor.moveToNext();
         }
         cursor.close();

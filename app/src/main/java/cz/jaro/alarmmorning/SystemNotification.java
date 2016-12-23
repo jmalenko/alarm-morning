@@ -14,7 +14,7 @@ import cz.jaro.alarmmorning.model.Day;
 import cz.jaro.alarmmorning.receivers.NotificationReceiver;
 
 /**
- * Created by ext93831 on 18.1.2016.
+ * SystemNotification manages the notification about the alarm.
  */
 public class SystemNotification {
 

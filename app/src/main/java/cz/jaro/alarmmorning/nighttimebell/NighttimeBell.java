@@ -34,7 +34,6 @@ public class NighttimeBell {
     private Context context;
     private AlarmManager alarmManager;
 
-    private Intent intent;
     private PendingIntent operation;
 
     /**
@@ -77,12 +76,12 @@ public class NighttimeBell {
     private void register(String stringValue) {
         Log.d(TAG, "register(stringValue=)" + stringValue);
 
-        Calendar playNighttimeBellAt = CheckAlarmTime.calcNextOccurence(context, stringValue);
+        Calendar playNighttimeBellAt = CheckAlarmTime.calcNextOccurence(stringValue);
 
         String action = ACTION_PLAY;
         Log.i(TAG, "Setting system alarm at " + playNighttimeBellAt.getTime().toString() + " with action " + action);
 
-        intent = new Intent(context, NighttimeBellAlarmReceiver.class);
+        Intent intent = new Intent(context, NighttimeBellAlarmReceiver.class);
         intent.setAction(action);
 
         operation = PendingIntent.getBroadcast(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -156,12 +155,9 @@ public class NighttimeBell {
                 afd.close();
             }
 
-            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mp) {
-                    Log.d(TAG, "onCompletion");
-                    mp.release();
-                }
+            mediaPlayer.setOnCompletionListener(mp -> {
+                Log.d(TAG, "onCompletion");
+                mp.release();
             });
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
             mediaPlayer.prepare();

@@ -158,14 +158,14 @@ public class SetTimeSlide extends BaseFragment implements TimePicker.OnTimeChang
     }
 
     private void log(String message, List<Integer> times) {
-        StringBuffer str = new StringBuffer();
+        StringBuilder str = new StringBuilder();
         for (int time : times) {
             if (0 < str.length())
                 str.append(", ");
 
             int hour = RelativeTimePreference.valueToHour(time);
             int minute = RelativeTimePreference.valueToMinute(time);
-            str.append(hour + ":" + minute);
+            str.append(hour).append(":").append(minute);
         }
         Log.d(TAG, message + ": " + str);
     }
