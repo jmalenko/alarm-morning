@@ -29,6 +29,8 @@
     <string name="holidays_none">None</string>
     <string name="holidays_all">All</string>
     <string name="holidays_list_title">List of holidays:</string>
+    <string name="holidays_recommendations">We recommend one of the automatically detected countries:</string>
+    <string name="holidays_setting">Actual setting:</string>
 
     <!-- Ring activity -->
     <string name="title_activity_ring">Alarm</string>

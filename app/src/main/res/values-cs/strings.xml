@@ -29,6 +29,8 @@
     <string name="holidays_none">Žádné</string>
     <string name="holidays_all">Všechny</string>
     <string name="holidays_list_title">Seznam svátků:</string>
+    <string name="holidays_recommendations">Doporučujeme jednu z následujících automaticky detekovaných zemí:</string>
+    <string name="holidays_setting">Nastavená země:</string>
 
     <!-- Ring activity -->
     <string name="title_activity_ring">Budík</string>

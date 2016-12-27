@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import java.util.List;
 
@@ -21,6 +22,9 @@ public class SetHolidaySlide extends BaseFragment {
     private static final String TAG = SetHolidaySlide.class.getSimpleName();
 
     private HolidaySelector holidaySelector;
+    private LinearLayout recommendationContainer;
+
+    private boolean firstSelection = true;
 
     @Nullable
     @Override
@@ -29,6 +33,8 @@ public class SetHolidaySlide extends BaseFragment {
 
         holidaySelector = (HolidaySelector) view.findViewById(R.id.holidaySelector);
         holidaySelector.setListVisibility(View.GONE);
+
+        recommendationContainer = (LinearLayout) view.findViewById(R.id.recommendationContainer);
 
         // Preset
         String holidayPreference;
@@ -49,8 +55,25 @@ public class SetHolidaySlide extends BaseFragment {
     }
 
     @Override
+    public void onSlideSelected() {
+        super.onSlideSelected();
+
+        if (firstSelection) {
+            if (!Wizard.loadWizardFinished(getContext())) {
+                if (recommendationContainer.getChildCount() > 0) {
+                    View v = recommendationContainer.getChildAt(0);
+                    String countryCode = (String) v.getTag(R.id.button_tag_country_code);
+
+                    holidaySelector.setPath(countryCode);
+                }
+            }
+            firstSelection = false;
+        }
+    }
+
+    @Override
     public void onSlideDeselected() {
-        Log.v(TAG, "onSlideDeselected()");
+        super.onSlideDeselected();
 
         String holidayCalendarPreferenceString = holidaySelector.getPath();
 

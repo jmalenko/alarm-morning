@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <item
+        name="button_tag_country_code"
+        type="id"/>
+
+    <item
+        name="button_tag_quality"
+        type="id"/>
+
+</resources>

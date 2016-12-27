@@ -1,23 +1,35 @@
 package cz.jaro.alarmmorning.graphics;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
+import android.os.Looper;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import cz.jaro.alarmmorning.Localization;
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.holiday.HolidayAdapter;
 import cz.jaro.alarmmorning.holiday.HolidayHelper;
+import cz.jaro.alarmmorning.holiday.regiondetector.GPSLocationProviderRegionDetector;
+import cz.jaro.alarmmorning.holiday.regiondetector.IPRegionDetector;
+import cz.jaro.alarmmorning.holiday.regiondetector.LocaleRegionDetector;
+import cz.jaro.alarmmorning.holiday.regiondetector.LocationProviderRegionDetector;
+import cz.jaro.alarmmorning.holiday.regiondetector.NetworkLocationProviderRegionDetector;
+import cz.jaro.alarmmorning.holiday.regiondetector.RegionDetector;
+import cz.jaro.alarmmorning.holiday.regiondetector.TelephonyRegionDetector;
+import cz.jaro.alarmmorning.wizard.Wizard;
 import de.jollyday.Holiday;
 
 /**
@@ -25,9 +37,12 @@ import de.jollyday.Holiday;
  * <p/>
  * Realized as three spinners (only the relevant are visible) and and text with list of nearest holidays.
  */
-public class HolidaySelector extends LinearLayout implements AdapterView.OnItemSelectedListener {
+public class HolidaySelector extends LinearLayout implements AdapterView.OnItemSelectedListener, RegionDetector.OnRegionChangeListener {
 
     private static final String TAG = HolidaySelector.class.getSimpleName();
+
+    private final LinearLayout recommendation;
+    private final LinearLayout recommendationContainer;
 
     private Spinner spinner1;
     private Spinner spinner2;
@@ -79,6 +94,12 @@ public class HolidaySelector extends LinearLayout implements AdapterView.OnItemS
         adapter3.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
         spinner3.setAdapter(adapter3);
         spinner3.setOnItemSelectedListener(this);
+
+        // Recommendations
+        recommendation = (LinearLayout) findViewById(R.id.recommendation);
+        recommendationContainer = (LinearLayout) findViewById(R.id.recommendationContainer);
+
+        startRegionDetectors();
     }
 
     @Override
@@ -91,8 +112,8 @@ public class HolidaySelector extends LinearLayout implements AdapterView.OnItemS
         // Source: http://stackoverflow.com/questions/5624825/spinner-onitemselected-executes-when-it-is-not-suppose-to/5918177#5918177
         // Addendum: After refactoring to a View, the initialization of all the spinners is not done at once. It is done just before the first usage in the
         // code. Therefore we need to store the initialization state of each spinner.
-        if (!spinnerInitialized[spinnerId-1]) {
-            spinnerInitialized[spinnerId-1] = true;
+        if (!spinnerInitialized[spinnerId - 1]) {
+            spinnerInitialized[spinnerId - 1] = true;
             return;
         }
 
@@ -241,4 +262,139 @@ public class HolidaySelector extends LinearLayout implements AdapterView.OnItemS
     public void setListVisibility(int visibility) {
         listOfHolidaysVisibility = visibility;
     }
+
+    private void startRegionDetectors() {
+        List<RegionDetector> regionDetectors = new ArrayList<>();
+
+        regionDetectors.add(new LocaleRegionDetector(getContext()));
+        regionDetectors.add(new TelephonyRegionDetector(getContext()));
+        regionDetectors.add(new IPRegionDetector(getContext()));
+        regionDetectors.add(new GPSLocationProviderRegionDetector(getContext()));
+        regionDetectors.add(new NetworkLocationProviderRegionDetector(getContext()));
+
+        for (RegionDetector regionDetector : regionDetectors) {
+            regionDetector.setOnRegionChangeListener(this);
+
+            // Run in a thread. Thread needed for parallel use of several RegionDetectors and to prevent NetworkOnMainThreadException.
+            Thread thread = new Thread() {
+                @Override
+                public void run() {
+                    // Looper needed because of GPSLocationProviderRegionDetector (which uses GPS)
+                    if (regionDetector instanceof LocationProviderRegionDetector)
+                        Looper.prepare();
+
+                    regionDetector.detect();
+
+                    if (regionDetector instanceof LocationProviderRegionDetector)
+                        Looper.loop();
+                }
+            };
+            thread.start();
+        }
+    }
+
+    @Override
+    public boolean onRegionChange(RegionDetector regionDetector, String countryCode, Object region) {
+        Log.d(TAG, "onRegionChange(regionDetector=" + regionDetector.getClass().getSimpleName() + ", countryCode=" + countryCode + ")");
+
+        // Smart fix of country codes
+        if (countryCode.equals("GB"))
+            countryCode = "UK";
+
+        // Is this region's holiday calendar available?
+        HolidayHelper holidayHelper = HolidayHelper.getInstance();
+        if (!holidayHelper.isPathValid(countryCode)) {
+            return true;
+        }
+
+        // The UI must be updated from the UI thread
+        Activity activity = (Activity) getContext();
+        final String finalCountryCode = countryCode;
+        activity.runOnUiThread(() -> {
+            int quality = regionDetectorQuality(regionDetector);
+
+            Button button = getButton(finalCountryCode);
+            if (button == null) { // Button for this region doesn't exist
+                String countryName = holidayHelper.preferenceToDisplayName(finalCountryCode);
+
+                // Create the button
+                button = new Button(getContext());
+                button.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+                button.setText(countryName);
+                button.setTag(R.id.button_tag_country_code, finalCountryCode);
+                button.setTag(R.id.button_tag_quality, quality);
+                button.setOnClickListener(v -> {
+                    String path = (String) v.getTag(R.id.button_tag_country_code);
+                    updateView(path);
+                });
+
+                int index = findTargetIndex(quality);
+                Log.v(TAG, "Adding " + finalCountryCode + " at index " + index);
+                recommendationContainer.addView(button, index);
+
+                // Show...
+                //    in Wizard shown for the 1st time: if there are 2 (or more) regions. Because the 1st resgion is preselected.
+                //    otherwise: if a detected region is different from the selected one
+                if (!Wizard.loadWizardFinished(getContext())) {
+                    if (recommendationContainer.getChildCount() == 2)
+                        recommendation.setVisibility(VISIBLE);
+                } else {
+                    if (!finalCountryCode.equals(getPath()))
+                        recommendation.setVisibility(VISIBLE);
+                }
+            } else {
+                int qualityButton = (int) button.getTag(R.id.button_tag_quality);
+                quality += qualityButton;
+                button.setTag(R.id.button_tag_quality, quality);
+
+                // TODO For RegionDetectors that detect region continuously, subtract quality from the previously detected region.
+
+                // Reorder
+                recommendationContainer.removeView(button);
+
+                int index = findTargetIndex(quality);
+                Log.v(TAG, "Moving " + finalCountryCode + " to index " + index);
+                recommendationContainer.addView(button, index);
+            }
+        });
+
+        return true;
+    }
+
+    private int findTargetIndex(int qualityButton) {
+        for (int index = 0; index < recommendationContainer.getChildCount(); index++) {
+            View v = recommendationContainer.getChildAt(index);
+            int quality = (int) v.getTag(R.id.button_tag_quality);
+
+            if (qualityButton > quality)
+                return index;
+        }
+        return recommendationContainer.getChildCount();
+    }
+
+    private Button getButton(String countryCode) {
+        for (int index = 0; index < recommendationContainer.getChildCount(); index++) {
+            View v = recommendationContainer.getChildAt(index);
+            String countryCode2 = (String) v.getTag(R.id.button_tag_country_code);
+            if (countryCode.equals(countryCode2))
+                return (Button) v;
+        }
+        return null;
+    }
+
+    private int regionDetectorQuality(RegionDetector regionDetector) {
+        if (regionDetector instanceof LocaleRegionDetector)
+            return 1;
+        else if (regionDetector instanceof TelephonyRegionDetector)
+            return 1;
+        else if (regionDetector instanceof IPRegionDetector)
+            return 5;
+        else if (regionDetector instanceof GPSLocationProviderRegionDetector)
+            return 10;
+        else if (regionDetector instanceof NetworkLocationProviderRegionDetector)
+            return 8;
+        else
+            throw new IllegalStateException("Unsupported region detector " + regionDetector.getClass().getSimpleName());
+    }
+
 }
