@@ -53,7 +53,7 @@
     <string name="wizard_set_time_description_bottom">O víkendu bude budík vypnutý.</string>
 
     <string name="wizard_set_holidays_title">Nastavit svátky</string>
-    <string name="wizard_set_holidays_description">Ve svátek je budík vyplnutý. Zvolte svou zemi.</string>
+    <string name="wizard_set_holidays_description">Ve svátek je budík vypnutý. Zvolte svou zemi.</string>
 
     <string name="wizard_set_actions_title">Nastavit akce při zvonění</string>
     <string name="wizard_set_actions_description">Také můžete reagovat na stisk klávesy nebo senzor vzdálenosti.</string>
