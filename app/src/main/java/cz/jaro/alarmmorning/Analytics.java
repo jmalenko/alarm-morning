@@ -488,7 +488,6 @@ public class Analytics {
             conf.put("configuration_locale", configuration.locale);
 
             conf.put("settingsSystem_time_12_24", Settings.System.getString(mContext.getContentResolver(), Settings.System.TIME_12_24));
-            conf.put("settingsSystem_sys_prop_setting_version", Settings.System.getString(mContext.getContentResolver(), Settings.System.SYS_PROP_SETTING_VERSION));
 
             // Locale
             Locale locale = Locale.getDefault();
