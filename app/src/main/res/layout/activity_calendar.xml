@@ -9,7 +9,7 @@
     <include
         layout="@layout/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content" />
 
     <android.support.v4.widget.DrawerLayout
         android:id="@+id/drawer_layout"
@@ -28,7 +28,7 @@
             <FrameLayout
                 android:id="@+id/content_frame"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
+                android:layout_height="match_parent" />
         </LinearLayout>
 
         <!-- The navigation drawer -->
@@ -38,8 +38,9 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="start"
+            android:layout_marginTop="0dp"
             android:background="@color/primary_dark"
             app:itemBackground="@drawable/activated_background"
-            app:menu="@menu/drawer"/>
+            app:menu="@menu/drawer" />
     </android.support.v4.widget.DrawerLayout>
 </LinearLayout>
