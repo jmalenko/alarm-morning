@@ -121,10 +121,13 @@ public class GlobalManager {
             Log.v(TAG, "   loading the ringing or snoozed alarm");
             day = dataSource.loadDay(clock().now());
         } else {
-            day = getNextAlarm(clock(), day1 -> {
-                Log.v(TAG, "   checking filter condition for " + day1.getDateTime().getTime());
-                int state = getState(day1.getDateTime());
-                return state != GlobalManager.STATE_DISMISSED_BEFORE_RINGING && state != GlobalManager.STATE_DISMISSED;
+            day = getNextAlarm(clock(), new DayFilter() { // TODO Hotfix - Roboelectric doesn't allow shadow of a class with lambda
+                @Override
+                public boolean match(Day day) {
+                    Log.v(TAG, "   checking filter condition for " + day.getDateTime().getTime());
+                    int state = getState(day.getDateTime());
+                    return state != GlobalManager.STATE_DISMISSED_BEFORE_RINGING && state != GlobalManager.STATE_DISMISSED;
+                }
             });
         }
 
