@@ -3,7 +3,7 @@ package cz.jaro.alarmmorning.holiday;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import java.util.List;
@@ -19,7 +19,7 @@ import static org.junit.Assert.assertThat;
  * <p/>
  * Implemented as instrumentation test because the HolidayHelper needs Context to handle preferences and localized strings (when no calendar is selected).
  */
-@RunWith(RobolectricGradleTestRunner.class)
+@RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class, manifest = "app/src/main/AndroidManifest.xml", sdk = 21)
 public class HolidayHelperTest {
 

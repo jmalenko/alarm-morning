@@ -14,7 +14,7 @@ import junit.framework.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
-import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
@@ -34,7 +34,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Test "when there is no alarm..."
  */
-@RunWith(RobolectricGradleTestRunner.class)
+@RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class, manifest = "app/src/main/AndroidManifest.xml", sdk = 21)
 public class AlarmMorningActivity0Test {
 
@@ -58,7 +58,7 @@ public class AlarmMorningActivity0Test {
             View item = recyclerView.getChildAt(position);
 
             TextView textTime = (TextView) item.findViewById(R.id.textTime);
-            assertThat(textTime.getText()).isEqualTo(shadowActivity.getResources().getString(R.string.alarm_unset));
+            assertThat(textTime.getText()).isEqualTo(activity.getResources().getString(R.string.alarm_unset));
         }
     }
 
@@ -91,7 +91,7 @@ public class AlarmMorningActivity0Test {
             assertThat(textDayOfWeekCal.getText()).isEqualTo(dayOfWeekText);
 
             TextView alarmTimeText = (TextView) item.findViewById(R.id.textTimeCal);
-            assertThat(alarmTimeText.getText()).isEqualTo(shadowActivity.getResources().getString(R.string.alarm_unset));
+            assertThat(alarmTimeText.getText()).isEqualTo(activity.getResources().getString(R.string.alarm_unset));
 
             TextView textDate = (TextView) item.findViewById(R.id.textDate);
             String dateText = Localization.dateToStringVeryShort(res, date.getTime());
