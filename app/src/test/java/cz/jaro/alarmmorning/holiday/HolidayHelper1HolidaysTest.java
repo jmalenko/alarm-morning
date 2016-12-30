@@ -12,7 +12,6 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 import cz.jaro.alarmmorning.BuildConfig;
-import cz.jaro.alarmmorning.model.Alarm0Test;
 import de.jollyday.Holiday;
 
 import static org.junit.Assert.assertEquals;
@@ -25,37 +24,36 @@ import static org.junit.Assert.assertEquals;
 public class HolidayHelper1HolidaysTest {
 
     public static final List<Calendar> holidays_Czech;
-
     static {
         holidays_Czech = new ArrayList<>();
         // 2016
-        holidays_Czech.add(new GregorianCalendar(Alarm0Test.YEAR, Calendar.JANUARY, 1));
-        holidays_Czech.add(new GregorianCalendar(Alarm0Test.YEAR, Calendar.MARCH, 27));
-        holidays_Czech.add(new GregorianCalendar(Alarm0Test.YEAR, Calendar.MARCH, 28));
-        holidays_Czech.add(new GregorianCalendar(Alarm0Test.YEAR, Calendar.MAY, 1));
-        holidays_Czech.add(new GregorianCalendar(Alarm0Test.YEAR, Calendar.MAY, 8));
-        holidays_Czech.add(new GregorianCalendar(Alarm0Test.YEAR, Calendar.JULY, 5));
-        holidays_Czech.add(new GregorianCalendar(Alarm0Test.YEAR, Calendar.JULY, 6));
-        holidays_Czech.add(new GregorianCalendar(Alarm0Test.YEAR, Calendar.SEPTEMBER, 28));
-        holidays_Czech.add(new GregorianCalendar(Alarm0Test.YEAR, Calendar.OCTOBER, 28));
-        holidays_Czech.add(new GregorianCalendar(Alarm0Test.YEAR, Calendar.NOVEMBER, 17));
-        holidays_Czech.add(new GregorianCalendar(Alarm0Test.YEAR, Calendar.DECEMBER, 24));
-        holidays_Czech.add(new GregorianCalendar(Alarm0Test.YEAR, Calendar.DECEMBER, 25));
-        holidays_Czech.add(new GregorianCalendar(Alarm0Test.YEAR, Calendar.DECEMBER, 26));
+        holidays_Czech.add(new GregorianCalendar(2016, Calendar.JANUARY, 1));
+        holidays_Czech.add(new GregorianCalendar(2016, Calendar.MARCH, 27));
+        holidays_Czech.add(new GregorianCalendar(2016, Calendar.MARCH, 28));
+        holidays_Czech.add(new GregorianCalendar(2016, Calendar.MAY, 1));
+        holidays_Czech.add(new GregorianCalendar(2016, Calendar.MAY, 8));
+        holidays_Czech.add(new GregorianCalendar(2016, Calendar.JULY, 5));
+        holidays_Czech.add(new GregorianCalendar(2016, Calendar.JULY, 6));
+        holidays_Czech.add(new GregorianCalendar(2016, Calendar.SEPTEMBER, 28));
+        holidays_Czech.add(new GregorianCalendar(2016, Calendar.OCTOBER, 28));
+        holidays_Czech.add(new GregorianCalendar(2016, Calendar.NOVEMBER, 17));
+        holidays_Czech.add(new GregorianCalendar(2016, Calendar.DECEMBER, 24));
+        holidays_Czech.add(new GregorianCalendar(2016, Calendar.DECEMBER, 25));
+        holidays_Czech.add(new GregorianCalendar(2016, Calendar.DECEMBER, 26));
         // 2017
-        holidays_Czech.add(new GregorianCalendar(Alarm0Test.YEAR + 1, Calendar.JANUARY, 1));
-        holidays_Czech.add(new GregorianCalendar(Alarm0Test.YEAR + 1, Calendar.APRIL, 16));
-        holidays_Czech.add(new GregorianCalendar(Alarm0Test.YEAR + 1, Calendar.APRIL, 17));
-        holidays_Czech.add(new GregorianCalendar(Alarm0Test.YEAR + 1, Calendar.MAY, 1));
-        holidays_Czech.add(new GregorianCalendar(Alarm0Test.YEAR + 1, Calendar.MAY, 8));
-        holidays_Czech.add(new GregorianCalendar(Alarm0Test.YEAR + 1, Calendar.JULY, 5));
-        holidays_Czech.add(new GregorianCalendar(Alarm0Test.YEAR + 1, Calendar.JULY, 6));
-        holidays_Czech.add(new GregorianCalendar(Alarm0Test.YEAR + 1, Calendar.SEPTEMBER, 28));
-        holidays_Czech.add(new GregorianCalendar(Alarm0Test.YEAR + 1, Calendar.OCTOBER, 28));
-        holidays_Czech.add(new GregorianCalendar(Alarm0Test.YEAR + 1, Calendar.NOVEMBER, 17));
-        holidays_Czech.add(new GregorianCalendar(Alarm0Test.YEAR + 1, Calendar.DECEMBER, 24));
-        holidays_Czech.add(new GregorianCalendar(Alarm0Test.YEAR + 1, Calendar.DECEMBER, 25));
-        holidays_Czech.add(new GregorianCalendar(Alarm0Test.YEAR + 1, Calendar.DECEMBER, 26));
+        holidays_Czech.add(new GregorianCalendar(2017, Calendar.JANUARY, 1));
+        holidays_Czech.add(new GregorianCalendar(2017, Calendar.APRIL, 16));
+        holidays_Czech.add(new GregorianCalendar(2017, Calendar.APRIL, 17));
+        holidays_Czech.add(new GregorianCalendar(2017, Calendar.MAY, 1));
+        holidays_Czech.add(new GregorianCalendar(2017, Calendar.MAY, 8));
+        holidays_Czech.add(new GregorianCalendar(2017, Calendar.JULY, 5));
+        holidays_Czech.add(new GregorianCalendar(2017, Calendar.JULY, 6));
+        holidays_Czech.add(new GregorianCalendar(2017, Calendar.SEPTEMBER, 28));
+        holidays_Czech.add(new GregorianCalendar(2017, Calendar.OCTOBER, 28));
+        holidays_Czech.add(new GregorianCalendar(2017, Calendar.NOVEMBER, 17));
+        holidays_Czech.add(new GregorianCalendar(2017, Calendar.DECEMBER, 24));
+        holidays_Czech.add(new GregorianCalendar(2017, Calendar.DECEMBER, 25));
+        holidays_Czech.add(new GregorianCalendar(2017, Calendar.DECEMBER, 26));
     }
 
     private HolidayHelper holidayHelper;
