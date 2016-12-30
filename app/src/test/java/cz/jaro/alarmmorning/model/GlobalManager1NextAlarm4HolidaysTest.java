@@ -46,8 +46,8 @@ public class GlobalManager1NextAlarm4HolidaysTest {
             Defaults defaults = new Defaults();
             defaults.setDayOfWeek(dayOfWeek);
             defaults.setState(Defaults.STATE_ENABLED);
-            defaults.setHour(GlobalManager1NextAlarm0NoAlarmTest.HOUR_DEFAULT);
-            defaults.setMinute(GlobalManager1NextAlarm0NoAlarmTest.MINUTE_DEFAULT);
+            defaults.setHour(DayTest.HOUR_DEFAULT);
+            defaults.setMinute(DayTest.MINUTE_DEFAULT);
 
             Analytics analytics = new Analytics(Analytics.Channel.Test, Analytics.ChannelName.Defaults);
 
@@ -64,8 +64,8 @@ public class GlobalManager1NextAlarm4HolidaysTest {
     public void t10_everyDayWIthoutHolidays() {
         globalManager.saveHoliday(SettingsActivity.PREF_HOLIDAY_NONE);
 
-        Calendar from = new GregorianCalendar(GlobalManager1NextAlarm0NoAlarmTest.YEAR, Calendar.JANUARY, 1);
-        Calendar to = new GregorianCalendar(GlobalManager1NextAlarm0NoAlarmTest.YEAR + 1, Calendar.JANUARY, 1);
+        Calendar from = new GregorianCalendar(DayTest.YEAR, Calendar.JANUARY, 1);
+        Calendar to = new GregorianCalendar(DayTest.YEAR + 1, Calendar.JANUARY, 1);
         for (Calendar date = (Calendar) from.clone(); date.before(to); date.add(Calendar.DATE, 1)) {
 
             FixedClock clock = new FixedClock(date);
@@ -77,8 +77,8 @@ public class GlobalManager1NextAlarm4HolidaysTest {
             assertThat("Year" + str, nextAlarm.get(Calendar.YEAR), is(date.get(Calendar.YEAR)));
             assertThat("Month" + str, nextAlarm.get(Calendar.MONTH), is(date.get(Calendar.MONTH)));
             assertThat("Date" + str, nextAlarm.get(Calendar.DAY_OF_MONTH), is(date.get(Calendar.DAY_OF_MONTH)));
-            assertThat("Hour" + str, nextAlarm.get(Calendar.HOUR_OF_DAY), is(GlobalManager1NextAlarm0NoAlarmTest.HOUR_DEFAULT));
-            assertThat("Minute" + str, nextAlarm.get(Calendar.MINUTE), is(GlobalManager1NextAlarm0NoAlarmTest.MINUTE_DEFAULT));
+            assertThat("Hour" + str, nextAlarm.get(Calendar.HOUR_OF_DAY), is(DayTest.HOUR_DEFAULT));
+            assertThat("Minute" + str, nextAlarm.get(Calendar.MINUTE), is(DayTest.MINUTE_DEFAULT));
         }
     }
 
@@ -86,72 +86,72 @@ public class GlobalManager1NextAlarm4HolidaysTest {
     public void t10a_NewYear_CZ() {
         globalManager.saveHoliday("CZ");
 
-        Calendar date = new GregorianCalendar(GlobalManager1NextAlarm0NoAlarmTest.YEAR, Calendar.JANUARY, 1, GlobalManager1NextAlarm0NoAlarmTest.HOUR, GlobalManager1NextAlarm0NoAlarmTest.MINUTE);
+        Calendar date = new GregorianCalendar(DayTest.YEAR, Calendar.JANUARY, 1, DayTest.HOUR, DayTest.MINUTE);
         FixedClock clock = new FixedClock(date);
 
         Calendar nextAlarm = globalManager.getNextAlarm(clock);
 
-        assertThat("Year", nextAlarm.get(Calendar.YEAR), is(GlobalManager1NextAlarm0NoAlarmTest.YEAR));
+        assertThat("Year", nextAlarm.get(Calendar.YEAR), is(DayTest.YEAR));
         assertThat("Month", nextAlarm.get(Calendar.MONTH), is(Calendar.JANUARY));
         assertThat("Date", nextAlarm.get(Calendar.DAY_OF_MONTH), is(2));
-        assertThat("Hour", nextAlarm.get(Calendar.HOUR_OF_DAY), is(GlobalManager1NextAlarm0NoAlarmTest.HOUR_DEFAULT));
-        assertThat("Minute", nextAlarm.get(Calendar.MINUTE), is(GlobalManager1NextAlarm0NoAlarmTest.MINUTE_DEFAULT));
+        assertThat("Hour", nextAlarm.get(Calendar.HOUR_OF_DAY), is(DayTest.HOUR_DEFAULT));
+        assertThat("Minute", nextAlarm.get(Calendar.MINUTE), is(DayTest.MINUTE_DEFAULT));
     }
 
     @Test
     public void t10b_EasterSunday_CZ() {
         globalManager.saveHoliday("CZ");
 
-        Calendar date = new GregorianCalendar(GlobalManager1NextAlarm0NoAlarmTest.YEAR, Calendar.MARCH, 27, GlobalManager1NextAlarm0NoAlarmTest.HOUR, GlobalManager1NextAlarm0NoAlarmTest.MINUTE);
+        Calendar date = new GregorianCalendar(DayTest.YEAR, Calendar.MARCH, 27, DayTest.HOUR, DayTest.MINUTE);
         FixedClock clock = new FixedClock(date);
 
         Calendar nextAlarm = globalManager.getNextAlarm(clock);
 
-        assertThat("Year", nextAlarm.get(Calendar.YEAR), is(GlobalManager1NextAlarm0NoAlarmTest.YEAR));
+        assertThat("Year", nextAlarm.get(Calendar.YEAR), is(DayTest.YEAR));
         assertThat("Month", nextAlarm.get(Calendar.MONTH), is(Calendar.MARCH));
         assertThat("Date", nextAlarm.get(Calendar.DAY_OF_MONTH), is(29));
-        assertThat("Hour", nextAlarm.get(Calendar.HOUR_OF_DAY), is(GlobalManager1NextAlarm0NoAlarmTest.HOUR_DEFAULT));
-        assertThat("Minute", nextAlarm.get(Calendar.MINUTE), is(GlobalManager1NextAlarm0NoAlarmTest.MINUTE_DEFAULT));
+        assertThat("Hour", nextAlarm.get(Calendar.HOUR_OF_DAY), is(DayTest.HOUR_DEFAULT));
+        assertThat("Minute", nextAlarm.get(Calendar.MINUTE), is(DayTest.MINUTE_DEFAULT));
     }
 
     @Test
     public void t10c_EasterMonday_CZ() {
         globalManager.saveHoliday("CZ");
 
-        Calendar date = new GregorianCalendar(GlobalManager1NextAlarm0NoAlarmTest.YEAR, Calendar.MARCH, 28, GlobalManager1NextAlarm0NoAlarmTest.HOUR, GlobalManager1NextAlarm0NoAlarmTest.MINUTE);
+        Calendar date = new GregorianCalendar(DayTest.YEAR, Calendar.MARCH, 28, DayTest.HOUR, DayTest.MINUTE);
         FixedClock clock = new FixedClock(date);
 
         Calendar nextAlarm = globalManager.getNextAlarm(clock);
 
-        assertThat("Year", nextAlarm.get(Calendar.YEAR), is(GlobalManager1NextAlarm0NoAlarmTest.YEAR));
+        assertThat("Year", nextAlarm.get(Calendar.YEAR), is(DayTest.YEAR));
         assertThat("Month", nextAlarm.get(Calendar.MONTH), is(Calendar.MARCH));
         assertThat("Date", nextAlarm.get(Calendar.DAY_OF_MONTH), is(29));
-        assertThat("Hour", nextAlarm.get(Calendar.HOUR_OF_DAY), is(GlobalManager1NextAlarm0NoAlarmTest.HOUR_DEFAULT));
-        assertThat("Minute", nextAlarm.get(Calendar.MINUTE), is(GlobalManager1NextAlarm0NoAlarmTest.MINUTE_DEFAULT));
+        assertThat("Hour", nextAlarm.get(Calendar.HOUR_OF_DAY), is(DayTest.HOUR_DEFAULT));
+        assertThat("Minute", nextAlarm.get(Calendar.MINUTE), is(DayTest.MINUTE_DEFAULT));
     }
 
     @Test
     public void t10d_LabourDay_CZ() {
         globalManager.saveHoliday("CZ");
 
-        Calendar date = new GregorianCalendar(GlobalManager1NextAlarm0NoAlarmTest.YEAR, Calendar.MAY, 1, GlobalManager1NextAlarm0NoAlarmTest.HOUR, GlobalManager1NextAlarm0NoAlarmTest.MINUTE);
+        Calendar date = new GregorianCalendar(DayTest.YEAR, Calendar.MAY, 1, DayTest.HOUR, DayTest.MINUTE);
         FixedClock clock = new FixedClock(date);
 
         Calendar nextAlarm = globalManager.getNextAlarm(clock);
 
-        assertThat("Year", nextAlarm.get(Calendar.YEAR), is(GlobalManager1NextAlarm0NoAlarmTest.YEAR));
+        assertThat("Year", nextAlarm.get(Calendar.YEAR), is(DayTest.YEAR));
         assertThat("Month", nextAlarm.get(Calendar.MONTH), is(Calendar.MAY));
         assertThat("Date", nextAlarm.get(Calendar.DAY_OF_MONTH), is(2));
-        assertThat("Hour", nextAlarm.get(Calendar.HOUR_OF_DAY), is(GlobalManager1NextAlarm0NoAlarmTest.HOUR_DEFAULT));
-        assertThat("Minute", nextAlarm.get(Calendar.MINUTE), is(GlobalManager1NextAlarm0NoAlarmTest.MINUTE_DEFAULT));
+        assertThat("Hour", nextAlarm.get(Calendar.HOUR_OF_DAY), is(DayTest.HOUR_DEFAULT));
+        assertThat("Minute", nextAlarm.get(Calendar.MINUTE), is(DayTest.MINUTE_DEFAULT));
     }
 
     @Test
     public void t11_everyDayWIthHolidays_CZ() {
         globalManager.saveHoliday("CZ");
 
-        Calendar from = new GregorianCalendar(GlobalManager1NextAlarm0NoAlarmTest.YEAR, Calendar.JANUARY, 1);
-        Calendar to = new GregorianCalendar(GlobalManager1NextAlarm0NoAlarmTest.YEAR + 1, Calendar.JANUARY, 1);
+        Calendar from = new GregorianCalendar(DayTest.YEAR, Calendar.JANUARY, 1);
+        Calendar to = new GregorianCalendar(DayTest.YEAR + 1, Calendar.JANUARY, 1);
         for (Calendar date = (Calendar) from.clone(); date.before(to); date.add(Calendar.DATE, 1)) {
             FixedClock clock = new FixedClock(date);
 
@@ -171,8 +171,8 @@ public class GlobalManager1NextAlarm4HolidaysTest {
                 assertThat("Month" + str, nextAlarm.get(Calendar.MONTH), is(date.get(Calendar.MONTH)));
                 assertThat("Date" + str, nextAlarm.get(Calendar.DAY_OF_MONTH), is(date.get(Calendar.DAY_OF_MONTH)));
             }
-            assertThat("Hour" + str, nextAlarm.get(Calendar.HOUR_OF_DAY), is(GlobalManager1NextAlarm0NoAlarmTest.HOUR_DEFAULT));
-            assertThat("Minute" + str, nextAlarm.get(Calendar.MINUTE), is(GlobalManager1NextAlarm0NoAlarmTest.MINUTE_DEFAULT));
+            assertThat("Hour" + str, nextAlarm.get(Calendar.HOUR_OF_DAY), is(DayTest.HOUR_DEFAULT));
+            assertThat("Minute" + str, nextAlarm.get(Calendar.MINUTE), is(DayTest.MINUTE_DEFAULT));
         }
     }
 

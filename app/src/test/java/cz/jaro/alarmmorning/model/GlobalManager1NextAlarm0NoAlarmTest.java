@@ -22,6 +22,10 @@ import cz.jaro.alarmmorning.SettingsActivity;
 import cz.jaro.alarmmorning.clock.FixedClock;
 import cz.jaro.alarmmorning.shadows.ShadowAlarmManagerAPI21;
 
+import static cz.jaro.alarmmorning.model.DayTest.HOUR_DAY;
+import static cz.jaro.alarmmorning.model.DayTest.HOUR_DEFAULT;
+import static cz.jaro.alarmmorning.model.DayTest.MINUTE_DAY;
+import static cz.jaro.alarmmorning.model.DayTest.MINUTE_DEFAULT;
 import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertNull;
 
@@ -36,19 +40,6 @@ import static org.junit.Assert.assertNull;
 public class GlobalManager1NextAlarm0NoAlarmTest {
 
     private GlobalManager globalManager;
-
-    // February 2016 starts with Monday
-    public static final int YEAR = 2016;
-    public static final int MONTH = Calendar.FEBRUARY;
-    public static final int DAY = 1;
-    public static final int HOUR = 1;
-    public static final int MINUTE = 0;
-
-    public static final int HOUR_DAY = 8;
-    public static final int MINUTE_DAY = 1;
-
-    public static final int HOUR_DEFAULT = AlarmDbHelper.DEFAULT_ALARM_HOUR;
-    public static final int MINUTE_DEFAULT = AlarmDbHelper.DEFAULT_ALARM_MINUTE;
 
     public static final int RANGE = 40; // Note: Large values result in longer run times
 
@@ -106,7 +97,7 @@ public class GlobalManager1NextAlarm0NoAlarmTest {
 
     @NonNull
     public static FixedClock clockTest() {
-        GregorianCalendar date = new GregorianCalendar(YEAR, MONTH, DAY);
+        GregorianCalendar date = new GregorianCalendar(DayTest.YEAR, DayTest.MONTH, DayTest.DAY);
         return new FixedClock(date);
     }
 

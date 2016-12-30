@@ -1,8 +1,5 @@
 package cz.jaro.alarmmorning.model;
 
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,8 +17,8 @@ import cz.jaro.alarmmorning.AlarmMorningActivity;
 import cz.jaro.alarmmorning.AlarmMorningActivityTest;
 import cz.jaro.alarmmorning.BuildConfig;
 import cz.jaro.alarmmorning.GlobalManager;
-import cz.jaro.alarmmorning.SettingsActivity;
 import cz.jaro.alarmmorning.clock.Clock;
+import cz.jaro.alarmmorning.shadows.ShadowAlarmManagerAPI21;
 
 import static cz.jaro.alarmmorning.holiday.HolidayHelperTest.DE;
 import static org.hamcrest.core.Is.is;
@@ -31,20 +28,22 @@ import static org.junit.Assert.assertThat;
  * This tests do not depend on {@link Clock}.
  */
 @RunWith(RobolectricTestRunner.class)
-@Config(constants = BuildConfig.class, manifest = "app/src/main/AndroidManifest.xml", sdk = 21)
+@Config(constants = BuildConfig.class, manifest = "app/src/main/AndroidManifest.xml", sdk = 21, shadows = {ShadowAlarmManagerAPI21.class})
 public class DayTest {
 
     // February 2016 starts with Monday
     public static final int YEAR = 2016;
     public static final int MONTH = Calendar.FEBRUARY;
     public static final int DAY = 1;
+    public static final int HOUR = 1;
+    public static final int MINUTE = 0;
     public static final int DAY_OF_WEEK = Calendar.MONDAY;
 
     public static final int HOUR_DAY = 8;
     public static final int MINUTE_DAY = 1;
 
-    public static final int HOUR_DEFAULT = 7;
-    public static final int MINUTE_DEFAULT = 0;
+    public static final int HOUR_DEFAULT = AlarmDbHelper.DEFAULT_ALARM_HOUR;
+    public static final int MINUTE_DEFAULT = AlarmDbHelper.DEFAULT_ALARM_MINUTE;
 
     public static final int HOLIDAY_YEAR = YEAR;
     public static final int HOLIDAY_MONTH = Calendar.JANUARY;
@@ -164,7 +163,8 @@ public class DayTest {
         ShadowActivity shadowActivity = Shadows.shadowOf(activity);
 
         // Set to use holiday
-        useHoliday(activity, DE);
+        GlobalManager globalManager = GlobalManager.getInstance();
+        globalManager.saveHoliday(DE);
 
         // Set date to holiday
         GregorianCalendar date = new GregorianCalendar(HOLIDAY_YEAR, HOLIDAY_MONTH, HOLIDAY_DAY);
@@ -182,15 +182,6 @@ public class DayTest {
         day.setState(Day.STATE_RULE);
 
         assertThat(day.isEnabled(), is(false));
-    }
-
-    private void useHoliday(AlarmMorningActivity activity, String path) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(activity);
-        SharedPreferences.Editor editor = preferences.edit();
-
-        editor.putString(SettingsActivity.PREF_HOLIDAY, path);
-
-        editor.commit();
     }
 
     @Test
