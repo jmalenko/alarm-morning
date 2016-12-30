@@ -3,6 +3,7 @@ package cz.jaro.alarmmorning.model;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,6 +19,7 @@ import java.util.GregorianCalendar;
 import cz.jaro.alarmmorning.AlarmMorningActivity;
 import cz.jaro.alarmmorning.AlarmMorningActivityTest;
 import cz.jaro.alarmmorning.BuildConfig;
+import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.SettingsActivity;
 import cz.jaro.alarmmorning.clock.Clock;
 
@@ -65,6 +67,11 @@ public class DayTest {
         day.setHour(HOUR_DAY);
         day.setMinute(MINUTE_DAY);
         day.setDefaults(defaults);
+    }
+
+    @After
+    public void after() {
+        GlobalManager1NextAlarm0NoAlarmTest.resetSingleton(GlobalManager.class, "instance");
     }
 
     @Test
