@@ -111,14 +111,7 @@ public class AlarmDbHelper extends SQLiteOpenHelper {
             database.execSQL(DATABASE_CREATE_TABLE_DAY);
 
             // Initialize
-            ContentValues values = new ContentValues();
-            values.put(COLUMN_DEFAULTS_STATE, Defaults.STATE_DISABLED);
-            values.put(COLUMN_DEFAULTS_HOUR, DEFAULT_ALARM_HOUR);
-            values.put(COLUMN_DEFAULTS_MINUTE, DEFAULT_ALARM_MINUTE);
-            for (int dayOfWeek : AlarmDataSource.allDaysOfWeek) {
-                values.put(COLUMN_DEFAULTS_DAY_OF_WEEK, dayOfWeek);
-                database.insert(TABLE_DEFAULTS, null, values);
-            }
+            resetDefaults(database);
         }
 
         public void revert(SQLiteDatabase database) {
@@ -126,5 +119,16 @@ public class AlarmDbHelper extends SQLiteOpenHelper {
             database.execSQL("DROP TABLE IF EXISTS " + TABLE_DAY);
         }
     }};
+
+    static void resetDefaults(SQLiteDatabase database) {
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_DEFAULTS_STATE, Defaults.STATE_DISABLED);
+        values.put(COLUMN_DEFAULTS_HOUR, DEFAULT_ALARM_HOUR);
+        values.put(COLUMN_DEFAULTS_MINUTE, DEFAULT_ALARM_MINUTE);
+        for (int dayOfWeek : AlarmDataSource.allDaysOfWeek) {
+            values.put(COLUMN_DEFAULTS_DAY_OF_WEEK, dayOfWeek);
+            database.insert(TABLE_DEFAULTS, null, values);
+        }
+    }
 
 }

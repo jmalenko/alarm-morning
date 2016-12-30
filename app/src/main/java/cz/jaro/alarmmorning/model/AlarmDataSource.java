@@ -236,4 +236,19 @@ public class AlarmDataSource {
 
         return str.toString();
     }
+
+    /**
+     * Reset the database to the initial state.
+     * <p>
+     * Deletes all Days and disables the Defaults.
+     */
+    public void resetDatabase() {
+        deleteAllDays();
+        AlarmDbHelper.resetDefaults(database);
+    }
+
+    private void deleteAllDays() {
+        database.delete(AlarmDbHelper.TABLE_DAY, null, null);
+    }
+
 }

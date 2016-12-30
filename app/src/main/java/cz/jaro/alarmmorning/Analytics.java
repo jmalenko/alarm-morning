@@ -163,7 +163,8 @@ public class Analytics {
         Notification,
         Time,
         External,
-        Widget
+        Widget,
+        Test
     }
 
     public enum ChannelName {

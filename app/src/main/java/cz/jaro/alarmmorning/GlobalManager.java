@@ -998,4 +998,10 @@ public class GlobalManager {
         return alarmTimes;
     }
 
+    /**
+     * Reset the database to the initial state.
+     */
+    public void resetDatabase() {
+        dataSource.resetDatabase();
+    }
 }
