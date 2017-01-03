@@ -57,6 +57,8 @@ public class LocationProviderRegionDetector extends RegionDetector {
             locationManager.requestLocationUpdates(provider, 0, 0, locationListener);
         } catch (SecurityException e) {
             Log.w(TAG, "Location permission missing", e);
+        } catch (RuntimeException e) {
+            Log.w(TAG, e);
         }
     }
 
