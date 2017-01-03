@@ -24,6 +24,7 @@ import static org.junit.Assert.assertEquals;
 public class HolidayHelper1HolidaysTest {
 
     public static final List<Calendar> holidays_Czech;
+
     static {
         holidays_Czech = new ArrayList<>();
         // 2016
@@ -44,6 +45,20 @@ public class HolidayHelper1HolidaysTest {
         holidays_Czech.add(new GregorianCalendar(2017, Calendar.JANUARY, 1));
         holidays_Czech.add(new GregorianCalendar(2017, Calendar.APRIL, 16));
         holidays_Czech.add(new GregorianCalendar(2017, Calendar.APRIL, 17));
+        holidays_Czech.add(new GregorianCalendar(2017, Calendar.MAY, 1));
+        holidays_Czech.add(new GregorianCalendar(2017, Calendar.MAY, 8));
+        holidays_Czech.add(new GregorianCalendar(2017, Calendar.JULY, 5));
+        holidays_Czech.add(new GregorianCalendar(2017, Calendar.JULY, 6));
+        holidays_Czech.add(new GregorianCalendar(2017, Calendar.SEPTEMBER, 28));
+        holidays_Czech.add(new GregorianCalendar(2017, Calendar.OCTOBER, 28));
+        holidays_Czech.add(new GregorianCalendar(2017, Calendar.NOVEMBER, 17));
+        holidays_Czech.add(new GregorianCalendar(2017, Calendar.DECEMBER, 24));
+        holidays_Czech.add(new GregorianCalendar(2017, Calendar.DECEMBER, 25));
+        holidays_Czech.add(new GregorianCalendar(2017, Calendar.DECEMBER, 26));
+        // 2018
+        holidays_Czech.add(new GregorianCalendar(2018, Calendar.JANUARY, 1));
+        holidays_Czech.add(new GregorianCalendar(2017, Calendar.MARCH, 30));
+        holidays_Czech.add(new GregorianCalendar(2017, Calendar.APRIL, 2));
         holidays_Czech.add(new GregorianCalendar(2017, Calendar.MAY, 1));
         holidays_Czech.add(new GregorianCalendar(2017, Calendar.MAY, 8));
         holidays_Czech.add(new GregorianCalendar(2017, Calendar.JULY, 5));
