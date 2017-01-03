@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import junit.framework.Assert;
 
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
@@ -27,6 +28,7 @@ import java.util.Calendar;
 import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.clock.SystemClock;
 import cz.jaro.alarmmorning.model.AlarmDataSource;
+import cz.jaro.alarmmorning.model.GlobalManager1NextAlarm0NoAlarmTest;
 import cz.jaro.alarmmorning.receivers.AlarmReceiver;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,6 +39,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class, manifest = "app/src/main/AndroidManifest.xml", sdk = 21)
 public class AlarmMorningActivity0Test {
+
+    @After
+    public void after() {
+        GlobalManager1NextAlarm0NoAlarmTest.resetSingleton(GlobalManager.class, "instance");
+    }
 
     @Test
     public void menu_noAlarmInDefaults() {

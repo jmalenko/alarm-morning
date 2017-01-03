@@ -1,6 +1,8 @@
 package cz.jaro.alarmmorning;
 
-import android.app.Activity;
+import android.app.Application;
+import android.app.Fragment;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -10,101 +12,94 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 
+import org.junit.After;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
+import org.robolectric.RuntimeEnvironment;
 import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowActivity;
 
+import java.util.Calendar;
 import java.util.Locale;
 
 import cz.jaro.alarmmorning.model.AlarmDataSource;
+import cz.jaro.alarmmorning.model.Defaults;
+import cz.jaro.alarmmorning.model.GlobalManager1NextAlarm0NoAlarmTest;
 import cz.jaro.alarmmorning.wizard.Wizard;
 
+import static junit.framework.Assert.assertTrue;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.core.Is.is;
 
 /**
  * Test navigation.
  */
 @RunWith(RobolectricTestRunner.class)
-@Config(constants = BuildConfig.class, manifest = "app/src/main/AndroidManifest.xml", sdk = 21)
+@Config(constants = BuildConfig.class, manifest = "app/src/main/AndroidManifest.xml", sdk = 21, qualifiers = "cs")
 public class AlarmMorningActivityTest {
 
-    public static final String TEST_PREFERENCE_NAME = "test_preference_name";
+    @After
+    public void after() {
+        GlobalManager1NextAlarm0NoAlarmTest.resetSingleton(GlobalManager.class, "instance");
+    }
 
-    public static void setLocale(Activity activity, String language, String country) {
+    /**
+     * Set the locale as default locale and in the context configuration. Setting these locales for localized tests is necessary, because the Robolectric {@link
+     * Config} qualifier will use the language only for resolving resource.
+     *
+     * @param context  The android context
+     * @param language The language of the locale
+     * @param country  The country of the locale
+     */
+    public static void setLocale(Context context, String language, String country) {
         Locale locale = new Locale(language, country);
-        // update locale for date formatters
         Locale.setDefault(locale);
         // update locale for app resources
-        Resources res = activity.getResources();
+        Resources res = context.getResources();
         Configuration config = res.getConfiguration();
         config.locale = locale;
         res.updateConfiguration(config, res.getDisplayMetrics());
     }
 
+    void saveWizardPreference(boolean wizardPreference) {
+        Context context = AlarmMorningApplication.getAppContext();
+
+        // Set to default
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean(Wizard.PREF_WIZARD, wizardPreference);
+        editor.commit();
+    }
+
     @Test
-    public void menu_startCalendar_on_first_start() {
+    public void start_first_to_Wizard() {
+        saveWizardPreference(Wizard.PREF_WIZARD_DEFAULT);
+
         AlarmMorningActivity activity = Robolectric.setupActivity(AlarmMorningActivity.class);
         ShadowActivity shadowActivity = Shadows.shadowOf(activity);
-
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(activity.getBaseContext());
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean(Wizard.PREF_WIZARD, Wizard.PREF_WIZARD_DEFAULT);
-        editor.commit();
 
         Intent intent = shadowActivity.peekNextStartedActivity();
         assertThat(intent.getComponent().getClassName()).isEqualTo(Wizard.class.getName());
     }
 
-    // TODO Fix test
-/*
     @Test
-    public void menu_startCalendar_on_second_start() {
-//        Context context = RuntimeEnvironment.application.getApplicationContext();
-//        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-//        SharedPreferences.Editor editor = preferences.edit();
-//        editor.putBoolean(Wizard.PREF_WIZARD, !Wizard.PREF_WIZARD_DEFAULT);
-//        editor.commit();
-
-//        SharedPreferences preferences = RuntimeEnvironment.application.getSharedPreferences(TEST_PREFERENCE_NAME, Context.MODE_PRIVATE);
-//        preferences.edit().putBoolean(Wizard.PREF_WIZARD, !Wizard.PREF_WIZARD_DEFAULT).commit();
-
-
-//        Context context = RuntimeEnvironment.application.getApplicationContext();
-//        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-//        SharedPreferences preferences = RuntimeEnvironment.application.getSharedPreferences(TEST_PREFERENCE_NAME, Context.MODE_PRIVATE);
-//        preferences.edit().putBoolean(Wizard.PREF_WIZARD, !Wizard.PREF_WIZARD_DEFAULT).commit();
-
-
-//        Context context = RuntimeEnvironment.application.getApplicationContext();
-//        SharedPreferences preferences = ShadowPreferenceManager.getDefaultSharedPreferences(context);
-//        preferences.edit().putBoolean(Wizard.PREF_WIZARD, !Wizard.PREF_WIZARD_DEFAULT).commit();
-
-
-        // Create the activity - this will call onCreate()
-//        activity=actController.create().get();
+    public void start_second_to_Calendar() {
+        saveWizardPreference(!Wizard.PREF_WIZARD_DEFAULT);
 
         AlarmMorningActivity activity = Robolectric.setupActivity(AlarmMorningActivity.class);
-//        AlarmMorningActivity activity = Robolectric.buildActivity(AlarmMorningActivity.class).create().start().resume().get();
-        ShadowActivity shadowActivity = Shadows.shadowOf(activity);
 
-        Intent intent = shadowActivity.peekNextStartedActivity();
-        assertThat(intent).isNotNull();
-        assertThat(intent.getComponent()).isNotNull();
-        assertThat(intent.getComponent().getClassName()).isEqualTo(AlarmMorningActivity.class.getName());
-
-//        mHomeScreenActivity = Robolectric.buildActivity(HomeScreenActivity.class).create().get(); // start HomeScreenActivity, call through to onCreate()
-//        mHomeScreenActivity = Robolectric.buildActivity(HomeScreenActivity.class).create().start().resume().get(); // start HomeScreenActivity, call through to onCreate()
-
-        Fragment fragment = activity.getFragmentManager().findFragmentById(R.id.calendar_recycler_view);
-        assertThat(fragment).isNotNull();
+        Fragment fragment = activity.getFragmentManager().findFragmentById(R.id.content_frame);
+        assertTrue(fragment instanceof CalendarFragment);
     }
 
     @Test
     public void menu_startDefaultsActivity() {
+        saveWizardPreference(!Wizard.PREF_WIZARD_DEFAULT);
+
         AlarmMorningActivity activity = Robolectric.setupActivity(AlarmMorningActivity.class);
         ShadowActivity shadowActivity = Shadows.shadowOf(activity);
 
@@ -116,6 +111,8 @@ public class AlarmMorningActivityTest {
 
     @Test
     public void menu_startSettingsActivity() {
+        saveWizardPreference(!Wizard.PREF_WIZARD_DEFAULT);
+
         AlarmMorningActivity activity = Robolectric.setupActivity(AlarmMorningActivity.class);
         ShadowActivity shadowActivity = Shadows.shadowOf(activity);
 
@@ -127,6 +124,8 @@ public class AlarmMorningActivityTest {
 
     @Test
     public void menu_startWebsiteActivity() {
+        saveWizardPreference(!Wizard.PREF_WIZARD_DEFAULT);
+
         AlarmMorningActivity activity = Robolectric.setupActivity(AlarmMorningActivity.class);
         ShadowActivity shadowActivity = Shadows.shadowOf(activity);
 
@@ -135,8 +134,69 @@ public class AlarmMorningActivityTest {
         Intent intent = shadowActivity.peekNextStartedActivity();
         assertThat(intent.getAction()).isEqualTo(Intent.ACTION_VIEW);
     }
-*/
+
     @Test
+    @Config(qualifiers = "en")
+    public void resourceLanguage_en() {
+        Application application = RuntimeEnvironment.application;
+        assertThat(application.getString(R.string.app_name)).isEqualTo("Alarm Morning");
+    }
+
+    @Test
+    @Config(qualifiers = "cs")
+    public void resourceLanguage_cs() {
+        Application application = RuntimeEnvironment.application;
+        assertThat(application.getString(R.string.app_name)).isEqualTo("Budík");
+    }
+
+    @Test
+    public void set_locale_en() {
+        DefaultsActivity activity = Robolectric.setupActivity(DefaultsActivity.class);
+
+        setLocale(activity, "en", "US");
+
+        Resources resources = activity.getResources();
+        Configuration configuration = resources.getConfiguration();
+        Assert.assertThat(configuration.locale.toString(), is("en_US"));
+    }
+
+    @Test
+    public void set_locale_cs() {
+        DefaultsActivity activity = Robolectric.setupActivity(DefaultsActivity.class);
+
+        setLocale(activity, "cs", "CZ");
+
+        Resources resources = activity.getResources();
+        Configuration configuration = resources.getConfiguration();
+        Assert.assertThat(configuration.locale.toString(), is("cs_CZ"));
+    }
+
+    @Test
+    public void first_day_of_week_en() {
+        DefaultsActivity activity = Robolectric.setupActivity(DefaultsActivity.class);
+
+        setLocale(activity, "en", "US");
+
+        Defaults defaults = activity.loadPosition(0);
+
+        // TODO Fix test
+        Assert.assertThat(defaults.getDayOfWeek(), is(Calendar.SUNDAY));
+    }
+
+    @Test
+    public void first_day_of_week_cs() {
+        DefaultsActivity activity = Robolectric.setupActivity(DefaultsActivity.class);
+
+        setLocale(activity, "cs", "CZ");
+
+        Defaults defaults = activity.loadPosition(0);
+
+        // TODO Fix test
+        Assert.assertThat(defaults.getDayOfWeek(), is(Calendar.MONDAY));
+    }
+
+    @Test
+    @Config(qualifiers = "en")
     public void defaults_ordering_en() {
         DefaultsActivity activity = Robolectric.setupActivity(DefaultsActivity.class);
         ShadowActivity shadowActivity = Shadows.shadowOf(activity);
@@ -158,17 +218,17 @@ public class AlarmMorningActivityTest {
             TextView textDayOfWeek = (TextView) item.findViewById(R.id.textDayOfWeek);
 
             // TODO Fix test
-//            if (position == 0)
-//                assertThat(textDayOfWeek.getText()).isEqualTo("Sun");
+            if (position == 0)
+                assertThat(textDayOfWeek.getText()).isEqualTo("Sun");
 
             String dayOfWeekText = Localization.dayOfWeekToStringShort(res, AlarmDataSource.allDaysOfWeek[position]); // week starts with Sunday
 
-            // TODO Fix test
-//            assertThat(new Integer(position).toString() + textDayOfWeek.getText()).isEqualTo(new Integer(position).toString() + dayOfWeekText);
+            assertThat(new Integer(position).toString() + textDayOfWeek.getText()).isEqualTo(new Integer(position).toString() + dayOfWeekText);
         }
     }
 
     @Test
+    @Config(qualifiers = "cs")
     public void defaults_ordering_cs() {
         DefaultsActivity activity = Robolectric.setupActivity(DefaultsActivity.class);
         ShadowActivity shadowActivity = Shadows.shadowOf(activity);
@@ -189,6 +249,7 @@ public class AlarmMorningActivityTest {
             View item = recyclerView.getChildAt(position);
             TextView textDayOfWeek = (TextView) item.findViewById(R.id.textDayOfWeek);
 
+            // TODO Fix test
             if (position == 0)
                 assertThat(textDayOfWeek.getText()).isEqualTo("Po");
 
@@ -197,6 +258,5 @@ public class AlarmMorningActivityTest {
             assertThat(Integer.toString(position) + textDayOfWeek.getText()).isEqualTo(Integer.toString(position) + dayOfWeekText);
         }
     }
-
 
 }
