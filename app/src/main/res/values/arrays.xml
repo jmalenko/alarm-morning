@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="actionArray">
-        <item>Nothing</item>
-        <item>Mute for 10 seconds</item>
-        <item>Snooze</item>
-        <item>Dismiss</item>
+        <item>@string/action_nothing</item>
+        <item>@string/action_mute_for_10_seconds</item>
+        <item>@string/action_snooze</item>
+        <item>@string/action_dismiss</item>
     </string-array>
     <string-array name="actionValues">
         <item>0</item>

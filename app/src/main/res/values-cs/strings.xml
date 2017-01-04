@@ -127,6 +127,8 @@
     <string name="action_dismiss">Ukončit</string>
     <string name="action_snooze">Odložit</string>
     <string name="action_change">Změnit</string>
+    <string name="action_nothing">Nic</string>
+    <string name="action_mute_for_10_seconds">Ztišit na 10 sekund</string>
 
     <string name="time_to_ring_toast_days">Budík zazvoní za <xliff:g example="1" id="days">%1$d</xliff:g> dny, <xliff:g example="2" id="hours">%2$d</xliff:g> hodin a <xliff:g example="3" id="minutes">%3$d</xliff:g> minut</string>
     <string name="time_to_ring_toast_hours">Budík zazvoní za <xliff:g example="2" id="hours">%1$d</xliff:g> hodin a <xliff:g example="3" id="minutes">%2$d</xliff:g> minut</string>
