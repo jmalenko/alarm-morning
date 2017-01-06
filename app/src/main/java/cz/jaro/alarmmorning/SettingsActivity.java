@@ -123,6 +123,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
     private static final int REQUEST_CODE_WIZARD = 1;
 
+    private RingtonePreference ringtonePreference;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -151,7 +153,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
         final Context context = this;
 
-        // Start/stop CheckAlarmTime
+        // Start/stop services
 
         Preference prefCheckAlarmTime = findPreference(PREF_CHECK_ALARM_TIME);
         prefCheckAlarmTime.setOnPreferenceChangeListener((preference, newValue) -> {
@@ -169,8 +171,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             return true;
         });
 
-        // Start/stop NighttimeBell
-
         Preference prefNighttimeBell = findPreference(PREF_NIGHTTIME_BELL);
         prefNighttimeBell.setOnPreferenceChangeListener((preference, newValue) -> {
             analytics(preference, newValue);
@@ -187,6 +187,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             return true;
         });
 
+        // Click handlers
+
         Preference prefStartWizard = findPreference(PREF_START_WIZARD);
         prefStartWizard.setOnPreferenceClickListener(preference -> {
             Analytics analytics = new Analytics(preference.getContext(), Analytics.Event.Start,
@@ -198,6 +200,18 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             startActivityForResult(intent, REQUEST_CODE_WIZARD);
 
             return true;
+        });
+
+        Preference prefRingtone = findPreference(PREF_RINGTONE);
+        prefRingtone.setOnPreferenceClickListener(preference -> {
+            ringtonePreference = (RingtonePreference) preference;
+            return false;
+        });
+
+        Preference prefNighttimeBellRingtone = findPreference(PREF_NIGHTTIME_BELL_RINGTONE);
+        prefNighttimeBellRingtone.setOnPreferenceClickListener(preference -> {
+            ringtonePreference = (RingtonePreference) preference;
+            return false;
         });
     }
 
@@ -251,9 +265,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             }
         } else {
             // Propagate to RingtonePreference
-            // TODO Add condition: the RingtonePreference was changed
-            RingtonePreference ringtonePreference = (RingtonePreference) findPreference(PREF_RINGTONE);
-            ringtonePreference.onActivityResult(requestCode, resultCode, data);
+            if (ringtonePreference != null) {
+                ringtonePreference.onActivityResult(requestCode, resultCode, data);
+                ringtonePreference = null;
+            }
         }
     }
 
@@ -294,6 +309,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     if (ringtone == null) {
                         // Clear the summary if there was a lookup error.
                         preference.setSummary(null);
+                    } else if (stringValue.equals(PREF_NIGHTTIME_BELL_RINGTONE_DEFAULT)) {
+                        // Use string from resources for a raw ringtone
+                        String name = preference.getContext().getResources().getString(R.string.alarmtone_title_church_bell);
+                        preference.setSummary(name);
                     } else {
                         // Set the summary to reflect the new ringtone display name.
                         String name = ringtone.getTitle(preference.getContext());
