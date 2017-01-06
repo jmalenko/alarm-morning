@@ -39,6 +39,7 @@ import android.view.View;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
 
+import cz.jaro.alarmmorning.nighttimebell.CustomAlarmTone;
 import cz.jaro.alarmmorning.wizard.Wizard;
 
 public class AlarmMorningActivity extends AppCompatActivity {
@@ -139,6 +140,10 @@ public class AlarmMorningActivity extends AppCompatActivity {
             Intent wizardIntent = new Intent(this, Wizard.class);
             startActivityForResult(wizardIntent, REQUEST_CODE_WIZARD);
         }
+
+        // Possibly install the raws (if not installed yet)
+        CustomAlarmTone customAlarmTone = new CustomAlarmTone(this);
+        customAlarmTone.install();
 
         FirebaseAnalytics mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
