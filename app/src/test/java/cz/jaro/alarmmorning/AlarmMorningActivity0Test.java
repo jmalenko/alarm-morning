@@ -9,9 +9,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 
-import junit.framework.Assert;
-
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
@@ -26,19 +25,31 @@ import org.robolectric.shadows.ShadowPendingIntent;
 import java.util.Calendar;
 
 import cz.jaro.alarmmorning.clock.Clock;
-import cz.jaro.alarmmorning.clock.SystemClock;
 import cz.jaro.alarmmorning.model.AlarmDataSource;
 import cz.jaro.alarmmorning.model.GlobalManager1NextAlarm0NoAlarmTest;
 import cz.jaro.alarmmorning.receivers.AlarmReceiver;
+import cz.jaro.alarmmorning.shadows.ShadowAlarmManagerAPI21;
+import cz.jaro.alarmmorning.shadows.ShadowGlobalManager;
 
+import static cz.jaro.alarmmorning.model.DayTest.DAY;
+import static cz.jaro.alarmmorning.model.DayTest.MONTH;
+import static cz.jaro.alarmmorning.model.DayTest.YEAR;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Test "when there is no alarm..."
  */
 @RunWith(RobolectricTestRunner.class)
-@Config(constants = BuildConfig.class, manifest = "app/src/main/AndroidManifest.xml", sdk = 21)
+@Config(constants = BuildConfig.class, sdk = 21, shadows = {ShadowAlarmManagerAPI21.class, ShadowGlobalManager.class})
 public class AlarmMorningActivity0Test {
+
+    private GlobalManager globalManager;
+
+    @Before
+    public void before() {
+        globalManager = GlobalManager.getInstance();
+        globalManager.reset();
+    }
 
     @After
     public void after() {
@@ -46,11 +57,19 @@ public class AlarmMorningActivity0Test {
     }
 
     @Test
-    public void menu_noAlarmInDefaults() {
+    public void clockSetToFixedTime() {
+        Clock clock = globalManager.clock();
+        Calendar now = clock.now();
+
+        assertThat(now.get(Calendar.YEAR)).isEqualTo(YEAR);
+        assertThat(now.get(Calendar.MONTH)).isEqualTo(MONTH);
+        assertThat(now.get(Calendar.DAY_OF_MONTH)).isEqualTo(DAY);
+    }
+
+    @Test
+    public void noAlarmInDefaults() {
         DefaultsActivity activity = Robolectric.setupActivity(DefaultsActivity.class);
         ShadowActivity shadowActivity = Shadows.shadowOf(activity);
-
-        Resources res = activity.getResources();
 
         RecyclerView recyclerView = (RecyclerView) shadowActivity.findViewById(R.id.defaults_recycler_view);
 
@@ -70,7 +89,7 @@ public class AlarmMorningActivity0Test {
     }
 
     @Test
-    public void menu_noAlarmInCalendar() {
+    public void noAlarm() {
         AlarmMorningActivity activity = Robolectric.setupActivity(AlarmMorningActivity.class);
         ShadowActivity shadowActivity = Shadows.shadowOf(activity);
 
@@ -88,7 +107,7 @@ public class AlarmMorningActivity0Test {
         for (int position = 0; position < recyclerView.getChildCount(); position++) {
             View item = recyclerView.getChildAt(position);
 
-            Clock clock = new SystemClock(); // TODO Solve dependency on clock
+            Clock clock = globalManager.clock();
             Calendar today = CalendarFragment.getToday(clock);
             Calendar date = CalendarFragment.addDays(today, position);
 
@@ -105,8 +124,11 @@ public class AlarmMorningActivity0Test {
             assertThat(textDate.getText()).isEqualTo(dateText);
 
             TextView textState = (TextView) item.findViewById(R.id.textState);
-            // TODO Fix test
-            // assertThat(textState.getText()).isEmpty();
+            if (position == 0) {
+                assertThat(textState.getText().equals("") || textState.getText().equals(res.getString(R.string.alarm_state_passed))).isTrue();
+            } else {
+                assertThat(textState.getText()).isEmpty();
+            }
 
             TextView textComment = (TextView) item.findViewById(R.id.textComment);
             assertThat(textComment.getText()).isEmpty();
@@ -114,21 +136,18 @@ public class AlarmMorningActivity0Test {
     }
 
     @Test
-    public void registerSystemAlarmToSetNextSystemAlarm() throws Exception {
+    public void noAlarmCheckNextSystemAlarm() {
         Context context = RuntimeEnvironment.application.getApplicationContext();
-        SystemAlarm sut = SystemAlarm.getInstance(context);
 
         AlarmManager alarmManager = (AlarmManager) RuntimeEnvironment.application.getSystemService(Context.ALARM_SERVICE);
         ShadowAlarmManager shadowAlarmManager = Shadows.shadowOf(alarmManager);
 
-        Assert.assertNull(shadowAlarmManager.getNextScheduledAlarm());
-
-        sut.onAlarmSet();
-
         ShadowAlarmManager.ScheduledAlarm scheduledAlarm = shadowAlarmManager.getNextScheduledAlarm();
 
+        assertThat(scheduledAlarm).isNotNull();
+
         // time
-        Clock clock = new SystemClock(); // TODO Solve dependency on clock
+        Clock clock = globalManager.clock();
         Calendar now = clock.now();
         Calendar expectedResetTime = SystemAlarm.getResetTime(now);
 
@@ -136,7 +155,7 @@ public class AlarmMorningActivity0Test {
 
         // action
         PendingIntent operation = scheduledAlarm.operation;
-        ShadowPendingIntent shadowOperation = Shadows.shadowOf(scheduledAlarm.operation);
+        ShadowPendingIntent shadowOperation = Shadows.shadowOf(operation);
 
         assertThat(shadowOperation.isBroadcastIntent()).isEqualTo(true);
         assertThat(shadowOperation.getSavedIntents().length).isEqualTo(1);

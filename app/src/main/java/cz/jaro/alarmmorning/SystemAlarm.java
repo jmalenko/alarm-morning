@@ -186,7 +186,11 @@ public class SystemAlarm {
 
     public static Calendar getResetTime(Calendar now) {
         Calendar resetTime = new GregorianCalendar(now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH));
-        resetTime.add(Calendar.DAY_OF_MONTH, 1);
+        resetTime.add(Calendar.DATE, 1);
+        resetTime.set(Calendar.HOUR, 0);
+        resetTime.set(Calendar.MINUTE, 0);
+        resetTime.set(Calendar.SECOND, 0);
+        resetTime.set(Calendar.MILLISECOND, 0);
 
         return resetTime;
     }
