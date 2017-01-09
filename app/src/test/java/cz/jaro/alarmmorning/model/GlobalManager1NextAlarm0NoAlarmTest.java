@@ -18,7 +18,6 @@ import java.util.GregorianCalendar;
 import cz.jaro.alarmmorning.Analytics;
 import cz.jaro.alarmmorning.BuildConfig;
 import cz.jaro.alarmmorning.GlobalManager;
-import cz.jaro.alarmmorning.SettingsActivity;
 import cz.jaro.alarmmorning.clock.FixedClock;
 import cz.jaro.alarmmorning.shadows.ShadowAlarmManagerAPI21;
 
@@ -48,9 +47,7 @@ public class GlobalManager1NextAlarm0NoAlarmTest {
         globalManager = GlobalManager.getInstance();
 
         globalManager.resetDatabase();
-
-        // Holiday
-        globalManager.saveHoliday(SettingsActivity.PREF_HOLIDAY_NONE);
+        globalManager.resetSettings();
     }
 
     /**

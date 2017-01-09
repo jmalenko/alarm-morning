@@ -1011,4 +1011,25 @@ public class GlobalManager {
     public void resetDatabase() {
         dataSource.resetDatabase();
     }
+
+    /**
+     * Reset the settings to defaults.
+     */
+    public void resetSettings() {
+        Context context = AlarmMorningApplication.getAppContext();
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+
+        // Clear preferences
+        SharedPreferences.Editor editor = preferences.edit();
+
+        editor.clear();
+
+        editor.commit();
+
+        // Set defaults
+        // TODO Hotfix - Robolectric hasn't implemented setDefaultValues() yet, we have to set each setting individually (as the need for testing
+        // arises)
+//        PreferenceManager.setDefaultValues(context, R.xml.preferences, true);
+        saveHoliday(SettingsActivity.PREF_HOLIDAY_NONE);
+    }
 }

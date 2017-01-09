@@ -40,6 +40,7 @@ public class GlobalManager1NextAlarm4HolidaysTest {
         globalManager = GlobalManager.getInstance();
 
         globalManager.resetDatabase();
+        globalManager.resetSettings();
 
         // Defaults
         for (int dayOfWeek : AlarmDataSource.allDaysOfWeek) {
