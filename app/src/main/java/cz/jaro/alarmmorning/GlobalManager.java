@@ -401,8 +401,12 @@ public class GlobalManager {
 
             if (!nextActionPersisted.action.equals(ACTION_UNDEFINED)) {
                 Log.w(TAG, "The next system alarm changed while the app was not running.\n" +
-                        "   Persisted is action=" + nextActionPersisted.action + ", time=" + nextActionPersisted.time.getTime() + ", alarmTime=" + nextActionPersisted.alarmTime.getTime() + "\n" +
-                        "   Current is   action=" + nextAction.action + ", time=" + nextAction.time.getTime() + ", alarmTime=" + nextAction.alarmTime.getTime());
+                        "   Persisted is action=" + nextActionPersisted.action +
+                        ", time=" + nextActionPersisted.time.getTime() +
+                        ", alarmTime=" + (nextActionPersisted.alarmTime == null ? "null" : nextActionPersisted.alarmTime.getTime()) + "\n" +
+                        "   Current is   action=" + nextAction.action +
+                        ", time=" + nextAction.time.getTime() +
+                        ", alarmTime=" + (nextAction.alarmTime == null ? "null" : nextAction.alarmTime.getTime()));
                 // e.g. because it was being upgraded or the device was off
 
                 List<Calendar> skippedAlarmTimes = new ArrayList<>();
@@ -411,24 +415,27 @@ public class GlobalManager {
                     skippedAlarmTimes.add(getAlarmTimeOfRingingAlarm());
                 }
 
-                Calendar from = nextActionPersisted.alarmTime;
-                from.add(Calendar.SECOND, 1);
+                if (nextActionPersisted.alarmTime != null) {
+                    // Notification about skipped alarms
+                    Calendar from = nextActionPersisted.alarmTime;
+                    from.add(Calendar.SECOND, 1);
 
-                List<Calendar> alarmTimes = getAlarmsInPeriod(from, clock().now());
+                    List<Calendar> alarmTimes = getAlarmsInPeriod(from, clock().now());
 
-                skippedAlarmTimes.addAll(alarmTimes);
+                    skippedAlarmTimes.addAll(alarmTimes);
 
-                if (!skippedAlarmTimes.isEmpty()) {
-                    Log.i(TAG, "  The following alarm times were skipped: " + Localization.dateTimesToString(skippedAlarmTimes, context));
+                    if (!skippedAlarmTimes.isEmpty()) {
+                        Log.i(TAG, "  The following alarm times were skipped: " + Localization.dateTimesToString(skippedAlarmTimes, context));
 
-                    Analytics analytics = new Analytics(context, Analytics.Event.Skipped_alarm, Analytics.Channel.Time, Analytics.ChannelName.Alarm);
-                    analytics.set(Analytics.Param.Skipped_alarm_times, skippedAlarmTimes.toString());
-                    analytics.save();
+                        Analytics analytics = new Analytics(context, Analytics.Event.Skipped_alarm, Analytics.Channel.Time, Analytics.ChannelName.Alarm);
+                        analytics.set(Analytics.Param.Skipped_alarm_times, skippedAlarmTimes.toString());
+                        analytics.save();
 
-                    SystemNotification systemNotification = SystemNotification.getInstance(context);
-                    systemNotification.notifySkippedAlarms(skippedAlarmTimes.size());
+                        SystemNotification systemNotification = SystemNotification.getInstance(context);
+                        systemNotification.notifySkippedAlarms(skippedAlarmTimes.size());
 
-                    lastAlarmTime = skippedAlarmTimes.get(skippedAlarmTimes.size() - 1);
+                        lastAlarmTime = skippedAlarmTimes.get(skippedAlarmTimes.size() - 1);
+                    }
                 }
             }
         }
