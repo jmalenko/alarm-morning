@@ -36,9 +36,7 @@ public class GlobalManager1NextAlarm2DefaultTest {
     @Before
     public void before() {
         globalManager = GlobalManager.getInstance();
-
-        globalManager.resetDatabase();
-        globalManager.resetSettings();
+        globalManager.reset();
     }
 
     @After

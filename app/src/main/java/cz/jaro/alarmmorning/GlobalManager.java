@@ -1016,14 +1016,14 @@ public class GlobalManager {
     /**
      * Reset the database to the initial state.
      */
-    public void resetDatabase() {
+    private void resetDatabase() {
         dataSource.resetDatabase();
     }
 
     /**
      * Reset the settings to defaults.
      */
-    public void resetSettings() {
+    private void resetSettings() {
         Context context = AlarmMorningApplication.getAppContext();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 
