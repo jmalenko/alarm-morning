@@ -10,6 +10,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
@@ -303,20 +304,7 @@ public class Analytics {
         String dayOfWeekTypeString = dayOfWeekType == com.ibm.icu.util.Calendar.WEEKEND ? DAY_OF_WEEK_TYPE__WEEKEND : DAY_OF_WEEK_TYPE__WEEKDAY;
         mPayload.putString(Param.Day_of_week_type.name(), dayOfWeekTypeString);
 
-        String alarmStateString;
-        switch (day.getState()) {
-            case Day.STATE_DISABLED:
-                alarmStateString = DISABLED;
-                break;
-            case Day.STATE_ENABLED:
-                alarmStateString = ALARM_STATE__SET_TO_SPECIFIC;
-                break;
-            case Day.STATE_RULE:
-                alarmStateString = ALARM_STATE__SET_TO_DEFAULT;
-                break;
-            default:
-                throw new IllegalArgumentException("Unexpected day state: " + day.getState());
-        }
+        String alarmStateString = dayStateToString(day.getState());
         mPayload.putString(Param.Alarm_state.name(), alarmStateString);
 
         setDefaults(day.getDefaults());
@@ -341,7 +329,7 @@ public class Analytics {
     }
 
     public Analytics setDefaults(Defaults defaults) {
-        if (defaults.isEnabled()) {
+        if (defaults != null && defaults.isEnabled()) {
             String defaultAlarmTimeString = getDefaultsAlarmTimeString(defaults);
             mPayload.putString(Param.Default_alarm_time.name(), defaultAlarmTimeString);
         } else {
@@ -354,9 +342,7 @@ public class Analytics {
     public Analytics setDefaultsAll(Defaults defaults) {
         int dayOfWeek = defaults.getDayOfWeek();
 
-        GregorianCalendar calendar = new GregorianCalendar(1, 2, 2016); // February 2016 starts with Monday
-        calendar.add(Calendar.DATE, dayOfWeek + 5);
-        String dayOfWeekString = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.US);
+        String dayOfWeekString = dayOfWeekToString(defaults.getDayOfWeek());
         mPayload.putString(Param.Day_of_week.name(), dayOfWeekString);
 
         com.ibm.icu.util.Calendar c = com.ibm.icu.util.Calendar.getInstance();
@@ -688,6 +674,55 @@ public class Analytics {
     public static String calendarToTime(Calendar calendar) {
         SimpleDateFormat sdfTime = new SimpleDateFormat(TIME_FORMAT, Locale.US);
         return sdfTime.format(calendar.getTime());
+    }
+
+    public static String calendarToTime(int hour, int minute) {
+        Calendar calendar = GregorianCalendar.getInstance();
+        calendar.set(Calendar.HOUR, hour);
+        calendar.set(Calendar.MINUTE, minute);
+
+        return calendarToTime(calendar);
+    }
+
+    @NonNull
+    public static String dayStateToString(int state) {
+        String alarmStateString;
+        switch (state) {
+            case Day.STATE_DISABLED:
+                alarmStateString = DISABLED;
+                break;
+            case Day.STATE_ENABLED:
+                alarmStateString = ALARM_STATE__SET_TO_SPECIFIC;
+                break;
+            case Day.STATE_RULE:
+                alarmStateString = ALARM_STATE__SET_TO_DEFAULT;
+                break;
+            default:
+                throw new IllegalArgumentException("Unexpected day state: " + state);
+        }
+        return alarmStateString;
+    }
+
+    @NonNull
+    public static String defaultStateToString(int state) {
+        String alarmStateString;
+        switch (state) {
+            case Defaults.STATE_DISABLED:
+                alarmStateString = DISABLED;
+                break;
+            case Defaults.STATE_ENABLED:
+                alarmStateString = ALARM_STATE__SET_TO_SPECIFIC;
+                break;
+            default:
+                throw new IllegalArgumentException("Unexpected defaults state: " + state);
+        }
+        return alarmStateString;
+    }
+
+    static public String dayOfWeekToString(int dayOfWeek) {
+        GregorianCalendar calendar = new GregorianCalendar(1, 2, 2016); // February 2016 starts with Monday
+        calendar.add(Calendar.DATE, dayOfWeek + 5);
+        return calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.US);
     }
 
     public String permissionCheckToString(int permissionCheck) {

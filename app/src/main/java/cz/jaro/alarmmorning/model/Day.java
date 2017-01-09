@@ -2,6 +2,7 @@ package cz.jaro.alarmmorning.model;
 
 import java.util.Calendar;
 
+import cz.jaro.alarmmorning.Analytics;
 import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.holiday.HolidayHelper;
@@ -273,5 +274,33 @@ public class Day {
     public String getHolidayDescription() {
         HolidayHelper holidayHelper = HolidayHelper.getInstance();
         return holidayHelper.getHolidayDescription(getDate());
+    }
+
+    @Override
+    public String toString() {
+        StringBuffer str = new StringBuffer();
+
+        str.append(Analytics.calendarToDate(date));
+        str.append(" ");
+        str.append(Analytics.dayStateToString(state));
+
+        switch (state) {
+            case STATE_DISABLED:
+                if (isHoliday()) {
+                    str.append(": holiday ");
+                    str.append(getHolidayDescription());
+                }
+                break;
+            case STATE_ENABLED:
+                str.append(" ");
+                str.append(Analytics.calendarToTime(getDateTime()));
+                break;
+            case STATE_RULE:
+                str.append(": ");
+                str.append(defaults.toString());
+                break;
+        }
+
+        return str.toString();
     }
 }

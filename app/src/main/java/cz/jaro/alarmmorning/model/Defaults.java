@@ -1,5 +1,7 @@
 package cz.jaro.alarmmorning.model;
 
+import cz.jaro.alarmmorning.Analytics;
+
 /**
  * Represents the alarm clock setting for a particular weekday.
  */
@@ -105,4 +107,25 @@ public class Defaults implements Cloneable {
         cloned.setMinute(getMinute());
         return cloned;
     }
+
+    @Override
+    public String toString() {
+        StringBuffer str = new StringBuffer();
+
+        str.append(Analytics.dayOfWeekToString(dayOfWeek));
+        str.append(" ");
+        str.append(Analytics.defaultStateToString(state));
+
+        switch (state) {
+            case STATE_DISABLED:
+                break;
+            case STATE_ENABLED:
+                str.append(" ");
+                str.append(Analytics.calendarToTime(hour, minute));
+                break;
+        }
+
+        return str.toString();
+    }
+
 }
