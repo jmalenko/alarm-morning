@@ -1,6 +1,10 @@
 package cz.jaro.alarmmorning.model;
 
-import android.test.AndroidTestCase;
+import android.support.test.runner.AndroidJUnit4;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -8,7 +12,11 @@ import java.util.GregorianCalendar;
 import cz.jaro.alarmmorning.Analytics;
 import cz.jaro.alarmmorning.GlobalManager;
 
-public class AlarmDataSourceTest extends AndroidTestCase {
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
+
+@RunWith(AndroidJUnit4.class)
+public class AlarmDataSourceTest {
 
     // February 2016 starts with Monday
     public static final int YEAR = 2016;
@@ -25,14 +33,14 @@ public class AlarmDataSourceTest extends AndroidTestCase {
     private GlobalManager globalManager;
     private Analytics analytics;
 
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void before() throws Exception {
         globalManager = GlobalManager.getInstance();
         analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
     }
 
-    public void test_Defaults_2writes() {
+    @Test
+    public void defaults_2writes() {
         // save 1st object
 
         Defaults defaults1a = new Defaults();
@@ -58,6 +66,8 @@ public class AlarmDataSourceTest extends AndroidTestCase {
         defaults2a.setHour(HOUR_DEFAULT + 1);
         defaults2a.setMinute(MINUTE_DEFAULT + 1);
 
+        analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
+
         globalManager.saveDefault(defaults2a, analytics);
 
         Defaults defaults2b = globalManager.loadDefault(defaults2a.getDayOfWeek());
@@ -68,7 +78,8 @@ public class AlarmDataSourceTest extends AndroidTestCase {
         assertEquals(defaults2a.getMinute(), defaults2b.getMinute());
     }
 
-    public void test_Day_2writes() {
+    @Test
+    public void day_2writes() {
         // save 1st object
 
         Day day1a = new Day();
@@ -95,7 +106,9 @@ public class AlarmDataSourceTest extends AndroidTestCase {
         day2a.setHour(HOUR_DEFAULT + 1);
         day2a.setMinute(MINUTE_DEFAULT + 1);
 
-        globalManager.saveDay(day2a, analytics);
+        Analytics analytics2 = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
+
+        globalManager.saveDay(day2a, analytics2);
 
         Day day2b = globalManager.loadDay(day2a.getDate());
 
@@ -106,7 +119,8 @@ public class AlarmDataSourceTest extends AndroidTestCase {
         assertNotNull(day2b.getDefaults());
     }
 
-    public void test_Day_load_notStored() {
+    @Test
+    public void day_load_notStored() {
         Calendar dateWithoutRecord = new GregorianCalendar(YEAR - 1, MONTH, DAY);
         Day day = globalManager.loadDay(dateWithoutRecord);
 

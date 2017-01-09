@@ -1006,6 +1006,14 @@ public class GlobalManager {
     }
 
     /**
+     * Reset all the data (database and settings) to the initial state.
+     */
+    public void reset() {
+        resetDatabase();
+        resetSettings();
+    }
+
+    /**
      * Reset the database to the initial state.
      */
     public void resetDatabase() {
@@ -1027,8 +1035,7 @@ public class GlobalManager {
         editor.commit();
 
         // Set defaults
-        // TODO Hotfix - Robolectric hasn't implemented setDefaultValues() yet, we have to set each setting individually (as the need for testing
-        // arises)
+        // TODO Hotfix - Robolectric hasn't implemented setDefaultValues() yet, we have to set each setting individually (as the need for testing arises)
 //        PreferenceManager.setDefaultValues(context, R.xml.preferences, true);
         saveHoliday(SettingsActivity.PREF_HOLIDAY_NONE);
     }

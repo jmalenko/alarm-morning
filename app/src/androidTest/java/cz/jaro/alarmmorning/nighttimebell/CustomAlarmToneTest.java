@@ -1,51 +1,60 @@
 package cz.jaro.alarmmorning.nighttimebell;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.test.AndroidTestCase;
-import android.test.suitebuilder.annotation.LargeTest;
+import android.support.test.InstrumentationRegistry;
+import android.support.test.runner.AndroidJUnit4;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.io.File;
 
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.SettingsActivity;
 
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotSame;
+import static junit.framework.Assert.assertTrue;
+
 /**
  * Tests CustomAlarmTone
  */
-@LargeTest
-public class CustomAlarmToneTest extends AndroidTestCase {
+@RunWith(AndroidJUnit4.class)
+public class CustomAlarmToneTest {
 
     private File mFile;
     private SharedPreferences mSharedPreferences;
 
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void before() throws Exception {
+        Context appContext = InstrumentationRegistry.getTargetContext();
 
-        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(appContext);
         mSharedPreferences.
                 edit().
                 putBoolean(CustomAlarmTone.PREF_FILES_INSTALLED, false).
                 commit();
 
         File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_ALARMS);
-        String filename = getContext().getResources().getResourceEntryName(R.raw.church_clock_strikes_3) + ".mp3";
+        String filename = appContext.getResources().getResourceEntryName(R.raw.church_clock_strikes_3) + ".mp3";
 
         mFile = new File(path, filename);
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-
-        // Delete the files
+    @After
+    public void after() throws Exception {
+        // Delete the file
         mFile.delete();
     }
 
-    public void test_copiesAlarmTones() {
+    @Test
+    public void copiesAlarmTones() {
         installAlarmTones();
 
         // Make sure the files exist and aren't blank
@@ -55,7 +64,8 @@ public class CustomAlarmToneTest extends AndroidTestCase {
         assertTrue(mSharedPreferences.getBoolean(CustomAlarmTone.PREF_FILES_INSTALLED, false));
     }
 
-    public void test_overridesDefaultAlarmTone() {
+    @Test
+    public void overridesDefaultAlarmTone() {
         // Set the ringtone preference to the default
         mSharedPreferences
                 .edit()
@@ -70,7 +80,8 @@ public class CustomAlarmToneTest extends AndroidTestCase {
                 "");
     }
 
-    public void test_doesNotOverrideNonDefaultAlarmTone() {
+    @Test
+    public void doesNotOverrideNonDefaultAlarmTone() {
         // Set the ringtone preference to something other than the default
         mSharedPreferences.edit()
                 .putString(SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE, "something_other_than_default")
@@ -84,7 +95,8 @@ public class CustomAlarmToneTest extends AndroidTestCase {
                 mSharedPreferences.getString(SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE, ""));
     }
 
-    public void test_handlesFilesAlreadyExist() {
+    @Test
+    public void handlesFilesAlreadyExist() {
         // Run twice
         installAlarmTones();
 
@@ -103,7 +115,8 @@ public class CustomAlarmToneTest extends AndroidTestCase {
     //
 
     private void installAlarmTones() {
-        CustomAlarmTone customAlarmTone = new CustomAlarmTone(getContext());
+        Context appContext = InstrumentationRegistry.getTargetContext();
+        CustomAlarmTone customAlarmTone = new CustomAlarmTone(appContext);
         customAlarmTone.install();
     }
 }

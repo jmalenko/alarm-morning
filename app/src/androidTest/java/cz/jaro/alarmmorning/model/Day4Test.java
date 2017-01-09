@@ -1,6 +1,10 @@
 package cz.jaro.alarmmorning.model;
 
-import android.test.AndroidTestCase;
+import android.support.test.runner.AndroidJUnit4;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.util.GregorianCalendar;
 
@@ -13,27 +17,29 @@ import static cz.jaro.alarmmorning.model.AlarmDataSourceTest.HOUR_DAY;
 import static cz.jaro.alarmmorning.model.AlarmDataSourceTest.MINUTE_DAY;
 import static cz.jaro.alarmmorning.model.AlarmDataSourceTest.MONTH;
 import static cz.jaro.alarmmorning.model.AlarmDataSourceTest.YEAR;
+import static junit.framework.Assert.assertEquals;
 
-public class Day4Test extends AndroidTestCase {
+@RunWith(AndroidJUnit4.class)
+public class Day4Test {
 
     private GlobalManager globalManager;
-    private Analytics analytics;
 
     private Day day0;
     private Day day1;
     private Day day2;
 
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void before() throws Exception {
         globalManager = GlobalManager.getInstance();
-        analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
 
         day0 = new Day();
         day0.setState(Day.STATE_ENABLED);
         day0.setDate(new GregorianCalendar(YEAR, MONTH, DAY));
         day0.setHour(HOUR_DAY);
         day0.setMinute(MINUTE_DAY);
+
+        Analytics analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
+
         globalManager.saveDay(day0, analytics);
 
         // day1 = day0 + 8 days
@@ -42,6 +48,9 @@ public class Day4Test extends AndroidTestCase {
         day1.setDate(new GregorianCalendar(YEAR, MONTH, DAY + 1));
         day1.setHour(HOUR_DAY + 1);
         day1.setMinute(MINUTE_DAY + 1);
+
+        analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
+
         globalManager.saveDay(day1, analytics);
 
         // day2 = day0 + 8 days
@@ -50,10 +59,14 @@ public class Day4Test extends AndroidTestCase {
         day2.setDate(new GregorianCalendar(YEAR, MONTH, DAY + 2));
         day2.setHour(HOUR_DAY + 2);
         day2.setMinute(MINUTE_DAY + 2);
+
+        analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
+
         globalManager.saveDay(day2, analytics);
     }
 
-    public void test_before0() {
+    @Test
+    public void before0() {
         FixedClock clock = new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DAY, MINUTE_DAY)).addMinute(-1);
 
         assertEquals(day0.isNextAlarm(clock), true);
@@ -61,7 +74,8 @@ public class Day4Test extends AndroidTestCase {
         assertEquals(day2.isNextAlarm(clock), false);
     }
 
-    public void test_before1() {
+    @Test
+    public void before1() {
         FixedClock clock = new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY + 1, HOUR_DAY + 1, MINUTE_DAY + 1)).addMinute(-1);
 
         assertEquals(day0.isNextAlarm(clock), false);
@@ -69,7 +83,8 @@ public class Day4Test extends AndroidTestCase {
         assertEquals(day2.isNextAlarm(clock), false);
     }
 
-    public void test_before2() {
+    @Test
+    public void before2() {
         FixedClock clock = new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY + 2, HOUR_DAY + 2, MINUTE_DAY + 2)).addMinute(-1);
 
         assertEquals(day0.isNextAlarm(clock), false);
@@ -77,7 +92,8 @@ public class Day4Test extends AndroidTestCase {
         assertEquals(day2.isNextAlarm(clock), true);
     }
 
-    public void test_after2() {
+    @Test
+    public void after2() {
         FixedClock clock = new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY + 2, HOUR_DAY + 2, MINUTE_DAY + 2)).addMinute(1);
 
         // set all defaults to disabled
@@ -87,6 +103,9 @@ public class Day4Test extends AndroidTestCase {
             defaults.setState(Defaults.STATE_DISABLED);
             defaults.setHour(1);
             defaults.setMinute(2);
+
+            Analytics analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
+
             globalManager.saveDefault(defaults, analytics);
         }
 

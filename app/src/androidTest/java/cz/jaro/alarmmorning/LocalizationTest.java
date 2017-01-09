@@ -1,28 +1,41 @@
 package cz.jaro.alarmmorning;
 
+import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.test.AndroidTestCase;
+import android.support.test.InstrumentationRegistry;
+import android.support.test.runner.AndroidJUnit4;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.util.Calendar;
 import java.util.Locale;
 
-public class LocalizationTest extends AndroidTestCase {
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.fail;
+
+@RunWith(AndroidJUnit4.class)
+public class LocalizationTest {
 
     private void setLocale(String language, String country) {
         Locale locale = new Locale(language, country);
         // update locale for date formatters
         Locale.setDefault(locale);
         // update locale for app resources
-        Resources res = getContext().getResources();
+        Context appContext = InstrumentationRegistry.getTargetContext();
+        Resources res = appContext.getResources();
         Configuration config = res.getConfiguration();
         config.locale = locale;
         res.updateConfiguration(config, res.getDisplayMetrics());
     }
 
-    public void test_dayOfWeekToString_en() {
+    @Test
+    public void dayOfWeekToString_en() {
         setLocale("en", "US");
-        Resources res = getContext().getResources();
+        Context appContext = InstrumentationRegistry.getTargetContext();
+        Resources res = appContext.getResources();
 
         assertEquals("Sunday", Localization.dayOfWeekToString(res, Calendar.SUNDAY));
         assertEquals("Monday", Localization.dayOfWeekToString(res, Calendar.MONDAY));
@@ -33,9 +46,11 @@ public class LocalizationTest extends AndroidTestCase {
         assertEquals("Saturday", Localization.dayOfWeekToString(res, Calendar.SATURDAY));
     }
 
-    public void test_dayOfWeekToStringShort_en() {
+    @Test
+    public void dayOfWeekToStringShort_en() {
         setLocale("en", "US");
-        Resources res = getContext().getResources();
+        Context appContext = InstrumentationRegistry.getTargetContext();
+        Resources res = appContext.getResources();
 
         assertEquals("Sun", Localization.dayOfWeekToStringShort(res, Calendar.SUNDAY));
         assertEquals("Mon", Localization.dayOfWeekToStringShort(res, Calendar.MONDAY));
@@ -46,9 +61,11 @@ public class LocalizationTest extends AndroidTestCase {
         assertEquals("Sat", Localization.dayOfWeekToStringShort(res, Calendar.SATURDAY));
     }
 
-    public void test_dayOfWeekToString_cs() {
+    @Test
+    public void dayOfWeekToString_cs() {
         setLocale("cs", "CZ");
-        Resources res = getContext().getResources();
+        Context appContext = InstrumentationRegistry.getTargetContext();
+        Resources res = appContext.getResources();
 
         // Czech: záměrně je uveden 4. pád, protože se používá ve větě "Nastavit budík v neděli?"
         assertEquals("neděli", Localization.dayOfWeekToString(res, Calendar.SUNDAY));
@@ -60,9 +77,11 @@ public class LocalizationTest extends AndroidTestCase {
         assertEquals("sobotu", Localization.dayOfWeekToString(res, Calendar.SATURDAY));
     }
 
-    public void test_dayOfWeekToStringShort_cs() {
+    @Test
+    public void dayOfWeekToStringShort_cs() {
         setLocale("cs", "CZ");
-        Resources res = getContext().getResources();
+        Context appContext = InstrumentationRegistry.getTargetContext();
+        Resources res = appContext.getResources();
 
         assertEquals("Ne", Localization.dayOfWeekToStringShort(res, Calendar.SUNDAY));
         assertEquals("Po", Localization.dayOfWeekToStringShort(res, Calendar.MONDAY));
@@ -73,9 +92,11 @@ public class LocalizationTest extends AndroidTestCase {
         assertEquals("So", Localization.dayOfWeekToStringShort(res, Calendar.SATURDAY));
     }
 
-    public void test_dayOfWeekToString_invalid() {
+    @Test
+    public void dayOfWeekToString_invalid() {
         setLocale("en", "US");
-        Resources res = getContext().getResources();
+        Context appContext = InstrumentationRegistry.getTargetContext();
+        Resources res = appContext.getResources();
 
         try {
             Localization.dayOfWeekToString(res, 100);
@@ -85,21 +106,24 @@ public class LocalizationTest extends AndroidTestCase {
         }
     }
 
-    public void test_weekStart_en() {
+    @Test
+    public void weekStart_en() {
         setLocale("en", "US");
         com.ibm.icu.util.Calendar c = com.ibm.icu.util.Calendar.getInstance();
 
         assertEquals(Calendar.SUNDAY, c.getFirstDayOfWeek());
     }
 
-    public void test_weekStart_cs() {
+    @Test
+    public void weekStart_cs() {
         setLocale("cs", "CZ");
         com.ibm.icu.util.Calendar c = com.ibm.icu.util.Calendar.getInstance();
 
         assertEquals(Calendar.MONDAY, c.getFirstDayOfWeek());
     }
 
-    public void test_weekend_en() {
+    @Test
+    public void weekend_en() {
         setLocale("en", "US");
         com.ibm.icu.util.Calendar c = com.ibm.icu.util.Calendar.getInstance();
 
@@ -112,7 +136,8 @@ public class LocalizationTest extends AndroidTestCase {
         assertEquals(com.ibm.icu.util.Calendar.WEEKEND, c.getDayOfWeekType(Calendar.SATURDAY));
     }
 
-    public void test_weekend_cs() {
+    @Test
+    public void weekend_cs() {
         setLocale("cs", "CZ");
         com.ibm.icu.util.Calendar c = com.ibm.icu.util.Calendar.getInstance();
 
@@ -125,7 +150,8 @@ public class LocalizationTest extends AndroidTestCase {
         assertEquals(com.ibm.icu.util.Calendar.WEEKEND, c.getDayOfWeekType(Calendar.SATURDAY));
     }
 
-    public void test_weekend_ir() {
+    @Test
+    public void weekend_ir() {
         setLocale("fa", "IR");
         com.ibm.icu.util.Calendar c = com.ibm.icu.util.Calendar.getInstance();
 

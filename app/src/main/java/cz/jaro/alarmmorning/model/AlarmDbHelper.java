@@ -127,7 +127,7 @@ public class AlarmDbHelper extends SQLiteOpenHelper {
         values.put(COLUMN_DEFAULTS_MINUTE, DEFAULT_ALARM_MINUTE);
         for (int dayOfWeek : AlarmDataSource.allDaysOfWeek) {
             values.put(COLUMN_DEFAULTS_DAY_OF_WEEK, dayOfWeek);
-            database.insert(TABLE_DEFAULTS, null, values);
+            database.insertWithOnConflict(TABLE_DEFAULTS, null, values, SQLiteDatabase.CONFLICT_REPLACE);
         }
     }
 
