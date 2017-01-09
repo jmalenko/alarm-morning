@@ -1,25 +1,14 @@
 package cz.jaro.alarmmorning.model;
 
-import android.support.annotation.NonNull;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.FixMethodOrder;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.MethodSorters;
-import org.robolectric.RobolectricTestRunner;
-import org.robolectric.annotation.Config;
 
-import java.lang.reflect.Field;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 import cz.jaro.alarmmorning.Analytics;
-import cz.jaro.alarmmorning.BuildConfig;
+import cz.jaro.alarmmorning.FixedTimeTest;
 import cz.jaro.alarmmorning.GlobalManager;
+import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.clock.FixedClock;
-import cz.jaro.alarmmorning.shadows.ShadowAlarmManagerAPI21;
 
 import static cz.jaro.alarmmorning.model.DayTest.HOUR_DAY;
 import static cz.jaro.alarmmorning.model.DayTest.HOUR_DEFAULT;
@@ -30,52 +19,10 @@ import static org.junit.Assert.assertNull;
 
 /**
  * Tests when no alarm should ring. Holiday is not defined.
- * <p>
- * The tests use Robolectric to mock access to database and context (needed by holidays).
  */
-@RunWith(RobolectricTestRunner.class)
-@Config(constants = BuildConfig.class, sdk = 21, shadows = {ShadowAlarmManagerAPI21.class})
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class GlobalManager1NextAlarm0NoAlarmTest {
+public class GlobalManager1NextAlarm0NoAlarmTest extends FixedTimeTest {
 
-    private GlobalManager globalManager;
-
-    public static final int RANGE = 40; // Note: Large values result in longer run times
-
-    @Before
-    public void before() {
-        globalManager = GlobalManager.getInstance();
-        globalManager.reset();
-    }
-
-    /**
-     * This must be done to clean up after a test. Otherwise we get <code>java.lang.RuntimeException: java.util.concurrent.ExecutionException: java.lang
-     * .IllegalStateException: Illegal connection pointer 1. Current pointers for thread</code>
-     * <p>
-     * The reason is that the own SQLiteOpenHelper is a singleton. Between tests all instances should be reset or you will get strange side effects like this.
-     * For me it works to set the static variable null per reflection. Here an example
-     */
-    @After
-    public void after() {
-        resetSingleton(GlobalManager.class, "instance");
-    }
-
-    /**
-     * Sets a static field to null.
-     *
-     * @param clazz     Class
-     * @param fieldName The static variable name which holds the singleton instance
-     */
-    public static void resetSingleton(Class clazz, String fieldName) {
-        Field instance;
-        try {
-            instance = clazz.getDeclaredField(fieldName);
-            instance.setAccessible(true);
-            instance.set(null, null);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
+    static final int RANGE = 40; // Note: Large values result in longer run times
 
     @Test
     public void t00_preconditions() {
@@ -84,21 +31,15 @@ public class GlobalManager1NextAlarm0NoAlarmTest {
 
     @Test
     public void t10_noAlarmNow() {
-        FixedClock clock = clockTest();
+        Clock clock = globalManager.clock();
         Calendar nextAlarm = globalManager.getNextAlarm(clock);
 
         assertNull(nextAlarm);
     }
 
-    @NonNull
-    public static FixedClock clockTest() {
-        GregorianCalendar date = new GregorianCalendar(DayTest.YEAR, DayTest.MONTH, DayTest.DAY);
-        return new FixedClock(date);
-    }
-
     @Test
     public void t11_noAlarmAnytime() {
-        Calendar now = clockTest().now();
+        Calendar now = globalManager.clock().now();
         for (int i = -RANGE; i <= RANGE; i++) {
             Calendar date = (Calendar) now.clone();
             date.add(Calendar.DATE, i);
@@ -116,7 +57,7 @@ public class GlobalManager1NextAlarm0NoAlarmTest {
     private void insertDisabledValues() {
         // Days
         for (int i = -RANGE; i <= RANGE; i++) {
-            Calendar now = clockTest().now();
+            Calendar now = globalManager.clock().now();
             Calendar date = (Calendar) now.clone();
             date.add(Calendar.DATE, i);
 
@@ -158,7 +99,7 @@ public class GlobalManager1NextAlarm0NoAlarmTest {
     public void t20_noAlarmAnytimeWithFullDatabase() {
         insertDisabledValues();
 
-        Calendar now = clockTest().now();
+        Calendar now = globalManager.clock().now();
         for (int i = -RANGE; i <= RANGE; i++) {
             Calendar date = (Calendar) now.clone();
             date.add(Calendar.DATE, i);

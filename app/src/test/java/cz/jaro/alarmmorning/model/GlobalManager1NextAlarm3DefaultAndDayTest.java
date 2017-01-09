@@ -1,22 +1,13 @@
 package cz.jaro.alarmmorning.model;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.FixMethodOrder;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.MethodSorters;
-import org.robolectric.RobolectricTestRunner;
-import org.robolectric.annotation.Config;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import cz.jaro.alarmmorning.Analytics;
-import cz.jaro.alarmmorning.BuildConfig;
-import cz.jaro.alarmmorning.GlobalManager;
+import cz.jaro.alarmmorning.FixedTimeTest;
 import cz.jaro.alarmmorning.clock.FixedClock;
-import cz.jaro.alarmmorning.shadows.ShadowAlarmManagerAPI21;
 
 import static cz.jaro.alarmmorning.model.GlobalManager1NextAlarm2DefaultTest.dayOfWeek;
 import static cz.jaro.alarmmorning.model.GlobalManager1NextAlarm2DefaultTest.findNextSameDayOfWeek;
@@ -26,23 +17,7 @@ import static org.junit.Assert.assertThat;
 /**
  * Tests when there is one default enabled and a day that disables the alarm (which was set by default). Holiday is not defined.
  */
-@RunWith(RobolectricTestRunner.class)
-@Config(constants = BuildConfig.class, sdk = 21, shadows = {ShadowAlarmManagerAPI21.class})
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class GlobalManager1NextAlarm3DefaultAndDayTest {
-
-    private GlobalManager globalManager;
-
-    @Before
-    public void before() {
-        globalManager = GlobalManager.getInstance();
-        globalManager.reset();
-    }
-
-    @After
-    public void after() {
-        GlobalManager1NextAlarm0NoAlarmTest.resetSingleton(GlobalManager.class, "instance");
-    }
+public class GlobalManager1NextAlarm3DefaultAndDayTest extends FixedTimeTest {
 
     private void setDefaultAlarm() {
         Calendar date = new GregorianCalendar(DayTest.YEAR, DayTest.MONTH, DayTest.DAY, DayTest.HOUR, DayTest.MINUTE);

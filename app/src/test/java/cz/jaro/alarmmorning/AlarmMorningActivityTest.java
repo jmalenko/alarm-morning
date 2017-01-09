@@ -12,12 +12,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
-import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
@@ -28,7 +25,6 @@ import java.util.Locale;
 
 import cz.jaro.alarmmorning.model.AlarmDataSource;
 import cz.jaro.alarmmorning.model.Defaults;
-import cz.jaro.alarmmorning.model.GlobalManager1NextAlarm0NoAlarmTest;
 import cz.jaro.alarmmorning.wizard.Wizard;
 
 import static junit.framework.Assert.assertTrue;
@@ -38,14 +34,7 @@ import static org.hamcrest.core.Is.is;
 /**
  * Test navigation.
  */
-@RunWith(RobolectricTestRunner.class)
-@Config(constants = BuildConfig.class, manifest = "app/src/main/AndroidManifest.xml", sdk = 21, qualifiers = "cs")
-public class AlarmMorningActivityTest {
-
-    @After
-    public void after() {
-        GlobalManager1NextAlarm0NoAlarmTest.resetSingleton(GlobalManager.class, "instance");
-    }
+public class AlarmMorningActivityTest extends FixedTimeTest {
 
     /**
      * Set the locale as default locale and in the context configuration. Setting these locales for localized tests is necessary, because the Robolectric {@link

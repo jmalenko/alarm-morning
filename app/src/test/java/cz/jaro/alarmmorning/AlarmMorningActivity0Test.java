@@ -9,31 +9,19 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
-import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.Shadows;
-import org.robolectric.annotation.Config;
-import org.robolectric.internal.ShadowExtractor;
 import org.robolectric.shadows.ShadowActivity;
 import org.robolectric.shadows.ShadowAlarmManager;
 import org.robolectric.shadows.ShadowPendingIntent;
 
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 import cz.jaro.alarmmorning.clock.Clock;
-import cz.jaro.alarmmorning.clock.FixedClock;
 import cz.jaro.alarmmorning.model.AlarmDataSource;
-import cz.jaro.alarmmorning.model.DayTest;
-import cz.jaro.alarmmorning.model.GlobalManager1NextAlarm0NoAlarmTest;
 import cz.jaro.alarmmorning.receivers.AlarmReceiver;
-import cz.jaro.alarmmorning.shadows.ShadowAlarmManagerAPI21;
-import cz.jaro.alarmmorning.shadows.ShadowGlobalManager;
 
 import static cz.jaro.alarmmorning.model.DayTest.DAY;
 import static cz.jaro.alarmmorning.model.DayTest.MONTH;
@@ -43,30 +31,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Test "when there is no alarm..."
  */
-@RunWith(RobolectricTestRunner.class)
-@Config(constants = BuildConfig.class, sdk = 21, shadows = {ShadowAlarmManagerAPI21.class, ShadowGlobalManager.class})
-public class AlarmMorningActivity0Test {
-
-    private GlobalManager globalManager;
-
-    @Before
-    public void before() {
-        globalManager = GlobalManager.getInstance();
-        ShadowGlobalManager shadowGlobalManager = (ShadowGlobalManager) ShadowExtractor.extract(globalManager);
-
-        FixedClock clock = new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR, DayTest.MINUTE));
-        shadowGlobalManager.setClock(clock);
-
-        globalManager.reset();
-    }
-
-    @After
-    public void after() {
-        GlobalManager1NextAlarm0NoAlarmTest.resetSingleton(GlobalManager.class, "instance");
-    }
+public class AlarmMorningActivity0Test extends FixedTimeTest {
 
     @Test
-    public void clockSetToFixedTime() {
+    public void clockIsSetToFixedTime() {
         Clock clock = globalManager.clock();
         Calendar now = clock.now();
 

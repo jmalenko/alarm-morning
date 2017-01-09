@@ -1,23 +1,15 @@
 package cz.jaro.alarmmorning.model;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.FixMethodOrder;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.MethodSorters;
-import org.robolectric.RobolectricTestRunner;
-import org.robolectric.annotation.Config;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import cz.jaro.alarmmorning.Analytics;
-import cz.jaro.alarmmorning.BuildConfig;
+import cz.jaro.alarmmorning.FixedTimeTest;
 import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.clock.FixedClock;
-import cz.jaro.alarmmorning.shadows.ShadowAlarmManagerAPI21;
 
 import static cz.jaro.alarmmorning.model.GlobalManager1NextAlarm0NoAlarmTest.RANGE;
 import static org.hamcrest.core.Is.is;
@@ -27,23 +19,7 @@ import static org.junit.Assert.assertThat;
 /**
  * Tests when there is only one day alarm enabled. Holiday is not defined.
  */
-@RunWith(RobolectricTestRunner.class)
-@Config(constants = BuildConfig.class, sdk = 21, shadows = {ShadowAlarmManagerAPI21.class})
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class GlobalManager1NextAlarm1DayTest {
-
-    private GlobalManager globalManager;
-
-    @Before
-    public void before() {
-        globalManager = GlobalManager.getInstance();
-        globalManager.reset();
-    }
-
-    @After
-    public void after() {
-        GlobalManager1NextAlarm0NoAlarmTest.resetSingleton(GlobalManager.class, "instance");
-    }
+public class GlobalManager1NextAlarm1DayTest extends FixedTimeTest {
 
     private void setAlarmToToday() {
         Calendar date = new GregorianCalendar(DayTest.YEAR, DayTest.MONTH, DayTest.DAY, DayTest.HOUR, DayTest.MINUTE);
@@ -70,7 +46,7 @@ public class GlobalManager1NextAlarm1DayTest {
     public void t10_alarmToday() {
         setAlarmToToday();
 
-        Clock clock = GlobalManager1NextAlarm0NoAlarmTest.clockTest();
+        Clock clock = globalManager.clock();
         Calendar nextAlarm = globalManager.getNextAlarm(clock);
 
         assertThat("Year", nextAlarm.get(Calendar.YEAR), is(DayTest.YEAR));
@@ -131,7 +107,7 @@ public class GlobalManager1NextAlarm1DayTest {
     public void t23_before() {
         setAlarmToToday();
 
-        Calendar now = GlobalManager1NextAlarm0NoAlarmTest.clockTest().now();
+        Calendar now = globalManager.clock().now();
         for (int i = -RANGE; i <= 0; i++) {
             Calendar date = (Calendar) now.clone();
             date.add(Calendar.DATE, i);
@@ -171,7 +147,7 @@ public class GlobalManager1NextAlarm1DayTest {
     public void t32_after() {
         setAlarmToToday();
 
-        Calendar now = GlobalManager1NextAlarm0NoAlarmTest.clockTest().now();
+        Calendar now = globalManager.clock().now();
         for (int i = 1; i <= RANGE; i++) {
             Calendar date = (Calendar) now.clone();
             date.add(Calendar.DATE, i);

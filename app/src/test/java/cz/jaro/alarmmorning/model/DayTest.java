@@ -1,13 +1,9 @@
 package cz.jaro.alarmmorning.model;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
-import org.robolectric.RobolectricTestRunner;
 import org.robolectric.Shadows;
-import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowActivity;
 
 import java.util.Calendar;
@@ -15,10 +11,9 @@ import java.util.GregorianCalendar;
 
 import cz.jaro.alarmmorning.AlarmMorningActivity;
 import cz.jaro.alarmmorning.AlarmMorningActivityTest;
-import cz.jaro.alarmmorning.BuildConfig;
+import cz.jaro.alarmmorning.FixedTimeTest;
 import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.clock.Clock;
-import cz.jaro.alarmmorning.shadows.ShadowAlarmManagerAPI21;
 
 import static cz.jaro.alarmmorning.holiday.HolidayHelperTest.DE;
 import static org.hamcrest.core.Is.is;
@@ -27,9 +22,7 @@ import static org.junit.Assert.assertThat;
 /**
  * This tests do not depend on {@link Clock}.
  */
-@RunWith(RobolectricTestRunner.class)
-@Config(constants = BuildConfig.class, manifest = "app/src/main/AndroidManifest.xml", sdk = 21, shadows = {ShadowAlarmManagerAPI21.class})
-public class DayTest {
+public class DayTest extends FixedTimeTest {
 
     // February 2016 starts with Monday
     public static final int YEAR = 2016;
@@ -55,6 +48,8 @@ public class DayTest {
 
     @Before
     public void before() {
+        super.before();
+
         defaults = new Defaults();
         defaults.setDayOfWeek(DAY_OF_WEEK);
         defaults.setHour(HOUR_DEFAULT);
@@ -66,11 +61,6 @@ public class DayTest {
         day.setHour(HOUR_DAY);
         day.setMinute(MINUTE_DAY);
         day.setDefaults(defaults);
-    }
-
-    @After
-    public void after() {
-        GlobalManager1NextAlarm0NoAlarmTest.resetSingleton(GlobalManager.class, "instance");
     }
 
     @Test

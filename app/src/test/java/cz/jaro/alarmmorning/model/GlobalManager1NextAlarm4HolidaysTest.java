@@ -1,23 +1,15 @@
 package cz.jaro.alarmmorning.model;
 
-import org.junit.After;
 import org.junit.Before;
-import org.junit.FixMethodOrder;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.MethodSorters;
-import org.robolectric.RobolectricTestRunner;
-import org.robolectric.annotation.Config;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import cz.jaro.alarmmorning.Analytics;
-import cz.jaro.alarmmorning.BuildConfig;
-import cz.jaro.alarmmorning.GlobalManager;
+import cz.jaro.alarmmorning.FixedTimeTest;
 import cz.jaro.alarmmorning.SettingsActivity;
 import cz.jaro.alarmmorning.clock.FixedClock;
-import cz.jaro.alarmmorning.shadows.ShadowAlarmManagerAPI21;
 
 import static cz.jaro.alarmmorning.holiday.HolidayHelper1HolidaysTest.holidays_Czech;
 import static cz.jaro.alarmmorning.holiday.HolidayHelper1HolidaysTest.isHoliday;
@@ -28,17 +20,11 @@ import static org.junit.Assert.assertThat;
 /**
  * Tests when there is holiday defined.
  */
-@RunWith(RobolectricTestRunner.class)
-@Config(constants = BuildConfig.class, sdk = 21, shadows = {ShadowAlarmManagerAPI21.class})
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class GlobalManager1NextAlarm4HolidaysTest {
-
-    private GlobalManager globalManager;
+public class GlobalManager1NextAlarm4HolidaysTest extends FixedTimeTest {
 
     @Before
     public void before() {
-        globalManager = GlobalManager.getInstance();
-        globalManager.reset();
+        super.before();
 
         // Defaults
         for (int dayOfWeek : AlarmDataSource.allDaysOfWeek) {
@@ -52,11 +38,6 @@ public class GlobalManager1NextAlarm4HolidaysTest {
 
             globalManager.saveDefault(defaults, analytics);
         }
-    }
-
-    @After
-    public void after() {
-        GlobalManager1NextAlarm0NoAlarmTest.resetSingleton(GlobalManager.class, "instance");
     }
 
     @Test
