@@ -18,14 +18,18 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
+import org.robolectric.internal.ShadowExtractor;
 import org.robolectric.shadows.ShadowActivity;
 import org.robolectric.shadows.ShadowAlarmManager;
 import org.robolectric.shadows.ShadowPendingIntent;
 
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 import cz.jaro.alarmmorning.clock.Clock;
+import cz.jaro.alarmmorning.clock.FixedClock;
 import cz.jaro.alarmmorning.model.AlarmDataSource;
+import cz.jaro.alarmmorning.model.DayTest;
 import cz.jaro.alarmmorning.model.GlobalManager1NextAlarm0NoAlarmTest;
 import cz.jaro.alarmmorning.receivers.AlarmReceiver;
 import cz.jaro.alarmmorning.shadows.ShadowAlarmManagerAPI21;
@@ -48,6 +52,11 @@ public class AlarmMorningActivity0Test {
     @Before
     public void before() {
         globalManager = GlobalManager.getInstance();
+        ShadowGlobalManager shadowGlobalManager = (ShadowGlobalManager) ShadowExtractor.extract(globalManager);
+
+        FixedClock clock = new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR, DayTest.MINUTE));
+        shadowGlobalManager.setClock(clock);
+
         globalManager.reset();
     }
 

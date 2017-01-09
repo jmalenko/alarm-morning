@@ -1011,6 +1011,7 @@ public class GlobalManager {
     public void reset() {
         resetDatabase();
         resetSettings();
+        onAlarmSet();
     }
 
     /**
