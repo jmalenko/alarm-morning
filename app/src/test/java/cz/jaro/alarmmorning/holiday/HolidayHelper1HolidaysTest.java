@@ -2,26 +2,24 @@ package cz.jaro.alarmmorning.holiday;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.robolectric.RobolectricTestRunner;
-import org.robolectric.annotation.Config;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import cz.jaro.alarmmorning.BuildConfig;
+import cz.jaro.alarmmorning.FixedTimeTest;
+import cz.jaro.alarmmorning.clock.Clock;
 import de.jollyday.Holiday;
 
+import static cz.jaro.alarmmorning.calendar.CalendarUtils.beginningOfToday;
+import static cz.jaro.alarmmorning.calendar.CalendarUtils.roundDown;
 import static org.junit.Assert.assertEquals;
 
 /**
  * Test the Czech holidays (in HolidayHelper class).
  */
-@RunWith(RobolectricTestRunner.class)
-@Config(constants = BuildConfig.class, manifest = "app/src/main/AndroidManifest.xml", sdk = 21)
-public class HolidayHelper1HolidaysTest {
+public class HolidayHelper1HolidaysTest extends FixedTimeTest {
 
     public static final List<Calendar> holidays_Czech;
 
@@ -75,11 +73,39 @@ public class HolidayHelper1HolidaysTest {
 
     @Before
     public void before() {
+        super.before();
         holidayHelper = HolidayHelper.getInstance();
     }
 
     @Test
-    public void listHolidays() {
+    public void listHolidays2016() {
+        Clock clock = globalManager.clock();
+        Calendar now = clock.now();
+
+        Calendar from = beginningOfToday(now);
+        roundDown(from, Calendar.MONTH);
+
+        Calendar to = beginningOfToday(now);
+        to.add(Calendar.YEAR, 1);
+        roundDown(to, Calendar.MONTH);
+
+        List<Holiday> holidays = holidayHelper.listHolidays(HolidayHelperTest.CZ, from, to);
+
+        for (Holiday holiday : holidays) {
+            Calendar date = Calendar.getInstance();
+            date.setTime(holiday.getDate().toDate());
+
+            if (!isHoliday(date, holidays_Czech)) {
+                throw new AssertionError("There should be no holiday on " + date.getTime().toString());
+            }
+        }
+
+        // Make sure there is no other holiday
+        assertEquals("Count of holidays", holidays.size(), 13);
+    }
+
+    @Test
+    public void listHolidaysFloat() {
         List<Holiday> holidays = holidayHelper.listHolidays(HolidayHelperTest.CZ);
         for (Holiday holiday : holidays) {
             Calendar date = Calendar.getInstance();
@@ -90,7 +116,7 @@ public class HolidayHelper1HolidaysTest {
             }
         }
 
-        // make sure there is no other holiday
+        // Make sure there is no other holiday
         assertEquals("Count of holidays", holidays.size(), 13);
     }
 

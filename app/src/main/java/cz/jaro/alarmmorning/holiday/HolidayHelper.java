@@ -22,7 +22,6 @@ import java.util.Set;
 import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.SettingsActivity;
-import cz.jaro.alarmmorning.clock.SystemClock;
 import de.jollyday.CalendarHierarchy;
 import de.jollyday.Holiday;
 import de.jollyday.HolidayCalendar;
@@ -95,52 +94,69 @@ public class HolidayHelper {
     /**
      * Get list of {@link Holiday}s, from today (including) till the same day next year (excluding), sorted by date.
      *
-     * @param path path identifier of a region
-     * @return list of {@link Holiday}s
-     */
-    public List<Holiday> listHolidays(String path) {
-        HolidayCalendar holidayCalendar = HolidayHelper.getInstance().getHolidayCalendar(path);
-        return listHolidays(holidayCalendar, path);
-    }
-
-    /**
-     * Get list of {@link Holiday}s, from today (including) till the same day next year (excluding), sorted by date.
-     *
-     * @return list of {@link Holiday}s
+     * @return List of {@link Holiday}s.
      */
     public List<Holiday> listHolidays() {
         GlobalManager globalManager = GlobalManager.getInstance();
-        HolidayCalendar holidayCalendar = HolidayHelper.getInstance().getHolidayCalendar();
-        return listHolidays(holidayCalendar, globalManager.loadHoliday());
+        String path = globalManager.loadHoliday();
+
+        return listHolidays(path);
     }
 
     /**
      * Get list of {@link Holiday}s, from today (including) till the same day next year (excluding), sorted by date.
      *
-     * @param holidayCalendar HolidayCalendar to use
-     * @return list of {@link Holiday}s
+     * @param path Path identifier of a region
+     * @return List of {@link Holiday}s.
      */
-    private List<Holiday> listHolidays(HolidayCalendar holidayCalendar, String path) {
+    public List<Holiday> listHolidays(String path) {
+        GlobalManager globalManager = GlobalManager.getInstance();
+
+        Calendar from = beginningOfToday(globalManager.clock().now());
+        Calendar to = (Calendar) from.clone();
+        to.add(Calendar.YEAR, 1);
+
+        return listHolidays(path, from, to);
+    }
+
+    /**
+     * Get list of {@link Holiday}s for the <code>path</code>, between <code>from</code> and <code>to</code> (including), sorted by date.
+     *
+     * @param path Path identifier of a region
+     * @param from Lower end of range range
+     * @param to   Upper range of date range
+     * @return List of {@link Holiday}s.
+     */
+    public List<Holiday> listHolidays(String path, Calendar from, Calendar to) {
+        HolidayCalendar holidayCalendar = HolidayHelper.getInstance().getHolidayCalendar(path);
+
+        return listHolidays(holidayCalendar, path, from, to);
+    }
+
+    /**
+     * Get list of {@link Holiday}s, between <code>from</code> and <code>to</code> (including), sorted by date.
+     *
+     * @param holidayCalendar HolidayCalendar to use
+     * @param path            Path identifier of a region
+     * @param from            Lower end of range range
+     * @param to              Upper range of date range
+     * @return List of {@link Holiday}s.
+     */
+    private List<Holiday> listHolidays(HolidayCalendar holidayCalendar, String path, Calendar from, Calendar to) {
         HolidayManager holidayManager = HolidayManager.getInstance(holidayCalendar);
 
         String[] ids = path.split("\\.");
         String[] subRegions = Arrays.copyOfRange(ids, 1, ids.length);
 
-        // Add all the holidays this year and next year
+        // Add all the holidays the years that include the range
         Set<Holiday> holidays = new HashSet<>();
-        int year = new SystemClock().now().get(Calendar.YEAR);
-        for (int y = year; y <= year + 1; y++) {
+        for (int y = from.get(Calendar.YEAR); y <= to.get(Calendar.YEAR); y++) {
             Set<Holiday> holidaysY;
             holidaysY = holidayManager.getHolidays(y, subRegions);
             holidays.addAll(holidaysY);
         }
 
-        // Filter: keep only holidays in next year
-        GlobalManager globalManager = GlobalManager.getInstance();
-        Calendar from = beginningOfToday(globalManager.clock().now());
-        Calendar to = (Calendar) from.clone();
-        to.add(Calendar.YEAR, 1);
-
+        // Filter: keep only holidays in the range
         Iterator<Holiday> it = holidays.iterator();
         while (it.hasNext()) {
             Holiday h = it.next();
