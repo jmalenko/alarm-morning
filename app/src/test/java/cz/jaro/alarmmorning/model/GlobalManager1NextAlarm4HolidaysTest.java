@@ -11,6 +11,7 @@ import cz.jaro.alarmmorning.FixedTimeTest;
 import cz.jaro.alarmmorning.SettingsActivity;
 import cz.jaro.alarmmorning.clock.FixedClock;
 
+import static cz.jaro.alarmmorning.calendar.CalendarUtils.addDay;
 import static cz.jaro.alarmmorning.holiday.HolidayHelper1HolidaysTest.holidays_Czech;
 import static cz.jaro.alarmmorning.holiday.HolidayHelper1HolidaysTest.isHoliday;
 import static cz.jaro.alarmmorning.holiday.HolidayHelper1HolidaysTest.sameDate;
@@ -46,7 +47,7 @@ public class GlobalManager1NextAlarm4HolidaysTest extends FixedTimeTest {
 
         Calendar from = new GregorianCalendar(DayTest.YEAR, Calendar.JANUARY, 1);
         Calendar to = new GregorianCalendar(DayTest.YEAR + 1, Calendar.JANUARY, 1);
-        for (Calendar date = (Calendar) from.clone(); date.before(to); date.add(Calendar.DATE, 1)) {
+        for (Calendar date = (Calendar) from.clone(); date.before(to); addDay(date)) {
 
             FixedClock clock = new FixedClock(date);
 
@@ -132,7 +133,7 @@ public class GlobalManager1NextAlarm4HolidaysTest extends FixedTimeTest {
 
         Calendar from = new GregorianCalendar(DayTest.YEAR, Calendar.JANUARY, 1);
         Calendar to = new GregorianCalendar(DayTest.YEAR + 1, Calendar.JANUARY, 1);
-        for (Calendar date = (Calendar) from.clone(); date.before(to); date.add(Calendar.DATE, 1)) {
+        for (Calendar date = (Calendar) from.clone(); date.before(to); addDay(date)) {
             FixedClock clock = new FixedClock(date);
 
             Calendar nextAlarm = globalManager.getNextAlarm(clock);

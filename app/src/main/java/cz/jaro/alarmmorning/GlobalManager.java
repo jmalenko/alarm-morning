@@ -28,6 +28,11 @@ import cz.jaro.alarmmorning.model.Day;
 import cz.jaro.alarmmorning.model.DayFilter;
 import cz.jaro.alarmmorning.model.Defaults;
 
+import static cz.jaro.alarmmorning.calendar.CalendarUtils.addDay;
+import static cz.jaro.alarmmorning.calendar.CalendarUtils.addMilliSecondsClone;
+import static cz.jaro.alarmmorning.calendar.CalendarUtils.addMinutesClone;
+import static cz.jaro.alarmmorning.calendar.CalendarUtils.roundDown;
+
 /**
  * The GlobalManager keeps the state of the application and communicates with the application components.
  * <p>
@@ -417,8 +422,7 @@ public class GlobalManager {
 
                 if (nextActionPersisted.alarmTime != null) {
                     // Notification about skipped alarms
-                    Calendar from = nextActionPersisted.alarmTime;
-                    from.add(Calendar.SECOND, 1);
+                    Calendar from = addMilliSecondsClone(nextActionPersisted.alarmTime, 1);
 
                     List<Calendar> alarmTimes = getAlarmsInPeriod(from, clock().now());
 
@@ -477,8 +481,7 @@ public class GlobalManager {
     public boolean inRecentPast(Calendar time, int minutes) {
         Calendar now = clock().now();
 
-        Calendar from = (Calendar) now.clone();
-        from.add(Calendar.MINUTE, -minutes);
+        Calendar from = addMinutesClone(now, -minutes);
 
         return time.after(from) && time.before(now);
     }
@@ -835,10 +838,8 @@ public class GlobalManager {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         int snoozeTime = preferences.getInt(SettingsActivity.PREF_SNOOZE_TIME, SettingsActivity.PREF_SNOOZE_TIME_DEFAULT);
 
-        Calendar ringAfterSnoozeTime = clock.now();
-        ringAfterSnoozeTime.add(Calendar.MINUTE, snoozeTime);
-        ringAfterSnoozeTime.set(Calendar.SECOND, 0);
-        ringAfterSnoozeTime.set(Calendar.MILLISECOND, 0);
+        Calendar ringAfterSnoozeTime = addMinutesClone(clock.now(), snoozeTime);
+        roundDown(ringAfterSnoozeTime, Calendar.SECOND);
 
         return ringAfterSnoozeTime;
     }
@@ -945,7 +946,7 @@ public class GlobalManager {
     public Day getNextAlarm(Clock clock, DayFilter filter) {
         Calendar date = clock.now();
 
-        for (int daysInAdvance = 0; daysInAdvance < HORIZON_DAYS; daysInAdvance++, date.add(Calendar.DATE, 1)) {
+        for (int daysInAdvance = 0; daysInAdvance < HORIZON_DAYS; daysInAdvance++, addDay(date)) {
             Day day = loadDay(date);
 
             if (!day.isEnabled()) {
@@ -980,7 +981,7 @@ public class GlobalManager {
 
         List<Calendar> alarmTimes = new ArrayList<>();
 
-        for (Calendar date = (Calendar) from.clone(); date.before(to); date.add(Calendar.DATE, 1)) {
+        for (Calendar date = (Calendar) from.clone(); date.before(to); addDay(date)) {
             Day day = loadDay(date);
 
             if (!day.isEnabled()) {

@@ -2,6 +2,8 @@ package cz.jaro.alarmmorning.model;
 
 import cz.jaro.alarmmorning.Analytics;
 
+import static cz.jaro.alarmmorning.calendar.CalendarUtils.dayOfWeekToString;
+
 /**
  * Represents the alarm clock setting for a particular weekday.
  */
@@ -112,7 +114,7 @@ public class Defaults implements Cloneable {
     public String toString() {
         StringBuffer str = new StringBuffer();
 
-        str.append(Analytics.dayOfWeekToString(dayOfWeek));
+        str.append(dayOfWeekToString(dayOfWeek));
         str.append(" ");
         str.append(Analytics.defaultStateToString(state));
 

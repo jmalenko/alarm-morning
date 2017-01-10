@@ -26,6 +26,11 @@ import cz.jaro.alarmmorning.graphics.RecyclerViewWithContextMenu;
 import cz.jaro.alarmmorning.graphics.SimpleDividerItemDecoration;
 import cz.jaro.alarmmorning.model.Day;
 
+import static cz.jaro.alarmmorning.calendar.CalendarUtils.addDay;
+import static cz.jaro.alarmmorning.calendar.CalendarUtils.addDaysClone;
+import static cz.jaro.alarmmorning.calendar.CalendarUtils.beginningOfToday;
+import static cz.jaro.alarmmorning.calendar.CalendarUtils.onTheSameDate;
+
 /**
  * Fragment that appears in the "content_frame".
  */
@@ -173,7 +178,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         if (!today.equals(today2)) {
             int diffInDays = -1;
             for (int i = 1; i < GlobalManager.HORIZON_DAYS; i++) {
-                Calendar date = addDays(today, i);
+                Calendar date = addDaysClone(today, i);
                 if (today2.equals(date)) {
                     diffInDays = i;
                     break;
@@ -216,8 +221,8 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     private int dayToPosition(Day day) {
         Calendar date = clock().now();
 
-        for (int daysInAdvance = 0; daysInAdvance < GlobalManager.HORIZON_DAYS; daysInAdvance++, date.add(Calendar.DATE, 1)) {
-            if (RingActivity.onTheSameDate(day.getDate(), date)) {
+        for (int daysInAdvance = 0; daysInAdvance < GlobalManager.HORIZON_DAYS; daysInAdvance++, addDay(date)) {
+            if (onTheSameDate(day.getDate(), date)) {
                 return daysInAdvance;
             }
         }
@@ -289,25 +294,14 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
     public Day loadPosition(int position) {
         GlobalManager globalManager = GlobalManager.getInstance();
-        Calendar date = addDays(today, position);
+        Calendar date = addDaysClone(today, position);
         Day day = globalManager.loadDay(date);
         return day;
     }
 
-    public static Calendar addDays(Calendar today, int numberOfDays) {
-        Calendar date = (Calendar) today.clone();
-        date.add(Calendar.DAY_OF_MONTH, numberOfDays);
-        return date;
-    }
-
     public static Calendar getToday(Clock clock) {
-        Calendar today = clock.now();
-        today.set(Calendar.HOUR_OF_DAY, 0);
-        today.set(Calendar.MINUTE, 0);
-        today.set(Calendar.SECOND, 0);
-        today.set(Calendar.MILLISECOND, 0);
-
-        return today;
+        Calendar now = clock.now();
+        return beginningOfToday(now);
     }
 
     /**

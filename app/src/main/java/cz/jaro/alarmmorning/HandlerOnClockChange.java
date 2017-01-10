@@ -9,6 +9,9 @@ import java.util.Calendar;
 import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.clock.SystemClock;
 
+import static cz.jaro.alarmmorning.calendar.CalendarUtils.roundDown;
+import static cz.jaro.alarmmorning.calendar.CalendarUtils.subField;
+
 /**
  * HandlerOnClockChange runs a Runnable whenever the clock changes. A Unit (hour, minute, second...) defines on which clock unit change the Runnable method
  * {@link Runnable#run()} is called.
@@ -207,57 +210,9 @@ public class HandlerOnClockChange extends Handler {
     private Calendar calcNextClockChange(Calendar now) {
         Calendar cal = (Calendar) now.clone();
 
-        switch (unit) {
-            case Calendar.YEAR:
-                cal.add(Calendar.YEAR, 1);
-                cal.set(Calendar.MONTH, 0);
-                cal.set(Calendar.WEEK_OF_YEAR, 0);
-                cal.set(Calendar.DATE, 0);
-                cal.set(Calendar.HOUR_OF_DAY, 0);
-                cal.set(Calendar.MINUTE, 0);
-                cal.set(Calendar.SECOND, 0);
-                cal.set(Calendar.MILLISECOND, 0);
-                break;
-            case Calendar.MONTH:
-                cal.add(Calendar.MONTH, 1);
-                cal.set(Calendar.WEEK_OF_YEAR, 0);
-                cal.set(Calendar.DATE, 0);
-                cal.set(Calendar.HOUR_OF_DAY, 0);
-                cal.set(Calendar.MINUTE, 0);
-                cal.set(Calendar.SECOND, 0);
-                cal.set(Calendar.MILLISECOND, 0);
-                break;
-            case Calendar.WEEK_OF_YEAR:
-                cal.add(Calendar.WEEK_OF_YEAR, 1);
-                cal.set(Calendar.DATE, 0);
-                cal.set(Calendar.HOUR_OF_DAY, 0);
-                cal.set(Calendar.MINUTE, 0);
-                cal.set(Calendar.SECOND, 0);
-                cal.set(Calendar.MILLISECOND, 0);
-                break;
-            case Calendar.DATE:
-                cal.add(Calendar.DATE, 1);
-                cal.set(Calendar.HOUR_OF_DAY, 0);
-                cal.set(Calendar.MINUTE, 0);
-                cal.set(Calendar.SECOND, 0);
-                cal.set(Calendar.MILLISECOND, 0);
-                break;
-            case Calendar.HOUR_OF_DAY:
-                cal.add(Calendar.HOUR_OF_DAY, 1);
-                cal.set(Calendar.MINUTE, 0);
-                cal.set(Calendar.SECOND, 0);
-                cal.set(Calendar.MILLISECOND, 0);
-                break;
-            case Calendar.MINUTE:
-                cal.add(Calendar.MINUTE, 1);
-                cal.set(Calendar.SECOND, 0);
-                cal.set(Calendar.MILLISECOND, 0);
-                break;
-            case Calendar.SECOND:
-                cal.add(Calendar.SECOND, 1);
-                cal.set(Calendar.MILLISECOND, 0);
-                break;
-        }
+        cal.add(unit, 1);
+        roundDown(cal, subField(unit));
+
         return cal;
     }
 

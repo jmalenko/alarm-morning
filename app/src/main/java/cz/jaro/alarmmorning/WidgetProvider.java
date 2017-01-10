@@ -16,6 +16,10 @@ import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.model.Day;
 import cz.jaro.alarmmorning.receivers.WidgetReceiver;
 
+import static cz.jaro.alarmmorning.calendar.CalendarUtils.inNextWeek;
+import static cz.jaro.alarmmorning.calendar.CalendarUtils.inTomorrow;
+import static cz.jaro.alarmmorning.calendar.CalendarUtils.onTheSameDate;
+
 /**
  * The widget.
  */
@@ -83,7 +87,7 @@ public class WidgetProvider extends AppWidgetProvider {
             Clock clock = globalManager.clock();
             Calendar now = clock.now();
 
-            if (!RingActivity.onTheSameDate(now, alarmTime)) {
+            if (!onTheSameDate(now, alarmTime)) {
                 if (inTomorrow(now, alarmTime)) {
                     Calendar fewHoursBeforeAlarmTime = (Calendar) alarmTime.clone();
                     fewHoursBeforeAlarmTime.add(Calendar.HOUR_OF_DAY, HIDE_TOMORROW_HOURS);
@@ -113,23 +117,6 @@ public class WidgetProvider extends AppWidgetProvider {
         } else {
             views.setViewVisibility(R.id.alarm_date, View.GONE);
         }
-    }
-
-    private static boolean inTomorrow(Calendar cal1, Calendar cal2) {
-        Calendar date = (Calendar) cal1.clone();
-        date.add(Calendar.DATE, 1);
-        return RingActivity.onTheSameDate(date, cal2);
-    }
-
-    private static boolean inNextWeek(Calendar cal1, Calendar cal2) {
-        Calendar date = (Calendar) cal1.clone();
-        for (int i = 0; i < 6; i++) {
-            date.add(Calendar.DATE, 1);
-            if (RingActivity.onTheSameDate(date, cal2)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /*

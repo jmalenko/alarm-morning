@@ -10,6 +10,8 @@ import cz.jaro.alarmmorning.FixedTimeTest;
 import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.clock.FixedClock;
 
+import static cz.jaro.alarmmorning.calendar.CalendarUtils.beginningOfTomorrow;
+import static cz.jaro.alarmmorning.calendar.CalendarUtils.nextSameDayOfWeek;
 import static cz.jaro.alarmmorning.model.GlobalManager1NextAlarm0NoAlarmTest.RANGE;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -93,13 +95,8 @@ public class GlobalManager1NextAlarm2DefaultTest extends FixedTimeTest {
 
         Calendar nextAlarm = globalManager.getNextAlarm(clock);
 
-        Calendar tomorrowBeginning = (Calendar) date.clone();
-        tomorrowBeginning.add(Calendar.DATE, 1);
-        tomorrowBeginning.set(Calendar.HOUR, 0);
-        tomorrowBeginning.set(Calendar.MINUTE, 0);
-        tomorrowBeginning.set(Calendar.SECOND, 0);
-        tomorrowBeginning.set(Calendar.MILLISECOND, 0);
-        Calendar nextSameDayOfWeek = findNextSameDayOfWeek(tomorrowBeginning, dayOfWeek());
+        Calendar tomorrowBeginning = beginningOfTomorrow(date);
+        Calendar nextSameDayOfWeek = nextSameDayOfWeek(tomorrowBeginning, dayOfWeek());
 
         assertThat("Year", nextAlarm.get(Calendar.YEAR), is(nextSameDayOfWeek.get(Calendar.YEAR)));
         assertThat("Month", nextAlarm.get(Calendar.MONTH), is(nextSameDayOfWeek.get(Calendar.MONTH)));
@@ -118,7 +115,7 @@ public class GlobalManager1NextAlarm2DefaultTest extends FixedTimeTest {
 
         Calendar nextAlarm = globalManager.getNextAlarm(clock);
 
-        Calendar nextSameDayOfWeekDay = findNextSameDayOfWeek(date, dayOfWeek());
+        Calendar nextSameDayOfWeekDay = nextSameDayOfWeek(date, dayOfWeek());
 
         assertThat("Year", nextAlarm.get(Calendar.YEAR), is(nextSameDayOfWeekDay.get(Calendar.YEAR)));
         assertThat("Month", nextAlarm.get(Calendar.MONTH), is(nextSameDayOfWeekDay.get(Calendar.MONTH)));
@@ -140,7 +137,7 @@ public class GlobalManager1NextAlarm2DefaultTest extends FixedTimeTest {
 
             Calendar nextAlarm = globalManager.getNextAlarm(clock);
 
-            Calendar nextSameDayOfWeekDay = findNextSameDayOfWeek(date, dayOfWeek());
+            Calendar nextSameDayOfWeekDay = nextSameDayOfWeek(date, dayOfWeek());
             String str = " on " + date.getTime();
 
             assertThat("Year" + str, nextAlarm.get(Calendar.YEAR), is(nextSameDayOfWeekDay.get(Calendar.YEAR)));
@@ -149,20 +146,6 @@ public class GlobalManager1NextAlarm2DefaultTest extends FixedTimeTest {
             assertThat("Hour" + str, nextAlarm.get(Calendar.HOUR_OF_DAY), is(DayTest.HOUR_DEFAULT));
             assertThat("Minute" + str, nextAlarm.get(Calendar.MINUTE), is(DayTest.MINUTE_DEFAULT));
         }
-    }
-
-    /**
-     * Finds the first day, starting with <code>date</code>, such that it's day of week equals <<code>dayOfWeek</code>.
-     *
-     * @param date      Date to start with
-     * @param dayOfWeek Day of Week
-     * @return Date of the next day
-     */
-    public static Calendar findNextSameDayOfWeek(Calendar date, int dayOfWeek) {
-        Calendar res = (Calendar) date.clone();
-        while (res.get(Calendar.DAY_OF_WEEK) != dayOfWeek)
-            res.add(Calendar.DATE, 1);
-        return res;
     }
 
     static int dayOfWeek() {

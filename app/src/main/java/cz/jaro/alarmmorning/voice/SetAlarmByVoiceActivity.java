@@ -18,6 +18,7 @@ import cz.jaro.alarmmorning.checkalarmtime.SetTimeActivity;
 import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.graphics.Blink;
 
+import static cz.jaro.alarmmorning.calendar.CalendarUtils.roundDown;
 import static cz.jaro.alarmmorning.model.Day.VALUE_UNSET;
 
 /**
@@ -151,21 +152,19 @@ public class SetAlarmByVoiceActivity extends Activity {
             case AlarmClock.ACTION_SET_TIMER:
                 if (120 <= seconds) {
                     alarmTime.add(Calendar.SECOND, seconds);
-                    alarmTime.add(Calendar.SECOND, 0);
                 } else {
                     alarmTime.add(Calendar.SECOND, seconds);
                     if (alarmTime.get(Calendar.SECOND) <= 30) {
-                        alarmTime.set(Calendar.SECOND, 0);
                         if (alarmTime.before(now)) {
                             alarmTime.add(Calendar.MINUTE, 1);
                         }
                     } else {
-                        alarmTime.set(Calendar.SECOND, 0);
                         alarmTime.add(Calendar.MINUTE, 1);
                     }
                 }
                 break;
         }
+        roundDown(alarmTime, Calendar.SECOND);
 
         // Save
         Analytics analytics = new Analytics(Analytics.Channel.External, Analytics.ChannelName.Voice);

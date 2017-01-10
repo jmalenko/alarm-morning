@@ -30,6 +30,9 @@ import cz.jaro.alarmmorning.model.Day;
 import static cz.jaro.alarmmorning.Analytics.CHECK_ALARM_TIME_ACTION__DON_T_SHOW_NOTIFICATION;
 import static cz.jaro.alarmmorning.Analytics.CHECK_ALARM_TIME_ACTION__NO_APPOINTMENT;
 import static cz.jaro.alarmmorning.Analytics.CHECK_ALARM_TIME_ACTION__SHOW_NOTIFICATION;
+import static cz.jaro.alarmmorning.calendar.CalendarUtils.beginningOfTomorrow;
+import static cz.jaro.alarmmorning.calendar.CalendarUtils.justBeforeNoonTomorrow;
+import static cz.jaro.alarmmorning.calendar.CalendarUtils.roundDown;
 
 /**
  * This class implements the "check alarm time" feature. Specifically, the following check is (typically) run in the evening: compare the alarm time and time of
@@ -193,18 +196,12 @@ public class CheckAlarmTime {
         // Find first calendar event
         GlobalManager globalManager = GlobalManager.getInstance();
         Clock clock = globalManager.clock();
+        Calendar now = clock.now();
 
-        Calendar tomorrowStart = clock.now();
-        tomorrowStart.add(Calendar.DATE, 1);
-        tomorrowStart.set(Calendar.HOUR_OF_DAY, 0);
-        tomorrowStart.set(Calendar.MINUTE, 0);
-        tomorrowStart.set(Calendar.SECOND, 0);
-        tomorrowStart.set(Calendar.MILLISECOND, 0);
+        Calendar tomorrowStart = beginningOfTomorrow(now);
         Log.v(TAG, "tomorrowStart=" + tomorrowStart.getTime());
 
-        Calendar tomorrowNoon = (Calendar) tomorrowStart.clone();
-        tomorrowNoon.add(Calendar.HOUR_OF_DAY, 12);
-        tomorrowNoon.add(Calendar.MILLISECOND, -1);
+        Calendar tomorrowNoon = justBeforeNoonTomorrow(now);
         Log.v(TAG, "tomorrowNoon=" + tomorrowNoon.getTime());
 
         // Load tomorrow's alarm time
@@ -348,8 +345,7 @@ public class CheckAlarmTime {
         Calendar time = (Calendar) now.clone();
         time.set(Calendar.HOUR_OF_DAY, hours);
         time.set(Calendar.MINUTE, minutes);
-        time.set(Calendar.SECOND, 0);
-        time.set(Calendar.MILLISECOND, 0);
+        roundDown(time, Calendar.SECOND);
 
         // If in the past, then shift to tomorrow
         if (time.before(now)) {

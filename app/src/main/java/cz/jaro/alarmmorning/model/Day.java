@@ -7,6 +7,8 @@ import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.holiday.HolidayHelper;
 
+import static cz.jaro.alarmmorning.calendar.CalendarUtils.roundDown;
+
 /**
  * Represents the alarm clock setting for a particular date. The default values are inherited from
  * {@link #defaults}, but can be changed (and stored here).
@@ -187,8 +189,7 @@ public class Day {
 
         alarmTime.set(Calendar.HOUR_OF_DAY, getHourX());
         alarmTime.set(Calendar.MINUTE, getMinuteX());
-        alarmTime.set(Calendar.SECOND, 0);
-        alarmTime.set(Calendar.MILLISECOND, 0);
+        roundDown(alarmTime, Calendar.SECOND);
 
         return alarmTime;
     }

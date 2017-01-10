@@ -40,6 +40,10 @@ import cz.jaro.alarmmorning.sensor.Proximity;
 import cz.jaro.alarmmorning.sensor.SensorEventDetector;
 import cz.jaro.alarmmorning.sensor.Shake;
 
+import static cz.jaro.alarmmorning.calendar.CalendarUtils.endOfToday;
+import static cz.jaro.alarmmorning.calendar.CalendarUtils.onTheSameDate;
+import static cz.jaro.alarmmorning.calendar.CalendarUtils.onTheSameMinute;
+
 
 /**
  * Activity that is displayed while the alarm fires.
@@ -405,13 +409,7 @@ public class RingActivity extends Activity implements RingInterface {
         */
         TextView nextCalendarView = (TextView) findViewById(R.id.nextCalendar);
 
-        Calendar endOfToday = Calendar.getInstance(); // last milisecond in today
-        endOfToday.add(Calendar.DATE, 1);
-        endOfToday.set(Calendar.HOUR_OF_DAY, 0);
-        endOfToday.set(Calendar.MINUTE, 0);
-        endOfToday.set(Calendar.SECOND, 0);
-        endOfToday.set(Calendar.MILLISECOND, 0);
-        endOfToday.add(Calendar.MILLISECOND, -1);
+        Calendar endOfToday = endOfToday(Calendar.getInstance()); // last milisecond in today
 
         CalendarHelper calendarHelper = new CalendarHelper(this);
         CalendarEvent event = calendarHelper.find(now, endOfToday);
@@ -428,17 +426,6 @@ public class RingActivity extends Activity implements RingInterface {
         } else {
             nextCalendarView.setVisibility(View.GONE);
         }
-    }
-
-    public static boolean onTheSameDate(Calendar cal1, Calendar cal2) {
-        return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
-                cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR);
-    }
-
-    public static boolean onTheSameMinute(Calendar cal1, Calendar cal2) {
-        return onTheSameDate(cal1, cal2) &&
-                cal1.get(Calendar.HOUR_OF_DAY) == cal2.get(Calendar.HOUR_OF_DAY) &&
-                cal1.get(Calendar.MINUTE) == cal2.get(Calendar.MINUTE);
     }
 
     private Uri getRingtoneUri() {

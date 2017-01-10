@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import cz.jaro.alarmmorning.CalendarFragment;
 import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.SettingsActivity;
@@ -30,6 +29,7 @@ import de.jollyday.HolidayCalendar;
 import de.jollyday.HolidayManager;
 import de.jollyday.util.ResourceUtil;
 
+import static cz.jaro.alarmmorning.calendar.CalendarUtils.beginningOfToday;
 import static cz.jaro.alarmmorning.holiday.HolidayHelper.PATH_TOP;
 
 /**
@@ -137,7 +137,7 @@ public class HolidayHelper {
 
         // Filter: keep only holidays in next year
         GlobalManager globalManager = GlobalManager.getInstance();
-        Calendar from = CalendarFragment.getToday(globalManager.clock());
+        Calendar from = beginningOfToday(globalManager.clock().now());
         Calendar to = (Calendar) from.clone();
         to.add(Calendar.YEAR, 1);
 

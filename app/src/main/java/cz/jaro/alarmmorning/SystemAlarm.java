@@ -10,10 +10,11 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.receivers.AlarmReceiver;
+
+import static cz.jaro.alarmmorning.calendar.CalendarUtils.beginningOfTomorrow;
 
 /**
  * The SystemAlarm handles the "waking up of the app at a specified time to perform an action".
@@ -185,13 +186,7 @@ public class SystemAlarm {
     }
 
     public static Calendar getResetTime(Calendar now) {
-        Calendar resetTime = new GregorianCalendar(now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH));
-        resetTime.add(Calendar.DATE, 1);
-        resetTime.set(Calendar.HOUR, 0);
-        resetTime.set(Calendar.MINUTE, 0);
-        resetTime.set(Calendar.SECOND, 0);
-        resetTime.set(Calendar.MILLISECOND, 0);
-
+        Calendar resetTime = beginningOfTomorrow(now);
         return resetTime;
     }
 

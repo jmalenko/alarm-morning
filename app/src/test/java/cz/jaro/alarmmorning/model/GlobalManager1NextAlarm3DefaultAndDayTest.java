@@ -9,8 +9,9 @@ import cz.jaro.alarmmorning.Analytics;
 import cz.jaro.alarmmorning.FixedTimeTest;
 import cz.jaro.alarmmorning.clock.FixedClock;
 
+import static cz.jaro.alarmmorning.calendar.CalendarUtils.beginningOfTomorrow;
+import static cz.jaro.alarmmorning.calendar.CalendarUtils.nextSameDayOfWeek;
 import static cz.jaro.alarmmorning.model.GlobalManager1NextAlarm2DefaultTest.dayOfWeek;
-import static cz.jaro.alarmmorning.model.GlobalManager1NextAlarm2DefaultTest.findNextSameDayOfWeek;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
@@ -83,13 +84,8 @@ public class GlobalManager1NextAlarm3DefaultAndDayTest extends FixedTimeTest {
 
         Calendar nextAlarm = globalManager.getNextAlarm(clock);
 
-        Calendar tomorrowBeginning = (Calendar) date.clone();
-        tomorrowBeginning.add(Calendar.DATE, 1);
-        tomorrowBeginning.set(Calendar.HOUR, 0);
-        tomorrowBeginning.set(Calendar.MINUTE, 0);
-        tomorrowBeginning.set(Calendar.SECOND, 0);
-        tomorrowBeginning.set(Calendar.MILLISECOND, 0);
-        Calendar nextSameDayOfWeek = findNextSameDayOfWeek(tomorrowBeginning, dayOfWeek());
+        Calendar tomorrowBeginning = beginningOfTomorrow(date);
+        Calendar nextSameDayOfWeek = nextSameDayOfWeek(tomorrowBeginning, dayOfWeek());
 
         assertThat("Year", nextAlarm.get(Calendar.YEAR), is(nextSameDayOfWeek.get(Calendar.YEAR)));
         assertThat("Month", nextAlarm.get(Calendar.MONTH), is(nextSameDayOfWeek.get(Calendar.MONTH)));
@@ -108,13 +104,8 @@ public class GlobalManager1NextAlarm3DefaultAndDayTest extends FixedTimeTest {
 
         Calendar nextAlarm = globalManager.getNextAlarm(clock);
 
-        Calendar tomorrowBeginning = (Calendar) date.clone();
-        tomorrowBeginning.add(Calendar.DATE, 1);
-        tomorrowBeginning.set(Calendar.HOUR, 0);
-        tomorrowBeginning.set(Calendar.MINUTE, 0);
-        tomorrowBeginning.set(Calendar.SECOND, 0);
-        tomorrowBeginning.set(Calendar.MILLISECOND, 0);
-        Calendar nextSameDayOfWeek = findNextSameDayOfWeek(tomorrowBeginning, dayOfWeek());
+        Calendar tomorrowBeginning = beginningOfTomorrow(date);
+        Calendar nextSameDayOfWeek = nextSameDayOfWeek(tomorrowBeginning, dayOfWeek());
 
         assertThat("Year", nextAlarm.get(Calendar.YEAR), is(nextSameDayOfWeek.get(Calendar.YEAR)));
         assertThat("Month", nextAlarm.get(Calendar.MONTH), is(nextSameDayOfWeek.get(Calendar.MONTH)));

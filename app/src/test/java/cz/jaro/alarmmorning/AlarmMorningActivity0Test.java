@@ -23,6 +23,7 @@ import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.model.AlarmDataSource;
 import cz.jaro.alarmmorning.receivers.AlarmReceiver;
 
+import static cz.jaro.alarmmorning.calendar.CalendarUtils.addDaysClone;
 import static cz.jaro.alarmmorning.model.DayTest.DAY;
 import static cz.jaro.alarmmorning.model.DayTest.MONTH;
 import static cz.jaro.alarmmorning.model.DayTest.YEAR;
@@ -86,7 +87,7 @@ public class AlarmMorningActivity0Test extends FixedTimeTest {
 
             Clock clock = globalManager.clock();
             Calendar today = CalendarFragment.getToday(clock);
-            Calendar date = CalendarFragment.addDays(today, position);
+            Calendar date = addDaysClone(today, position);
 
             TextView textDayOfWeekCal = (TextView) item.findViewById(R.id.textDayOfWeekCal);
             int dayOfWeek = date.get(Calendar.DAY_OF_WEEK);

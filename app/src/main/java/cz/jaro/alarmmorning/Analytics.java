@@ -38,6 +38,8 @@ import cz.jaro.alarmmorning.model.Defaults;
 import cz.jaro.alarmmorning.wizard.Wizard;
 import de.jollyday.Holiday;
 
+import static cz.jaro.alarmmorning.calendar.CalendarUtils.dayOfWeekToString;
+
 /**
  * This class supports logging for analytics.
  * <p>
@@ -717,12 +719,6 @@ public class Analytics {
                 throw new IllegalArgumentException("Unexpected defaults state: " + state);
         }
         return alarmStateString;
-    }
-
-    static public String dayOfWeekToString(int dayOfWeek) {
-        GregorianCalendar calendar = new GregorianCalendar(1, 2, 2016); // February 2016 starts with Monday
-        calendar.add(Calendar.DATE, dayOfWeek + 5);
-        return calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.US);
     }
 
     public String permissionCheckToString(int permissionCheck) {

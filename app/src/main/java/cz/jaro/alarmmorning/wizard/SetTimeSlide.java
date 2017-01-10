@@ -34,6 +34,10 @@ import cz.jaro.alarmmorning.model.AlarmDataSource;
 import cz.jaro.alarmmorning.model.AlarmDbHelper;
 import cz.jaro.alarmmorning.model.Defaults;
 
+import static cz.jaro.alarmmorning.calendar.CalendarUtils.addDaysClone;
+import static cz.jaro.alarmmorning.calendar.CalendarUtils.beginningOfToday;
+import static cz.jaro.alarmmorning.calendar.CalendarUtils.endOfToday;
+
 /**
  * Rules:
  * <p/>
@@ -205,16 +209,9 @@ public class SetTimeSlide extends BaseFragment implements TimePicker.OnTimeChang
             GlobalManager globalManager = GlobalManager.getInstance();
             Clock clock = globalManager.clock();
 
-            java.util.Calendar dayStart = clock.now();
-            dayStart.add(java.util.Calendar.DATE, -day);
-            dayStart.set(java.util.Calendar.HOUR_OF_DAY, 0);
-            dayStart.set(java.util.Calendar.MINUTE, 0);
-            dayStart.set(java.util.Calendar.SECOND, 0);
-            dayStart.set(java.util.Calendar.MILLISECOND, 0);
-
-            java.util.Calendar dayEnd = (java.util.Calendar) dayStart.clone();
-            dayEnd.add(java.util.Calendar.DATE, 1);
-            dayEnd.add(java.util.Calendar.MILLISECOND, -1);
+            java.util.Calendar dayIn = addDaysClone(clock.now(), -day);
+            java.util.Calendar dayStart = beginningOfToday(dayIn);
+            java.util.Calendar dayEnd = endOfToday(dayIn);
 
             CalendarHelper calendarHelper = new CalendarHelper(context);
             CalendarEventFilter notAllDay = new CalendarEventFilter() {
