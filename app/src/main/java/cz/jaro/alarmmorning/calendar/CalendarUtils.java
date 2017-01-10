@@ -341,7 +341,7 @@ public class CalendarUtils {
     }
 
     /**
-     * Zeroes all the fields, starting with <code>field</code> (including <code>field</code>).
+     * Zeroes all the fields, starting with <code>field</code> (including <code>field</code>). The field {@link Calendar#DATE} is set to one (instead of zero).
      * <p>
      * E.g. for field parameter {@link Calendar#DATE} zeroes all the following: {@link Calendar#HOUR_OF_DAY}, {@link Calendar#MINUTE}, {@link Calendar#SECOND},
      * {@link Calendar#MILLISECOND}.
@@ -359,7 +359,7 @@ public class CalendarUtils {
             case Calendar.WEEK_OF_YEAR:
                 date.set(Calendar.WEEK_OF_YEAR, 0);
             case Calendar.DATE:
-                date.set(Calendar.DATE, 0);
+                date.set(Calendar.DATE, 1);
             case Calendar.HOUR_OF_DAY:
                 date.set(Calendar.HOUR_OF_DAY, 0);
             case Calendar.MINUTE:
