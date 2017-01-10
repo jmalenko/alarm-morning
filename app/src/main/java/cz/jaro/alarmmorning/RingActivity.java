@@ -144,11 +144,8 @@ public class RingActivity extends Activity implements RingInterface {
 
         if (savedInstanceState != null) {
             mAlarmTime = (Calendar) savedInstanceState.getSerializable(ALARM_TIME);
-        }
-
-        Calendar alarmTime = (Calendar) getIntent().getSerializableExtra(ALARM_TIME);
-        if (alarmTime != null) {
-            this.mAlarmTime = alarmTime;
+        } else {
+            mAlarmTime = (Calendar) getIntent().getSerializableExtra(ALARM_TIME);
         }
 
         SlideButton dismissButton = (SlideButton) findViewById(R.id.dismissButton);
