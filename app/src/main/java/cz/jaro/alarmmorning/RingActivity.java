@@ -409,7 +409,7 @@ public class RingActivity extends Activity implements RingInterface {
         */
         TextView nextCalendarView = (TextView) findViewById(R.id.nextCalendar);
 
-        Calendar endOfToday = endOfToday(Calendar.getInstance()); // last milisecond in today
+        Calendar endOfToday = endOfToday(now); // last milisecond in today
 
         CalendarHelper calendarHelper = new CalendarHelper(this);
         CalendarEvent event = calendarHelper.find(now, endOfToday);
