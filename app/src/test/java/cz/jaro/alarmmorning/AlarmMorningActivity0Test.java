@@ -102,11 +102,7 @@ public class AlarmMorningActivity0Test extends FixedTimeTest {
             assertThat(textDate.getText()).isEqualTo(dateText);
 
             TextView textState = (TextView) item.findViewById(R.id.textState);
-            if (position == 0) {
-                assertThat(textState.getText().equals("") || textState.getText().equals(res.getString(R.string.alarm_state_passed))).isTrue();
-            } else {
-                assertThat(textState.getText()).isEmpty();
-            }
+            assertThat(textState.getText()).isEmpty();
 
             TextView textComment = (TextView) item.findViewById(R.id.textComment);
             assertThat(textComment.getText()).isEmpty();
