@@ -52,6 +52,7 @@ public class AlarmMorningActivity extends AppCompatActivity {
     public static final String ACTION_RING = "RING";
     public static final String ACTION_DISMISS = "DISMISS";
     public static final String ACTION_SNOOZE = "SNOOZE";
+    public static final String ACTION_CANCEL = "CANCEL";
 
     private final static String url = "https://github.com/jmalenko/alarm-morning/wiki";
 
@@ -82,6 +83,7 @@ public class AlarmMorningActivity extends AppCompatActivity {
         s_intentFilterInternal.addAction(ACTION_RING);
         s_intentFilterInternal.addAction(ACTION_DISMISS);
         s_intentFilterInternal.addAction(ACTION_SNOOZE);
+        s_intentFilterInternal.addAction(ACTION_CANCEL);
     }
 
     private final BroadcastReceiver timeChangedReceiver = new BroadcastReceiver() {
@@ -124,6 +126,11 @@ public class AlarmMorningActivity extends AppCompatActivity {
                     case ACTION_SNOOZE:
                         calendarFragment.onSnooze();
                         break;
+                    case ACTION_CANCEL:
+                        calendarFragment.onCancel();
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Unexpected argument " + action);
                 }
             }
         }

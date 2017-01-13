@@ -38,18 +38,18 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
     private static final String TAG = CalendarFragment.class.getSimpleName();
 
-    protected CalendarAdapter adapter;
+    private CalendarAdapter adapter;
 
     private RecyclerView recyclerView;
 
     private Calendar today;
-    private Day day;
-    private int position;
+    private Day day; // day corresponding to position in variable position
+    private int position; // position of the operation (via context menu)
 
-    private int positionNextAlarm;
-    private static final int POSITION_UNSET = -1;
+    private int positionNextAlarm; // position of the next alarm
+    private static final int POSITION_UNSET = -1; // constant representing "position of the next alarm" when no next alarm exists
 
-    private HandlerOnClockChange handler = new HandlerOnClockChange();
+    private final HandlerOnClockChange handler = new HandlerOnClockChange();
 
     public CalendarFragment() {
         // Empty constructor required for fragment subclasses
@@ -79,9 +79,6 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
         registerForContextMenu(recyclerView);
 
-        today = getToday(clock());
-        updatePositionNextAlarm();
-
         return rootView;
     }
 
@@ -89,16 +86,14 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     public void onResume() {
         super.onResume();
 
-        Calendar today2 = getToday(clock());
-        if (!today.equals(today2)) {
-            today = today2;
-        }
+        today = getToday(clock());
+        positionNextAlarm = calcPositionNextAlarm();
 
-        // handler for refreshing the content
-        handler.start(this::onSystemTimeChange, Calendar.SECOND);
-
-        // Refresh all the alarm times. Solves this scenario: Given displayed calendar, when set alarm by voice, then the calendar must refresh.
+        // Refresh all the alarm times. Solves scenario: Given displayed calendar, when set alarm by voice, then the calendar must refresh.
         adapter.notifyDataSetChanged();
+
+        // Handler for refreshing the content
+        handler.start(this::onSystemTimeChange, Calendar.SECOND);
     }
 
     @Override
@@ -115,7 +110,6 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
     public void onAlarmSet() {
         Log.d(TAG, "onAlarmSet()");
-        adapter.notifyItemChanged(0);
 
         adapter.notifyItemChanged(position);
         updatePositionNextAlarm();
@@ -128,30 +122,32 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
     public void onDismissBeforeRinging() {
         Log.d(TAG, "onDismissBeforeRinging()");
-        // TODO Use position variable instead of constant 0
-        adapter.notifyItemChanged(0);
         updatePositionNextAlarm();
     }
 
     public void onAlarmTimeOfEarlyDismissedAlarm() {
         Log.d(TAG, "onAlarmTimeOfEarlyDismissedAlarm()");
-        adapter.notifyItemChanged(0);
+        adapter.notifyItemChanged(positionNextAlarm);
     }
 
     public void onRing() {
         Log.d(TAG, "onRing()");
-        adapter.notifyItemChanged(0);
+        adapter.notifyItemChanged(positionNextAlarm);
     }
 
     public void onDismiss() {
         Log.d(TAG, "onDismiss()");
-        adapter.notifyItemChanged(0);
         updatePositionNextAlarm();
     }
 
     public void onSnooze() {
         Log.d(TAG, "onSnooze()");
-        adapter.notifyItemChanged(0);
+        adapter.notifyItemChanged(positionNextAlarm);
+    }
+
+    public void onCancel() {
+        Log.d(TAG, "onCancel()");
+        updatePositionNextAlarm();
     }
 
     /*
@@ -165,7 +161,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         adapter.notifyDataSetChanged();
     }
 
-    public void onSystemTimeChange() {
+    private void onSystemTimeChange() {
         Log.v(TAG, "onSystemTimeChange()");
 
         // Update time to next alarm
@@ -202,24 +198,18 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
     protected Clock clock() {
         GlobalManager globalManager = GlobalManager.getInstance();
-        Clock clock = globalManager.clock();
-        return clock;
+        return globalManager.clock();
     }
 
     private int calcPositionNextAlarm() {
         GlobalManager globalManager = GlobalManager.getInstance();
         Day day = globalManager.getDayWithNextAlarmToRing();
 
-        if (day == null) {
-            return POSITION_UNSET;
-        } else {
-            int position = dayToPosition(day);
-            return position;
-        }
+        return day == null ? POSITION_UNSET : dayToPosition(day);
     }
 
     private int dayToPosition(Day day) {
-        Calendar date = clock().now();
+        Calendar date = getToday(clock());
 
         for (int daysInAdvance = 0; daysInAdvance < GlobalManager.HORIZON_DAYS; daysInAdvance++, addDay(date)) {
             if (onTheSameDate(day.getDate(), date)) {
@@ -240,8 +230,8 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
             if (oldPositionNextAlarm != POSITION_UNSET)
                 adapter.notifyItemChanged(oldPositionNextAlarm);
-            if (positionNextAlarm != POSITION_UNSET)
-                adapter.notifyItemChanged(positionNextAlarm);
+            if (newPositionNextAlarm != POSITION_UNSET)
+                adapter.notifyItemChanged(newPositionNextAlarm);
         }
     }
 
@@ -295,8 +285,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     public Day loadPosition(int position) {
         GlobalManager globalManager = GlobalManager.getInstance();
         Calendar date = addDaysClone(today, position);
-        Day day = globalManager.loadDay(date);
-        return day;
+        return globalManager.loadDay(date);
     }
 
     public static Calendar getToday(Clock clock) {

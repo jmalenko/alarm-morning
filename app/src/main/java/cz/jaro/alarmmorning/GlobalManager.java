@@ -824,6 +824,8 @@ public class GlobalManager {
         systemNotification.onAlarmCancel();
 
         updateRingingActivity(context, RingActivity.ACTION_HIDE_ACTIVITY);
+
+        updateCalendarActivity(context, AlarmMorningActivity.ACTION_CANCEL);
     }
 
     /*
