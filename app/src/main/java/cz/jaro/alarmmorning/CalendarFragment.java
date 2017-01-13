@@ -307,7 +307,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
     @Override
     public void onClick(View view) {
-        int position = recyclerView.getChildPosition(view);
+        int position = recyclerView.getChildAdapterPosition(view);
         Log.d(TAG, "Clicked item on position " + position);
 
         Day day = loadPosition(position);
@@ -400,45 +400,43 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         MenuItem dismiss = menu.findItem(R.id.day_dismiss);
         MenuItem snooze = menu.findItem(R.id.day_snooze);
 
-//        if (position == 0) {
-            GlobalManager globalManager = GlobalManager.getInstance();
-            int state = globalManager.getState(day.getDateTime());
-//            if (state != GlobalManager.STATE_UNDEFINED) {
-                if (state == GlobalManager.STATE_FUTURE) {
-                    disable.setVisible(day.isEnabled());
-                    revert.setVisible(day.getState() != Day.STATE_RULE);
-                    dismiss.setVisible(position == 0 && day.isEnabled() && globalManager.afterNearFuture(day.getDateTime()));
-                    snooze.setVisible(false);
-                } else if (state == GlobalManager.STATE_RINGING) {
+        GlobalManager globalManager = GlobalManager.getInstance();
+        int state = globalManager.getState(day.getDateTime());
+        switch (state) {
+            case GlobalManager.STATE_FUTURE:
+                if (position == positionNextAlarm && day.isEnabled() && globalManager.afterNearFuture(day.getDateTime())) {
                     disable.setVisible(false);
                     revert.setVisible(false);
                     dismiss.setVisible(true);
-                    snooze.setVisible(true);
-                } else if (state == GlobalManager.STATE_SNOOZED) {
-                    disable.setVisible(false);
-                    revert.setVisible(false);
-                    dismiss.setVisible(true);
-                    snooze.setVisible(false);
-                } else if (state == GlobalManager.STATE_DISMISSED_BEFORE_RINGING || state == GlobalManager.STATE_DISMISSED) {
-                    disable.setVisible(false);
-                    revert.setVisible(false);
-                    dismiss.setVisible(false);
-                    snooze.setVisible(false);
                 } else {
-                    throw new IllegalArgumentException("Unexpected argument " + state);
+                    disable.setVisible(true);
+                    revert.setVisible(day.getState() != Day.STATE_RULE);
+                    dismiss.setVisible(false);
                 }
-//            } else {
-//                disable.setVisible(day.isEnabled());
-//                revert.setVisible(day.getState() != Day.STATE_RULE);
-//                dismiss.setVisible(false);
-//                snooze.setVisible(false);
-//            }
-//        } else {
-//            disable.setVisible(day.isEnabled());
-//            revert.setVisible(day.getState() != Day.STATE_RULE);
-//            dismiss.setVisible(false);
-//            snooze.setVisible(false);
-//        }
+                snooze.setVisible(false);
+                break;
+            case GlobalManager.STATE_RINGING:
+                disable.setVisible(false);
+                revert.setVisible(false);
+                dismiss.setVisible(true);
+                snooze.setVisible(true);
+                break;
+            case GlobalManager.STATE_SNOOZED:
+                disable.setVisible(false);
+                revert.setVisible(false);
+                dismiss.setVisible(true);
+                snooze.setVisible(false);
+                break;
+            case GlobalManager.STATE_DISMISSED_BEFORE_RINGING:
+            case GlobalManager.STATE_DISMISSED:
+                disable.setVisible(false);
+                revert.setVisible(false);
+                dismiss.setVisible(false);
+                snooze.setVisible(false);
+                break;
+            default:
+                throw new IllegalArgumentException("Unexpected argument " + state);
+        }
     }
 
     @Override
