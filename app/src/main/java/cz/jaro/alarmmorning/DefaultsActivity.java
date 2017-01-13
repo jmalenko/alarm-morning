@@ -97,7 +97,7 @@ public class DefaultsActivity extends AppCompatActivity implements View.OnCreate
 
     @Override
     public void onClick(View view) {
-        int position = recyclerView.getChildPosition(view);
+        int position = recyclerView.getChildAdapterPosition(view);
         Log.d(TAG, "Clicked item on position " + position);
 
         defaults = loadPosition(position);
