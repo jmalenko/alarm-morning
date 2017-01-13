@@ -32,13 +32,14 @@ import static cz.jaro.alarmmorning.model.DayTest.YEAR;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class FixedTimeTest {
 
-    public GlobalManager globalManager;
+    protected GlobalManager globalManager;
+    protected ShadowGlobalManager shadowGlobalManager;
 
     @Before
     public void before() {
         globalManager = GlobalManager.getInstance();
 
-        ShadowGlobalManager shadowGlobalManager = (ShadowGlobalManager) ShadowExtractor.extract(globalManager);
+        shadowGlobalManager = (ShadowGlobalManager) ShadowExtractor.extract(globalManager);
         shadowGlobalManager.setClock(clock());
 
         globalManager.reset();
