@@ -144,23 +144,23 @@ public class CustomAlarmTone {
                     null
             );
 
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-            SharedPreferences.Editor editor = preferences.edit();
-
             // Save local path
             JSONObject map = JSONSharedPreferences.loadJSONObject(mContext, INSTALLED_FILES_PATH);
             map.put(filename, newUri.toString());
             JSONSharedPreferences.saveJSONObject(mContext, INSTALLED_FILES_PATH, map);
 
             if (setAsDefault) {
+                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
+
                 // Update the preference if set to default
                 String ringtonePreference = preferences.getString(SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE, SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE_DEFAULT);
-                if (ringtonePreference.equals(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM).toString())) {
+                if (ringtonePreference.equals(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM).toString())
+                        || ringtonePreference.equals(SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE_DEFAULT)) {
+                    SharedPreferences.Editor editor = preferences.edit();
                     editor.putString(SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE, newUri.toString());
+                    editor.commit();
                 }
             }
-
-            editor.commit();
 
             Log.d(TAG, "Copied alarm tone '" + title + "' to " + outAbsPath);
             Log.d(TAG, "URI is " + newUri.toString());
