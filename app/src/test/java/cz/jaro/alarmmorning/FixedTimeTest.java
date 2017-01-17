@@ -12,9 +12,11 @@ import org.robolectric.internal.ShadowExtractor;
 import java.lang.reflect.Field;
 import java.util.GregorianCalendar;
 
+import cz.jaro.alarmmorning.checkalarmtime.CheckAlarmTime;
 import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.clock.FixedClock;
 import cz.jaro.alarmmorning.model.DayTest;
+import cz.jaro.alarmmorning.nighttimebell.NighttimeBell;
 import cz.jaro.alarmmorning.shadows.ShadowAlarmManagerAPI21;
 import cz.jaro.alarmmorning.shadows.ShadowGlobalManager;
 
@@ -47,14 +49,17 @@ public class FixedTimeTest {
 
     /**
      * This must be done to clean up after a test. Otherwise we get <code>java.lang.RuntimeException: java.util.concurrent.ExecutionException: java.lang
-     * .IllegalStateException: Illegal connection pointer 1. Current pointers for thread</code>
-     * <p>
-     * The reason is that the own SQLiteOpenHelper is a singleton. Between tests all instances should be reset or you will get strange side effects like this.
-     * For me it works to set the static variable null per reflection. Here an example
+     * .IllegalStateException: Illegal connection pointer 1. Current pointers for thread</code>. The reason is that the own SQLiteOpenHelper (and other
+     * classes) is a singleton. Between tests all instances should be reset, otherwise we get strange side effects like this.
      */
     @After
     public void after() {
+        // Reset all singletons
         resetSingleton(GlobalManager.class, "instance");
+        resetSingleton(SystemAlarm.class, "instance");
+        resetSingleton(CheckAlarmTime.class, "instance");
+        resetSingleton(SystemAlarmClock.class, "instance");
+        resetSingleton(NighttimeBell.class, "instance");
     }
 
     /**
