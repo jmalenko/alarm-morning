@@ -7,7 +7,7 @@ import org.robolectric.annotation.Implementation;
 import org.robolectric.annotation.Implements;
 import org.robolectric.shadows.ShadowAlarmManager;
 
-// TODO Hotfix - This class exists only because Robolectric supports API level 21 and we are using methods introduced afterwards. Remove this class when Roboelectric supports implemented methods.
+// TODO Hotfix - This class exists only because Robolectric supports API level 21 and we are using methods introduced afterwards. Remove this class when Robolectric supports implemented methods.
 
 /**
  * Shadow for {@link android.app.AlarmManager}.

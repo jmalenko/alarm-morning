@@ -126,7 +126,7 @@ public class GlobalManager {
             Log.v(TAG, "   loading the ringing or snoozed alarm");
             day = dataSource.loadDay(clock().now());
         } else {
-            day = getNextAlarm(clock(), new DayFilter() { // TODO Hotfix - Roboelectric doesn't allow shadow of a class with lambda
+            day = getNextAlarm(clock(), new DayFilter() { // TODO Hotfix - Robolectric doesn't allow shadow of a class with lambda
                 @Override
                 public boolean match(Day day) {
                     Log.v(TAG, "   checking filter condition for " + day.getDateTime().getTime());
