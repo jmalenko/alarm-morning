@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:contentDescription="Alarm icon"
-        android:src="@drawable/ic_alarm_on_white"/>
+        android:src="@drawable/ic_alarm_on_white" />
 
     <TextView
         android:id="@+id/alarm_time"
@@ -29,7 +29,7 @@
         android:shadowRadius="2"
         android:text="08:00"
         android:textAlignment="center"
-        android:textColor="@android:color/white"/>
+        android:textColor="@android:color/white" />
 
     <TextView
         android:id="@+id/alarm_date"
@@ -37,6 +37,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:ellipsize="marquee"
+        android:fontFamily="sans-serif-condensed"
         android:maxLines="1"
         android:shadowColor="#7F000000"
         android:shadowDx="0"
@@ -44,5 +45,5 @@
         android:shadowRadius="2"
         android:text="Mon"
         android:textAlignment="center"
-        android:textColor="@android:color/white"/>
+        android:textColor="@android:color/white" />
 </LinearLayout>
