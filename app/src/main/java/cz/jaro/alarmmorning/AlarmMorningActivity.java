@@ -63,12 +63,12 @@ public class AlarmMorningActivity extends AppCompatActivity {
     private ActionBarDrawerToggle mDrawerToggle;
     private Fragment mFragment;
 
-    CharSequence fragmentTitle;
+    private CharSequence fragmentTitle;
     private MenuItem lastMenuItem;
 
     private static final IntentFilter s_intentFilterTime;
 
-    LocalBroadcastManager bManager;
+    private LocalBroadcastManager bManager;
     private static IntentFilter s_intentFilterInternal;
 
     static {
