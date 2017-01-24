@@ -1,94 +1,41 @@
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:keepScreenOn="true"
-    android:orientation="vertical">
+    android:keepScreenOn="true">
 
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="0dip"
-        android:layout_weight="1"/>
-
-    <TextView
-        android:id="@+id/date"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:gravity="center"
-        android:text="Monday, February 15"
-        />
-
-    <TextView
-        android:id="@+id/time"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="@dimen/margin_medium"
-        android:text="12:34"
-        android:textColor="@color/accent"
-        android:textSize="70sp"
-        android:textStyle="bold"/>
-
-    <TextView
-        android:id="@+id/alarmTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:gravity="center"
-        android:text="Alarm was set to 7:15"
-        />
-
-    <TextView
-        android:id="@+id/nextCalendar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginLeft="@dimen/margin_medium"
-        android:layout_marginRight="@dimen/margin_medium"
-        android:layout_marginTop="@dimen/margin_medium"
-        android:gravity="center"
-        android:text="Next appointment: 8:00 Dentist"
-        />
-
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="0dip"
-        android:layout_weight="1"
-        />
-
-    <LinearLayout
+    <RelativeLayout
+        android:id="@+id/footer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="bottom"
-        android:orientation="vertical">
+        android:layout_alignParentBottom="true">
 
         <ImageButton
             android:id="@+id/snoozeButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="@dimen/margin_medium"
+            android:layout_centerHorizontal="true"
             android:background="@drawable/snooze_button"
             android:contentDescription="@string/action_snooze"
-            android:onClick="onSnooze"
-            />
+            android:onClick="onSnooze" />
 
         <TextView
             android:id="@+id/muted"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="@dimen/margin_medium"
+            android:layout_below="@id/snoozeButton"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="@dimen/margin_tiny"
+            android:layout_marginTop="@dimen/margin_tiny"
             android:text="Muted for 9 seconds"
-            android:visibility="invisible"
-            />
+            android:visibility="invisible" />
 
         <cz.jaro.alarmmorning.graphics.SlideButton
             android:id="@+id/dismissButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
+            android:layout_below="@id/muted"
+            android:layout_centerHorizontal="true"
             android:layout_marginBottom="@dimen/margin_medium"
             android:layout_marginLeft="@dimen/margin_medium"
             android:layout_marginRight="@dimen/margin_medium"
@@ -100,8 +47,79 @@
             android:paddingRight="34dp"
             android:paddingTop="2dp"
             android:progressDrawable="@android:color/transparent"
-            android:thumb="@drawable/slidebutton_thumb"
-            />
+            android:thumb="@drawable/slidebutton_thumb" />
 
-    </LinearLayout>
-</LinearLayout>
+    </RelativeLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/footer"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="0dip"
+                android:layout_weight="10" />
+
+            <TextView
+                android:id="@+id/date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center"
+                android:text="Monday, February 15" />
+
+            <TextView
+                android:id="@+id/time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="12:34"
+                android:textColor="@color/accent"
+                android:textSize="70sp"
+                android:textStyle="bold" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="0dip"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/alarmTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center"
+                android:text="Alarm was set to 7:15" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="0dip"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/nextCalendar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginLeft="@dimen/margin_medium"
+                android:layout_marginRight="@dimen/margin_medium"
+                android:gravity="center"
+                android:text="Next appointment: 8:00 Dentist" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="0dip"
+                android:layout_weight="10" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</RelativeLayout>
