@@ -401,7 +401,7 @@ public class GlobalManager {
         Calendar lastAlarmTime = null;
 
         if (systemAlarm.nextActionShouldChange()) {
-            NextAction nextAction = systemAlarm.calcNextAction(clock());
+            NextAction nextAction = systemAlarm.calcNextAction();
             NextAction nextActionPersisted = getNextAction();
 
             if (!nextActionPersisted.action.equals(ACTION_UNDEFINED)) {
@@ -583,7 +583,7 @@ public class GlobalManager {
 
         updateWidget(context);
 
-        NextAction nextAction = systemAlarm.calcNextAction(clock());
+        NextAction nextAction = systemAlarm.calcNextAction();
         if (nextAction.action.equals(SystemAlarm.ACTION_SET_SYSTEM_ALARM)) {
             // nothing
         } else if (nextAction.action.equals(SystemAlarm.ACTION_RING_IN_NEAR_FUTURE)) {

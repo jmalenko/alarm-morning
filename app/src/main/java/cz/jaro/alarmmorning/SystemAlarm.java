@@ -135,20 +135,31 @@ public class SystemAlarm {
      */
 
     private void initialize() {
-        GlobalManager globalManager = GlobalManager.getInstance();
-        Clock clock = globalManager.clock();
-
-        NextAction nextAction = calcNextAction(clock);
+        NextAction nextAction = calcNextAction();
         registerSystemAlarm(nextAction);
     }
 
     /**
-     * Returns the next action and system alarm according to the data in database.
+     * Returns the next action (after current time) and system alarm according to the data in database.
+     *
+     * @return the next action and system alarm
+     */
+    protected NextAction calcNextAction() {
+        Log.d(TAG, "calcNextAction()");
+
+        GlobalManager globalManager = GlobalManager.getInstance();
+        Clock clock = globalManager.clock();
+
+        return calcNextAction(clock);
+    }
+
+    /**
+     * Returns the next action after time <code>clock</code> and system alarm according to the data in database.
      *
      * @return the next action and system alarm
      */
     protected NextAction calcNextAction(Clock clock) {
-        Log.d(TAG, "calcNextAction()");
+        Log.d(TAG, "calcNextAction(clock=" + clock.now().getTime().toString() + ")");
 
         Calendar now = clock.now();
 
@@ -175,11 +186,9 @@ public class SystemAlarm {
     protected boolean nextActionShouldChange() {
         Log.v(TAG, "nextActionShouldChange()");
 
+        NextAction nextAction = calcNextAction();
+
         GlobalManager globalManager = GlobalManager.getInstance();
-
-        Clock clock = globalManager.clock();
-        NextAction nextAction = calcNextAction(clock);
-
         NextAction nextActionPersisted = globalManager.getNextAction();
 
         return !nextActionPersisted.equals(nextAction);
