@@ -61,7 +61,7 @@ public class CheckAlarmTime {
      * Action meaning: Check alarm time of the next alarm: compare it with the 1st calendar instance. If it is too close, offer the user to quickly change the
      * alarm time.
      */
-    protected static final String ACTION_CHECK_ALARM_TIME = "CHECK_ALARM_TIME";
+    public static final String ACTION_CHECK_ALARM_TIME = "CHECK_ALARM_TIME";
 
     /**
      * Action meaning: Automatically hide the notification (on a specified time). Note: the notification may have been already dismissed by the user.

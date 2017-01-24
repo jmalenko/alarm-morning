@@ -39,7 +39,7 @@ public class NighttimeBell {
     /**
      * Action meaning: Play the sound.
      */
-    protected static final String ACTION_PLAY = "PLAY_NIGHTTIME_BELL";
+    public static final String ACTION_PLAY = "PLAY_NIGHTTIME_BELL";
 
     private NighttimeBell(Context context) {
         this.context = context;
