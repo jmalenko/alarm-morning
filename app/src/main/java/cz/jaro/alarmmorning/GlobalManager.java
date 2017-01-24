@@ -1066,4 +1066,14 @@ public class GlobalManager {
 //        PreferenceManager.setDefaultValues(context, R.xml.preferences, true);
         saveHoliday(SettingsActivity.PREF_HOLIDAY_NONE);
     }
+
+    /**
+     * Returns the content of the database.
+     *
+     * @return Content of the database.
+     */
+    public String dumpDB() {
+        return dataSource.dumpDB();
+    }
+
 }

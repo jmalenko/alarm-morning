@@ -195,13 +195,13 @@ public class AlarmDataSource {
         return day;
     }
 
-    private String DBtoString() {
+    public String dumpDB() {
         StringBuilder str = new StringBuilder();
 
         Cursor cursor = database.query(AlarmDbHelper.TABLE_DEFAULTS, allColumnsDefaults, null, null, null, null, null);
         str.append("Table Defaults, rows ").append(cursor.getCount()).append("\n");
-        str.append("id|DoW|Sta| H | M \n");
-        str.append("--+---+---+---+-- \n");
+        str.append("id |DoW|Sta| H | M \n");
+        str.append("---+---+---+---+-- \n");
 
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
@@ -218,8 +218,8 @@ public class AlarmDataSource {
 
         cursor = database.query(AlarmDbHelper.TABLE_DAY, allColumnsDay, null, null, null, null, null);
         str.append("Table Day, rows ").append(cursor.getCount()).append("\n");
-        str.append("id| Date       |Sta| H | M \n");
-        str.append("--+------------+---+---+---\n");
+        str.append("id | Date       |Sta| H | M \n");
+        str.append("---+------------+---+---+---\n");
 
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
