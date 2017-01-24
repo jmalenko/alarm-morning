@@ -707,7 +707,7 @@ public class GlobalManager {
 
         // translate to STATE_FUTURE if in the near future
         Day dayWithNextAlarmToRing = getDayWithNextAlarmToRing();
-        if (afterNearFuture(dayWithNextAlarmToRing.getDateTime())) {
+        if (dayWithNextAlarmToRing != null && afterNearFuture(dayWithNextAlarmToRing.getDateTime())) {
             Log.i(TAG, "Immediately starting \"alarm in near future\" period.");
 
             onNearFuture(false);
