@@ -115,14 +115,18 @@ public class Day {
     }
 
     /**
-     * Check if the alarm time is passed, e.g. if the alarm is enabled and the alarm time was in past.
+     * Check if the alarm time is passed, e.g. if the alarm is enabled and the alarm time was in past (or the alarm is now).
+     * <p>
+     * Note: the part "or the alarm is now" of definition is defined for ease of testing: in tests, on the alarm time, we intend to check that the
+     * system alarm for next alarm is registered. In reality (with real time) there would be a slight delay between the alarm time and setting the next
+     * system alarm (which calls this method).
      *
      * @return true if the alarm time is passed
      */
     public boolean isPassed(Clock clock) {
         Calendar now = clock.now();
         if (isEnabled()) {
-            if (getDateTime().before(now)) {
+            if (!getDateTime().after(now)) {
                 return true;
             }
         }

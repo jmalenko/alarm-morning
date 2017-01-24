@@ -47,6 +47,8 @@ import static cz.jaro.alarmmorning.calendar.CalendarUtils.onTheSameMinute;
 
 /**
  * Activity that is displayed while the alarm fires.
+ * <p>
+ * Activity must be started with extra {@link #ALARM_TIME} that contains the Calendar instance of the alarm time.
  */
 public class RingActivity extends Activity implements RingInterface {
 
@@ -103,9 +105,7 @@ public class RingActivity extends Activity implements RingInterface {
 
             if (action.equals(ACTION_HIDE_ACTIVITY)) {
                 if (blink == null) { // The action (snooze, dismiss) was NOT started by this activity
-                    stopAll();
-
-                    finish();
+                    shutdown();
                 }
             }
         }
@@ -188,6 +188,11 @@ public class RingActivity extends Activity implements RingInterface {
         bManager.unregisterReceiver(bReceiver);
     }
 
+    public void shutdown() {
+        stopAll();
+        finish();
+    }
+
     public void onDismiss(View view) {
         Log.i(TAG, "Dismiss");
         doDismiss();
@@ -198,7 +203,7 @@ public class RingActivity extends Activity implements RingInterface {
         doSnooze();
     }
 
-    public void doDismiss() {
+    private void doDismiss() {
         Log.d(TAG, "doDismiss()");
 
         stopAll();
@@ -214,7 +219,7 @@ public class RingActivity extends Activity implements RingInterface {
         blink.initiateFinish();
     }
 
-    public void doSnooze() {
+    private void doSnooze() {
         Log.d(TAG, "doSnooze()");
 
         stopAll();
@@ -232,7 +237,7 @@ public class RingActivity extends Activity implements RingInterface {
         blink.initiateFinish();
     }
 
-    public void doMute() {
+    private void doMute() {
         Log.d(TAG, "doMute()");
 
         if (muteAvailable()) {
@@ -249,7 +254,7 @@ public class RingActivity extends Activity implements RingInterface {
         mutedInPast = false;
     }
 
-    public boolean muteAvailable() {
+    private boolean muteAvailable() {
         Log.d(TAG, "muteAvailable()");
         return !mutedInPast;
     }
@@ -333,7 +338,7 @@ public class RingActivity extends Activity implements RingInterface {
     /**
      * The wake lock that was acquired on system notification in {@link AlarmReceiver#onReceive(Context, Intent)} must be released.
      */
-    public void stopAll() {
+    private void stopAll() {
         Log.d(TAG, "stopAll()");
 
         if (isRinging) {
@@ -417,7 +422,7 @@ public class RingActivity extends Activity implements RingInterface {
         if (event != null) {
             String timeStr = Localization.timeToString(event.getBegin().getTime(), getBaseContext());
 
-            String nextCalendarText = event.getLocation() != null && !event.getLocation().isEmpty()?
+            String nextCalendarText = event.getLocation() != null && !event.getLocation().isEmpty() ?
                     res.getString(R.string.next_calendar_with_location, timeStr, event.getTitle(), event.getLocation()) :
                     res.getString(R.string.next_calendar_without_location, timeStr, event.getTitle());
 

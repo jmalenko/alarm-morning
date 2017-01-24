@@ -634,15 +634,36 @@ public class GlobalManager {
         systemNotification.onNearFuture();
     }
 
+    /**
+     * Dismiss the alarm.
+     * <p>
+     * Automatically chooses between calling {@link #onDismiss(Analytics)} and {@link @onDismissBeforeRinging}.
+     *
+     * @param analytics Analytics
+     */
+    public void onDismissAuto(Analytics analytics) {
+        Log.d(TAG, "onDismissAuto()");
+
+        Day dayWithNextAlarmToRing = getDayWithNextAlarmToRing();
+        Calendar now = clock().now();
+
+        if (now.after(dayWithNextAlarmToRing.getDateTime())) {
+            onDismiss(analytics);
+        } else {
+            onDismissBeforeRinging(analytics);
+        }
+    }
+
     public void onDismissBeforeRinging(Analytics analytics) {
         Log.d(TAG, "onDismissBeforeRinging()");
 
         Context context = AlarmMorningApplication.getAppContext();
+        Day dayWithNextAlarmToRing = getDayWithNextAlarmToRing();
 
         analytics.setContext(context);
         analytics.setEvent(Analytics.Event.Dismiss);
         analytics.set(Analytics.Param.Dismiss_type, Analytics.DISMISS__BEFORE);
-        analytics.setDay(getDayWithNextAlarmToRing());
+        analytics.setDay(dayWithNextAlarmToRing);
         analytics.save();
 
         setState(STATE_DISMISSED_BEFORE_RINGING, getAlarmTimeOfRingingAlarm());
@@ -662,8 +683,7 @@ public class GlobalManager {
         updateCalendarActivity(context, AlarmMorningActivity.ACTION_DISMISS_BEFORE_RINGING);
 
         // translate to STATE_FUTURE if in the near future
-        Day dayWithNextAlarmToRing = getDayWithNextAlarmToRing();
-        if (afterNearFuture(dayWithNextAlarmToRing.getDateTime())) {
+        if (dayWithNextAlarmToRing != null && afterNearFuture(dayWithNextAlarmToRing.getDateTime())) {
             Log.i(TAG, "Immediately starting \"alarm in near future\" period.");
 
             // TODO Start "alarm in near future" period. We cannot handle 1. early dismissed alarm till alarm time and 2. next alarm in near period at the same time, because get/setNextAction can store only one of such alarm. Instead this notification will be displayed at "alarm time of early dismissed alarm" (remove it from there once this is fixed).
@@ -806,13 +826,12 @@ public class GlobalManager {
      * This event occurs when there is an alarm with state after {@link #STATE_FUTURE} and before state {@link #STATE_DISMISSED} (or {@link
      * #STATE_DISMISSED_BEFORE_RINGING}), that has to be cancelled because an earlier alarm was set by the user.
      */
-    public void onAlarmCancel() {
+    private void onAlarmCancel() {
         Log.d(TAG, "onAlarmCancel()");
 
         Context context = AlarmMorningApplication.getAppContext();
 
-        int state = getState();
-        if (state == STATE_SNOOZED || state == STATE_RINGING) {
+        if (isRingingOrSnoozed()) {
             Analytics analytics = new Analytics(context, Analytics.Event.Dismiss, Analytics.Channel.Time, Analytics.ChannelName.Alarm);
             analytics.set(Analytics.Param.Dismiss_type, Analytics.DISMISS__AUTO);
             analytics.setDay(getDayWithNextAlarmToRing());

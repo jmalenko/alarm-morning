@@ -465,7 +465,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
                 Analytics analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
 
                 GlobalManager globalManager = GlobalManager.getInstance();
-                globalManager.onDismissBeforeRinging(analytics);
+                globalManager.onDismissAuto(analytics);
                 break;
 
             case R.id.day_snooze:
