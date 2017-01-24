@@ -514,12 +514,16 @@ public class GlobalManager {
         analytics.setDayOld(day);
         analytics.save();
 
-        if (day.getState() == Day.STATE_DISABLED)
-            Log.i(TAG, "Disable alarm on " + day.getDateTime().getTime());
-        else if (day.getState() == Day.STATE_ENABLED)
-            Log.i(TAG, "Set alarm on " + day.getDateTime().getTime());
-        else
-            Log.i(TAG, "Reverting alarm to default on " + day.getDateTime().getTime());
+        switch (day.getState()) {
+            case Day.STATE_DISABLED:
+                Log.i(TAG, "Disable alarm on " + day.getDateTime().getTime());
+                break;
+            case Day.STATE_ENABLED:
+                Log.i(TAG, "Set alarm on " + day.getDateTime().getTime());
+                break;
+            default:
+                Log.i(TAG, "Reverting alarm to default on " + day.getDateTime().getTime());
+        }
 
         dataSource.saveDay(day);
 
