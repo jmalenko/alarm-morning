@@ -588,16 +588,18 @@ public class GlobalManager {
         updateWidget(context);
 
         NextAction nextAction = systemAlarm.calcNextAction();
-        if (nextAction.action.equals(SystemAlarm.ACTION_SET_SYSTEM_ALARM)) {
-            // nothing
-        } else if (nextAction.action.equals(SystemAlarm.ACTION_RING_IN_NEAR_FUTURE)) {
-            // nothing
-        } else if (nextAction.action.equals(SystemAlarm.ACTION_RING)) {
-            if (systemAlarm.useNearFutureTime()) {
-                onNearFuture(false);
-            }
-        } else {
-            throw new IllegalArgumentException("Unexpected argument " + nextAction);
+        switch (nextAction.action) {
+            case SystemAlarm.ACTION_SET_SYSTEM_ALARM:
+            case SystemAlarm.ACTION_RING_IN_NEAR_FUTURE:
+                // nothing
+                break;
+            case SystemAlarm.ACTION_RING:
+                if (systemAlarm.useNearFutureTime()) {
+                    onNearFuture(false);
+                }
+                break;
+            default:
+                throw new IllegalArgumentException("Unexpected argument " + nextAction);
         }
     }
 
