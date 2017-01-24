@@ -66,7 +66,7 @@ public class CheckAlarmTime {
     /**
      * Action meaning: Automatically hide the notification (on a specified time). Note: the notification may have been already dismissed by the user.
      */
-    protected static final String ACTION_AUTO_HIDE_NOTIFICATION = "AUTO_HIDE_NOTIFICATION";
+    public static final String ACTION_AUTO_HIDE_NOTIFICATION = "AUTO_HIDE_NOTIFICATION";
 
     private CheckAlarmTime(Context context) {
         this.context = context;
