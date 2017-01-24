@@ -33,22 +33,22 @@ public class SystemAlarm {
     /**
      * Action meaning: Set system alarm for next action. (Currently, all alarms are unset in the next {@link GlobalManager#HORIZON_DAYS} days.)
      */
-    protected static final String ACTION_SET_SYSTEM_ALARM = "SET_SYSTEM_ALARM";
+    public static final String ACTION_SET_SYSTEM_ALARM = "SET_SYSTEM_ALARM";
 
     /**
      * Action meaning: The next alarm is near (in 2 hours.)
      */
-    protected static final String ACTION_RING_IN_NEAR_FUTURE = "RING_IN_NEAR_FUTURE";
+    public static final String ACTION_RING_IN_NEAR_FUTURE = "RING_IN_NEAR_FUTURE";
 
     /**
      * Action meaning: The alarm tim of an early dismissed alarm.
      */
-    protected static final String ACTION_ALARM_TIME_OF_EARLY_DISMISSED_ALARM = "ALARM_TIME_OF_EARLY_DISMISSED_ALARM";
+    public static final String ACTION_ALARM_TIME_OF_EARLY_DISMISSED_ALARM = "ALARM_TIME_OF_EARLY_DISMISSED_ALARM";
 
     /**
      * Action meaning: Start ringing.
      */
-    public static String ACTION_RING = "RING";
+    public static final String ACTION_RING = "RING";
 
     private SystemAlarm(Context context) {
         this.context = context;
@@ -93,7 +93,7 @@ public class SystemAlarm {
         }
     }
 
-    protected void registerSystemAlarm(String action, Calendar time, Calendar alarmTime) {
+    private void registerSystemAlarm(String action, Calendar time, Calendar alarmTime) {
         NextAction nextAction = new NextAction(action, time, alarmTime);
         registerSystemAlarm(nextAction);
     }
@@ -227,16 +227,21 @@ public class SystemAlarm {
 
         GlobalManager globalManager = GlobalManager.getInstance();
 
-        if (action.equals(ACTION_SET_SYSTEM_ALARM)) {
-            globalManager.onAlarmTimeOfEarlyDismissedAlarm();
-        } else if (action.equals(ACTION_RING_IN_NEAR_FUTURE)) {
-            globalManager.onNearFuture();
-        } else if (action.equals(ACTION_ALARM_TIME_OF_EARLY_DISMISSED_ALARM)) {
-            globalManager.onAlarmTimeOfEarlyDismissedAlarm();
-        } else if (action.equals(ACTION_RING)) {
-            globalManager.onRing();
-        } else {
-            throw new IllegalArgumentException("Unexpected argument " + action);
+        switch (action) {
+            case ACTION_SET_SYSTEM_ALARM:
+                globalManager.onAlarmTimeOfEarlyDismissedAlarm();
+                break;
+            case ACTION_RING_IN_NEAR_FUTURE:
+                globalManager.onNearFuture();
+                break;
+            case ACTION_ALARM_TIME_OF_EARLY_DISMISSED_ALARM:
+                globalManager.onAlarmTimeOfEarlyDismissedAlarm();
+                break;
+            case ACTION_RING:
+                globalManager.onRing();
+                break;
+            default:
+                throw new IllegalArgumentException("Unexpected argument " + action);
         }
     }
 
