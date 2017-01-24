@@ -102,12 +102,16 @@ public class Defaults implements Cloneable {
 
     @Override
     public Defaults clone() {
-        Defaults cloned = new Defaults();
-        cloned.setState(getState());
-        cloned.setDayOfWeek(getDayOfWeek());
-        cloned.setHour(getHour());
-        cloned.setMinute(getMinute());
-        return cloned;
+        try {
+            Defaults cloned = (Defaults) super.clone();
+            cloned.setState(getState());
+            cloned.setDayOfWeek(getDayOfWeek());
+            cloned.setHour(getHour());
+            cloned.setMinute(getMinute());
+            return cloned;
+        } catch (CloneNotSupportedException e) {
+            throw new IllegalStateException("This should not happen", e);
+        }
     }
 
     @Override
