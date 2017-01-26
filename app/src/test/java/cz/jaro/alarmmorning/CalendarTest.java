@@ -3,8 +3,10 @@ package cz.jaro.alarmmorning;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
+import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -25,6 +27,8 @@ import org.robolectric.annotation.Config;
 import org.robolectric.fakes.RoboMenuItem;
 import org.robolectric.shadows.ShadowActivity;
 import org.robolectric.shadows.ShadowAlarmManager;
+import org.robolectric.shadows.ShadowAppWidgetManager;
+import org.robolectric.shadows.ShadowNotificationManager;
 import org.robolectric.shadows.ShadowPendingIntent;
 import org.robolectric.shadows.ShadowTimePickerDialog;
 import org.robolectric.shadows.ShadowViewGroup;
@@ -48,6 +52,7 @@ import static cz.jaro.alarmmorning.model.DayTest.DAY;
 import static cz.jaro.alarmmorning.model.DayTest.MONTH;
 import static cz.jaro.alarmmorning.model.DayTest.YEAR;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -58,7 +63,15 @@ import static org.junit.Assert.assertThat;
 public class CalendarTest extends FixedTimeTest {
 
     private Context context;
+
+    private AlarmManager alarmManager;
     private ShadowAlarmManager shadowAlarmManager;
+
+    private NotificationManager notificationManager;
+    private ShadowNotificationManager shadowNotificationManager;
+
+    private AppWidgetManager appWidgetManager;
+    private ShadowAppWidgetManager shadowAppWidgetManager;
 
     private Activity activity;
     private ShadowActivity shadowActivity;
@@ -88,8 +101,14 @@ public class CalendarTest extends FixedTimeTest {
 
         context = RuntimeEnvironment.application.getApplicationContext();
 
-        AlarmManager alarmManager = (AlarmManager) RuntimeEnvironment.application.getSystemService(Context.ALARM_SERVICE);
+        alarmManager = (AlarmManager) RuntimeEnvironment.application.getSystemService(Context.ALARM_SERVICE);
         shadowAlarmManager = Shadows.shadowOf(alarmManager);
+
+        notificationManager = (NotificationManager) RuntimeEnvironment.application.getSystemService(Context.NOTIFICATION_SERVICE);
+        shadowNotificationManager = Shadows.shadowOf(notificationManager);
+
+        appWidgetManager = AppWidgetManager.getInstance(context);
+        shadowAppWidgetManager = Shadows.shadowOf(appWidgetManager);
 
         globalManager.forceSetAlarm();
     }
@@ -98,6 +117,19 @@ public class CalendarTest extends FixedTimeTest {
     public void t00_noAlarmIsScheduled() {
         // Check system alarm
         assertSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY + 1, 0, 0, SystemAlarm.ACTION_SET_SYSTEM_ALARM);
+
+        // Check system alarm clock
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            AlarmManager.AlarmClockInfo alarmClockInfo = alarmManager.getNextAlarmClock();
+
+            assertNull(alarmClockInfo);
+        }
+
+        // Check notification
+        assertThat(shadowNotificationManager.getAllNotifications().size(), is(0));
+
+        // Check widget
+        assertThat(shadowAppWidgetManager.getInstalledProviders().size(), is(0));
     }
 
     @Test
