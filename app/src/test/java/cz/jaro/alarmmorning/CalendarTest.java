@@ -380,8 +380,38 @@ public class CalendarTest extends FixedTimeTest {
     }
 
     @Test
+    public void t31_onRingWithTomorrow() {
+        // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
+        consumeNextScheduledAlarm();
+
+        // Shift clock
+        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT, DayTest.MINUTE_DEFAULT)));
+        // Save day
+        setAlarmToToday();
+        setAlarmToTomorrow();
+
+        Activity activity = Robolectric.setupActivity(Activity.class);
+        ShadowActivity shadowActivity = Shadows.shadowOf(activity);
+
+        // Call the receiver
+        Intent intent = new Intent();
+        intent.setAction(SystemAlarm.ACTION_RING);
+        AlarmReceiver alarmReceiver = new AlarmReceiver();
+        alarmReceiver.onReceive(context, intent);
+
+        // Check that ringing started
+        Intent intentNext = shadowActivity.peekNextStartedActivity();
+        Intent expectedIntentNext = new Intent(context, RingActivity.class);
+
+        assertThat(intentNext.getComponent(), is(expectedIntentNext.getComponent()));
+
+        // Check system alarm
+        assertSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY + 1, DEFAULT_ALARM_HOUR - 1, DEFAULT_ALARM_MINUTE + 1, SystemAlarm.ACTION_RING_IN_NEAR_FUTURE);
+    }
+
+    @Test
     @Config(qualifiers = "en")
-    public void t31_dismissWhileRinging() {
+    public void t32_dismissWhileRinging() {
         // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
         consumeNextScheduledAlarm();
 
@@ -421,7 +451,7 @@ public class CalendarTest extends FixedTimeTest {
 
     @Test
     @Config(qualifiers = "en")
-    public void t32_snoozeWhileRinging() {
+    public void t33_snoozeWhileRinging() {
         // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
         consumeNextScheduledAlarm();
 
@@ -604,13 +634,21 @@ public class CalendarTest extends FixedTimeTest {
     }
 
     private void setAlarmToToday() {
-        Calendar date = new GregorianCalendar(DayTest.YEAR, DayTest.MONTH, DayTest.DAY);
+        Calendar date = new GregorianCalendar(DayTest.YEAR, DayTest.MONTH, DayTest.DAY, DayTest.HOUR_DEFAULT, DayTest.MINUTE_DEFAULT);
+        setAlarm(date);
+    }
 
+    private void setAlarmToTomorrow() {
+        Calendar date = new GregorianCalendar(DayTest.YEAR, DayTest.MONTH, DayTest.DAY + 1, DayTest.HOUR_DEFAULT + 1, DayTest.MINUTE_DEFAULT + 1);
+        setAlarm(date);
+    }
+
+    private void setAlarm(Calendar date) {
         Day day = new Day();
         day.setDate(date);
         day.setState(Day.STATE_ENABLED);
-        day.setHour(DayTest.HOUR_DEFAULT);
-        day.setMinute(DayTest.MINUTE_DEFAULT);
+        day.setHour(date.get(Calendar.HOUR_OF_DAY));
+        day.setMinute(date.get(Calendar.MINUTE));
 
         Defaults defaults = new Defaults();
         int dayOfWeek = date.get(Calendar.DAY_OF_WEEK);
