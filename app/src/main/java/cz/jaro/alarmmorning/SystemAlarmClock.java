@@ -49,52 +49,39 @@ public class SystemAlarmClock {
     public void onAlarmSet() {
         Log.d(TAG, "onAlarmSet()");
 
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            reset();
-        } else {
-            Log.d(TAG, "The system alarm clock is not supported on this Android version");
-        }
+        reset();
     }
 
     public void onDismissBeforeRinging() {
         Log.d(TAG, "onDismissBeforeRinging()");
 
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            reset();
-        } else {
-            Log.d(TAG, "The system alarm clock is not supported on this Android version");
-        }
+        reset();
     }
 
     public void onRing() {
         Log.d(TAG, "onRing()");
 
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            reset();
-        } else {
-            Log.d(TAG, "The system alarm clock is not supported on this Android version");
-        }
+        reset();
     }
 
     public void onAlarmCancel() {
         Log.d(TAG, "onAlarmCancel()");
 
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            reset();
-        } else {
-            Log.d(TAG, "The system alarm clock is not supported on this Android version");
-        }
+        reset();
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void reset() {
         Log.v(TAG, "reset()");
 
-        cancel();
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            cancel();
 
-        register();
+            register();
 
-        print();
+            print();
+        } else {
+            Log.d(TAG, "The system alarm clock is not supported on this Android version");
+        }
     }
 
     private void cancel() {

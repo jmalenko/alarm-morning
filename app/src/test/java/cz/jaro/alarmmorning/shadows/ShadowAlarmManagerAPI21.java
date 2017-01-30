@@ -2,7 +2,9 @@ package cz.jaro.alarmmorning.shadows;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.content.Intent;
 
+import org.robolectric.Shadows;
 import org.robolectric.annotation.Implementation;
 import org.robolectric.annotation.Implements;
 import org.robolectric.shadows.ShadowAlarmManager;
@@ -16,16 +18,36 @@ import org.robolectric.shadows.ShadowAlarmManager;
 @Implements(AlarmManager.class)
 public class ShadowAlarmManagerAPI21 extends ShadowAlarmManager {
 
-    private AlarmManager.AlarmClockInfo nextAlarmClock;
+    private AlarmManager.AlarmClockInfo alarmClockInfo;
+    private PendingIntent operation;
 
     @Implementation
-    public void setAlarmClock(AlarmManager.AlarmClockInfo info, PendingIntent operation) {
-        this.nextAlarmClock = info;
+    public void setAlarmClock(AlarmManager.AlarmClockInfo alarmClockInfo, PendingIntent operation) {
+        this.alarmClockInfo = alarmClockInfo;
+        this.operation = operation;
     }
 
     @Implementation
     public AlarmManager.AlarmClockInfo getNextAlarmClock() {
-        return nextAlarmClock;
+        return alarmClockInfo;
     }
 
+    @Implementation
+    public void cancel(PendingIntent pendingIntent) {
+        if (operation != null) {
+            final Intent intentTypeToRemove = Shadows.shadowOf(pendingIntent).getSavedIntent();
+            final Intent alarmIntent = Shadows.shadowOf(operation).getSavedIntent();
+            if (intentTypeToRemove.filterEquals(alarmIntent)) {
+                alarmClockInfo = null;
+                operation = null;
+                return;
+            }
+        }
+
+        super.cancel(pendingIntent);
+    }
+
+    public PendingIntent getNextAlarmClockOperation() {
+        return operation;
+    }
 }

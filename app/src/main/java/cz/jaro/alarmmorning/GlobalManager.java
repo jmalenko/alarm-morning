@@ -848,6 +848,9 @@ public class GlobalManager {
         SystemNotification systemNotification = SystemNotification.getInstance(context);
         systemNotification.onAlarmCancel();
 
+        SystemAlarmClock systemAlarmClock = SystemAlarmClock.getInstance(context);
+        systemAlarmClock.onAlarmCancel();
+
         updateRingingActivity(context, RingActivity.ACTION_HIDE_ACTIVITY);
 
         updateCalendarActivity(context, AlarmMorningActivity.ACTION_CANCEL);
