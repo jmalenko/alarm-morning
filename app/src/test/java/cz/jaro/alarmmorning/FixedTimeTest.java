@@ -8,6 +8,7 @@ import org.junit.runners.MethodSorters;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 import org.robolectric.internal.ShadowExtractor;
+import org.robolectric.shadows.ShadowApplication;
 
 import java.lang.reflect.Field;
 import java.util.GregorianCalendar;
@@ -39,6 +40,9 @@ public class FixedTimeTest {
 
     @Before
     public void before() {
+        // Disable Google Analytics
+        ShadowApplication.getInstance().declareActionUnbindable("com.google.android.gms.analytics.service.START");
+
         globalManager = GlobalManager.getInstance();
 
         shadowGlobalManager = (ShadowGlobalManager) ShadowExtractor.extract(globalManager);
