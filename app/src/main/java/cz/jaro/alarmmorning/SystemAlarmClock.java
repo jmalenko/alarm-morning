@@ -67,7 +67,9 @@ public class SystemAlarmClock {
     public void onAlarmCancel() {
         Log.d(TAG, "onAlarmCancel()");
 
-        reset();
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            cancel();
+        }
     }
 
     private void reset() {
@@ -98,7 +100,7 @@ public class SystemAlarmClock {
         Log.v(TAG, "register()");
 
         GlobalManager globalManager = GlobalManager.getInstance();
-        Day day = globalManager.getDayWithNextAlarmToRing();
+        Day day = globalManager.getDayWithNextAlarm();
 
         if (day != null) {
             Calendar alarmTime = day.getDateTime();

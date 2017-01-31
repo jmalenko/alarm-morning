@@ -131,6 +131,9 @@ public class CalendarTest extends FixedTimeTest {
             RingActivity ringActivity = (RingActivity) this.activity;
             ringActivity.shutdown();
         }
+
+        // Cancell all notifications
+        notificationManager.cancelAll();
     }
 
     @Test
@@ -474,9 +477,15 @@ public class CalendarTest extends FixedTimeTest {
         // Consume the alarm with action ACTION_RING_IN_NEAR_FUTURE
         consumeNextScheduledAlarm();
 
+        // Shift clock - must go through onNearFuture() as it calls globalManager.setNextAction()
+        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT - 2, DayTest.MINUTE_DEFAULT)));
+        globalManager.onNearFuture(); // FIXME this should NOT be necessary. Create test with zero advance period (in which case the onNearFuture() is not called
+
+        // Consume the alarm with action ACTION_RING
+        consumeNextScheduledAlarm();
+
         // Shift clock
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT, DayTest.MINUTE_DEFAULT, 1))); // 1 second after alarm
-        globalManager.onRing();
+        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT, DayTest.MINUTE_DEFAULT)));
 
         Activity activity = Robolectric.setupActivity(Activity.class);
         ShadowActivity shadowActivity = Shadows.shadowOf(activity);
@@ -539,6 +548,13 @@ public class CalendarTest extends FixedTimeTest {
         // Consume the alarm with action ACTION_RING_IN_NEAR_FUTURE
         consumeNextScheduledAlarm();
 
+        // Shift clock - must go through onNearFuture() as it calls globalManager.setNextAction()
+        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT - 2, DayTest.MINUTE_DEFAULT)));
+        globalManager.onNearFuture(); // FIXME this should NOT be necessary. Create test with zero advance period (in which case the onNearFuture() is not called
+
+        // Consume the alarm with action ACTION_RING
+        consumeNextScheduledAlarm();
+
         // Shift clock
         shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT, DayTest.MINUTE_DEFAULT, 1))); // 1 second after alarm
         globalManager.onRing();
@@ -562,7 +578,7 @@ public class CalendarTest extends FixedTimeTest {
         assertSystemAlarm(YEAR, MONTH, DAY + 1, DEFAULT_ALARM_HOUR - 1, DEFAULT_ALARM_MINUTE + 1, SystemAlarm.ACTION_RING_IN_NEAR_FUTURE);
 
         // Check system alarm clock
-//        assertSystemAlarmClock(YEAR, MONTH, DAY + 1, DEFAULT_ALARM_HOUR + 1, DEFAULT_ALARM_MINUTE + 1); // FIXME
+        assertSystemAlarmClock(YEAR, MONTH, DAY + 1, DEFAULT_ALARM_HOUR + 1, DEFAULT_ALARM_MINUTE + 1);
 
         // Check notification
         // TODO Fails when run with other test (fine when run as the only test)
@@ -588,6 +604,13 @@ public class CalendarTest extends FixedTimeTest {
         setAlarmToToday();
 
         // Consume the alarm with action ACTION_RING_IN_NEAR_FUTURE
+        consumeNextScheduledAlarm();
+
+        // Shift clock - must go through onNearFuture() as it calls globalManager.setNextAction()
+        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT - 2, DayTest.MINUTE_DEFAULT)));
+        globalManager.onNearFuture(); // FIXME this should NOT be necessary. Create test with zero advance period (in which case the onNearFuture() is not called
+
+        // Consume the alarm with action ACTION_RING
         consumeNextScheduledAlarm();
 
         // Shift clock
@@ -619,6 +642,13 @@ public class CalendarTest extends FixedTimeTest {
         setAlarmToToday();
 
         // Consume the alarm with action ACTION_RING_IN_NEAR_FUTURE
+        consumeNextScheduledAlarm();
+
+        // Shift clock - must go through onNearFuture() as it calls globalManager.setNextAction()
+        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT - 2, DayTest.MINUTE_DEFAULT)));
+        globalManager.onNearFuture(); // FIXME this should NOT be necessary. Create test with zero advance period (in which case the onNearFuture() is not called
+
+        // Consume the alarm with action ACTION_RING
         consumeNextScheduledAlarm();
 
         // Shift clock
@@ -664,12 +694,22 @@ public class CalendarTest extends FixedTimeTest {
         // Consume the alarm with action ACTION_RING_IN_NEAR_FUTURE
         consumeNextScheduledAlarm();
 
+        // Shift clock - must go through onNearFuture() as it calls globalManager.setNextAction()
+        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT - 2, DayTest.MINUTE_DEFAULT)));
+        globalManager.onNearFuture(); // FIXME this should NOT be necessary. Create test with zero advance period (in which case the onNearFuture() is not called
+
+        // Consume the alarm with action ACTION_RING
+        consumeNextScheduledAlarm();
+
+        // Shift clock - must go through onNearFuture() as it calls globalManager.setNextAction()
+        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT, DayTest.MINUTE_DEFAULT)));
+        globalManager.onRing();
+
+        // Consume the alarm with action ACTION_RING
+        consumeNextScheduledAlarm();
+
         // Shift clock
         shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT, DayTest.MINUTE_DEFAULT, 1))); // 1 second after alarm
-
-        // We must some internal variables about the current alarm before calling onSnooze()
-        Calendar alarmTime = new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT, DayTest.MINUTE_DEFAULT);
-        globalManager.setState(GlobalManager.STATE_RINGING, alarmTime);
 
         Analytics analytics = new Analytics(Analytics.Channel.Test, Analytics.ChannelName.Calendar);
         globalManager.onSnooze(analytics);
@@ -1014,7 +1054,7 @@ public class CalendarTest extends FixedTimeTest {
     private void assertSystemAlarmClockNone() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             AlarmManager.AlarmClockInfo alarmClockInfo = alarmManager.getNextAlarmClock();
-//            assertNull(alarmClockInfo); // FIXME Fix test
+            assertNull(alarmClockInfo);
         }
     }
 

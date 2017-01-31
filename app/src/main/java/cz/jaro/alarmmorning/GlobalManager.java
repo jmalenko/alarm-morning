@@ -118,6 +118,11 @@ public class GlobalManager {
         return new SystemClock();
     }
 
+    /**
+     * Excludes today's alarm if it was dismissed (both before and after alarm time). Includes today's alarm that is ringing or snoozed.
+     *
+     * @return Day with next alarm.
+     */
     public Day getDayWithNextAlarmToRing() {
         Log.v(TAG, "getDayWithNextAlarmToRing()");
 
@@ -131,10 +136,30 @@ public class GlobalManager {
                 public boolean match(Day day) {
                     Log.v(TAG, "   checking filter condition for " + day.getDateTime().getTime());
                     int state = getState(day.getDateTime());
-                    return state != GlobalManager.STATE_DISMISSED_BEFORE_RINGING && state != GlobalManager.STATE_DISMISSED;
+                    return state != STATE_DISMISSED_BEFORE_RINGING && state != STATE_DISMISSED;
                 }
             });
         }
+
+        return day;
+    }
+
+    /**
+     * Excludes today's alarm if it was dismissed (both before and after alarm time) or is ringing or is snoozed.
+     *
+     * @return Day with next alarm.
+     */
+    public Day getDayWithNextAlarm() {
+        Log.v(TAG, "getDayWithNextAlarm()");
+
+        Day day = getNextAlarm(clock(), new DayFilter() { // TODO Hotfix - Robolectric doesn't allow shadow of a class with lambda
+            @Override
+            public boolean match(Day day) {
+                Log.v(TAG, "   checking filter condition for " + day.getDateTime().getTime());
+                int state = getState(day.getDateTime());
+                return state != STATE_DISMISSED_BEFORE_RINGING && state != STATE_DISMISSED && state != STATE_RINGING && state != STATE_SNOOZED;
+            }
+        });
 
         return day;
     }
@@ -721,7 +746,8 @@ public class GlobalManager {
 
         Context context = AlarmMorningApplication.getAppContext();
 
-        boolean isNew = getNextAction().time.equals(getNextAction().alarmTime); // otherwise the alarm is resumed after snoozing
+        NextAction nextAction = getNextAction();
+        boolean isNew = nextAction.time.equals(nextAction.alarmTime); // otherwise the alarm is resumed after snoozing
 
         if (isRingingOrSnoozed() && isNew) {
             Log.i(TAG, "The previous alarm is still ringing. Cancelling it.");
@@ -731,7 +757,7 @@ public class GlobalManager {
             SystemNotification systemNotification = SystemNotification.getInstance(context);
             systemNotification.notifyCancelledAlarm();
 
-            setState(STATE_RINGING, getNextAction().alarmTime);
+            setState(STATE_RINGING, nextAction.alarmTime);
         } else {
             setState(STATE_RINGING, getAlarmTimeOfRingingAlarm());
         }
