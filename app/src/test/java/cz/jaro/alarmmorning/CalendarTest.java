@@ -43,7 +43,6 @@ import java.util.GregorianCalendar;
 import cz.jaro.alarmmorning.clock.FixedClock;
 import cz.jaro.alarmmorning.graphics.SlideButton;
 import cz.jaro.alarmmorning.model.Day;
-import cz.jaro.alarmmorning.model.DayTest;
 import cz.jaro.alarmmorning.model.Defaults;
 import cz.jaro.alarmmorning.receivers.AlarmReceiver;
 import cz.jaro.alarmmorning.receivers.NotificationReceiver;
@@ -55,6 +54,8 @@ import cz.jaro.alarmmorning.wizard.Wizard;
 import static cz.jaro.alarmmorning.model.AlarmDbHelper.DEFAULT_ALARM_HOUR;
 import static cz.jaro.alarmmorning.model.AlarmDbHelper.DEFAULT_ALARM_MINUTE;
 import static cz.jaro.alarmmorning.model.DayTest.DAY;
+import static cz.jaro.alarmmorning.model.DayTest.HOUR_DEFAULT;
+import static cz.jaro.alarmmorning.model.DayTest.MINUTE_DEFAULT;
 import static cz.jaro.alarmmorning.model.DayTest.MONTH;
 import static cz.jaro.alarmmorning.model.DayTest.YEAR;
 import static org.hamcrest.core.Is.is;
@@ -471,7 +472,7 @@ public class CalendarTest extends FixedTimeTest {
 //        assertNotificationAction(notification, 1, "Snooze", NotificationReceiver.ACTION_SNOOZE);
 
         // Start ring activity
-        Calendar alarmTime = new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT, DayTest.MINUTE_DEFAULT);
+        Calendar alarmTime = new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DEFAULT, MINUTE_DEFAULT);
         startActivityRing(alarmTime);
 
         // Check appearance
@@ -530,7 +531,7 @@ public class CalendarTest extends FixedTimeTest {
         prepareUntilRing();
 
         // Start ring activity
-        Calendar alarmTime = new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT, DayTest.MINUTE_DEFAULT, 10);
+        Calendar alarmTime = new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DEFAULT, MINUTE_DEFAULT, 10);
         startActivityRing(alarmTime);
 
         dismissButton.performClick();
@@ -554,7 +555,7 @@ public class CalendarTest extends FixedTimeTest {
         consumeNextScheduledAlarm();
 
         // Start ring activity
-        Calendar alarmTime = new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT, DayTest.MINUTE_DEFAULT, 10);
+        Calendar alarmTime = new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DEFAULT, MINUTE_DEFAULT, 10);
         startActivityRing(alarmTime);
 
         snoozeButton.performClick();
@@ -717,7 +718,7 @@ public class CalendarTest extends FixedTimeTest {
         consumeNextScheduledAlarm();
 
         // Shift clock
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT - 2, DayTest.MINUTE_DEFAULT)));
+        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DEFAULT - 2, MINUTE_DEFAULT)));
 
         // Call the receiver
         Intent intent = new Intent();
@@ -725,7 +726,7 @@ public class CalendarTest extends FixedTimeTest {
         AlarmReceiver alarmReceiver = new AlarmReceiver();
         alarmReceiver.onReceive(context, intent);
 
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT - 2, DayTest.MINUTE_DEFAULT, 10)));
+        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DEFAULT - 2, MINUTE_DEFAULT, 10)));
     }
 
     private void prepareUntilRing() {
@@ -739,7 +740,7 @@ public class CalendarTest extends FixedTimeTest {
         consumeNextScheduledAlarm();
 
         // Shift clock
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT, DayTest.MINUTE_DEFAULT)));
+        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DEFAULT, MINUTE_DEFAULT)));
 
         // Call the receiver
         Intent intent = new Intent();
@@ -747,7 +748,7 @@ public class CalendarTest extends FixedTimeTest {
         AlarmReceiver alarmReceiver = new AlarmReceiver();
         alarmReceiver.onReceive(context, intent);
 
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT, DayTest.MINUTE_DEFAULT, 10)));
+        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DEFAULT, MINUTE_DEFAULT, 10)));
     }
 
     private void prepareUntilSnooze() {
@@ -761,7 +762,7 @@ public class CalendarTest extends FixedTimeTest {
         consumeNextScheduledAlarm();
 
         // Shift clock - must go through onNearFuture() as it calls globalManager.setNextAction()
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT, DayTest.MINUTE_DEFAULT)));
+        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DEFAULT, MINUTE_DEFAULT)));
 
         // Call the receiver
         Intent intent = new Intent();
@@ -773,10 +774,10 @@ public class CalendarTest extends FixedTimeTest {
         consumeNextScheduledAlarm();
 
         // Shift clock
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT, DayTest.MINUTE_DEFAULT, 10)));
+        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DEFAULT, MINUTE_DEFAULT, 10)));
 
         // Start ring activity
-        Calendar alarmTime = new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT, DayTest.MINUTE_DEFAULT);
+        Calendar alarmTime = new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DEFAULT, MINUTE_DEFAULT);
         startActivityRing(alarmTime);
 
         snoozeButton.performClick();
@@ -784,7 +785,7 @@ public class CalendarTest extends FixedTimeTest {
         // Consume the alarm with action ACTION_RING
         consumeNextScheduledAlarm();
 
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT, DayTest.MINUTE_DEFAULT, 10)));
+        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DEFAULT, MINUTE_DEFAULT, 10)));
     }
 
     private void consumeNextScheduledAlarm() {
@@ -793,12 +794,12 @@ public class CalendarTest extends FixedTimeTest {
     }
 
     private void setAlarmToToday() {
-        Calendar date = new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT, DayTest.MINUTE_DEFAULT);
+        Calendar date = new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DEFAULT, MINUTE_DEFAULT);
         setAlarm(date);
     }
 
     private void setAlarmToTomorrow() {
-        Calendar date = new GregorianCalendar(YEAR, MONTH, DAY + 1, DayTest.HOUR_DEFAULT + 1, DayTest.MINUTE_DEFAULT + 1);
+        Calendar date = new GregorianCalendar(YEAR, MONTH, DAY + 1, HOUR_DEFAULT + 1, MINUTE_DEFAULT + 1);
         setAlarm(date);
     }
 
@@ -860,10 +861,6 @@ public class CalendarTest extends FixedTimeTest {
         textDate = (TextView) item.findViewById(R.id.textDate);
         textTime = (TextView) item.findViewById(R.id.textTimeCal);
         textState = (TextView) item.findViewById(R.id.textState);
-    }
-
-    private void clickItem() {
-        item.performClick();
     }
 
     private void clickContextMenu(int id) {
