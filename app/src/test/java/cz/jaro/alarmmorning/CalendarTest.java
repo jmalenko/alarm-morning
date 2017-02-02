@@ -384,23 +384,7 @@ public class CalendarTest extends FixedTimeTest {
 
     @Test
     public void t20_onNear() {
-        // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
-        consumeNextScheduledAlarm();
-
-        // Save day
-        setAlarmToToday();
-
-        // Consume the alarm with action ACTION_RING_IN_NEAR_FUTURE
-        consumeNextScheduledAlarm();
-
-        // Shift clock
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT - 2, DayTest.MINUTE_DEFAULT)));
-
-        // Call the receiver
-        Intent intent = new Intent();
-        intent.setAction(SystemAlarm.ACTION_RING_IN_NEAR_FUTURE);
-        AlarmReceiver alarmReceiver = new AlarmReceiver();
-        alarmReceiver.onReceive(context, intent);
+        prepareUntilNear();
 
         // Check system alarm
         assertSystemAlarm(YEAR, MONTH, DAY, DEFAULT_ALARM_HOUR, DEFAULT_ALARM_MINUTE, SystemAlarm.ACTION_RING);
@@ -423,24 +407,8 @@ public class CalendarTest extends FixedTimeTest {
 
     @Test
     @Config(qualifiers = "en")
-    public void t21_dismissBeforeRinging() {
-        // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
-        consumeNextScheduledAlarm();
-
-        // Save day
-        setAlarmToToday();
-
-        // Consume the alarm with action ACTION_RING_IN_NEAR_FUTURE
-        consumeNextScheduledAlarm();
-
-        // Shift clock
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT - 2, DayTest.MINUTE_DEFAULT, 1))); // 1 second after near time
-
-        // Call the receiver
-        Intent intent = new Intent();
-        intent.setAction(SystemAlarm.ACTION_RING_IN_NEAR_FUTURE);
-        AlarmReceiver alarmReceiver = new AlarmReceiver();
-        alarmReceiver.onReceive(context, intent);
+    public void t21_dismissWhileInNearPeriod() {
+        prepareUntilNear();
 
         // Consume the alarm with action ACTION_RING
         consumeNextScheduledAlarm();
@@ -472,23 +440,7 @@ public class CalendarTest extends FixedTimeTest {
 
     @Test
     public void t30_onRing() {
-        // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
-        consumeNextScheduledAlarm();
-
-        // Save day
-        setAlarmToToday();
-
-        // Consume the alarm with action ACTION_RING_IN_NEAR_FUTURE
-        consumeNextScheduledAlarm();
-
-        // Shift clock
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT, DayTest.MINUTE_DEFAULT)));
-
-        // Call the receiver
-        Intent intent = new Intent();
-        intent.setAction(SystemAlarm.ACTION_RING);
-        AlarmReceiver alarmReceiver = new AlarmReceiver();
-        alarmReceiver.onReceive(context, intent);
+        prepareUntilRing();
 
         // Check that ringing started
         Activity activity = Robolectric.setupActivity(Activity.class);
@@ -539,20 +491,9 @@ public class CalendarTest extends FixedTimeTest {
         consumeNextScheduledAlarm();
 
         // Save day
-        setAlarmToToday();
         setAlarmToTomorrow();
 
-        // Consume the alarm with action ACTION_RING_IN_NEAR_FUTURE
-        consumeNextScheduledAlarm();
-
-        // Shift clock
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT, DayTest.MINUTE_DEFAULT)));
-
-        // Call the receiver
-        Intent intent = new Intent();
-        intent.setAction(SystemAlarm.ACTION_RING);
-        AlarmReceiver alarmReceiver = new AlarmReceiver();
-        alarmReceiver.onReceive(context, intent);
+        prepareUntilRing();
 
         // Check that ringing started
         Activity activity = Robolectric.setupActivity(Activity.class);
@@ -586,25 +527,10 @@ public class CalendarTest extends FixedTimeTest {
     @Test
     @Config(qualifiers = "en")
     public void t32_dismissWhileRinging() {
-        // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
-        consumeNextScheduledAlarm();
+        prepareUntilRing();
 
-        // Save day
-        setAlarmToToday();
-
-        // Consume the alarm with action ACTION_RING_IN_NEAR_FUTURE
-        consumeNextScheduledAlarm();
-
-        // Shift clock
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT, DayTest.MINUTE_DEFAULT, 1))); // 1 second after alarm
-
-        // Call the receiver
-        Intent intent = new Intent();
-        intent.setAction(SystemAlarm.ACTION_RING);
-        AlarmReceiver alarmReceiver = new AlarmReceiver();
-        alarmReceiver.onReceive(context, intent);
-
-        Calendar alarmTime = new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT, DayTest.MINUTE_DEFAULT);
+        // Start ring activity
+        Calendar alarmTime = new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT, DayTest.MINUTE_DEFAULT, 10);
         startActivityRing(alarmTime);
 
         dismissButton.performClick();
@@ -622,29 +548,13 @@ public class CalendarTest extends FixedTimeTest {
     @Test
     @Config(qualifiers = "en")
     public void t33_snoozeWhileRinging() {
-        // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
-        consumeNextScheduledAlarm();
-
-        // Save day
-        setAlarmToToday();
-
-        // Consume the alarm with action ACTION_RING_IN_NEAR_FUTURE
-        consumeNextScheduledAlarm();
-
-        // Shift clock
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT, DayTest.MINUTE_DEFAULT, 1))); // 1 second after alarm
-
-        // Call the receiver
-        Intent intent = new Intent();
-        intent.setAction(SystemAlarm.ACTION_RING);
-        AlarmReceiver alarmReceiver = new AlarmReceiver();
-        alarmReceiver.onReceive(context, intent);
+        prepareUntilRing();
 
         // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
         consumeNextScheduledAlarm();
 
         // Start ring activity
-        Calendar alarmTime = new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT, DayTest.MINUTE_DEFAULT);
+        Calendar alarmTime = new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT, DayTest.MINUTE_DEFAULT, 10);
         startActivityRing(alarmTime);
 
         snoozeButton.performClick();
@@ -671,29 +581,7 @@ public class CalendarTest extends FixedTimeTest {
     @Test
     public void t40_dismissWhileSnoozed() {
         // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
-        consumeNextScheduledAlarm();
-
-        // Save day
-        setAlarmToToday();
-
-        // Consume the alarm with action ACTION_RING_IN_NEAR_FUTURE
-        consumeNextScheduledAlarm();
-
-        // Shift clock - must go through onNearFuture() as it calls globalManager.setNextAction()
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT, DayTest.MINUTE_DEFAULT)));
-        globalManager.onRing();
-
-        // Consume the alarm with action ACTION_RING
-        consumeNextScheduledAlarm();
-
-        // Shift clock
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT, DayTest.MINUTE_DEFAULT, 1))); // 1 second after alarm
-
-        Analytics analytics = new Analytics(Analytics.Channel.Test, Analytics.ChannelName.Calendar);
-        globalManager.onSnooze(analytics);
-
-        // Consume the alarm with action ACTION_RING
-        consumeNextScheduledAlarm();
+        prepareUntilSnooze();
 
         // Click in calendar
         startActivityCalendar();
@@ -722,27 +610,7 @@ public class CalendarTest extends FixedTimeTest {
 
     @Test
     public void t41_setTimeWhileSnoozed() {
-        // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
-        consumeNextScheduledAlarm();
-
-        // Save day
-        setAlarmToToday();
-
-        // Consume the alarm with action ACTION_RING_IN_NEAR_FUTURE
-        consumeNextScheduledAlarm();
-
-        // Shift clock
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT, DayTest.MINUTE_DEFAULT, 1))); // 1 second after alarm
-
-        // We must some internal variables about the current alarm before calling onSnooze()
-        Calendar alarmTime = new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT, DayTest.MINUTE_DEFAULT);
-        globalManager.setState(GlobalManager.STATE_RINGING, alarmTime);
-
-        Analytics analytics = new Analytics(Analytics.Channel.Test, Analytics.ChannelName.Calendar);
-        globalManager.onSnooze(analytics);
-
-        // Consume the alarm with action ACTION_RING
-        consumeNextScheduledAlarm();
+        prepareUntilSnooze();
 
         // Click in calendar
         startActivityCalendar();
@@ -784,26 +652,7 @@ public class CalendarTest extends FixedTimeTest {
     @Test
     public void t42_revertWhileSnoozed() {
         // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
-        consumeNextScheduledAlarm();
-
-        // Save day
-        setAlarmToToday();
-
-        // Consume the alarm with action ACTION_RING_IN_NEAR_FUTURE
-        consumeNextScheduledAlarm();
-
-        // Shift clock
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT, DayTest.MINUTE_DEFAULT, 1))); // 1 second after alarm
-
-        // We must some internal variables about the current alarm before calling onSnooze()
-        Calendar alarmTime = new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT, DayTest.MINUTE_DEFAULT);
-        globalManager.setState(GlobalManager.STATE_RINGING, alarmTime);
-
-        Analytics analytics = new Analytics(Analytics.Channel.Test, Analytics.ChannelName.Calendar);
-        globalManager.onSnooze(analytics);
-
-        // Consume the alarm with action ACTION_RING
-        consumeNextScheduledAlarm();
+        prepareUntilSnooze();
 
         // Click in calendar
         startActivityCalendar();
@@ -835,27 +684,7 @@ public class CalendarTest extends FixedTimeTest {
      */
     @Test
     public void t43_disableWhileSnoozed() {
-        // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
-        consumeNextScheduledAlarm();
-
-        // Save day
-        setAlarmToToday();
-
-        // Consume the alarm with action ACTION_RING_IN_NEAR_FUTURE
-        consumeNextScheduledAlarm();
-
-        // Shift clock
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT, DayTest.MINUTE_DEFAULT, 1))); // 1 second after alarm
-
-        // We must some internal variables about the current alarm before calling onSnooze()
-        Calendar alarmTime = new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT, DayTest.MINUTE_DEFAULT);
-        globalManager.setState(GlobalManager.STATE_RINGING, alarmTime);
-
-        Analytics analytics = new Analytics(Analytics.Channel.Test, Analytics.ChannelName.Calendar);
-        globalManager.onSnooze(analytics);
-
-        // Consume the alarm with action ACTION_RING
-        consumeNextScheduledAlarm();
+        prepareUntilSnooze();
 
         // Click in calendar
         startActivityCalendar();
@@ -875,6 +704,87 @@ public class CalendarTest extends FixedTimeTest {
 
         // Check notification
         assertThat(shadowNotificationManager.size(), is(0));
+    }
+
+    private void prepareUntilNear() {
+        // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
+        consumeNextScheduledAlarm();
+
+        // Save day
+        setAlarmToToday();
+
+        // Consume the alarm with action ACTION_RING_IN_NEAR_FUTURE
+        consumeNextScheduledAlarm();
+
+        // Shift clock
+        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT - 2, DayTest.MINUTE_DEFAULT)));
+
+        // Call the receiver
+        Intent intent = new Intent();
+        intent.setAction(SystemAlarm.ACTION_RING_IN_NEAR_FUTURE);
+        AlarmReceiver alarmReceiver = new AlarmReceiver();
+        alarmReceiver.onReceive(context, intent);
+
+        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT - 2, DayTest.MINUTE_DEFAULT, 10)));
+    }
+
+    private void prepareUntilRing() {
+        // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
+        consumeNextScheduledAlarm();
+
+        // Save day
+        setAlarmToToday();
+
+        // Consume the alarm with action ACTION_RING_IN_NEAR_FUTURE
+        consumeNextScheduledAlarm();
+
+        // Shift clock
+        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT, DayTest.MINUTE_DEFAULT)));
+
+        // Call the receiver
+        Intent intent = new Intent();
+        intent.setAction(SystemAlarm.ACTION_RING);
+        AlarmReceiver alarmReceiver = new AlarmReceiver();
+        alarmReceiver.onReceive(context, intent);
+
+        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT, DayTest.MINUTE_DEFAULT, 10)));
+    }
+
+    private void prepareUntilSnooze() {
+        // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
+        consumeNextScheduledAlarm();
+
+        // Save day
+        setAlarmToToday();
+
+        // Consume the alarm with action ACTION_RING_IN_NEAR_FUTURE
+        consumeNextScheduledAlarm();
+
+        // Shift clock - must go through onNearFuture() as it calls globalManager.setNextAction()
+        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT, DayTest.MINUTE_DEFAULT)));
+
+        // Call the receiver
+        Intent intent = new Intent();
+        intent.setAction(SystemAlarm.ACTION_RING);
+        AlarmReceiver alarmReceiver = new AlarmReceiver();
+        alarmReceiver.onReceive(context, intent);
+
+        // Consume the alarm with action ACTION_RING
+        consumeNextScheduledAlarm();
+
+        // Shift clock
+        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT, DayTest.MINUTE_DEFAULT, 10)));
+
+        // Start ring activity
+        Calendar alarmTime = new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT, DayTest.MINUTE_DEFAULT);
+        startActivityRing(alarmTime);
+
+        snoozeButton.performClick();
+
+        // Consume the alarm with action ACTION_RING
+        consumeNextScheduledAlarm();
+
+        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT, DayTest.MINUTE_DEFAULT, 10)));
     }
 
     private void consumeNextScheduledAlarm() {
