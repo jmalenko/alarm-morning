@@ -16,7 +16,6 @@ import android.widget.SeekBar;
 public class SlideButton extends SeekBar {
 
     private Drawable thumb;
-    private OnClickListener listener;
 
     public SlideButton(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -41,7 +40,7 @@ public class SlideButton extends SeekBar {
                     anim.setDuration(getResources().getInteger(android.R.integer.config_shortAnimTime));
                     anim.start();
                 } else {
-                    handleSlide();
+                    performClick();
                     seekBar.setProgress(0);
                 }
             }
@@ -74,14 +73,6 @@ public class SlideButton extends SeekBar {
     @Override
     public Drawable getThumb() {
         return thumb;
-    }
-
-    private void handleSlide() {
-        listener.onClick(this);
-    }
-
-    public void setSlideButtonListener(OnClickListener listener) {
-        this.listener = listener;
     }
 
 }

@@ -747,7 +747,7 @@ public class GlobalManager {
         Context context = AlarmMorningApplication.getAppContext();
 
         NextAction nextAction = getNextAction();
-        boolean isNew = nextAction.time.equals(nextAction.alarmTime); // otherwise the alarm is resumed after snoozing
+        boolean isNew = !nextAction.time.after(nextAction.alarmTime); // otherwise the alarm is resumed after snoozing
 
         if (isRingingOrSnoozed() && isNew) {
             Log.i(TAG, "The previous alarm is still ringing. Cancelling it.");
@@ -1063,7 +1063,7 @@ public class GlobalManager {
     }
 
     /**
-     * Reset all the data (database and settings) to the initial state.
+     * Reset all the data (database and settings (including the data stored by GlobalManager)) to the initial state.
      */
     public void reset() {
         resetDatabase();
@@ -1079,7 +1079,10 @@ public class GlobalManager {
     }
 
     /**
-     * Reset the settings to defaults.
+     * Reset the settings to the defaults and remove the data stored by GlobalManager.
+     * <p>
+     * Note: this just rests the settings, but the subsequent action is not triggered by this method. E.g. when resetting the holiday, the alarm is not reset
+     * (in case the next day was holiday).
      */
     private void resetSettings() {
         Context context = AlarmMorningApplication.getAppContext();
@@ -1095,7 +1098,9 @@ public class GlobalManager {
         // Set defaults
         // TODO Hotfix - Robolectric hasn't implemented setDefaultValues() yet, we have to set each setting individually (as the need for testing arises)
 //        PreferenceManager.setDefaultValues(context, R.xml.preferences, true);
-        saveHoliday(SettingsActivity.PREF_HOLIDAY_NONE);
+        editor = preferences.edit();
+        editor.putString(SettingsActivity.PREF_HOLIDAY, SettingsActivity.PREF_HOLIDAY_NONE);
+        editor.commit();
     }
 
     /**

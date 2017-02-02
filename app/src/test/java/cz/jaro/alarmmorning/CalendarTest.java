@@ -395,7 +395,6 @@ public class CalendarTest extends FixedTimeTest {
 
         // Shift clock
         shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT - 2, DayTest.MINUTE_DEFAULT)));
-        globalManager.onNearFuture();
 
         // Call the receiver
         Intent intent = new Intent();
@@ -436,7 +435,12 @@ public class CalendarTest extends FixedTimeTest {
 
         // Shift clock
         shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT - 2, DayTest.MINUTE_DEFAULT, 1))); // 1 second after near time
-        globalManager.onNearFuture();
+
+        // Call the receiver
+        Intent intent = new Intent();
+        intent.setAction(SystemAlarm.ACTION_RING_IN_NEAR_FUTURE);
+        AlarmReceiver alarmReceiver = new AlarmReceiver();
+        alarmReceiver.onReceive(context, intent);
 
         // Consume the alarm with action ACTION_RING
         consumeNextScheduledAlarm();
@@ -477,18 +481,8 @@ public class CalendarTest extends FixedTimeTest {
         // Consume the alarm with action ACTION_RING_IN_NEAR_FUTURE
         consumeNextScheduledAlarm();
 
-        // Shift clock - must go through onNearFuture() as it calls globalManager.setNextAction()
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT - 2, DayTest.MINUTE_DEFAULT)));
-        globalManager.onNearFuture(); // FIXME this should NOT be necessary. Create test with zero advance period (in which case the onNearFuture() is not called
-
-        // Consume the alarm with action ACTION_RING
-        consumeNextScheduledAlarm();
-
         // Shift clock
         shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT, DayTest.MINUTE_DEFAULT)));
-
-        Activity activity = Robolectric.setupActivity(Activity.class);
-        ShadowActivity shadowActivity = Shadows.shadowOf(activity);
 
         // Call the receiver
         Intent intent = new Intent();
@@ -497,6 +491,9 @@ public class CalendarTest extends FixedTimeTest {
         alarmReceiver.onReceive(context, intent);
 
         // Check that ringing started
+        Activity activity = Robolectric.setupActivity(Activity.class);
+        ShadowActivity shadowActivity = Shadows.shadowOf(activity);
+
         Intent intentNext = shadowActivity.peekNextStartedActivity();
         Intent expectedIntentNext = new Intent(context, RingActivity.class);
 
@@ -548,19 +545,8 @@ public class CalendarTest extends FixedTimeTest {
         // Consume the alarm with action ACTION_RING_IN_NEAR_FUTURE
         consumeNextScheduledAlarm();
 
-        // Shift clock - must go through onNearFuture() as it calls globalManager.setNextAction()
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT - 2, DayTest.MINUTE_DEFAULT)));
-        globalManager.onNearFuture(); // FIXME this should NOT be necessary. Create test with zero advance period (in which case the onNearFuture() is not called
-
-        // Consume the alarm with action ACTION_RING
-        consumeNextScheduledAlarm();
-
         // Shift clock
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT, DayTest.MINUTE_DEFAULT, 1))); // 1 second after alarm
-        globalManager.onRing();
-
-        Activity activity = Robolectric.setupActivity(Activity.class);
-        ShadowActivity shadowActivity = Shadows.shadowOf(activity);
+        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT, DayTest.MINUTE_DEFAULT)));
 
         // Call the receiver
         Intent intent = new Intent();
@@ -569,6 +555,9 @@ public class CalendarTest extends FixedTimeTest {
         alarmReceiver.onReceive(context, intent);
 
         // Check that ringing started
+        Activity activity = Robolectric.setupActivity(Activity.class);
+        ShadowActivity shadowActivity = Shadows.shadowOf(activity);
+
         Intent intentNext = shadowActivity.peekNextStartedActivity();
         Intent expectedIntentNext = new Intent(context, RingActivity.class);
 
@@ -606,16 +595,14 @@ public class CalendarTest extends FixedTimeTest {
         // Consume the alarm with action ACTION_RING_IN_NEAR_FUTURE
         consumeNextScheduledAlarm();
 
-        // Shift clock - must go through onNearFuture() as it calls globalManager.setNextAction()
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT - 2, DayTest.MINUTE_DEFAULT)));
-        globalManager.onNearFuture(); // FIXME this should NOT be necessary. Create test with zero advance period (in which case the onNearFuture() is not called
-
-        // Consume the alarm with action ACTION_RING
-        consumeNextScheduledAlarm();
-
         // Shift clock
         shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT, DayTest.MINUTE_DEFAULT, 1))); // 1 second after alarm
-        globalManager.onRing();
+
+        // Call the receiver
+        Intent intent = new Intent();
+        intent.setAction(SystemAlarm.ACTION_RING);
+        AlarmReceiver alarmReceiver = new AlarmReceiver();
+        alarmReceiver.onReceive(context, intent);
 
         Calendar alarmTime = new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT, DayTest.MINUTE_DEFAULT);
         startActivityRing(alarmTime);
@@ -644,16 +631,14 @@ public class CalendarTest extends FixedTimeTest {
         // Consume the alarm with action ACTION_RING_IN_NEAR_FUTURE
         consumeNextScheduledAlarm();
 
-        // Shift clock - must go through onNearFuture() as it calls globalManager.setNextAction()
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT - 2, DayTest.MINUTE_DEFAULT)));
-        globalManager.onNearFuture(); // FIXME this should NOT be necessary. Create test with zero advance period (in which case the onNearFuture() is not called
-
-        // Consume the alarm with action ACTION_RING
-        consumeNextScheduledAlarm();
-
         // Shift clock
         shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT, DayTest.MINUTE_DEFAULT, 1))); // 1 second after alarm
-        globalManager.onRing();
+
+        // Call the receiver
+        Intent intent = new Intent();
+        intent.setAction(SystemAlarm.ACTION_RING);
+        AlarmReceiver alarmReceiver = new AlarmReceiver();
+        alarmReceiver.onReceive(context, intent);
 
         // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
         consumeNextScheduledAlarm();
@@ -692,13 +677,6 @@ public class CalendarTest extends FixedTimeTest {
         setAlarmToToday();
 
         // Consume the alarm with action ACTION_RING_IN_NEAR_FUTURE
-        consumeNextScheduledAlarm();
-
-        // Shift clock - must go through onNearFuture() as it calls globalManager.setNextAction()
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR_DEFAULT - 2, DayTest.MINUTE_DEFAULT)));
-        globalManager.onNearFuture(); // FIXME this should NOT be necessary. Create test with zero advance period (in which case the onNearFuture() is not called
-
-        // Consume the alarm with action ACTION_RING
         consumeNextScheduledAlarm();
 
         // Shift clock - must go through onNearFuture() as it calls globalManager.setNextAction()

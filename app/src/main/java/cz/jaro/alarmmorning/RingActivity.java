@@ -152,7 +152,7 @@ public class RingActivity extends Activity implements RingInterface {
         }
 
         SlideButton dismissButton = (SlideButton) findViewById(R.id.dismissButton);
-        dismissButton.setSlideButtonListener(this::onDismiss);
+        dismissButton.setOnClickListener(this::onDismiss);
 
         startAll();
     }
