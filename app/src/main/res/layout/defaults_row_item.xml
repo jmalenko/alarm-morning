@@ -11,17 +11,15 @@
         android:layout_height="72dp"
         android:background="@color/primary_dark"
         android:gravity="center"
-        android:textSize="@dimen/text_size_day_of_week"
-        />
+        android:textSize="@dimen/text_size_day_of_week" />
 
     <TextView
         android:id="@+id/textTime"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="72dp"
-        android:layout_marginLeft="@dimen/margin_medium"
         android:layout_toRightOf="@id/textDayOfWeek"
         android:gravity="center_vertical"
-        android:textSize="@dimen/text_size_time"
-        />
+        android:paddingLeft="@dimen/margin_medium"
+        android:textSize="@dimen/text_size_time" />
 
 </RelativeLayout>

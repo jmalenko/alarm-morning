@@ -1,6 +1,9 @@
 package cz.jaro.alarmmorning;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ObjectAnimator;
 import android.app.TimePickerDialog;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
@@ -13,6 +16,7 @@ import android.view.ContextMenu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.RelativeLayout;
 import android.widget.TimePicker;
 
 import java.util.ArrayList;
@@ -81,13 +85,15 @@ public class DefaultsActivity extends AppCompatActivity implements View.OnCreate
         return AlarmDataSource.allDaysOfWeek[(firstDayOfWeek + position) % AlarmDataSource.allDaysOfWeek.length];
     }
 
+    private int dayOfWeekToPosition(int dayOfWeek) {
+        return (dayOfWeek - firstDayOfWeek - 1 + AlarmDataSource.allDaysOfWeek.length) % AlarmDataSource.allDaysOfWeek.length;
+    }
+
     private void save(Defaults defaults) {
         Analytics analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Defaults);
 
         GlobalManager globalManager = GlobalManager.getInstance();
         globalManager.saveDefault(defaults, analytics);
-
-        adapter.notifyDataSetChanged();
     }
 
     /*
@@ -139,6 +145,9 @@ public class DefaultsActivity extends AppCompatActivity implements View.OnCreate
         defaults.setMinute(minute);
 
         save(defaults);
+
+        int position = dayOfWeekToPosition(defaults.getDayOfWeek());
+        invalidateAndHighlight(position);
 
         showDialogChangeOtherDays();
     }
@@ -250,8 +259,26 @@ public class DefaultsActivity extends AppCompatActivity implements View.OnCreate
                 defaults2.setDayOfWeek(dayOfWeek);
 
                 save(defaults2);
+
+                int position = dayOfWeekToPosition(dayOfWeek);
+                invalidateAndHighlight(position);
             }
         }
     };
+
+    private void invalidateAndHighlight(int position) {
+        RelativeLayout rowView = (RelativeLayout) recyclerView.getChildAt(position);
+        View view = rowView.getChildAt(1);
+
+        view.invalidate(); // instead of adapter.notifyItemChanged(position) which is not working as expected (the animation is very quick)
+
+        highlight(view);
+    }
+
+    private void highlight(View view) {
+        ObjectAnimator anim = ObjectAnimator.ofObject(view, "backgroundColor", new ArgbEvaluator(), getResources().getColor(R.color.accent), Color.TRANSPARENT);
+        anim.setDuration(2000);
+        anim.start();
+    }
 
 }
