@@ -127,7 +127,7 @@
     <string name="action_set">Nastavit</string>
     <string name="action_set_time">Nastavit čas</string>
     <string name="action_disable">Vypnout</string>
-    <string name="action_revert">Vrátit na čas podle pravidla</string>
+    <string name="action_revert">Vrátit na čas podle pravidla (<xliff:g example="07:00" id="time">%1$s</xliff:g>)</string>
 
     <string name="time_to_ring_toast_days">Budík zazvoní za <xliff:g example="1" id="days">%1$d</xliff:g> dny, <xliff:g example="2" id="hours">%2$d</xliff:g> hodin a <xliff:g example="3" id="minutes">%3$d</xliff:g> minut</string>
     <string name="time_to_ring_toast_hours">Budík zazvoní za <xliff:g example="2" id="hours">%1$d</xliff:g> hodin a <xliff:g example="3" id="minutes">%2$d</xliff:g> minut</string>

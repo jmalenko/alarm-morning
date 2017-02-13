@@ -127,7 +127,7 @@
     <string name="action_set">Set</string>
     <string name="action_set_time">Set time</string>
     <string name="action_disable">Disable</string>
-    <string name="action_revert">Revert to time by rule</string>
+    <string name="action_revert">Revert to time by rule (<xliff:g example="07:00" id="time">%1$s</xliff:g>)</string>
 
     <string name="time_to_ring_toast_days">This alarm is set for <xliff:g example="1" id="days">%1$d</xliff:g> days, <xliff:g example="2" id="hours">%2$d</xliff:g> hours and <xliff:g example="3" id="minutes">%3$d</xliff:g> minutes from now</string>
     <string name="time_to_ring_toast_hours">This alarm is set for <xliff:g example="2" id="hours">%1$d</xliff:g> hours and <xliff:g example="3" id="minutes">%2$d</xliff:g> minutes from now</string>

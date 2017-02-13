@@ -18,5 +18,5 @@
 
     <item
         android:id="@+id/day_revert"
-        android:title="@string/action_revert" />
+        android:title="" />
 </menu>

@@ -25,6 +25,7 @@ import cz.jaro.alarmmorning.graphics.RecyclerViewWithContextMenu;
 import cz.jaro.alarmmorning.graphics.SimpleDividerItemDecoration;
 import cz.jaro.alarmmorning.graphics.TimePickerDialogWithDisable;
 import cz.jaro.alarmmorning.model.Day;
+import cz.jaro.alarmmorning.model.Defaults;
 
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.addDay;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.addDaysClone;
@@ -395,6 +396,17 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
             headerTitle = getResources().getString(R.string.menu_day_header_disabled, dayOfWeekText, dateText);
         }
         menu.setHeaderTitle(headerTitle);
+
+        // Set title
+        MenuItem revertItem = menu.findItem(R.id.day_revert);
+        Defaults defaults = day.getDefaults();
+        String timeText;
+        if (defaults.isEnabled()) {
+            timeText = Localization.timeToString(defaults.getHour(), defaults.getMinute(), getActivity());
+        } else {
+            timeText = getResources().getString(R.string.alarm_unset);
+        }
+        revertItem.setTitle(getString(R.string.action_revert, timeText));
 
         // Hide irrelevant items
 
