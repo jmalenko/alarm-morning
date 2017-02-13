@@ -9,6 +9,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SimpleItemAnimator;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -21,7 +22,6 @@ import android.widget.TimePicker;
 import java.util.ArrayList;
 import java.util.List;
 
-import cz.jaro.alarmmorning.graphics.HighlightItemAnimator;
 import cz.jaro.alarmmorning.graphics.RecyclerViewWithContextMenu;
 import cz.jaro.alarmmorning.graphics.SimpleDividerItemDecoration;
 import cz.jaro.alarmmorning.graphics.TimePickerDialogWithDisable;
@@ -65,7 +65,7 @@ public class DefaultsActivity extends AppCompatActivity implements View.OnCreate
 
         // item separator
         recyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
-        recyclerView.setItemAnimator(new HighlightItemAnimator());
+        ((SimpleItemAnimator) recyclerView.getItemAnimator()).setSupportsChangeAnimations(false);
 
         registerForContextMenu(recyclerView);
 
@@ -273,10 +273,11 @@ public class DefaultsActivity extends AppCompatActivity implements View.OnCreate
     };
 
     private void invalidateAndHighlight(int position) {
+        adapter.notifyItemChanged(position);
+
         RelativeLayout rowView = (RelativeLayout) recyclerView.getChildAt(position);
         View view = rowView.getChildAt(1);
 
-        adapter.notifyItemChanged(position);
         highlight(view);
     }
 
