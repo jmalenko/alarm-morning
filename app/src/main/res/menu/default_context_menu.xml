@@ -2,9 +2,9 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/default_set_time"
-        android:title="@string/menu_default_set_time"/>
+        android:title="@string/action_set_time" />
 
     <item
         android:id="@+id/default_disable"
-        android:title="@string/menu_default_disable"/>
+        android:title="@string/action_disable" />
 </menu>

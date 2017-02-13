@@ -10,13 +10,13 @@
 
     <item
         android:id="@+id/day_set_time"
-        android:title="@string/menu_day_set_time"/>
+        android:title="@string/action_set_time" />
 
     <item
         android:id="@+id/day_disable"
-        android:title="@string/menu_day_disable"/>
+        android:title="@string/action_disable" />
 
     <item
         android:id="@+id/day_revert"
-        android:title="@string/menu_day_revert"/>
+        android:title="@string/action_revert" />
 </menu>
