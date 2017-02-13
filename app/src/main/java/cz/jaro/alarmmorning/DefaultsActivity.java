@@ -21,6 +21,7 @@ import android.widget.TimePicker;
 import java.util.ArrayList;
 import java.util.List;
 
+import cz.jaro.alarmmorning.graphics.HighlightItemAnimator;
 import cz.jaro.alarmmorning.graphics.RecyclerViewWithContextMenu;
 import cz.jaro.alarmmorning.graphics.SimpleDividerItemDecoration;
 import cz.jaro.alarmmorning.graphics.TimePickerDialogWithDisable;
@@ -64,6 +65,7 @@ public class DefaultsActivity extends AppCompatActivity implements View.OnCreate
 
         // item separator
         recyclerView.addItemDecoration(new SimpleDividerItemDecoration(this));
+        recyclerView.setItemAnimator(new HighlightItemAnimator());
 
         registerForContextMenu(recyclerView);
 
@@ -274,8 +276,7 @@ public class DefaultsActivity extends AppCompatActivity implements View.OnCreate
         RelativeLayout rowView = (RelativeLayout) recyclerView.getChildAt(position);
         View view = rowView.getChildAt(1);
 
-        view.invalidate(); // instead of adapter.notifyItemChanged(position) which is not working as expected (the animation is very quick)
-
+        adapter.notifyItemChanged(position);
         highlight(view);
     }
 
