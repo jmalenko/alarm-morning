@@ -2,7 +2,6 @@ package cz.jaro.alarmmorning;
 
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
-import android.app.TimePickerDialog;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -24,10 +23,11 @@ import java.util.List;
 
 import cz.jaro.alarmmorning.graphics.RecyclerViewWithContextMenu;
 import cz.jaro.alarmmorning.graphics.SimpleDividerItemDecoration;
+import cz.jaro.alarmmorning.graphics.TimePickerDialogWithDisable;
 import cz.jaro.alarmmorning.model.AlarmDataSource;
 import cz.jaro.alarmmorning.model.Defaults;
 
-public class DefaultsActivity extends AppCompatActivity implements View.OnCreateContextMenuListener, TimePickerDialog.OnTimeSetListener, View.OnClickListener {
+public class DefaultsActivity extends AppCompatActivity implements View.OnCreateContextMenuListener, TimePickerDialogWithDisable.OnTimeSetWithDisableListener, View.OnClickListener {
 
     private static final String TAG = DefaultsActivity.class.getSimpleName();
 
@@ -131,18 +131,22 @@ public class DefaultsActivity extends AppCompatActivity implements View.OnCreate
     }
 
     @Override
-    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+    public void onTimeSetWithDisable(TimePicker view, boolean disable, int hourOfDay, int minute) {
         if (view.isShown()) {
-            saveThisAndOthers(Defaults.STATE_ENABLED, hourOfDay, minute);
+            saveThisAndOthers(disable, hourOfDay, minute);
         }
     }
 
-    private void saveThisAndOthers(int state, int hour, int minute) {
+    private void saveThisAndOthers(boolean disable, int hour, int minute) {
         calculateChangeOtherDays();
 
-        defaults.setState(state);
-        defaults.setHour(hour);
-        defaults.setMinute(minute);
+        if (disable) {
+            defaults.setState(Defaults.STATE_DISABLED);
+        } else {
+            defaults.setState(Defaults.STATE_ENABLED);
+            defaults.setHour(hour);
+            defaults.setMinute(minute);
+        }
 
         save(defaults);
 
@@ -201,7 +205,7 @@ public class DefaultsActivity extends AppCompatActivity implements View.OnCreate
 
             case R.id.default_disable:
                 Log.d(TAG, "Disable");
-                saveThisAndOthers(Defaults.STATE_DISABLED, defaults.getHour(), defaults.getMinute());
+                saveThisAndOthers(true, defaults.getHour(), defaults.getMinute());
                 break;
         }
         return super.onContextItemSelected(item);
@@ -245,7 +249,7 @@ public class DefaultsActivity extends AppCompatActivity implements View.OnCreate
             String title = getResources().getString(R.string.change_others_title, timeText, days);
 
             snackbar = Snackbar.make(getCurrentFocus(), title, Snackbar.LENGTH_INDEFINITE);
-            snackbar.setAction(getString(R.string.change_others_yes), snackbarClickListener);
+            snackbar.setAction(getString(R.string.action_set), snackbarClickListener);
             snackbar.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.primary_dark));
             snackbar.show();
         }

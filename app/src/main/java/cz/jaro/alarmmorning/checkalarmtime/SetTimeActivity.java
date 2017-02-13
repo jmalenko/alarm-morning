@@ -1,6 +1,5 @@
 package cz.jaro.alarmmorning.checkalarmtime;
 
-import android.app.TimePickerDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -14,6 +13,7 @@ import java.util.Calendar;
 import cz.jaro.alarmmorning.Analytics;
 import cz.jaro.alarmmorning.CalendarFragment;
 import cz.jaro.alarmmorning.GlobalManager;
+import cz.jaro.alarmmorning.graphics.TimePickerDialogWithDisable;
 import cz.jaro.alarmmorning.model.Day;
 
 import static cz.jaro.alarmmorning.Analytics.CHECK_ALARM_TIME_METHOD__DIALOG;
@@ -26,7 +26,7 @@ import static cz.jaro.alarmmorning.model.Day.VALUE_UNSET;
  * <p>
  * The "default time" parameter should be pssed in the {@link CheckAlarmTimeNotificationReceiver#EXTRA_NEW_ALARM_TIME} extra.
  */
-public class SetTimeActivity extends AppCompatActivity implements TimePickerDialog.OnTimeSetListener {
+public class SetTimeActivity extends AppCompatActivity implements TimePickerDialogWithDisable.OnTimeSetWithDisableListener {
 
     private static final String TAG = SetTimeActivity.class.getSimpleName();
 
@@ -61,43 +61,59 @@ public class SetTimeActivity extends AppCompatActivity implements TimePickerDial
         int hourOfDay = newAlarmTime.get(Calendar.HOUR_OF_DAY);
         int minute = newAlarmTime.get(Calendar.MINUTE);
 
-        TimePickerDialog timePickerDialog = new TimePickerDialog(this, this, hourOfDay, minute, DateFormat.is24HourFormat(this));
+        TimePickerDialogWithDisable timePickerDialog = new TimePickerDialogWithDisable(this, this, hourOfDay, minute, DateFormat.is24HourFormat(this));
         timePickerDialog.setOnDismissListener(dialog -> finish()); // The Cancel button is handled via OnDismissListener
         timePickerDialog.show();
     }
 
     @Override
-    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+    public void onTimeSetWithDisable(TimePicker view, boolean disable, int hourOfDay, int minute) {
         if (view.isShown()) {
-            Log.v(TAG, "onTimeSet()");
-            Calendar saveAlarmTime = (Calendar) newAlarmTime.clone();
-            saveAlarmTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
-            saveAlarmTime.set(Calendar.MINUTE, minute);
-
+            Log.v(TAG, "onTimeSetWithDisable()");
             Analytics analytics = new Analytics().set(Analytics.Param.Check_alarm_time_method, CHECK_ALARM_TIME_METHOD__DIALOG);
             analytics.setChannel(Analytics.Channel.Notification);
             analytics.setChannelName(Analytics.ChannelName.Check_alarm_time);
 
-            save(this, saveAlarmTime, analytics);
+            if (disable) {
+                save(this, disable, newAlarmTime, analytics);
+            } else {
+                Calendar saveAlarmTime = (Calendar) newAlarmTime.clone();
+                saveAlarmTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                saveAlarmTime.set(Calendar.MINUTE, minute);
+
+                save(this, disable, saveAlarmTime, analytics);
+            }
 
             finish();
         }
     }
 
     public static void save(Context context, Calendar saveAlarmTime, Analytics analytics) {
-        save(context, saveAlarmTime, analytics, true);
+        save(context, false, saveAlarmTime, analytics, true);
     }
 
     public static void save(Context context, Calendar saveAlarmTime, Analytics analytics, boolean showToast) {
+        save(context, false, saveAlarmTime, analytics, showToast);
+    }
+
+    public static void save(Context context, boolean disable, Calendar saveAlarmTime, Analytics analytics) {
+        save(context, disable, saveAlarmTime, analytics, true);
+    }
+
+    public static void save(Context context, boolean disable, Calendar saveAlarmTime, Analytics analytics, boolean showToast) {
         GlobalManager globalManager = GlobalManager.getInstance();
 
         // Load
         Day day = globalManager.loadDay(saveAlarmTime);
 
         // Update
-        day.setState(Day.STATE_ENABLED);
-        day.setHour(saveAlarmTime.get(Calendar.HOUR_OF_DAY));
-        day.setMinute(saveAlarmTime.get(Calendar.MINUTE));
+        if (disable) {
+            day.setState(Day.STATE_DISABLED);
+        } else {
+            day.setState(Day.STATE_ENABLED);
+            day.setHour(saveAlarmTime.get(Calendar.HOUR_OF_DAY));
+            day.setMinute(saveAlarmTime.get(Calendar.MINUTE));
+        }
 
         // Save
         globalManager.saveDay(day, analytics);

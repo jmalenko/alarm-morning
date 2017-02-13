@@ -1,7 +1,6 @@
 package cz.jaro.alarmmorning;
 
 import android.app.Fragment;
-import android.app.TimePickerDialog;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -24,6 +23,7 @@ import java.util.Calendar;
 import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.graphics.RecyclerViewWithContextMenu;
 import cz.jaro.alarmmorning.graphics.SimpleDividerItemDecoration;
+import cz.jaro.alarmmorning.graphics.TimePickerDialogWithDisable;
 import cz.jaro.alarmmorning.model.Day;
 
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.addDay;
@@ -34,7 +34,7 @@ import static cz.jaro.alarmmorning.calendar.CalendarUtils.onTheSameDate;
 /**
  * Fragment that appears in the "content_frame".
  */
-public class CalendarFragment extends Fragment implements View.OnClickListener, TimePickerDialog.OnTimeSetListener {
+public class CalendarFragment extends Fragment implements View.OnClickListener, TimePickerDialogWithDisable.OnTimeSetWithDisableListener {
 
     private static final String TAG = CalendarFragment.class.getSimpleName();
 
@@ -349,11 +349,15 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     }
 
     @Override
-    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+    public void onTimeSetWithDisable(TimePicker view, boolean disable, int hourOfDay, int minute) {
         if (view.isShown()) {
-            day.setState(Day.STATE_ENABLED);
-            day.setHour(hourOfDay);
-            day.setMinute(minute);
+            if (disable) {
+                day.setState(Day.STATE_DISABLED);
+            } else {
+                day.setState(Day.STATE_ENABLED);
+                day.setHour(hourOfDay);
+                day.setMinute(minute);
+            }
 
             save(day);
         }

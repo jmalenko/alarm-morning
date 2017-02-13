@@ -16,7 +16,6 @@
     <string name="title_activity_defaults">Pravidla pro dny</string>
 
     <string name="change_others_title">Nastavit budík na <xliff:g example="07:00" id="time">%1$s</xliff:g> také v <xliff:g example="Sat" id="dayOfWeek">%2$s</xliff:g>?</string>
-    <string name="change_others_yes">Nastavit</string>
 
     <string name="menu_default_header">Budík v <xliff:g example="07:00" id="time">%1$s</xliff:g> každé <xliff:g example="Sat" id="dayOfWeek">%2$s</xliff:g></string>
     <string name="menu_default_header_disabled">Budík je vypnutý každé <xliff:g example="Sat" id="dayOfWeek">%1$s</xliff:g></string>
@@ -129,6 +128,10 @@
     <string name="action_change">Změnit</string>
     <string name="action_nothing">Nic</string>
     <string name="action_mute_for_10_seconds">Ztišit na 10 sekund</string>
+
+    <string name="action_set">Nastavit</string>
+    <string name="action_disable">Vypnout</string>
+    <string name="action_revert">Vrátit na čas podle pravidla</string>
 
     <string name="time_to_ring_toast_days">Budík zazvoní za <xliff:g example="1" id="days">%1$d</xliff:g> dny, <xliff:g example="2" id="hours">%2$d</xliff:g> hodin a <xliff:g example="3" id="minutes">%3$d</xliff:g> minut</string>
     <string name="time_to_ring_toast_hours">Budík zazvoní za <xliff:g example="2" id="hours">%1$d</xliff:g> hodin a <xliff:g example="3" id="minutes">%2$d</xliff:g> minut</string>
