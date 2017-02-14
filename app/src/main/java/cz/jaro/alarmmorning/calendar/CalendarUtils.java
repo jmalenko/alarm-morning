@@ -1,5 +1,6 @@
 package cz.jaro.alarmmorning.calendar;
 
+import java.text.DateFormatSymbols;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Locale;
@@ -268,15 +269,15 @@ public class CalendarUtils {
     }
 
     /**
-     * Returns the name of a <code>dayOfWeek</code>
+     * Returns the short name of a <code>dayOfWeek</code> in US English.
      *
      * @param dayOfWeek Day of week.
      * @return Name of the day of week.
      */
     static public String dayOfWeekToString(int dayOfWeek) {
-        GregorianCalendar calendar = new GregorianCalendar(1, 2, 2016); // February 2016 starts with Monday
-        calendar.add(Calendar.DATE, dayOfWeek + 5);
-        return calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.US);
+        DateFormatSymbols symbols = new DateFormatSymbols(Locale.US);
+        String[] dayNames = symbols.getShortWeekdays();
+        return dayNames[dayOfWeek];
     }
 
     /**
@@ -456,5 +457,26 @@ public class CalendarUtils {
             }
         }
         return false;
+    }
+
+    /**
+     * Creates a calendar from milliseconds (since epoch).
+     *
+     * @param milliseconds milliseconds since epoch
+     * @return Gregorian calendar
+     */
+    public static GregorianCalendar newGregorianCalendar(long milliseconds) {
+        GregorianCalendar calendar = new GregorianCalendar();
+        calendar.setTimeInMillis(milliseconds);
+        return calendar;
+    }
+
+    /**
+     * Creates a calendar representing today (the beginning midnight).
+     *
+     * @return Gregorian calendar
+     */
+    public static Calendar newGregorianCalendar() {
+        return beginningOfToday(new GregorianCalendar());
     }
 }

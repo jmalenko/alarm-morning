@@ -17,11 +17,11 @@ import org.json.JSONException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import cz.jaro.alarmmorning.calendar.CalendarUtils;
 import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.clock.SystemClock;
 import cz.jaro.alarmmorning.model.AlarmDataSource;
@@ -251,13 +251,11 @@ public class GlobalManager {
         long timeInMS = preferences.getLong(PERSIST_TIME, TIME_UNDEFINED);
         long alarmTimeInMS = preferences.getLong(PERSIST_ALARM_TIME, TIME_UNDEFINED);
 
-        Calendar time = new GregorianCalendar();
-        time.setTime(new Date(timeInMS));
+        Calendar time = CalendarUtils.newGregorianCalendar(timeInMS);
 
         Calendar alarmTime = null;
         if (alarmTimeInMS != -1) {
-            alarmTime = new GregorianCalendar();
-            alarmTime.setTime(new Date(alarmTimeInMS));
+            alarmTime = CalendarUtils.newGregorianCalendar(alarmTimeInMS);
         }
 
         NextAction nextAction = new NextAction(action, time, alarmTime);
@@ -295,8 +293,7 @@ public class GlobalManager {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 
         long stateAlarmTimeInMS = preferences.getLong(PERSIST_STATE_OF_ALARM_TIME, TIME_UNDEFINED);
-        Calendar stateAlarmTime = new GregorianCalendar();
-        stateAlarmTime.setTime(new Date(stateAlarmTimeInMS));
+        Calendar stateAlarmTime = CalendarUtils.newGregorianCalendar(stateAlarmTimeInMS);
 
         return stateAlarmTime;
     }

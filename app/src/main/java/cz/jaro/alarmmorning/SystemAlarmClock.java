@@ -9,8 +9,8 @@ import android.os.Build;
 import android.util.Log;
 
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 
+import cz.jaro.alarmmorning.calendar.CalendarUtils;
 import cz.jaro.alarmmorning.model.Day;
 import cz.jaro.alarmmorning.receivers.VoidReceiver;
 
@@ -124,8 +124,7 @@ public class SystemAlarmClock {
         if (alarmClockInfo == null) {
             Log.v(TAG, "   system alarm clock is not set");
         } else {
-            Calendar t = new GregorianCalendar();
-            t.setTimeInMillis(alarmClockInfo.getTriggerTime());
+            Calendar t = CalendarUtils.newGregorianCalendar(alarmClockInfo.getTriggerTime());
             Log.v(TAG, "   system alarm clock is at " + t.getTime());
         }
     }

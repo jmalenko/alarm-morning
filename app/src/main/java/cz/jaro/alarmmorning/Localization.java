@@ -13,6 +13,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import cz.jaro.alarmmorning.calendar.CalendarUtils;
+
 /**
  * This class contains all the localization related features.
  */
@@ -161,7 +163,7 @@ public class Localization {
      * @return the time as string
      */
     public static String timeToString(int hours, int minutes, Context context) {
-        Calendar date = Calendar.getInstance();
+        Calendar date = CalendarUtils.newGregorianCalendar();
         date.set(Calendar.HOUR_OF_DAY, hours);
         date.set(Calendar.MINUTE, minutes);
         return timeToString(date.getTime(), context);

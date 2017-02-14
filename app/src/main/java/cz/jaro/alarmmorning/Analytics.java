@@ -24,12 +24,12 @@ import java.io.Serializable;
 import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 import java.util.TimeZone;
 
+import cz.jaro.alarmmorning.calendar.CalendarUtils;
 import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.clock.SystemClock;
 import cz.jaro.alarmmorning.holiday.HolidayHelper;
@@ -703,7 +703,7 @@ public class Analytics {
     }
 
     public static String calendarToTime(int hour, int minute) {
-        Calendar calendar = GregorianCalendar.getInstance();
+        Calendar calendar = CalendarUtils.newGregorianCalendar();
         calendar.set(Calendar.HOUR, hour);
         calendar.set(Calendar.MINUTE, minute);
 

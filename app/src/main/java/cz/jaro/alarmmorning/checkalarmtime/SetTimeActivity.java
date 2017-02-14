@@ -13,6 +13,7 @@ import java.util.Calendar;
 import cz.jaro.alarmmorning.Analytics;
 import cz.jaro.alarmmorning.CalendarFragment;
 import cz.jaro.alarmmorning.GlobalManager;
+import cz.jaro.alarmmorning.calendar.CalendarUtils;
 import cz.jaro.alarmmorning.graphics.TimePickerDialogWithDisable;
 import cz.jaro.alarmmorning.model.Day;
 
@@ -40,8 +41,7 @@ public class SetTimeActivity extends AppCompatActivity implements TimePickerDial
         // Read parameters from extra
         long newAlarmTimeLong = getIntent().getLongExtra(EXTRA_NEW_ALARM_TIME, VALUE_UNSET);
         if (newAlarmTimeLong != VALUE_UNSET) {
-            newAlarmTime = Calendar.getInstance();
-            newAlarmTime.setTimeInMillis(newAlarmTimeLong);
+            newAlarmTime = CalendarUtils.newGregorianCalendar(newAlarmTimeLong);
         }
 
         if (savedInstanceState != null) {

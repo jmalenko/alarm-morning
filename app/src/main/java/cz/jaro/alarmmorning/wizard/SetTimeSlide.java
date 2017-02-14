@@ -19,6 +19,7 @@ import com.ibm.icu.util.Calendar;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import cz.jaro.alarmmorning.Analytics;
@@ -28,6 +29,7 @@ import cz.jaro.alarmmorning.SettingsActivity;
 import cz.jaro.alarmmorning.calendar.CalendarEvent;
 import cz.jaro.alarmmorning.calendar.CalendarEventFilter;
 import cz.jaro.alarmmorning.calendar.CalendarHelper;
+import cz.jaro.alarmmorning.calendar.CalendarUtils;
 import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.graphics.RelativeTimePreference;
 import cz.jaro.alarmmorning.model.AlarmDataSource;
@@ -184,8 +186,7 @@ public class SetTimeSlide extends BaseFragment implements TimePicker.OnTimeChang
 
             long alarmTimeInMillis = nextAlarmClock.getTriggerTime();
 
-            Calendar alarmTime = Calendar.getInstance();
-            alarmTime.setTimeInMillis(alarmTimeInMillis);
+            GregorianCalendar alarmTime = CalendarUtils.newGregorianCalendar(alarmTimeInMillis);
 
             hourOfDay = alarmTime.get(java.util.Calendar.HOUR_OF_DAY);
             minute = alarmTime.get(java.util.Calendar.MINUTE);

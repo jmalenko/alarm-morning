@@ -9,6 +9,7 @@ import java.util.Calendar;
 
 import cz.jaro.alarmmorning.AlarmMorningActivity;
 import cz.jaro.alarmmorning.Analytics;
+import cz.jaro.alarmmorning.calendar.CalendarUtils;
 
 import static cz.jaro.alarmmorning.Analytics.CHECK_ALARM_TIME_METHOD__QUICK;
 import static cz.jaro.alarmmorning.model.Day.VALUE_UNSET;
@@ -53,8 +54,7 @@ public class CheckAlarmTimeNotificationReceiver extends BroadcastReceiver {
                     throw new IllegalArgumentException("The " + EXTRA_NEW_ALARM_TIME + " extra must be set");
                 }
 
-                Calendar newAlarmTime = Calendar.getInstance();
-                newAlarmTime.setTimeInMillis(newAlarmTimeLong);
+                Calendar newAlarmTime = CalendarUtils.newGregorianCalendar(newAlarmTimeLong);
 
                 Log.i(TAG, "Set alarm time to " + newAlarmTime.getTime());
                 Analytics analytics = new Analytics(Analytics.Channel.Notification, Analytics.ChannelName.Check_alarm_time).set(Analytics.Param.Check_alarm_time_method, CHECK_ALARM_TIME_METHOD__QUICK);

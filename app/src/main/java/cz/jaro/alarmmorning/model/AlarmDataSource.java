@@ -11,8 +11,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Locale;
+
+import cz.jaro.alarmmorning.calendar.CalendarUtils;
 
 /**
  * Store objects to a database.
@@ -100,7 +101,7 @@ public class AlarmDataSource {
 
         if (day == null) {
             day = new Day();
-            day.setDate(new GregorianCalendar(date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DAY_OF_MONTH)));
+            day.setDate(CalendarUtils.beginningOfToday(date));
             day.setState(Day.STATE_RULE);
             day.setHour(Day.VALUE_UNSET);
             day.setMinute(Day.VALUE_UNSET);
@@ -161,9 +162,8 @@ public class AlarmDataSource {
 
     private Calendar textToDate(String dateText) {
         try {
-            Calendar date = new GregorianCalendar();
             Date date2 = iso8601Format.parse(dateText);
-            date.setTimeInMillis(date2.getTime());
+            Calendar date = CalendarUtils.newGregorianCalendar(date2.getTime());
             return date;
         } catch (ParseException e) {
             Log.e(TAG, "Unable to parse date from string: " + dateText);
