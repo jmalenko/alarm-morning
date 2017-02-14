@@ -422,8 +422,6 @@ public class GlobalManager {
         SystemAlarmClock systemAlarmClock = SystemAlarmClock.getInstance(context);
         systemAlarmClock.onAlarmSet();
 
-        updateWidget(context);
-
         Calendar lastAlarmTime = null;
 
         if (systemAlarm.nextActionShouldChange()) {
