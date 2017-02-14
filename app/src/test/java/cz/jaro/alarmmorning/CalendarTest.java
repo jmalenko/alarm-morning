@@ -9,6 +9,7 @@ import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProviderInfo;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -61,6 +62,7 @@ import static cz.jaro.alarmmorning.model.DayTest.YEAR;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.robolectric.Robolectric.buildActivity;
 
 /**
  * Tests of alarm management in UI.
@@ -89,6 +91,7 @@ public class CalendarTest extends FixedTimeTest {
     private View item;
 
     private TextView textDate;
+    private TextView textDoW;
     private TextView textTime;
     private TextView textState;
 
@@ -118,6 +121,7 @@ public class CalendarTest extends FixedTimeTest {
         shadowAppWidgetManager = Shadows.shadowOf(appWidgetManager);
 
         AppWidgetProviderInfo appWidgetProviderInfo = new AppWidgetProviderInfo();
+        appWidgetProviderInfo.provider = new ComponentName(context, WidgetProvider.class);
         shadowAppWidgetManager.addInstalledProvider(appWidgetProviderInfo);
 
         globalManager.forceSetAlarm();
@@ -133,7 +137,7 @@ public class CalendarTest extends FixedTimeTest {
             ringActivity.shutdown();
         }
 
-        // Cancell all notifications
+        // Cancel all notifications
         notificationManager.cancelAll();
     }
 
@@ -154,7 +158,7 @@ public class CalendarTest extends FixedTimeTest {
         assertThat(shadowNotificationManager.size(), is(0));
 
         // Check widget
-        // TODO Test widget
+        assertWidget(R.drawable.ic_alarm_off_white, "No alarm", null);
     }
 
     @Test
@@ -168,6 +172,7 @@ public class CalendarTest extends FixedTimeTest {
         loadItemAtPosition(0);
 
 //        assertThat(textDate.getText(), is("2/1")); // TODO Fix test
+        assertThat(textDoW.getText(), is("Mon"));
         assertThat(textTime.getText(), is("Off"));
         assertThat(textState.getText(), is(""));
 
@@ -186,6 +191,7 @@ public class CalendarTest extends FixedTimeTest {
 
         // Check calendar
 //        assertThat(textDate.getText(), is("2/1")); // TODO Fix test
+        assertThat(textDoW.getText(), is("Mon"));
 //        assertThat(textTime.getText(), is("07:00")); // TODO Fix test
         assertThat(textState.getText(), is("Changed"));
 
@@ -197,6 +203,9 @@ public class CalendarTest extends FixedTimeTest {
 
         // Check notification
         assertThat(shadowNotificationManager.size(), is(0));
+
+        // Check widget
+        assertWidget(R.drawable.ic_alarm_white, "07:00", "Mon");
     }
 
     @Test
@@ -245,6 +254,7 @@ public class CalendarTest extends FixedTimeTest {
 
         // Check calendar
 //        assertThat(textDate.getText(), is("2/1")); // TODO Fix test
+        assertThat(textDoW.getText(), is("Mon"));
 //        assertThat(textTime.getText(), is("09:02")); // TODO Fix test
         assertThat(textState.getText(), is("Changed"));
 
@@ -256,6 +266,9 @@ public class CalendarTest extends FixedTimeTest {
 
         // Check notification
         assertThat(shadowNotificationManager.size(), is(0));
+
+        // Check widget
+        assertWidget(R.drawable.ic_alarm_white, "09:02", "Mon");
     }
 
     @Test
@@ -286,6 +299,7 @@ public class CalendarTest extends FixedTimeTest {
 
         // Check calendar
 //        assertThat(textDate.getText(), is("2/1")); // TODO Fix test
+        assertThat(textDoW.getText(), is("Mon"));
 //        assertThat(textTime.getText(), is("00:59")); // TODO Fix test
         assertThat(textState.getText(), is("Passed"));
 
@@ -301,6 +315,9 @@ public class CalendarTest extends FixedTimeTest {
 
         // Check notification
         assertThat(shadowNotificationManager.size(), is(0));
+
+        // Check widget
+        assertWidget(R.drawable.ic_alarm_off_white, "No alarm", null);
     }
 
     @Test
@@ -333,6 +350,7 @@ public class CalendarTest extends FixedTimeTest {
 
         // Check calendar
 //        assertThat(textDate.getText(), is("2/1")); // TODO Fix test
+        assertThat(textDoW.getText(), is("Mon"));
 //        assertThat(textTime.getText(), is("07:00")); // TODO Fix test
         assertThat(textState.getText(), is("Changed"));
 
@@ -344,6 +362,9 @@ public class CalendarTest extends FixedTimeTest {
 
         // Check notification
         assertThat(shadowNotificationManager.size(), is(0));
+
+        // Check widget
+        assertWidget(R.drawable.ic_alarm_white, "07:00", "Mon");
     }
 
     @Test
@@ -369,7 +390,8 @@ public class CalendarTest extends FixedTimeTest {
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
 
         // Check calendar
-//        assertThat(textDate.getText(), is("2/1")); // TODO Fix test
+//        assertThat(textDate.getText(), is("2/2")); // TODO Fix test
+        assertThat(textDoW.getText(), is("Tue"));
 //        assertThat(textTime.getText(), is("07:00")); // TODO Fix test
         assertThat(textState.getText(), is("Changed"));
 
@@ -381,6 +403,9 @@ public class CalendarTest extends FixedTimeTest {
 
         // Check notification
         assertThat(shadowNotificationManager.size(), is(0));
+
+        // Check widget
+        assertWidget(R.drawable.ic_alarm_white, "07:00", "Tue");
     }
 
     @Test
@@ -404,6 +429,9 @@ public class CalendarTest extends FixedTimeTest {
 //        assertThat(shadowNotification.getBigContentText(), is("Touch to view all alarms"));
 //        assertNotificationActionCount(notification, 1);
 //        assertNotificationAction(notification, 0, "Dismiss", NotificationReceiver.ACTION_DISMISS_BEFORE_RINGING);
+
+        // Check widget
+        assertWidget(R.drawable.ic_alarm_white, "07:00", "Mon");
     }
 
     @Test
@@ -426,6 +454,7 @@ public class CalendarTest extends FixedTimeTest {
 
         // Check calendar
 //        assertThat(textDate.getText(), is("2/1")); // TODO Fix test
+        assertThat(textDoW.getText(), is("Mon"));
 //        assertThat(textTime.getText(), is("07:00")); // TODO Fix test
         assertThat(textState.getText(), is("Dismissed before ringing"));
 
@@ -437,6 +466,9 @@ public class CalendarTest extends FixedTimeTest {
 
         // Check notification
         assertThat(shadowNotificationManager.size(), is(0));
+
+        // Check widget
+        assertWidget(R.drawable.ic_alarm_off_white, "No alarm", null);
     }
 
     @Test
@@ -484,6 +516,9 @@ public class CalendarTest extends FixedTimeTest {
 
 //        assertThat(textDate.getText(), is("Monday, February 1")); // TODO Fix test
 //        assertThat(textTime.getText(), is("07:00")); // TODO Fix test
+
+        // Check widget
+        assertWidget(R.drawable.ic_alarm_off_white, "No alarm", null);
     }
 
     @Test
@@ -523,6 +558,17 @@ public class CalendarTest extends FixedTimeTest {
 //        assertNotificationActionCount(notification, 2);
 //        assertNotificationAction(notification, 0, "Dismiss", NotificationReceiver.ACTION_DISMISS);
 //        assertNotificationAction(notification, 1, "Snooze", NotificationReceiver.ACTION_SNOOZE);
+
+        // Check widget
+        assertWidget(R.drawable.ic_alarm_white, "08:01", "Tomorrow");
+
+        // Shift clock by just under 2 hours
+        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DEFAULT + 2, MINUTE_DEFAULT, 59)));
+        assertWidget(R.drawable.ic_alarm_white, "08:01", "Tomorrow");
+
+        // Shift clock
+        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DEFAULT + 2, MINUTE_DEFAULT + 1)));
+        assertWidget(R.drawable.ic_alarm_white, "08:01", null);
     }
 
     @Test
@@ -544,6 +590,9 @@ public class CalendarTest extends FixedTimeTest {
 
         // Check notification
         assertThat(shadowNotificationManager.size(), is(0));
+
+        // Check widget
+        assertWidget(R.drawable.ic_alarm_off_white, "No alarm", null);
     }
 
     @Test
@@ -577,6 +626,9 @@ public class CalendarTest extends FixedTimeTest {
 ////        assertThat(shadowNotification.getBigContentText(), is("Snoozed till 07:10"));  // TODO Fix test
 //        assertNotificationActionCount(notification, 1);
 //        assertNotificationAction(notification, 0, "Dismiss", NotificationReceiver.ACTION_DISMISS);
+
+        // Check widget
+        assertWidget(R.drawable.ic_alarm_off_white, "No alarm", null);
     }
 
     @Test
@@ -596,6 +648,7 @@ public class CalendarTest extends FixedTimeTest {
 
         // Check calendar
 //        assertThat(textDate.getText(), is("2/1")); // TODO Fix test
+        assertThat(textDoW.getText(), is("Mon"));
 //        assertThat(textTime.getText(), is("07:00")); // TODO Fix test
         assertThat(textState.getText(), is("Passed"));
 
@@ -607,6 +660,9 @@ public class CalendarTest extends FixedTimeTest {
 
         // Check notification
         assertThat(shadowNotificationManager.size(), is(0));
+
+        // Check widget
+        assertWidget(R.drawable.ic_alarm_off_white, "No alarm", null);
     }
 
     @Test
@@ -634,6 +690,7 @@ public class CalendarTest extends FixedTimeTest {
 
         // Check calendar
 //        assertThat(textDate.getText(), is("2/1")); // TODO Fix test
+        assertThat(textDoW.getText(), is("Mon"));
 //        assertThat(textTime.getText(), is("07:00")); // TODO Fix test
         assertThat(textState.getText(), is("Changed"));
 
@@ -645,6 +702,9 @@ public class CalendarTest extends FixedTimeTest {
 
         // Check notification
         assertThat(shadowNotificationManager.size(), is(0));
+
+        // Check widget
+        assertWidget(R.drawable.ic_alarm_white, "13:00", "Mon");
     }
 
     /**
@@ -667,6 +727,7 @@ public class CalendarTest extends FixedTimeTest {
 
         // Check calendar
 //        assertThat(textDate.getText(), is("2/1")); // TODO Fix test
+        assertThat(textDoW.getText(), is("Mon"));
 //        assertThat(textTime.getText(), is("07:00")); // TODO Fix test
 //        assertThat(textState.getText(), is("Passed"));
 
@@ -678,6 +739,9 @@ public class CalendarTest extends FixedTimeTest {
 
         // Check notification
         assertThat(shadowNotificationManager.size(), is(0));
+
+        // Check widget
+        assertWidget(R.drawable.ic_alarm_off_white, "No alarm", null);
     }
 
     /**
@@ -705,6 +769,9 @@ public class CalendarTest extends FixedTimeTest {
 
         // Check notification
         assertThat(shadowNotificationManager.size(), is(0));
+
+        // Check widget
+        assertWidget(R.drawable.ic_alarm_off_white, "No alarm", null);
     }
 
     private void prepareUntilNear() {
@@ -826,7 +893,7 @@ public class CalendarTest extends FixedTimeTest {
         Intent ringIntent = new Intent(context, RingActivity.class);
         ringIntent.putExtra(RingActivity.ALARM_TIME, alarmTime);
 
-        activity = Robolectric.buildActivity(RingActivity.class).withIntent(ringIntent).setup().get();
+        activity = buildActivity(RingActivity.class).withIntent(ringIntent).setup().get();
         shadowActivity = Shadows.shadowOf(activity);
 
         AlarmMorningActivityTest.setLocale(activity, "en", "US");
@@ -859,6 +926,7 @@ public class CalendarTest extends FixedTimeTest {
         item = recyclerView.getChildAt(position);
 
         textDate = (TextView) item.findViewById(R.id.textDate);
+        textDoW = (TextView) item.findViewById(R.id.textDayOfWeekCal);
         textTime = (TextView) item.findViewById(R.id.textTimeCal);
         textState = (TextView) item.findViewById(R.id.textState);
     }
@@ -964,6 +1032,32 @@ public class CalendarTest extends FixedTimeTest {
             assertThat("Class", shadowIntent1.getSavedIntents()[0].getComponent(), is(expectedIntent.getComponent()));
             assertThat("Action", shadowIntent1.getSavedIntents()[0].getAction(), is(actionString));
         }
+    }
+
+    private void assertWidget(int iconResId, String time, String date) {
+        // TODO Fix test of widget
+
+//        Activity activity = buildActivity(Activity.class).create().get();
+//        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.widget_layout);
+//        View view = remoteViews.apply(activity, null);
+//
+//        int widgetId = shadowAppWidgetManager.createWidget(WidgetProvider.class, R.layout.widget_layout);
+//        View view = shadowAppWidgetManager.getViewFor(widgetId);
+//
+//        ImageView widgetIcon = (ImageView) view.findViewById(R.id.icon);
+//        ShadowDrawable shadowWidgetIconDrawable = Shadows.shadowOf(widgetIcon.getDrawable());
+//        TextView widgetTime = (TextView) view.findViewById(R.id.alarm_time);
+//        TextView widgetDate = (TextView) view.findViewById(R.id.alarm_date);
+
+
+//        assertThat(shadowWidgetIconDrawable.getCreatedFromResId(), is(iconResId));
+//        assertThat(widgetTime.getText().toString(), is(time));
+//        if (date == null) {
+//            assertThat(widgetDate.getVisibility(), is(View.GONE));
+//        } else {
+//            assertThat(widgetDate.getVisibility(), is(View.VISIBLE));
+//            assertThat(widgetDate.getText().toString(), is(date));
+//        }
     }
 
 }
