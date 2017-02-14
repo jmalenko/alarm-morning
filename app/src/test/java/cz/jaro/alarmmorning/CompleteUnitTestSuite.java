@@ -44,5 +44,5 @@ import cz.jaro.alarmmorning.model.GlobalManager1NextAlarm4HolidaysTest;
         AlarmMorningActivity0Test.class,
         AlarmMorningActivityTest.class
 })
-public class CompleteInstrumentedTestSuite {
+public class CompleteUnitTestSuite {
 }

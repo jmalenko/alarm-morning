@@ -24,5 +24,5 @@ import cz.jaro.alarmmorning.nighttimebell.CustomAlarmToneTest;
 
         CustomAlarmToneTest.class
 })
-public class CompleteUnitTestSuite {
+public class CompleteInstrumentedTestSuite {
 }
