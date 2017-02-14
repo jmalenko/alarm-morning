@@ -123,8 +123,6 @@ public class CalendarTest extends FixedTimeTest {
         AppWidgetProviderInfo appWidgetProviderInfo = new AppWidgetProviderInfo();
         appWidgetProviderInfo.provider = new ComponentName(context, WidgetProvider.class);
         shadowAppWidgetManager.addInstalledProvider(appWidgetProviderInfo);
-
-        globalManager.forceSetAlarm();
     }
 
     @After
