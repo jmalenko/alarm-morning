@@ -33,7 +33,7 @@ import static cz.jaro.alarmmorning.model.DayTest.YEAR;
 @RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 21, shadows = {ShadowAlarmManagerAPI21.class, ShadowGlobalManager.class})
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class FixedTimeTest {
+public abstract class FixedTimeTest {
 
     protected GlobalManager globalManager;
     protected ShadowGlobalManager shadowGlobalManager;

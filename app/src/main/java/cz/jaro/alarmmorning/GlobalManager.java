@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.support.annotation.VisibleForTesting;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.RemoteViews;
@@ -1065,6 +1066,7 @@ public class GlobalManager {
     /**
      * Reset all the data (database and settings (including the data stored by GlobalManager)) to the initial state.
      */
+    @VisibleForTesting
     public void reset() {
         resetDatabase();
         resetSettings();

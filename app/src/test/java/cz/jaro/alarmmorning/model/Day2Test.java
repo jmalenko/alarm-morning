@@ -8,7 +8,11 @@ import java.util.GregorianCalendar;
 import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.clock.FixedClock;
 
-import static cz.jaro.alarmmorning.model.DayTest.*;
+import static cz.jaro.alarmmorning.model.DayTest.DAY;
+import static cz.jaro.alarmmorning.model.DayTest.HOUR_DAY;
+import static cz.jaro.alarmmorning.model.DayTest.MINUTE_DAY;
+import static cz.jaro.alarmmorning.model.DayTest.MONTH;
+import static cz.jaro.alarmmorning.model.DayTest.YEAR;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
@@ -41,7 +45,7 @@ public class Day2Test {
 
     @Test
     public void on() {
-        assertThat(day.isPassed(clock), is(false));
+        assertThat(day.isPassed(clock), is(true));
         assertThat(day.getTimeToRing(clock), is(0L));
     }
 
