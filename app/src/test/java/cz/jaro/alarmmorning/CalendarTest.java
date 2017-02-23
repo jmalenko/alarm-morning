@@ -322,10 +322,7 @@ public class CalendarTest extends FixedTimeTest {
     @Config(qualifiers = "en")
     public void t13_setAlarmWithZeroAdvancePeriod() {
         // Set the preference to zero
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt(SettingsActivity.PREF_NEAR_FUTURE_TIME, 0);
-        editor.commit();
+        setNearFuturePeriodPreferenceToZero(context);
 
         // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
         consumeNextScheduledAlarm();
@@ -853,6 +850,18 @@ public class CalendarTest extends FixedTimeTest {
         shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DEFAULT, MINUTE_DEFAULT, 10)));
     }
 
+    public static void setNearFuturePeriodPreferenceToZero(Context context) {
+        setNearFuturePeriodPreference(context, 0);
+    }
+
+    public static void setNearFuturePeriodPreference(Context context, int minutes) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putInt(SettingsActivity.PREF_NEAR_FUTURE_TIME, minutes);
+        editor.commit();
+    }
+
+
     private void consumeNextScheduledAlarm() {
         assertThat(shadowAlarmManager.getScheduledAlarms().size(), is(1));
         shadowAlarmManager.getNextScheduledAlarm();
@@ -937,6 +946,10 @@ public class CalendarTest extends FixedTimeTest {
     }
 
     private void assertSystemAlarm(int year, int month, int day, int hour, int minute, String action) {
+        assertSystemAlarm(context, shadowAlarmManager, year, month, day, hour, minute, action);
+    }
+
+    public static void assertSystemAlarm(Context context, ShadowAlarmManager shadowAlarmManager, int year, int month, int day, int hour, int minute, String action) {
         assertThat("Alarm count", shadowAlarmManager.getScheduledAlarms().size(), is(1));
 
         ShadowAlarmManager.ScheduledAlarm nextScheduledAlarm = shadowAlarmManager.peekNextScheduledAlarm();

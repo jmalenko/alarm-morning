@@ -101,10 +101,6 @@
         <receiver android:name=".receivers.TimeChangedReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.TIME_SET"/>
-            </intent-filter>
-        </receiver>
-        <receiver android:name=".receivers.TimeZoneChangedReceiver">
-            <intent-filter>
                 <action android:name="android.intent.action.TIMEZONE_CHANGED"/>
             </intent-filter>
         </receiver>

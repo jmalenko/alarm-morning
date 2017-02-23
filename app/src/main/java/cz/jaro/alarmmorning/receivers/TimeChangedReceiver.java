@@ -10,7 +10,7 @@ import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.WakeLocker;
 
 /**
- * This receiver is called by the operating system on time change (time was explicitly set).
+ * This receiver is called by the operating system on time change (time was explicitly set), date change or time zone change.
  */
 public class TimeChangedReceiver extends BroadcastReceiver {
 
@@ -20,7 +20,7 @@ public class TimeChangedReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         WakeLocker.acquire(context);
 
-        Log.v(TAG, "onReceive()");
+        Log.v(TAG, "onReceive(action=" + intent.getAction() + ")");
 
         new Analytics(context, Analytics.Event.Start, Analytics.Channel.External, Analytics.ChannelName.TimeChange).setConfigurationInfo().save();
 
