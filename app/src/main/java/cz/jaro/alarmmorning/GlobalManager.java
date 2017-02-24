@@ -416,9 +416,6 @@ public class GlobalManager {
         Context context = AlarmMorningApplication.getAppContext();
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
 
-        SystemAlarmClock systemAlarmClock = SystemAlarmClock.getInstance(context);
-        systemAlarmClock.onAlarmSet();
-
         Calendar lastAlarmTime = null;
 
         if (systemAlarm.nextActionShouldChange()) {
