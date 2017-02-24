@@ -162,35 +162,36 @@ public class AlarmMorningActivityTest extends FixedTimeTest {
 
     @Test
     public void first_day_of_week_en() {
-        DefaultsActivity activity = Robolectric.setupActivity(DefaultsActivity.class);
+        Context context = RuntimeEnvironment.application.getApplicationContext();
+        setLocale(context, "en", "US");
 
-        setLocale(activity, "en", "US");
+        DefaultsActivity activity = Robolectric.setupActivity(DefaultsActivity.class);
 
         Defaults defaults = activity.loadPosition(0);
 
-        // TODO Fix test
         Assert.assertThat(defaults.getDayOfWeek(), is(Calendar.SUNDAY));
     }
 
     @Test
     public void first_day_of_week_cs() {
-        DefaultsActivity activity = Robolectric.setupActivity(DefaultsActivity.class);
+        Context context = RuntimeEnvironment.application.getApplicationContext();
+        setLocale(context, "cs", "CZ");
 
-        setLocale(activity, "cs", "CZ");
+        DefaultsActivity activity = Robolectric.setupActivity(DefaultsActivity.class);
 
         Defaults defaults = activity.loadPosition(0);
 
-        // TODO Fix test
         Assert.assertThat(defaults.getDayOfWeek(), is(Calendar.MONDAY));
     }
 
     @Test
-    @Config(qualifiers = "en")
     public void defaults_ordering_en() {
+        Context context = RuntimeEnvironment.application.getApplicationContext();
+        setLocale(context, "en", "US");
+
         DefaultsActivity activity = Robolectric.setupActivity(DefaultsActivity.class);
         ShadowActivity shadowActivity = Shadows.shadowOf(activity);
 
-        setLocale(activity, "en", "US");
         Resources res = activity.getResources();
 
         RecyclerView recyclerView = (RecyclerView) shadowActivity.findViewById(R.id.defaults_recycler_view);
@@ -206,7 +207,6 @@ public class AlarmMorningActivityTest extends FixedTimeTest {
             View item = recyclerView.getChildAt(position);
             TextView textDayOfWeek = (TextView) item.findViewById(R.id.textDayOfWeek);
 
-            // TODO Fix test
             if (position == 0)
                 assertThat(textDayOfWeek.getText()).isEqualTo("Sun");
 
@@ -217,12 +217,13 @@ public class AlarmMorningActivityTest extends FixedTimeTest {
     }
 
     @Test
-    @Config(qualifiers = "cs")
     public void defaults_ordering_cs() {
+        Context context = RuntimeEnvironment.application.getApplicationContext();
+        setLocale(context, "cs", "CZ");
+
         DefaultsActivity activity = Robolectric.setupActivity(DefaultsActivity.class);
         ShadowActivity shadowActivity = Shadows.shadowOf(activity);
 
-        setLocale(activity, "cs", "CZ");
         Resources res = activity.getResources();
 
         RecyclerView recyclerView = (RecyclerView) shadowActivity.findViewById(R.id.defaults_recycler_view);
@@ -238,7 +239,6 @@ public class AlarmMorningActivityTest extends FixedTimeTest {
             View item = recyclerView.getChildAt(position);
             TextView textDayOfWeek = (TextView) item.findViewById(R.id.textDayOfWeek);
 
-            // TODO Fix test
             if (position == 0)
                 assertThat(textDayOfWeek.getText()).isEqualTo("Po");
 
