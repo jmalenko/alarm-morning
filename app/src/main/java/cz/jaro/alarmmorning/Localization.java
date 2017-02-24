@@ -66,8 +66,16 @@ public class Localization {
     private static String dayOfWeekToShortStringAlgo(int dayOfWeek) {
         Calendar date = Calendar.getInstance();
         date.set(Calendar.DAY_OF_WEEK, dayOfWeek);
-        SimpleDateFormat sdf = new SimpleDateFormat("E", Locale.US);
-        sdf.setCalendar(date);
+
+        /*
+        Example of SimpleDateFormat(pattern) parameter effects:
+            Pattern parameter       en_US locale            cs_CZ locale
+            --------------------------------------------------------------
+            no parameter            2/25/17 1:30 PM         24.02.17 13:30
+            "E"                     Mon                     po
+            "EEEE"                  Monday                  pondělí
+        */
+        SimpleDateFormat sdf = new SimpleDateFormat("E");
         return sdf.format(date.getTime());
     }
 
@@ -117,8 +125,7 @@ public class Localization {
     private static String dayOfWeekToStringAlgo(int dayOfWeek) {
         Calendar date = Calendar.getInstance();
         date.set(Calendar.DAY_OF_WEEK, dayOfWeek);
-        SimpleDateFormat sdf = new SimpleDateFormat("EEEE", Locale.US);
-        sdf.setCalendar(date);
+        SimpleDateFormat sdf = new SimpleDateFormat("EEEE");
         return sdf.format(date.getTime());
     }
 
@@ -181,7 +188,7 @@ public class Localization {
         if (currentValue != null) {
             return timeToStringFormat(date, currentValue);
         } else {
-            return timeToStringAlgo(date, context);
+            return timeToStringAlgo(date);
         }
     }
 
@@ -193,19 +200,27 @@ public class Localization {
      * @return the time as string
      */
     private static String timeToStringFormat(Date date, String format) {
-        SimpleDateFormat sdf = new SimpleDateFormat(format, Locale.US);
+        SimpleDateFormat sdf = new SimpleDateFormat(format);
         return sdf.format(date);
     }
 
     /**
      * Converts the time (in a day) to text. Uses an algorithm to derive the result from the system locale.
      *
-     * @param date    time moment
-     * @param context context
+     * @param date time moment
      * @return the time as string
      */
-    private static String timeToStringAlgo(Date date, Context context) {
-        java.text.DateFormat dateFormat = android.text.format.DateFormat.getTimeFormat(context);
+    private static String timeToStringAlgo(Date date) {
+        /*
+        Example of DateFormat.getTimeInstance(style) parameter effects:
+            Style parameter         en_US locale                                        cs_CZ locale
+            -----------------------------------------------------------------------------------------------------------------
+            FULL                    7:00:00 AM Central European Standard Time           7:00:00 Středoevropský standardní čas
+            LONG                    7:00:00 AM CET                                      7:00:00 SEČ
+            MEDIUM)                 7:00:00 AM                                          7:00:00
+            SHORT                   7:00 AM                                             7:00
+        */
+        DateFormat dateFormat = DateFormat.getTimeInstance(DateFormat.SHORT);
         return dateFormat.format(date);
     }
 
@@ -229,14 +244,27 @@ public class Localization {
 
     /**
      * Converts a date to text in <i>very</i> short format. Uses an algorithm to derive the result from the system locale.
+     * <p>
+     * Contains month and day of month only.
      *
      * @param date date
      * @return the date as string
      */
     private static String dateToStringVeryShortAlgo(Date date) {
-        SimpleDateFormat dateFormat = (SimpleDateFormat) java.text.DateFormat.getDateInstance(java.text.DateFormat.SHORT);
+        /*
+        Example of DateFormat.getDateInstance(style) parameter effects:
+            Style parameter         en_US locale                    cs_CZ locale
+            ------------------------------------------------------------------------------
+            FULL                    Monday, February 1, 2016        pondělí 1. února, 2016
+            LONG                    February 1, 2016                1. února, 2016
+            MEDIUM)                 Feb 1, 2016                     1. 2. 2016
+            SHORT                   2/1/16                          01.02.16
+        */
+        SimpleDateFormat dateFormat = (SimpleDateFormat) DateFormat.getDateInstance(DateFormat.SHORT);
+
         // Trick: use regex to trim off all y's and any non-alphabetic characters before and after
         dateFormat.applyPattern(dateFormat.toPattern().replaceAll("[^\\p{Alpha}]*y+[^\\p{Alpha}]*", ""));
+
         return dateFormat.format(date);
     }
 
@@ -260,12 +288,18 @@ public class Localization {
 
     /**
      * Converts a date to text in full format. Uses an algorithm to derive the result from the system locale.
+     * <p>
+     * Contains month and day of month, optionally contains day of week. Does not contain the year.
      *
      * @param date date
      * @return the date as string
      */
     private static String dateToStringFullAlgo(Date date) {
-        SimpleDateFormat dateFormat = (SimpleDateFormat) java.text.DateFormat.getDateInstance(DateFormat.FULL);
+        SimpleDateFormat dateFormat = (SimpleDateFormat) DateFormat.getDateInstance(DateFormat.FULL);
+
+        // Trick: use regex to trim off all y's and any non-alphabetic characters before and after
+        dateFormat.applyPattern(dateFormat.toPattern().replaceAll("[^\\p{Alpha}]*y+[^\\p{Alpha}]*", ""));
+
         return dateFormat.format(date);
     }
 
@@ -333,8 +367,8 @@ public class Localization {
 
         String currentValue = resources.getString(resId);
 
-        boolean changed = defaultValue.equals(currentValue);
-        return changed ? null : currentValue;
+        boolean same = defaultValue.equals(currentValue);
+        return same ? null : currentValue;
     }
 
 }

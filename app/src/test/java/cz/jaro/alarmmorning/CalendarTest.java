@@ -111,6 +111,8 @@ public class CalendarTest extends FixedTimeTest {
 
         context = RuntimeEnvironment.application.getApplicationContext();
 
+        AlarmMorningActivityTest.setLocale(context, "en", "US");
+
         alarmManager = (AlarmManager) RuntimeEnvironment.application.getSystemService(Context.ALARM_SERVICE);
         shadowAlarmManager = (ShadowAlarmManagerAPI21) Shadows.shadowOf(alarmManager);
 
@@ -160,7 +162,6 @@ public class CalendarTest extends FixedTimeTest {
     }
 
     @Test
-    @Config(qualifiers = "en")
     public void t10_setAlarm() {
         // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
         consumeNextScheduledAlarm();
@@ -169,7 +170,7 @@ public class CalendarTest extends FixedTimeTest {
         startActivityCalendar();
         loadItemAtPosition(0);
 
-//        assertThat(textDate.getText(), is("2/1")); // TODO Fix test
+        assertThat(textDate.getText(), is("2/1"));
         assertThat(textDoW.getText(), is("Mon"));
         assertThat(textTime.getText(), is("Off"));
         assertThat(textState.getText(), is(""));
@@ -188,9 +189,9 @@ public class CalendarTest extends FixedTimeTest {
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
 
         // Check calendar
-//        assertThat(textDate.getText(), is("2/1")); // TODO Fix test
+        assertThat(textDate.getText(), is("2/1"));
         assertThat(textDoW.getText(), is("Mon"));
-//        assertThat(textTime.getText(), is("07:00")); // TODO Fix test
+        assertThat(textTime.getText(), is("7:00 AM"));
         assertThat(textState.getText(), is("Changed"));
 
         // Check system alarm
@@ -207,7 +208,6 @@ public class CalendarTest extends FixedTimeTest {
     }
 
     @Test
-    @Config(qualifiers = "en")
     public void t11_setAlarmTwice() {
         // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
         consumeNextScheduledAlarm();
@@ -225,7 +225,7 @@ public class CalendarTest extends FixedTimeTest {
         TimePickerDialog dialog = (TimePickerDialog) fragment.getDialog();
         ShadowTimePickerDialog shadowDialog = Shadows.shadowOf(dialog);
 
-//        assertThat(textDate.getText(), is("2/1")); // TODO Fix test
+        assertThat(textDate.getText(), is("2/1"));
         assertThat(shadowDialog.getHourOfDay(), is(DEFAULT_ALARM_HOUR));
         assertThat(shadowDialog.getMinute(), is(DEFAULT_ALARM_MINUTE));
 
@@ -242,7 +242,7 @@ public class CalendarTest extends FixedTimeTest {
         dialog = (TimePickerDialog) fragment.getDialog();
         shadowDialog = Shadows.shadowOf(dialog);
 
-//        assertThat(textDate.getText(), is("2/1")); // TODO Fix test
+        assertThat(textDate.getText(), is("2/1"));
         assertThat(shadowDialog.getHourOfDay(), is(DEFAULT_ALARM_HOUR + 1));
         assertThat(shadowDialog.getMinute(), is(DEFAULT_ALARM_MINUTE + 1));
 
@@ -251,9 +251,9 @@ public class CalendarTest extends FixedTimeTest {
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
 
         // Check calendar
-//        assertThat(textDate.getText(), is("2/1")); // TODO Fix test
+        assertThat(textDate.getText(), is("2/1"));
         assertThat(textDoW.getText(), is("Mon"));
-//        assertThat(textTime.getText(), is("09:02")); // TODO Fix test
+        assertThat(textTime.getText(), is("9:02 AM"));
         assertThat(textState.getText(), is("Changed"));
 
         // Check system alarm
@@ -266,11 +266,10 @@ public class CalendarTest extends FixedTimeTest {
         assertThat(shadowNotificationManager.size(), is(0));
 
         // Check widget
-        assertWidget(R.drawable.ic_alarm_white, "09:02", "Mon");
+        assertWidget(R.drawable.ic_alarm_white, "9:02 AM", "Mon");
     }
 
     @Test
-    @Config(qualifiers = "en")
     public void t12_setAlarmToPast() {
         // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
         consumeNextScheduledAlarm();
@@ -296,14 +295,14 @@ public class CalendarTest extends FixedTimeTest {
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
 
         // Check calendar
-//        assertThat(textDate.getText(), is("2/1")); // TODO Fix test
+        assertThat(textDate.getText(), is("2/1"));
         assertThat(textDoW.getText(), is("Mon"));
-//        assertThat(textTime.getText(), is("00:59")); // TODO Fix test
+        assertThat(textTime.getText(), is("12:59 AM"));
         assertThat(textState.getText(), is("Passed"));
 
         // Check system alarm
-        assertThat(shadowAlarmManager.getScheduledAlarms().size(), is(0));
         // The alarm that was consumed at the beginning of this method didn't change
+        assertThat(shadowAlarmManager.getScheduledAlarms().size(), is(0));
 
         // Check system alarm clock
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
@@ -319,7 +318,6 @@ public class CalendarTest extends FixedTimeTest {
     }
 
     @Test
-    @Config(qualifiers = "en")
     public void t13_setAlarmWithZeroAdvancePeriod() {
         // Set the preference to zero
         setNearFuturePeriodPreferenceToZero(context);
@@ -344,9 +342,9 @@ public class CalendarTest extends FixedTimeTest {
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
 
         // Check calendar
-//        assertThat(textDate.getText(), is("2/1")); // TODO Fix test
+        assertThat(textDate.getText(), is("2/1"));
         assertThat(textDoW.getText(), is("Mon"));
-//        assertThat(textTime.getText(), is("07:00")); // TODO Fix test
+        assertThat(textTime.getText(), is("7:00 AM"));
         assertThat(textState.getText(), is("Changed"));
 
         // Check system alarm
@@ -359,11 +357,10 @@ public class CalendarTest extends FixedTimeTest {
         assertThat(shadowNotificationManager.size(), is(0));
 
         // Check widget
-        assertWidget(R.drawable.ic_alarm_white, "07:00", "Mon");
+        assertWidget(R.drawable.ic_alarm_white, "7:00 AM", "Mon");
     }
 
     @Test
-    @Config(qualifiers = "en")
     public void t14_setAlarmTomorrow() {
         // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
         consumeNextScheduledAlarm();
@@ -385,9 +382,9 @@ public class CalendarTest extends FixedTimeTest {
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
 
         // Check calendar
-//        assertThat(textDate.getText(), is("2/2")); // TODO Fix test
+        assertThat(textDate.getText(), is("2/2"));
         assertThat(textDoW.getText(), is("Tue"));
-//        assertThat(textTime.getText(), is("07:00")); // TODO Fix test
+        assertThat(textTime.getText(), is("7:00 AM"));
         assertThat(textState.getText(), is("Changed"));
 
         // Check system alarm
@@ -400,7 +397,7 @@ public class CalendarTest extends FixedTimeTest {
         assertThat(shadowNotificationManager.size(), is(0));
 
         // Check widget
-        assertWidget(R.drawable.ic_alarm_white, "07:00", "Tue");
+        assertWidget(R.drawable.ic_alarm_white, "7:00 AM", "Tue");
     }
 
     @Test
@@ -420,17 +417,16 @@ public class CalendarTest extends FixedTimeTest {
 //        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
 //        ShadowNotification shadowNotification = Shadows.shadowOf(notification);
 //
-//        //assertThat(shadowNotification.getBigContentTitle(), is("Alarm at 7:00")); // TODO Fix test
+//        assertThat(shadowNotification.getBigContentTitle(), is("Alarm at 7:00 AM"));
 //        assertThat(shadowNotification.getBigContentText(), is("Touch to view all alarms"));
 //        assertNotificationActionCount(notification, 1);
 //        assertNotificationAction(notification, 0, "Dismiss", NotificationReceiver.ACTION_DISMISS_BEFORE_RINGING);
 
         // Check widget
-        assertWidget(R.drawable.ic_alarm_white, "07:00", "Mon");
+        assertWidget(R.drawable.ic_alarm_white, "7:00 AM", "Mon");
     }
 
     @Test
-    @Config(qualifiers = "en")
     public void t21_dismissWhileInNearPeriod() {
         prepareUntilNear();
 
@@ -448,9 +444,9 @@ public class CalendarTest extends FixedTimeTest {
         clickContextMenu(R.id.day_dismiss);
 
         // Check calendar
-//        assertThat(textDate.getText(), is("2/1")); // TODO Fix test
+        assertThat(textDate.getText(), is("2/1"));
         assertThat(textDoW.getText(), is("Mon"));
-//        assertThat(textTime.getText(), is("07:00")); // TODO Fix test
+        assertThat(textTime.getText(), is("7:00 AM"));
         assertThat(textState.getText(), is("Dismissed before ringing"));
 
         // Check system alarm
@@ -492,7 +488,7 @@ public class CalendarTest extends FixedTimeTest {
 //        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
 //        ShadowNotification shadowNotification = Shadows.shadowOf(notification);
 //
-////        assertThat(shadowNotification.getBigContentTitle(), is("Alarm at 7:00")); // TODO Fix test
+//        assertThat(shadowNotification.getBigContentTitle(), is("Alarm at 7:00 AM"));
 //        assertThat(shadowNotification.getBigContentText(), is("Ringing"));
 //        assertNotificationActionCount(notification, 2);
 //        assertNotificationAction(notification, 0, "Dismiss", NotificationReceiver.ACTION_DISMISS);
@@ -509,8 +505,8 @@ public class CalendarTest extends FixedTimeTest {
         assertThat(textNextCalendar.getVisibility(), is(View.GONE));
         assertThat(textMuted.getVisibility(), is(View.INVISIBLE));
 
-//        assertThat(textDate.getText(), is("Monday, February 1")); // TODO Fix test
-//        assertThat(textTime.getText(), is("07:00")); // TODO Fix test
+        assertThat(textDate.getText(), is("Monday, February 1"));
+        assertThat(textTime.getText(), is("7:00 AM"));
 
         // Check widget
         assertWidget(R.drawable.ic_alarm_off_white, "No alarm", null);
@@ -548,7 +544,7 @@ public class CalendarTest extends FixedTimeTest {
 //        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
 //        ShadowNotification shadowNotification = Shadows.shadowOf(notification);
 //
-////        assertThat(shadowNotification.getBigContentTitle(), is("Alarm at 7:00")); // TODO Fix test
+//        assertThat(shadowNotification.getBigContentTitle(), is("Alarm at 7:00 AM"));
 //        assertThat(shadowNotification.getBigContentText(), is("Ringing"));
 //        assertNotificationActionCount(notification, 2);
 //        assertNotificationAction(notification, 0, "Dismiss", NotificationReceiver.ACTION_DISMISS);
@@ -567,7 +563,6 @@ public class CalendarTest extends FixedTimeTest {
     }
 
     @Test
-    @Config(qualifiers = "en")
     public void t32_dismissWhileRinging() {
         prepareUntilRing();
 
@@ -591,7 +586,6 @@ public class CalendarTest extends FixedTimeTest {
     }
 
     @Test
-    @Config(qualifiers = "en")
     public void t33_snoozeWhileRinging() {
         prepareUntilRing();
 
@@ -617,8 +611,8 @@ public class CalendarTest extends FixedTimeTest {
 //        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
 //        ShadowNotification shadowNotification = Shadows.shadowOf(notification);
 //
-////        assertThat(shadowNotification.getBigContentTitle(), is("Alarm at 7:00")); // TODO Fix test
-////        assertThat(shadowNotification.getBigContentText(), is("Snoozed till 07:10"));  // TODO Fix test
+//        assertThat(shadowNotification.getBigContentTitle(), is("Alarm at 7:00 AM"));
+//        assertThat(shadowNotification.getBigContentText(), is("Snoozed till 7:10 AM"));
 //        assertNotificationActionCount(notification, 1);
 //        assertNotificationAction(notification, 0, "Dismiss", NotificationReceiver.ACTION_DISMISS);
 
@@ -642,9 +636,9 @@ public class CalendarTest extends FixedTimeTest {
         clickContextMenu(R.id.day_dismiss);
 
         // Check calendar
-//        assertThat(textDate.getText(), is("2/1")); // TODO Fix test
+        assertThat(textDate.getText(), is("2/1"));
         assertThat(textDoW.getText(), is("Mon"));
-//        assertThat(textTime.getText(), is("07:00")); // TODO Fix test
+        assertThat(textTime.getText(), is("7:00 AM"));
         assertThat(textState.getText(), is("Passed"));
 
         // Check system alarm
@@ -684,9 +678,9 @@ public class CalendarTest extends FixedTimeTest {
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
 
         // Check calendar
-//        assertThat(textDate.getText(), is("2/1")); // TODO Fix test
+        assertThat(textDate.getText(), is("2/1"));
         assertThat(textDoW.getText(), is("Mon"));
-//        assertThat(textTime.getText(), is("07:00")); // TODO Fix test
+        assertThat(textTime.getText(), is("1:00 PM"));
         assertThat(textState.getText(), is("Changed"));
 
         // Check system alarm
@@ -721,10 +715,10 @@ public class CalendarTest extends FixedTimeTest {
         clickContextMenu(R.id.day_revert);
 
         // Check calendar
-//        assertThat(textDate.getText(), is("2/1")); // TODO Fix test
+        assertThat(textDate.getText(), is("2/1"));
         assertThat(textDoW.getText(), is("Mon"));
-//        assertThat(textTime.getText(), is("07:00")); // TODO Fix test
-//        assertThat(textState.getText(), is("Passed"));
+        assertThat(textTime.getText(), is("Off"));
+        assertThat(textState.getText(), is("Passed"));
 
         // Check system alarm
         assertSystemAlarm(YEAR, MONTH, DAY + 1, 0, 0, SystemAlarm.ACTION_SET_SYSTEM_ALARM);
@@ -919,11 +913,9 @@ public class CalendarTest extends FixedTimeTest {
         activity = Robolectric.setupActivity(AlarmMorningActivity.class);
         shadowActivity = Shadows.shadowOf(activity);
 
-        AlarmMorningActivityTest.setLocale(activity, "en", "US");
-
         recyclerView = (RecyclerView) shadowActivity.findViewById(R.id.calendar_recycler_view);
 
-        // Hack: RecyclerView needs to be measured and layed out manually in Robolectric.
+        // Hack: RecyclerView needs to be measured and laid out manually in Robolectric.
         // Source: http://stackoverflow.com/questions/27052866/android-robolectric-click-recyclerview-item
         recyclerView.measure(0, 0);
         recyclerView.layout(0, 0, 100, 10000);

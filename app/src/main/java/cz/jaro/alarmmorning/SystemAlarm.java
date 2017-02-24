@@ -316,6 +316,16 @@ class NextAction {
         this.alarmTime = alarmTime;
     }
 
+    /**
+     * Compares this NextAction to the specified object.  The result is {@code true} if and only if the argument is not {@code null} and is a {@code NextAction}
+     * object that represents the same action, time and alarm time.
+     * <p>
+     * Implementation note: the standard equality of Calendar is not used, because it also considers fields irrelevant for alarm time, which is simply a time
+     * from epoch (specifically, the firstDayOfWeek, minimalDaysInFirstWeek, zone and lenient fields are compared)
+     *
+     * @param o The object to compare this {@code NextAction} against
+     * @return {@code true} if the given object represents a {@code NextAction} equivalent to this nextAction, {@code false} otherwise
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -324,8 +334,8 @@ class NextAction {
         NextAction that = (NextAction) o;
 
         if (action != null ? !action.equals(that.action) : that.action != null) return false;
-        if (time != null ? !time.equals(that.time) : that.time != null) return false;
-        return !(alarmTime != null ? !alarmTime.equals(that.alarmTime) : that.alarmTime != null);
+        if (time != null ? time.getTimeInMillis() != that.time.getTimeInMillis() : that.time != null) return false;
+        return !(alarmTime != null ? alarmTime.getTimeInMillis() != that.alarmTime.getTimeInMillis() : that.alarmTime != null);
     }
 
     @Override
