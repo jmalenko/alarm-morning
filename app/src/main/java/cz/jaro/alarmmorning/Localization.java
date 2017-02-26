@@ -220,6 +220,13 @@ public class Localization {
             MEDIUM)                 7:00:00 AM                                          7:00:00
             SHORT                   7:00 AM                                             7:00
         */
+
+        /*
+        Test on Galaxy Samsung S7: There is bug in Android that makes the running apps incorrectly thing it is in 12-hour mode after changing time, although the system is set to use 24-hour mode. The fix is to kill (by swiping in the list of running apps) and start the app. We don't hack the app to handle this situation.
+
+        Source: https://code.google.com/p/android/issues/detail?id=181201#c28
+        */
+
         DateFormat dateFormat = DateFormat.getTimeInstance(DateFormat.SHORT);
         return dateFormat.format(date);
     }
