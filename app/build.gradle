@@ -8,8 +8,8 @@ android {
         applicationId "cz.jaro.alarmmorning"
         minSdkVersion 15
         targetSdkVersion 25
-        versionCode 9
-        versionName "0.8"
+        versionCode 10
+        versionName "0.9"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         jackOptions {
             enabled true
@@ -31,8 +31,8 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:support-v4:25.1.0'
-    compile 'com.android.support:design:25.1.0'
+    compile 'com.android.support:support-v4:25.2.0'
+    compile 'com.android.support:design:25.2.0'
 
     compile 'com.ibm.icu:icu4j:53.1'
     androidTestCompile 'com.ibm.icu:icu4j:53.1'
@@ -51,7 +51,7 @@ dependencies {
     // Optional -- Mockito framework
     testCompile 'org.mockito:mockito-core:1.10.19'
 
-    androidTestCompile 'com.android.support:support-annotations:25.1.0'
+    androidTestCompile 'com.android.support:support-annotations:25.2.0'
     androidTestCompile 'com.android.support.test:runner:0.5'
     androidTestCompile 'com.android.support.test:rules:0.5'
     // Optional -- Hamcrest library
