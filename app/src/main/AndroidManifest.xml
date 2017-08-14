@@ -38,12 +38,16 @@
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
+        <!-- The RingActivity is not included in the Recent Apps but keeps the main activity included. -->
         <activity
             android:name=".RingActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_ring"
             android:launchMode="singleInstance"
-            android:theme="@style/FullscreenTheme">
+            android:theme="@style/FullscreenTheme"
+            android:noHistory="true"
+            android:taskAffinity=""
+            android:excludeFromRecents="true">
         </activity>
         <activity
             android:name=".DefaultsActivity"
