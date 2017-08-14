@@ -87,12 +87,14 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         int state = globalManager.getState(day.getDateTime());
 
         boolean enabled;
-        enabled = state != GlobalManager.STATE_DISMISSED_BEFORE_RINGING && state != GlobalManager.STATE_DISMISSED;
+        enabled = !day.isEnabled() || (state != GlobalManager.STATE_DISMISSED_BEFORE_RINGING && state != GlobalManager.STATE_DISMISSED);
         viewHolder.getTextTime().setEnabled(enabled);
 
         String stateText;
         if (day.isHoliday() && day.getState() == Day.STATE_RULE) {
             stateText = res.getString(R.string.holiday);
+        } else if (!day.isEnabled()) {
+            stateText = day.sameAsDefault() && !day.isHoliday() ? "" : res.getString(R.string.alarm_state_changed);
         } else {
             if (state == GlobalManager.STATE_FUTURE) {
                 stateText = day.sameAsDefault() && !day.isHoliday() ? "" : res.getString(R.string.alarm_state_changed);
