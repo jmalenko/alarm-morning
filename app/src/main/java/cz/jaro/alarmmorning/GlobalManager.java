@@ -450,7 +450,7 @@ public class GlobalManager {
                         Log.i(TAG, "  The following alarm times were skipped: " + Localization.dateTimesToString(skippedAlarmTimes, context));
 
                         Analytics analytics = new Analytics(context, Analytics.Event.Skipped_alarm, Analytics.Channel.Time, Analytics.ChannelName.Alarm);
-                        analytics.set(Analytics.Param.Skipped_alarm_times, skippedAlarmTimes.toString());
+                        analytics.set(Analytics.Param.Skipped_alarm_times, calendarsToReadableString(skippedAlarmTimes));
                         analytics.save();
 
                         SystemNotification systemNotification = SystemNotification.getInstance(context);
@@ -487,6 +487,23 @@ public class GlobalManager {
         }
 
         onAlarmSetNew(systemAlarm);
+    }
+
+    /**
+     * Formats skipped alarm list to a string which can be used in the Analytics.
+     *
+     * @param calendars List of skipped alarm times
+     * @return String to use in the Analytics
+     */
+    private String calendarsToReadableString(List<Calendar> calendars) {
+        StringBuilder str = new StringBuilder();
+        int i = 0;
+        for (Calendar calendar : calendars) {
+            if (0 < i++)
+                str.append("; ");
+            str.append(calendar.getTime().toString());
+        }
+        return str.toString();
     }
 
     /**
