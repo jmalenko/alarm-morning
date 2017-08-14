@@ -32,7 +32,7 @@ public class BootReceiver extends BroadcastReceiver {
 
         Log.i(TAG, "Starting CheckAlarmTime on boot");
         CheckAlarmTime checkAlarmTime = CheckAlarmTime.getInstance(context);
-        checkAlarmTime.checkAndRegisterCheckAlarmTime();
+        checkAlarmTime.checkAndRegister();
 
         Log.i(TAG, "Starting NighttimeBell on boot");
         NighttimeBell nighttimeBell = NighttimeBell.getInstance(context);

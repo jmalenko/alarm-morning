@@ -38,7 +38,7 @@ public class UpgradeReceiver extends BroadcastReceiver {
 
         Log.i(TAG, "Starting CheckAlarmTime on update");
         CheckAlarmTime checkAlarmTime = CheckAlarmTime.getInstance(context);
-        checkAlarmTime.checkAndRegisterCheckAlarmTime();
+        checkAlarmTime.checkAndRegister();
 
         Log.i(TAG, "Starting NighttimeBell on update");
         NighttimeBell nighttimeBell = NighttimeBell.getInstance(context);

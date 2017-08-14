@@ -80,8 +80,8 @@ public class CheckAlarmTime {
         return instance;
     }
 
-    public void checkAndRegisterCheckAlarmTime() {
-        Log.v(TAG, "checkAndRegisterCheckAlarmTime()");
+    public void checkAndRegister() {
+        Log.v(TAG, "checkAndRegister()");
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         boolean checkAlarmTimePreference = preferences.getBoolean(SettingsActivity.PREF_CHECK_ALARM_TIME, SettingsActivity.PREF_CHECK_ALARM_TIME_DEFAULT);
