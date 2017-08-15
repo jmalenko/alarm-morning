@@ -56,6 +56,7 @@ public class CheckAlarmTime {
     private AlarmManager alarmManager;
 
     private PendingIntent operation;
+    private PendingIntent operationDismissNotification;
 
     /**
      * Action meaning: Check alarm time of the next alarm: compare it with the 1st calendar instance. If it is too close, offer the user to quickly change the
@@ -98,7 +99,6 @@ public class CheckAlarmTime {
         String checkAlarmTimeAtPreference = preferences.getString(SettingsActivity.PREF_CHECK_ALARM_TIME_AT, SettingsActivity.PREF_CHECK_ALARM_TIME_AT_DEFAULT);
 
         register(checkAlarmTimeAtPreference);
-
     }
 
     private void register(String stringValue) {
@@ -153,9 +153,32 @@ public class CheckAlarmTime {
         Intent intentDismissNotification = new Intent(context, CheckAlarmTimeAlarmReceiver.class);
         intentDismissNotification.setAction(action);
 
-        PendingIntent operationDismissNotification = PendingIntent.getBroadcast(context, 1, intentDismissNotification, PendingIntent.FLAG_UPDATE_CURRENT);
+        operationDismissNotification = PendingIntent.getBroadcast(context, 1, intentDismissNotification, PendingIntent.FLAG_UPDATE_CURRENT);
 
         alarmManager.set(AlarmManager.RTC, time.getTimeInMillis(), operationDismissNotification);
+    }
+
+    private void unregisterNotificationDismiss(Calendar time) {
+        Log.d(TAG, "unregisterNotificationDismiss()");
+
+        if (operationDismissNotification != null) {
+            // Method 1: standard
+            Log.d(TAG, "Cancelling current system alarm");
+            operationDismissNotification.cancel();
+        } else {
+            // Method 2: try to recreate the operation
+            Log.d(TAG, "Recreating operation when cancelling system alarm");
+
+            String action = ACTION_AUTO_HIDE_NOTIFICATION;
+            Intent intentDismissNotification2 = new Intent(context, CheckAlarmTimeAlarmReceiver.class);
+            intentDismissNotification2.setAction(action);
+
+            PendingIntent operationDismissNotification2 = PendingIntent.getBroadcast(context, 1, intentDismissNotification2, PendingIntent.FLAG_NO_CREATE);
+
+            if (operationDismissNotification2 != null) {
+                operationDismissNotification2.cancel();
+            }
+        }
     }
 
     public void onReceive(Intent intent) {
@@ -175,88 +198,20 @@ public class CheckAlarmTime {
         }
     }
 
-    /**
-     * Compare the alarm time for tomorrow with the first meeting tomorrow. If the alarm time is nut sufficiently long before the meeting, then offer user to
-     * quickly change the alarm time.
-     * <p>
-     * The first meeting tomorrow is defined as follows:
-     * <p>
-     * 1. Entry appears tomorrow in the morning (between midnight and noon).
-     * <p>
-     * 2. Entry starts on the day
-     * <p>
-     * 3. Entry is not all-day
-     */
     private void onCheckAlarmTime() {
         Log.d(TAG, "onCheckAlarmTime()");
 
         // Register for tomorrow
         register();
 
-        // Find first calendar event
-        GlobalManager globalManager = GlobalManager.getInstance();
-        Clock clock = globalManager.clock();
-        Calendar now = clock.now();
-
-        Calendar tomorrowStart = beginningOfTomorrow(now);
-        Log.v(TAG, "tomorrowStart=" + tomorrowStart.getTime());
-
-        Calendar tomorrowNoon = justBeforeNoonTomorrow(now);
-        Log.v(TAG, "tomorrowNoon=" + tomorrowNoon.getTime());
-
-        // Load tomorrow's alarm time
-        Day day = globalManager.loadDay(tomorrowStart);
-        Calendar alarmTime = day.getDateTime();
-        Log.v(TAG, "alarmTime=" + alarmTime.getTime());
-
-        // Load gap
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        int checkAlarmTimeGap = preferences.getInt(SettingsActivity.PREF_CHECK_ALARM_TIME_GAP, SettingsActivity.PREF_CHECK_ALARM_TIME_GAP_DEFAULT);
-        Log.v(TAG, "checkAlarmTimeGap=" + checkAlarmTimeGap + " minutes");
-
-        Analytics analytics = new Analytics(context, Analytics.Event.Show, Analytics.Channel.Time, Analytics.ChannelName.Check_alarm_time);
-        analytics.setDay(day);
-        analytics.set(Analytics.Param.Check_alarm_time_gap, checkAlarmTimeGap);
-        // TODO Analytics - add device location
-
-        CalendarHelper calendarHelper = new CalendarHelper(context);
-        CalendarEventFilter notAllDay = new CalendarEventFilter() {
-            @Override
-            public boolean match(CalendarEvent event) {
-                return !event.getAllDay();
-            }
-        };
-        CalendarEvent event = calendarHelper.find(tomorrowStart, tomorrowNoon, notAllDay);
-
-        if (event != null) {
-            Calendar targetAlarmTime = (Calendar) event.getBegin().clone();
-            targetAlarmTime.add(Calendar.MINUTE, -checkAlarmTimeGap);
-            Log.v(TAG, "      targetAlarmTime=" + targetAlarmTime.getTime());
-
-            // TODO Currently, the alarm time must be on the same date. Support alarm on the previous day.
-            if (targetAlarmTime.before(tomorrowStart)) {
-                targetAlarmTime = tomorrowStart;
-                Log.v(TAG, "      adjusted targetAlarmTime to " + targetAlarmTime.getTime());
-            }
-
-            analytics.set(Analytics.Param.Appointment_begin, Analytics.calendarToTime(event.getBegin()));
-            analytics.set(Analytics.Param.Appointment_title, event.getTitle());
-            analytics.set(Analytics.Param.Appointment_location, event.getLocation());
-
-            if (!day.isEnabled() || targetAlarmTime.before(alarmTime)) {
-                Log.d(TAG, "Appointment that needs and earlier alarm time found");
-                analytics.set(Analytics.Param.Check_alarm_time_action, CHECK_ALARM_TIME_ACTION__SHOW_NOTIFICATION);
-
-                showNotification(day, targetAlarmTime, checkAlarmTimeGap, event);
-                registerNotificationDismiss(targetAlarmTime);
-            } else {
-                analytics.set(Analytics.Param.Check_alarm_time_action, CHECK_ALARM_TIME_ACTION__DON_T_SHOW_NOTIFICATION);
-            }
-        } else {
-            analytics.set(Analytics.Param.Check_alarm_time_action, CHECK_ALARM_TIME_ACTION__NO_APPOINTMENT);
+        MorningInfo morningInfo = new MorningInfo(context);
+        if (morningInfo.attentionNeeded) {
+            showNotification(morningInfo.day, morningInfo.targetAlarmTime, morningInfo.checkAlarmTimeGap, morningInfo.event);
+            registerNotificationDismiss(morningInfo.targetAlarmTime);
         }
 
-        analytics.save();
+        // Save analytics
+        morningInfo.analytics.save();
     }
 
     private void onAutoHideNotification() {
@@ -355,4 +310,129 @@ public class CheckAlarmTime {
         return time;
     }
 
+    /*
+     * Events
+     * ======
+     */
+
+    public void onAlarmSet() {
+        Log.d(TAG, "onAlarmSet()");
+
+        MorningInfo morningInfo = new MorningInfo(context);
+
+        // If the alarm time was changed to a time long enough before the first meeting and notication exists, then hide the notification
+        if (!morningInfo.attentionNeeded) {
+            unregisterNotificationDismiss(morningInfo.targetAlarmTime);
+            hideNotification();
+
+            // Modify and save analytics
+            Analytics analytics = new Analytics(context, Analytics.Event.Hide, Analytics.Channel.External, Analytics.ChannelName.Check_alarm_time);
+            analytics.set(Analytics.Param.Check_alarm_time_action, CHECK_ALARM_TIME_ACTION__DON_T_SHOW_NOTIFICATION);
+            analytics.setDay(morningInfo.day);
+            analytics.set(Analytics.Param.Check_alarm_time_gap, morningInfo.checkAlarmTimeGap);
+            analytics.set(Analytics.Param.Appointment_begin, Analytics.calendarToTime(morningInfo.event.getBegin()));
+            analytics.set(Analytics.Param.Appointment_title, morningInfo.event.getTitle());
+            analytics.set(Analytics.Param.Appointment_location, morningInfo.event.getLocation());
+            analytics.save();
+        }
+    }
+
+}
+
+class MorningInfo {
+    private static final String TAG = SystemAlarm.class.getSimpleName();
+
+    private final Context context;
+
+    Day day;
+    int checkAlarmTimeGap;
+    Analytics analytics;
+    CalendarEvent event;
+    Calendar targetAlarmTime;
+    boolean attentionNeeded;
+
+    MorningInfo(Context context) {
+        this.context = context;
+        init();
+    }
+
+    /**
+     * Compare the alarm time for tomorrow with the first meeting tomorrow. If the alarm time is nut sufficiently long before the meeting, then offer user to
+     * quickly change the alarm time.
+     * <p>
+     * The first meeting tomorrow is defined as follows:
+     * <p>
+     * 1. Entry appears tomorrow in the morning (between midnight and noon).
+     * <p>
+     * 2. Entry starts on the day
+     * <p>
+     * 3. Entry is not all-day
+     */
+    private void init() {
+        Log.d(TAG, "onCheckAlarmTime()");
+
+        // Find first calendar event
+        GlobalManager globalManager = GlobalManager.getInstance();
+        Clock clock = globalManager.clock();
+        Calendar now = clock.now();
+
+        Calendar tomorrowStart = beginningOfTomorrow(now);
+        Log.v(TAG, "tomorrowStart=" + tomorrowStart.getTime());
+
+        Calendar tomorrowNoon = justBeforeNoonTomorrow(now);
+        Log.v(TAG, "tomorrowNoon=" + tomorrowNoon.getTime());
+
+        // Load tomorrow's alarm time
+        day = globalManager.loadDay(tomorrowStart);
+        Calendar alarmTime = day.getDateTime();
+        Log.v(TAG, "alarmTime=" + alarmTime.getTime());
+
+        // Load gap
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        checkAlarmTimeGap = preferences.getInt(SettingsActivity.PREF_CHECK_ALARM_TIME_GAP, SettingsActivity.PREF_CHECK_ALARM_TIME_GAP_DEFAULT);
+        Log.v(TAG, "checkAlarmTimeGap=" + checkAlarmTimeGap + " minutes");
+
+        analytics = new Analytics(context, Analytics.Event.Show, Analytics.Channel.Time, Analytics.ChannelName.Check_alarm_time);
+        analytics.setDay(day);
+        analytics.set(Analytics.Param.Check_alarm_time_gap, checkAlarmTimeGap);
+        // TODO Analytics - add device location
+
+        CalendarHelper calendarHelper = new CalendarHelper(context);
+        CalendarEventFilter notAllDay = new CalendarEventFilter() {
+            @Override
+            public boolean match(CalendarEvent event) {
+                return !event.getAllDay();
+            }
+        };
+        event = calendarHelper.find(tomorrowStart, tomorrowNoon, notAllDay);
+
+        if (event != null) {
+            targetAlarmTime = (Calendar) event.getBegin().clone();
+            targetAlarmTime.add(Calendar.MINUTE, -checkAlarmTimeGap);
+            Log.v(TAG, "      targetAlarmTime=" + targetAlarmTime.getTime());
+
+            // TODO Currently, the alarm time must be on the same date. Support alarm on the previous day.
+            if (targetAlarmTime.before(tomorrowStart)) {
+                targetAlarmTime = tomorrowStart;
+                Log.v(TAG, "      adjusted targetAlarmTime to " + targetAlarmTime.getTime());
+            }
+
+            analytics.set(Analytics.Param.Appointment_begin, Analytics.calendarToTime(event.getBegin()));
+            analytics.set(Analytics.Param.Appointment_title, event.getTitle());
+            analytics.set(Analytics.Param.Appointment_location, event.getLocation());
+
+            attentionNeeded = !day.isEnabled() || targetAlarmTime.before(alarmTime);
+            if (attentionNeeded) {
+                Log.d(TAG, "Appointment that needs and earlier alarm time found");
+                analytics.set(Analytics.Param.Check_alarm_time_action, CHECK_ALARM_TIME_ACTION__SHOW_NOTIFICATION);
+            } else {
+                analytics.set(Analytics.Param.Check_alarm_time_action, CHECK_ALARM_TIME_ACTION__DON_T_SHOW_NOTIFICATION);
+            }
+        } else {
+            attentionNeeded = false;
+            targetAlarmTime = null;
+
+            analytics.set(Analytics.Param.Check_alarm_time_action, CHECK_ALARM_TIME_ACTION__NO_APPOINTMENT);
+        }
+    }
 }

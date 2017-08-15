@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Set;
 
 import cz.jaro.alarmmorning.calendar.CalendarUtils;
+import cz.jaro.alarmmorning.checkalarmtime.CheckAlarmTime;
 import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.clock.SystemClock;
 import cz.jaro.alarmmorning.model.AlarmDataSource;
@@ -605,6 +606,9 @@ public class GlobalManager {
 
             onAlarmSetNew(systemAlarm);
         }
+
+        CheckAlarmTime checkAlarmTime = CheckAlarmTime.getInstance(context);
+        checkAlarmTime.onAlarmSet();
 
         updateCalendarActivity(context, AlarmMorningActivity.ACTION_ALARM_SET);
     }
