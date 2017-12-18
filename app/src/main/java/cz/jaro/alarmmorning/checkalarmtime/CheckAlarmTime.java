@@ -23,6 +23,7 @@ import cz.jaro.alarmmorning.SystemAlarm;
 import cz.jaro.alarmmorning.calendar.CalendarEvent;
 import cz.jaro.alarmmorning.calendar.CalendarEventFilter;
 import cz.jaro.alarmmorning.calendar.CalendarHelper;
+import cz.jaro.alarmmorning.calendar.CalendarUtils;
 import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.graphics.TimePreference;
 import cz.jaro.alarmmorning.model.Day;
@@ -43,12 +44,10 @@ import static cz.jaro.alarmmorning.calendar.CalendarUtils.roundDown;
  */
 public class CheckAlarmTime {
 
-    // TODO Monitor the calendar instance that caused the alarm time change. Handle actions (time change, delete) accordingly.
-    // TODO Monitor new calendar instances that could cause the alarm time change. Handle accordingly.
-
     private static final String TAG = SystemAlarm.class.getSimpleName();
 
     private static final int NOTIFICATION_ID = 1;
+    private static final int REQUEST_CODE = 1;
 
     private static CheckAlarmTime instance;
 
@@ -193,6 +192,9 @@ public class CheckAlarmTime {
             case ACTION_AUTO_HIDE_NOTIFICATION:
                 onAutoHideNotification();
                 break;
+            case Intent.ACTION_PROVIDER_CHANGED:
+                onCalendarUpdated();
+                break;
             default:
                 throw new IllegalArgumentException("Unexpected argument " + action);
         }
@@ -207,7 +209,7 @@ public class CheckAlarmTime {
         MorningInfo morningInfo = new MorningInfo(context);
         if (morningInfo.attentionNeeded) {
             showNotification(morningInfo.day, morningInfo.targetAlarmTime, morningInfo.checkAlarmTimeGap, morningInfo.event);
-            registerNotificationDismiss(morningInfo.targetAlarmTime);
+            registerNotificationDismiss(morningInfo.alarmTime);
         }
 
         // Save analytics
@@ -219,6 +221,72 @@ public class CheckAlarmTime {
         new Analytics(context, Analytics.Event.Hide, Analytics.Channel.Time, Analytics.ChannelName.Check_alarm_time).save();
 
         hideNotification();
+    }
+
+    /**
+     * Note that Android broadcast and Intent "something happed with calendar" (specifically the PROVIDER_CHANGED action). However this intent doesn't have any
+     * attributes describing what happened. Therefore all the calendar events must be checked.
+     */
+    private void onCalendarUpdated() {
+        boolean betweenCheckAlarmTimeAndAlarmTime = isBetweenCheckAlarmTimeAndAlarmTime();
+        if (betweenCheckAlarmTimeAndAlarmTime) {
+            boolean notificationVisible = isNotificationVisible();
+            MorningInfo morningInfo = new MorningInfo(context);
+            if (morningInfo.attentionNeeded) {
+                if (notificationVisible) {
+                    // TODO Update notification if the target alarm time changed
+                    boolean targetAlarmTimeChanged = true;
+                    if (targetAlarmTimeChanged) {
+                        showNotification(morningInfo.day, morningInfo.targetAlarmTime, morningInfo.checkAlarmTimeGap, morningInfo.event);
+                    }
+
+                } else {
+                    // TODO Show notification but ignore if the user already dismissed the notification about this event (maybe only duration changed)
+                    boolean dismissedNotification = false;
+                    if (!dismissedNotification) {
+                        showNotification(morningInfo.day, morningInfo.targetAlarmTime, morningInfo.checkAlarmTimeGap, morningInfo.event);
+                        registerNotificationDismiss(morningInfo.alarmTime);
+                    }
+                }
+            } else {
+                if (notificationVisible) {
+                    // Hide notification
+                    unregisterNotificationDismiss(morningInfo.targetAlarmTime);
+                    hideNotification();
+                }
+            }
+        }
+    }
+
+    /**
+     * Checks that the current time is after the check alarm time and before the alarm time tomorrow.
+     *
+     * @return True iff the current time is after the check alarm time and before the alarm time tomorrow. If the alarm is disabled tomorrow, then return true,
+     */
+    private boolean isBetweenCheckAlarmTimeAndAlarmTime() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String checkAlarmTimeAtPreference = preferences.getString(SettingsActivity.PREF_CHECK_ALARM_TIME_AT, SettingsActivity.PREF_CHECK_ALARM_TIME_AT_DEFAULT);
+
+        GlobalManager globalManager = GlobalManager.getInstance();
+        Clock clock = globalManager.clock();
+        Calendar now = clock.now();
+
+        Calendar checkAlarmTimeAt = calcLastOccurence(checkAlarmTimeAtPreference);
+
+        Calendar checkAlarmTimeAtToday = calcTodaysOccurence(checkAlarmTimeAtPreference);
+        Calendar date = now.before(checkAlarmTimeAtToday) ? CalendarUtils.beginningOfToday(now) : CalendarUtils.beginningOfTomorrow(now);
+        Day day = globalManager.loadDay(date);
+
+        Log.v(TAG, !day.isEnabled() ? "Alarm is disabled on " + day.getDate().getTime().toString() : "Is now in period between" + checkAlarmTimeAt.getTime().toString() + " and " + day.getDateTime().getTime().toString());
+        boolean res = !day.isEnabled() || (now.after(checkAlarmTimeAt) && now.before(day.getDateTime()));
+        Log.d(TAG, "isBetweenCheckAlarmTimeAndAlarmTime() returns " + res);
+        return res;
+    }
+
+    private boolean isNotificationVisible() {
+        Intent notificationIntent = new Intent(context, CheckAlarmTimeNotificationReceiver.class);
+        PendingIntent test = PendingIntent.getBroadcast(context, REQUEST_CODE, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        return test != null;
     }
 
     private void showNotification(Day day, Calendar targetAlarmTime, int checkAlarmTimeGapPreference, CalendarEvent event) {
@@ -249,12 +317,12 @@ public class CheckAlarmTime {
 
         Intent intent = new Intent(context, CheckAlarmTimeNotificationReceiver.class);
         intent.setAction(CheckAlarmTimeNotificationReceiver.ACTION_CHECK_ALARM_TIME_CLICK);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, REQUEST_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.setContentIntent(pendingIntent);
 
         Intent deleteIntent = new Intent(context, CheckAlarmTimeNotificationReceiver.class);
         deleteIntent.setAction(CheckAlarmTimeNotificationReceiver.ACTION_CHECK_ALARM_TIME_DELETE);
-        PendingIntent deletePendingIntent = PendingIntent.getBroadcast(context, 1, deleteIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent deletePendingIntent = PendingIntent.getBroadcast(context, REQUEST_CODE, deleteIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.setDeleteIntent(deletePendingIntent);
 
         String targetTimeText = Localization.timeToString(targetAlarmTime.get(Calendar.HOUR_OF_DAY), targetAlarmTime.get(Calendar.MINUTE), context);
@@ -262,14 +330,14 @@ public class CheckAlarmTime {
         Intent setIntent = new Intent(context, CheckAlarmTimeNotificationReceiver.class);
         setIntent.setAction(CheckAlarmTimeNotificationReceiver.ACTION_CHECK_ALARM_TIME_SET_TO);
         setIntent.putExtra(CheckAlarmTimeNotificationReceiver.EXTRA_NEW_ALARM_TIME, targetAlarmTime.getTimeInMillis());
-        PendingIntent setPendingIntent = PendingIntent.getBroadcast(context, 1, setIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent setPendingIntent = PendingIntent.getBroadcast(context, REQUEST_CODE, setIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.addAction(R.drawable.ic_alarm_on_white, setText, setPendingIntent);
 
         String dialogText = res.getString(R.string.notification_check_text_set_dialog);
         Intent dialogIntent = new Intent(context, CheckAlarmTimeNotificationReceiver.class);
         dialogIntent.setAction(CheckAlarmTimeNotificationReceiver.ACTION_CHECK_ALARM_TIME_SET_DIALOG);
         dialogIntent.putExtra(CheckAlarmTimeNotificationReceiver.EXTRA_NEW_ALARM_TIME, targetAlarmTime.getTimeInMillis());
-        PendingIntent dialogPendingIntent = PendingIntent.getBroadcast(context, 1, dialogIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent dialogPendingIntent = PendingIntent.getBroadcast(context, REQUEST_CODE, dialogIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.addAction(R.drawable.ic_alarm_white, dialogText, dialogPendingIntent);
 
         NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -290,22 +358,61 @@ public class CheckAlarmTime {
      */
     @NonNull
     static public Calendar calcNextOccurence(String timePreference) {
-        int hours = TimePreference.getHour(timePreference);
-        int minutes = TimePreference.getMinute(timePreference);
-
         GlobalManager globalManager = GlobalManager.getInstance();
         Clock clock = globalManager.clock();
         Calendar now = clock.now();
 
-        Calendar time = (Calendar) now.clone();
-        time.set(Calendar.HOUR_OF_DAY, hours);
-        time.set(Calendar.MINUTE, minutes);
-        roundDown(time, Calendar.SECOND);
+        Calendar time = calcTodaysOccurence(timePreference);
 
         // If in the past, then shift to tomorrow
         if (time.before(now)) {
             time.add(Calendar.DAY_OF_MONTH, 1);
         }
+
+        return time;
+    }
+
+    /**
+     * Calculate the date and time of the last event that is occurring daily at {@code timePreference}.
+     *
+     * @param timePreference a string representation of {@link TimePreference} value
+     * @return Calendar with next event
+     */
+    @NonNull
+    static public Calendar calcLastOccurence(String timePreference) {
+        GlobalManager globalManager = GlobalManager.getInstance();
+        Clock clock = globalManager.clock();
+        Calendar now = clock.now();
+
+        Calendar time = calcTodaysOccurence(timePreference);
+
+        // If in the future, then shift to yesterday
+        if (now.before(time)) {
+            time.add(Calendar.DAY_OF_MONTH, -1);
+        }
+
+        return time;
+    }
+
+    /**
+     * Calculate the date and time of the today's event that is occurring daily at {@code timePreference}.
+     *
+     * @param timePreference a string representation of {@link TimePreference} value
+     * @return Calendar with next event
+     */
+    @NonNull
+    static public Calendar calcTodaysOccurence(String timePreference) {
+        GlobalManager globalManager = GlobalManager.getInstance();
+        Clock clock = globalManager.clock();
+        Calendar now = clock.now();
+
+        int hours = TimePreference.getHour(timePreference);
+        int minutes = TimePreference.getMinute(timePreference);
+
+        Calendar time = (Calendar) now.clone();
+        time.set(Calendar.HOUR_OF_DAY, hours);
+        time.set(Calendar.MINUTE, minutes);
+        roundDown(time, Calendar.SECOND);
 
         return time;
     }
@@ -348,6 +455,7 @@ class MorningInfo {
     int checkAlarmTimeGap;
     Analytics analytics;
     CalendarEvent event;
+    Calendar alarmTime;
     Calendar targetAlarmTime;
     boolean attentionNeeded;
 
@@ -384,7 +492,7 @@ class MorningInfo {
 
         // Load tomorrow's alarm time
         day = globalManager.loadDay(tomorrowStart);
-        Calendar alarmTime = day.getDateTime();
+        alarmTime = day.getDateTime();
         Log.v(TAG, "alarmTime=" + alarmTime.getTime());
 
         // Load gap
