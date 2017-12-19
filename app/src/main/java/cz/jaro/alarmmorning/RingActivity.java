@@ -24,6 +24,8 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
 
+import com.google.firebase.crash.FirebaseCrash;
+
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.HashSet;
@@ -149,6 +151,34 @@ public class RingActivity extends Activity implements RingInterface {
             mAlarmTime = (Calendar) savedInstanceState.getSerializable(ALARM_TIME);
         } else {
             mAlarmTime = (Calendar) getIntent().getSerializableExtra(ALARM_TIME);
+        }
+
+        if (mAlarmTime == null) {
+            // TODO This should not happen, but it does sometimes (see crash reporting). Therefore we log everything. Possible explanation is that the users
+            // manually start this activity directly without specifying the extra.
+            StringBuilder str = new StringBuilder();
+            str.append("Stack trace:\n");
+            str.append(Log.getStackTraceString(new IllegalStateException("Alarm time should not be null")));
+            str.append("\n");
+            str.append("Debug info:\n");
+            str.append("savedInstanceState is" + (savedInstanceState == null ? "" : " not") + " null");
+            str.append("\n");
+            str.append("\n");
+            str.append("Analytics:\n");
+            str.append(this.toString());
+            str.append("\n");
+            str.append("\n");
+            str.append("Analytics with configuration info\n");
+            Analytics analytics = new Analytics(this, Analytics.Event.Ring, Analytics.Channel.External, Analytics.ChannelName.Ring);
+            analytics.setConfigurationInfo();
+            str.append(analytics.toString());
+            str.append("\n");
+            str.append("\n");
+            str.append("Database dump:\n");
+            GlobalManager globalManager = GlobalManager.getInstance();
+            str.append(globalManager.dumpDB());
+
+            FirebaseCrash.log(str.toString());
         }
 
         SlideButton dismissButton = (SlideButton) findViewById(R.id.dismissButton);
@@ -389,19 +419,23 @@ public class RingActivity extends Activity implements RingInterface {
         timeView.setText(currentTimeString);
 
         TextView alarmTimeView = (TextView) findViewById(R.id.alarmTime);
-        if (onTheSameMinute(mAlarmTime, now)) {
-            alarmTimeView.setVisibility(View.INVISIBLE);
-        } else {
-            String alarmTimeText;
-            String timeStr = Localization.timeToString(mAlarmTime.getTime(), getBaseContext());
-            if (onTheSameDate(mAlarmTime, now)) {
-                alarmTimeText = res.getString(R.string.alarm_was_set_to_today, timeStr);
+        if (mAlarmTime != null) {
+            if (onTheSameMinute(mAlarmTime, now)) {
+                alarmTimeView.setVisibility(View.INVISIBLE);
             } else {
-                String dateStr = Localization.dateToStringFull(res, mAlarmTime.getTime());
-                alarmTimeText = res.getString(R.string.alarm_was_set_to_nontoday, timeStr, dateStr);
+                String alarmTimeText;
+                String timeStr = Localization.timeToString(mAlarmTime.getTime(), getBaseContext());
+                if (onTheSameDate(mAlarmTime, now)) {
+                    alarmTimeText = res.getString(R.string.alarm_was_set_to_today, timeStr);
+                } else {
+                    String dateStr = Localization.dateToStringFull(res, mAlarmTime.getTime());
+                    alarmTimeText = res.getString(R.string.alarm_was_set_to_nontoday, timeStr, dateStr);
+                }
+                alarmTimeView.setText(alarmTimeText);
+                alarmTimeView.setVisibility(View.VISIBLE);
             }
-            alarmTimeView.setText(alarmTimeText);
-            alarmTimeView.setVisibility(View.VISIBLE);
+        } else {
+            alarmTimeView.setVisibility(View.INVISIBLE);
         }
 
         /*
