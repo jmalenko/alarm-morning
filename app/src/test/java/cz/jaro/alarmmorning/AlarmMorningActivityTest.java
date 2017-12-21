@@ -8,7 +8,9 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.preference.PreferenceManager;
+import android.support.design.widget.NavigationView;
 import android.support.v7.widget.RecyclerView;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
@@ -119,6 +121,140 @@ public class AlarmMorningActivityTest extends FixedTimeTest {
         ShadowActivity shadowActivity = Shadows.shadowOf(activity);
 
         shadowActivity.clickMenuItem(R.id.navigation_website);
+
+        Intent intent = shadowActivity.peekNextStartedActivity();
+        assertThat(intent.getAction()).isEqualTo(Intent.ACTION_VIEW);
+    }
+
+    @Test
+    public void menu_startUserGuideActivity() {
+        saveWizardPreference(!Wizard.PREF_WIZARD_DEFAULT);
+
+        AlarmMorningActivity activity = Robolectric.setupActivity(AlarmMorningActivity.class);
+        ShadowActivity shadowActivity = Shadows.shadowOf(activity);
+
+        shadowActivity.clickMenuItem(R.id.navigation_user_guide);
+
+        Intent intent = shadowActivity.peekNextStartedActivity();
+        assertThat(intent.getAction()).isEqualTo(Intent.ACTION_VIEW);
+    }
+
+    @Test
+    public void menu_startChangeLogActivity() {
+        saveWizardPreference(!Wizard.PREF_WIZARD_DEFAULT);
+
+        AlarmMorningActivity activity = Robolectric.setupActivity(AlarmMorningActivity.class);
+        ShadowActivity shadowActivity = Shadows.shadowOf(activity);
+
+        shadowActivity.clickMenuItem(R.id.navigation_change_log);
+
+        Intent intent = shadowActivity.peekNextStartedActivity();
+        assertThat(intent.getAction()).isEqualTo(Intent.ACTION_VIEW);
+    }
+
+    @Test
+    public void menu_startReportBugActivity() {
+        saveWizardPreference(!Wizard.PREF_WIZARD_DEFAULT);
+
+        AlarmMorningActivity activity = Robolectric.setupActivity(AlarmMorningActivity.class);
+        ShadowActivity shadowActivity = Shadows.shadowOf(activity);
+
+        shadowActivity.clickMenuItem(R.id.navigation_report_bug);
+
+        Intent intent = shadowActivity.peekNextStartedActivity();
+        assertThat(intent.getAction()).isEqualTo(Intent.ACTION_VIEW);
+    }
+
+    @Test
+    public void menu_visibleTranslate_translatedLangugeAndCountry() {
+        saveWizardPreference(!Wizard.PREF_WIZARD_DEFAULT);
+
+        Context context = RuntimeEnvironment.application.getApplicationContext();
+        setLocale(context, "en", "US");
+
+        AlarmMorningActivity activity = Robolectric.setupActivity(AlarmMorningActivity.class);
+        ShadowActivity shadowActivity = Shadows.shadowOf(activity);
+
+        NavigationView mNavigationView = (NavigationView) shadowActivity.findViewById(R.id.left_drawer);
+        MenuItem menuItem = mNavigationView.getMenu().findItem(R.id.navigation_translate);
+
+        assertThat(menuItem.isVisible()).isEqualTo(false);
+    }
+
+    @Test
+    public void menu_visibleTranslate_translatedLangugeOnly() {
+        saveWizardPreference(!Wizard.PREF_WIZARD_DEFAULT);
+
+        Context context = RuntimeEnvironment.application.getApplicationContext();
+        setLocale(context, "en", "GB");
+
+        AlarmMorningActivity activity = Robolectric.setupActivity(AlarmMorningActivity.class);
+        ShadowActivity shadowActivity = Shadows.shadowOf(activity);
+
+        NavigationView mNavigationView = (NavigationView) shadowActivity.findViewById(R.id.left_drawer);
+        MenuItem menuItem = mNavigationView.getMenu().findItem(R.id.navigation_translate);
+
+        assertThat(menuItem.isVisible()).isEqualTo(true);
+
+        CharSequence title = menuItem.getTitle();
+        CharSequence language = title.subSequence(title.length() - 14, title.length());
+        assertThat(language).isEqualTo("United Kingdom");
+    }
+
+    @Test
+    public void menu_visibleTranslate_not_translated() {
+        saveWizardPreference(!Wizard.PREF_WIZARD_DEFAULT);
+
+        Context context = RuntimeEnvironment.application.getApplicationContext();
+        setLocale(context, "sk", "SK");
+
+        AlarmMorningActivity activity = Robolectric.setupActivity(AlarmMorningActivity.class);
+        ShadowActivity shadowActivity = Shadows.shadowOf(activity);
+
+        NavigationView mNavigationView = (NavigationView) shadowActivity.findViewById(R.id.left_drawer);
+        MenuItem menuItem = mNavigationView.getMenu().findItem(R.id.navigation_translate);
+
+        assertThat(menuItem.isVisible()).isEqualTo(true);
+
+        CharSequence title = menuItem.getTitle();
+        CharSequence language = title.subSequence(title.length() - 10, title.length());
+        assertThat(language).isEqualTo("Slovenčina");
+    }
+
+    @Test
+    public void menu_startTranslateActivity() {
+        saveWizardPreference(!Wizard.PREF_WIZARD_DEFAULT);
+
+        AlarmMorningActivity activity = Robolectric.setupActivity(AlarmMorningActivity.class);
+        ShadowActivity shadowActivity = Shadows.shadowOf(activity);
+
+        shadowActivity.clickMenuItem(R.id.navigation_translate);
+
+        Intent intent = shadowActivity.peekNextStartedActivity();
+        assertThat(intent.getAction()).isEqualTo(Intent.ACTION_VIEW);
+    }
+
+    @Test
+    public void menu_startRateActivity() {
+        saveWizardPreference(!Wizard.PREF_WIZARD_DEFAULT);
+
+        AlarmMorningActivity activity = Robolectric.setupActivity(AlarmMorningActivity.class);
+        ShadowActivity shadowActivity = Shadows.shadowOf(activity);
+
+        shadowActivity.clickMenuItem(R.id.navigation_rate);
+
+        Intent intent = shadowActivity.peekNextStartedActivity();
+        assertThat(intent.getAction()).isEqualTo(Intent.ACTION_VIEW);
+    }
+
+    @Test
+    public void menu_startDonateActivity() {
+        saveWizardPreference(!Wizard.PREF_WIZARD_DEFAULT);
+
+        AlarmMorningActivity activity = Robolectric.setupActivity(AlarmMorningActivity.class);
+        ShadowActivity shadowActivity = Shadows.shadowOf(activity);
+
+        shadowActivity.clickMenuItem(R.id.navigation_donate);
 
         Intent intent = shadowActivity.peekNextStartedActivity();
         assertThat(intent.getAction()).isEqualTo(Intent.ACTION_VIEW);

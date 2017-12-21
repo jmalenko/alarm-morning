@@ -19,12 +19,15 @@ package cz.jaro.alarmmorning;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.content.LocalBroadcastManager;
@@ -38,6 +41,10 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 
 import cz.jaro.alarmmorning.nighttimebell.CustomAlarmTone;
 import cz.jaro.alarmmorning.wizard.Wizard;
@@ -54,7 +61,14 @@ public class AlarmMorningActivity extends AppCompatActivity {
     public static final String ACTION_SNOOZE = "SNOOZE";
     public static final String ACTION_CANCEL = "CANCEL";
 
-    private final static String url = "https://github.com/jmalenko/alarm-morning/wiki";
+    public static final String URL_WEBSITE = "https://github.com/jmalenko/alarm-morning/wiki";
+    public static final String URL_USER_GUIDE = "https://github.com/jmalenko/alarm-morning/wiki/User-Guide";
+    public static final String URL_CHANGE_LOG = "https://github.com/jmalenko/alarm-morning/wiki/Change-Log";
+    public static final String URL_REPORT_BUG = "https://github.com/jmalenko/alarm-morning/issues";
+    public static final String URL_TRANSLATE = "https://crowdin.com/project/alarm-morning";
+    public static final String URL_DONATE = "https://www.paypal.me/jaromirmalenko/10usd";
+
+    private static final List<String> TRANSLATIONS = Arrays.asList("en_US", "cs_CZ"); // TODO Set programmatically (when that becomes possible in Android). For now, keep consistent with res\values directories. https://stackoverflow.com/questions/34797956/android-programmatically-check-if-app-is-localized-for-a-language
 
     public static final int REQUEST_CODE_WIZARD = 1;
 
@@ -201,6 +215,33 @@ public class AlarmMorningActivity extends AppCompatActivity {
             MenuItem calendarMenu = mNavigationView.getMenu().findItem(R.id.navigation_calendar);
             highlightMenuItem(calendarMenu);
         }
+
+        // Show Translate menu item only if the user language is not translatedLanguageAndCountry
+        Resources resources = getResources();
+        MenuItem translateMenuItem = mNavigationView.getMenu().findItem(R.id.navigation_translate);
+
+        Locale locale = Locale.getDefault();
+        boolean translatedLanguageAndCountry = TRANSLATIONS.contains(locale.getLanguage() + "_" + locale.getCountry());
+
+        if (translatedLanguageAndCountry) {
+            translateMenuItem.setVisible(false);
+        } else {
+            boolean translatedLanguage = false;
+            for (String translation : TRANSLATIONS) {
+                String[] localeTranslation = translation.split("_");
+                if (locale.getLanguage().equals(localeTranslation[0])) {
+                    translatedLanguage = true;
+                    break;
+                }
+            }
+
+            String displayLanguage = Locale.getDefault().getDisplayLanguage();
+            String displayCountry = Locale.getDefault().getDisplayCountry();
+            String title = translatedLanguage ? resources.getString(R.string.menu_translate2_title, displayLanguage, displayCountry) : resources.getString(R.string.menu_translate1_title, displayLanguage);
+
+            translateMenuItem.setTitle(title);
+            translateMenuItem.setVisible(true);
+        }
     }
 
     @Override
@@ -280,13 +321,25 @@ public class AlarmMorningActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Analytics analytics = new Analytics(this, Analytics.Event.Click, Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
+        String analyticsTarget;
+
         switch (item.getItemId()) {
             case android.R.id.home:
                 // The action bar home/up action should open or close the drawer.
-                if (isNavigationDrawerOpen())
+                if (isNavigationDrawerOpen()) {
                     closeNavigationDrawer();
-                else
+
+                    analyticsTarget = Analytics.TARGET_MENU_ACTION_CLOSE;
+                } else {
                     openNavigationDrawer();
+
+                    analyticsTarget = Analytics.TARGET_MENU_ACTION_OPEN;
+                }
+
+                analytics.set(Analytics.Param.Target, analyticsTarget);
+                analytics.save();
+
                 return true;
 
             case R.id.navigation_calendar:
@@ -298,21 +351,79 @@ public class AlarmMorningActivity extends AppCompatActivity {
                 // Highlight the selected item, update the title, and close the drawer
                 highlightMenuItem(item);
                 setFragmentTitle(item.getTitle());
+
+                analyticsTarget = Analytics.TARGET_MENU_CALENDAR;
+
                 break;
 
             case R.id.navigation_defaults:
                 Intent defaultsActivityIntent = new Intent(this, DefaultsActivity.class);
                 startActivity(defaultsActivityIntent);
+
+                analyticsTarget = Analytics.TARGET_MENU_DEFAULTS;
+
                 break;
 
             case R.id.navigation_settings:
                 Intent settingsActivityIntent = new Intent(this, SettingsActivity.class);
                 startActivity(settingsActivityIntent);
+
+                analyticsTarget = Analytics.TARGET_MENU_SETTINGS;
+
                 break;
 
             case R.id.navigation_website:
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                startActivity(browserIntent);
+                Intent websiteIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(URL_WEBSITE));
+                startActivity(websiteIntent);
+
+                analyticsTarget = Analytics.TARGET_MENU_WEBSITE;
+
+                break;
+
+            case R.id.navigation_user_guide:
+                Intent userGuideIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(URL_USER_GUIDE));
+                startActivity(userGuideIntent);
+
+                analyticsTarget = Analytics.TARGET_MENU_USER_GUIDE;
+
+                break;
+
+            case R.id.navigation_change_log:
+                Intent changeLogIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(URL_CHANGE_LOG));
+                startActivity(changeLogIntent);
+
+                analyticsTarget = Analytics.TARGET_MENU_CHANGE_LOG;
+
+                break;
+
+            case R.id.navigation_report_bug:
+                Intent reportBugIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(URL_REPORT_BUG));
+                startActivity(reportBugIntent);
+
+                analyticsTarget = Analytics.TARGET_MENU_REPORT_BUG;
+
+                break;
+
+            case R.id.navigation_translate:
+                Intent translateIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(URL_TRANSLATE));
+                startActivity(translateIntent);
+
+                analyticsTarget = Analytics.TARGET_MENU_TRANSLATE;
+
+                break;
+
+            case R.id.navigation_rate:
+                rateApp();
+
+                analyticsTarget = Analytics.TARGET_MENU_RATE;
+                break;
+
+            case R.id.navigation_donate:
+                Intent donateIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(URL_DONATE));
+                startActivity(donateIntent);
+
+                analyticsTarget = Analytics.TARGET_MENU_DONATE;
+
                 break;
 
             default:
@@ -320,6 +431,11 @@ public class AlarmMorningActivity extends AppCompatActivity {
         }
 
         closeNavigationDrawer();
+
+        analytics.set(Analytics.Param.Target, analyticsTarget);
+        analytics.set(Analytics.Param.Target, analyticsTarget);
+        analytics.save();
+
         return true;
     }
 
@@ -337,5 +453,40 @@ public class AlarmMorningActivity extends AppCompatActivity {
         super.onConfigurationChanged(newConfig);
         // Pass any configuration change to the drawer toggls
         mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    /**
+     * Start with rating the app.
+     * Determine if the Play Store app is installed on the device.
+     */
+    public void rateApp() {
+        try {
+            Intent rateIntent = rateIntentForUrl("market://details?id=");
+            startActivity(rateIntent);
+            Log.d(TAG, "Started rating in Google Play app");
+        } catch (ActivityNotFoundException e) {
+            try {
+                Intent rateIntent = rateIntentForUrl("amzn://apps/android?p=");
+                startActivity(rateIntent);
+                Log.d(TAG, "Started rating in Amazon app");
+            } catch (ActivityNotFoundException e2) {
+                Intent rateIntent = rateIntentForUrl("https://play.google.com/store/apps/details?id=");
+                startActivity(rateIntent);
+                Log.d(TAG, "Started rating in Google Play website");
+            }
+        }
+    }
+
+    private Intent rateIntentForUrl(String uri) {
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri + getPackageName()));
+        int flags = Intent.FLAG_ACTIVITY_NO_HISTORY | Intent.FLAG_ACTIVITY_MULTIPLE_TASK;
+        if (Build.VERSION.SDK_INT >= 21) {
+            flags |= Intent.FLAG_ACTIVITY_NEW_DOCUMENT;
+        } else {
+            // noinspection deprecation
+            flags |= Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET;
+        }
+        intent.addFlags(flags);
+        return intent;
     }
 }

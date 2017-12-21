@@ -157,6 +157,13 @@
     <string name="menu_defaults_title">Default alarms</string>
     <string name="menu_settings_title">Settings</string>
     <string name="menu_website_title">Website</string>
+    <string name="menu_user_guide_title">User guide</string>
+    <string name="menu_change_log_title">Change log</string>
+    <string name="menu_report_bug_title">Report a bug / feature request</string>
+    <string name="menu_translate1_title">Translate to <xliff:g example="Czech" id="language">%1$s</xliff:g></string>
+    <string name="menu_translate2_title">Translate to <xliff:g example="English" id="language">%1$s</xliff:g> in <xliff:g example="United Kingdom" id="language">%2$s</xliff:g></string>
+    <string name="menu_rate_title">Rate on Google Play</string>
+    <string name="menu_donate_title">Donate</string>
 
     <!-- Widgets -->
     <string name="relative_time_picker_label_hour">Hour</string>

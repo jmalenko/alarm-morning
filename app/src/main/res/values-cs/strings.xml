@@ -157,6 +157,13 @@
     <string name="menu_defaults_title">Pravidla pro dny</string>
     <string name="menu_settings_title">Nastavení</string>
     <string name="menu_website_title">Webová stránka</string>
+    <string name="menu_user_guide_title">Uživatelská příručka</string>
+    <string name="menu_change_log_title">Popis změn</string>
+    <string name="menu_report_bug_title">Nahlásit chybu / navrhnout zlepšení</string>
+    <string name="menu_translate1_title">Přeložit do <xliff:g example="Czech" id="language">%1$s</xliff:g></string>
+    <string name="menu_translate2_title">Přeložit do <xliff:g example="English" id="language">%1$s</xliff:g> v <xliff:g example="United Kingdom" id="language">%2$s</xliff:g></string>
+    <string name="menu_rate_title">Ohodnotit na Google Play</string>
+    <string name="menu_donate_title">Přispět</string>
 
     <!-- Widgets -->
     <string name="relative_time_picker_label_hour">Hodiny</string>

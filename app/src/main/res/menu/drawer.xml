@@ -1,31 +1,70 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
     <group
         android:id="@+id/group1"
         android:checkableBehavior="all">
         <item
             android:id="@+id/navigation_calendar"
             android:title="@string/menu_calendar_title"
-            android:icon="@drawable/ic_border_all"/>
+            android:icon="@drawable/ic_border_all" />
 
         <item
             android:id="@+id/navigation_defaults"
             android:title="@string/menu_defaults_title"
             android:checkable="false"
-            android:icon="@drawable/ic_border_clear"/>
-    </group>
+            android:icon="@drawable/ic_border_clear" />
 
-    <group
-        android:id="@+id/group2"
-        android:checkableBehavior="all">
         <item
             android:id="@+id/navigation_settings"
             android:title="@string/menu_settings_title"
             android:checkable="false"
-            android:icon="@drawable/ic_settings"/>
+            android:icon="@drawable/ic_settings" />
+    </group>
+
+    <group
+        android:id="@+id/group2"
+        android:checkableBehavior="none">
         <item
             android:id="@+id/navigation_website"
             android:title="@string/menu_website_title"
             android:checkable="false"
-            android:icon="@drawable/ic_info_outline"/>
+            android:icon="@drawable/ic_info_outline" />
+
+        <item
+            android:id="@+id/navigation_user_guide"
+            android:title="@string/menu_user_guide_title"
+            android:checkable="false"
+            android:icon="@drawable/ic_help_outline_white_24dp" />
+
+        <item
+            android:id="@+id/navigation_change_log"
+            android:title="@string/menu_change_log_title"
+            android:checkable="false"
+            android:icon="@drawable/ic_change_history_white_24dp" />
+
+        <item
+            android:id="@+id/navigation_report_bug"
+            android:title="@string/menu_report_bug_title"
+            android:checkable="false"
+            android:icon="@drawable/ic_bug_report_white_24dp" />
+
+        <!-- In the following, title attribute is intentionally omitted as it is dynamically generated -->
+        <item
+            android:id="@+id/navigation_translate"
+            android:checkable="false"
+            android:icon="@drawable/ic_language_white_24dp"
+            tools:ignore="MenuTitle" />
+
+        <item
+            android:id="@+id/navigation_rate"
+            android:title="@string/menu_rate_title"
+            android:checkable="false"
+            android:icon="@drawable/ic_star_rate_white_18dp" />
+
+        <item
+            android:id="@+id/navigation_donate"
+            android:title="@string/menu_donate_title"
+            android:checkable="false"
+            android:icon="@drawable/ic_attach_money_white_24dp" />
     </group>
 </menu>

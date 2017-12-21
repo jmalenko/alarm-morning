@@ -80,6 +80,19 @@ public class Analytics {
 
     public static final String TARGET__WIZARD = "Wizard";
 
+    public static final String TARGET_MENU_ACTION_CLOSE = "Menu action: Open";
+    public static final String TARGET_MENU_ACTION_OPEN = "Menu action: Close";
+    public static final String TARGET_MENU_CALENDAR = "Calendar";
+    public static final String TARGET_MENU_DEFAULTS = "Defaults";
+    public static final String TARGET_MENU_SETTINGS = "Settings";
+    public static final String TARGET_MENU_WEBSITE = "Website";
+    public static final String TARGET_MENU_USER_GUIDE = "User guide";
+    public static final String TARGET_MENU_CHANGE_LOG = "Change log";
+    public static final String TARGET_MENU_REPORT_BUG = "Report bug";
+    public static final String TARGET_MENU_TRANSLATE = "Translate";
+    public static final String TARGET_MENU_RATE = "Rate";
+    public static final String TARGET_MENU_DONATE = "Donate";
+
     public enum Param {
         Version,
         User_ID,
@@ -624,6 +637,8 @@ public class Analytics {
 
                 padRight(Param.Preference_key, 30) + " | " +
                 padRight(Param.Preference_value, 10) + " | " +
+
+                padRight(Param.Target, 20) + " | " +
 
                 padRight(Param.Configuration, 10) + " | " +
 
