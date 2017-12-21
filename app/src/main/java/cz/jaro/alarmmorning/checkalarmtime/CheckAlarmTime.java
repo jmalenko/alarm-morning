@@ -437,9 +437,9 @@ public class CheckAlarmTime {
             analytics.set(Analytics.Param.Check_alarm_time_action, CHECK_ALARM_TIME_ACTION__DON_T_SHOW_NOTIFICATION);
             analytics.setDay(morningInfo.day);
             analytics.set(Analytics.Param.Check_alarm_time_gap, morningInfo.checkAlarmTimeGap);
-            analytics.set(Analytics.Param.Appointment_begin, Analytics.calendarToTime(morningInfo.event.getBegin()));
-            analytics.set(Analytics.Param.Appointment_title, morningInfo.event.getTitle());
-            analytics.set(Analytics.Param.Appointment_location, morningInfo.event.getLocation());
+            analytics.set(Analytics.Param.Appointment_begin, morningInfo.event != null ? Analytics.calendarToTime(morningInfo.event.getBegin()) : "No event");
+            analytics.set(Analytics.Param.Appointment_title, morningInfo.event != null ? morningInfo.event.getTitle() : "");
+            analytics.set(Analytics.Param.Appointment_location, morningInfo.event != null ? morningInfo.event.getLocation() : "");
             analytics.save();
         }
     }
