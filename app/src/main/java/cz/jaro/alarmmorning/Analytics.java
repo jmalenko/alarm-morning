@@ -78,7 +78,7 @@ public class Analytics {
     public static final String CHECK_ALARM_TIME_METHOD__QUICK = "Quick";
     public static final String CHECK_ALARM_TIME_METHOD__DIALOG = "Dialog";
 
-    public static final String TARGET__WIZARD = "Wizard";
+    public static final String TARGET_WIZARD = "Wizard";
 
     public static final String TARGET_MENU_ACTION_CLOSE = "Menu action: Open";
     public static final String TARGET_MENU_ACTION_OPEN = "Menu action: Close";

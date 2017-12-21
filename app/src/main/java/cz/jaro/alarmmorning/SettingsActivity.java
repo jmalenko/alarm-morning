@@ -193,7 +193,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         prefStartWizard.setOnPreferenceClickListener(preference -> {
             Analytics analytics = new Analytics(preference.getContext(), Analytics.Event.Start,
                     Analytics.Channel.Activity, Analytics.ChannelName.Settings);
-            analytics.set(Analytics.Param.Target, Analytics.TARGET__WIZARD);
+            analytics.set(Analytics.Param.Target, Analytics.TARGET_WIZARD);
             analytics.save();
 
             Intent intent = new Intent(context, Wizard.class);
