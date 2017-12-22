@@ -718,7 +718,7 @@ public class CalendarTest extends FixedTimeTest {
         assertThat(textDate.getText(), is("2/1"));
         assertThat(textDoW.getText(), is("Mon"));
         assertThat(textTime.getText(), is("Off"));
-        assertThat(textState.getText(), is("Passed"));
+        assertThat(textState.getText(), is(""));
 
         // Check system alarm
         assertSystemAlarm(YEAR, MONTH, DAY + 1, 0, 0, SystemAlarm.ACTION_SET_SYSTEM_ALARM);

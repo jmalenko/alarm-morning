@@ -16,8 +16,10 @@ import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -33,6 +35,7 @@ import cz.jaro.alarmmorning.model.Defaults;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.addDay;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.addMilliSecondsClone;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.addMinutesClone;
+import static cz.jaro.alarmmorning.calendar.CalendarUtils.beginningOfToday;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.roundDown;
 
 /**
@@ -326,22 +329,68 @@ public class GlobalManager {
         }
     }
 
-    public void addDismissedAlarm(Calendar alarmTime) {
-        Log.v(TAG, "addDismissedAlarm(alarmtime=" + alarmTime.getTime() + ")");
+    interface SetOperation {
+        void modify(Set<Long> dismissedAlarms);
+    }
+
+    public static <T extends Comparable<? super T>> List<T> asSortedList(Collection<T> c) {
+        List<T> list = new ArrayList<T>(c);
+        java.util.Collections.sort(list);
+        return list;
+    }
+
+    private void modifyDismissedAlarm(SetOperation setOperation) {
+        Log.v(TAG, "modifyDismissedAlarm()");
 
         Set<Long> dismissedAlarms = getDismissedAlarms();
 
-        // TODO Remove elements for yesterday and before
-
-        dismissedAlarms.add(alarmTime.getTimeInMillis());
-
-        Log.e(TAG, "   there are " + dismissedAlarms.size() + " dismissed alarms at");
-        for (long alarmTime2 : dismissedAlarms) {
-            Log.e(TAG, "      " + new Date(alarmTime2) + ")");
+        // Remove elements for yesterday and before
+        Calendar beginningOfToday = beginningOfToday(clock().now());
+        for (Iterator<Long> iterator = dismissedAlarms.iterator(); iterator.hasNext(); ) {
+            long dismissedAlarm = iterator.next();
+            if (dismissedAlarm < beginningOfToday.getTimeInMillis()) {
+                Log.d(TAG, "Removing an old dismissed alarm from the set of dismissed alarms: " + new Date(dismissedAlarm));
+                iterator.remove();
+            }
         }
 
+        // Modify set
+        setOperation.modify(dismissedAlarms);
+
+        // Log
+        List<Long> sortedDismissedAlarms = asSortedList(dismissedAlarms);
+        Log.v(TAG, "There are " + dismissedAlarms.size() + " dismissed alarms at");
+        for (long alarmTime2 : sortedDismissedAlarms) {
+            Log.v(TAG, "   " + new Date(alarmTime2));
+        }
+
+        // Save
         Context context = AlarmMorningApplication.getAppContext();
         JSONSharedPreferences.saveJSONArray(context, PERSIST_DISMISSED, new JSONArray(dismissedAlarms));
+    }
+
+    private void addDismissedAlarm(Calendar alarmTime) {
+        Log.v(TAG, "addDismissedAlarm(alarmTime=" + alarmTime.getTime() + ")");
+
+        modifyDismissedAlarm(dismissedAlarms ->
+                dismissedAlarms.add(alarmTime.getTimeInMillis())
+        );
+    }
+
+    private void removeDismissedAlarm(Calendar alarmTime) {
+        Log.v(TAG, "removeDismissedAlarm(alarmTime=" + (alarmTime == null ? "null" : alarmTime.getTime()) + ")");
+
+        if (alarmTime == null) {
+            return;
+        }
+
+        modifyDismissedAlarm(dismissedAlarms -> {
+                    if (dismissedAlarms.contains(alarmTime.getTimeInMillis())) {
+                        Log.d(TAG, "Removing a dismissed alarm from the set of dismissed alarms: " + new Date(alarmTime.getTimeInMillis()));
+                        dismissedAlarms.remove(alarmTime.getTimeInMillis());
+                    }
+                }
+        );
     }
 
     /**
@@ -618,6 +667,9 @@ public class GlobalManager {
 
         Context context = AlarmMorningApplication.getAppContext();
 
+        Calendar alarmTime = getNextAlarm(clock());
+        removeDismissedAlarm(alarmTime);
+
         // register next system alarm
         systemAlarm.onAlarmSet();
 
@@ -634,7 +686,7 @@ public class GlobalManager {
                 break;
             case SystemAlarm.ACTION_RING:
                 if (systemAlarm.useNearFutureTime()) {
-                    onNearFuture(false);
+                    onNearFuture(false, true);
                 }
                 break;
             default:
@@ -645,10 +697,16 @@ public class GlobalManager {
     public void onNearFuture() {
         Log.d(TAG, "onNearFuture()");
 
-        onNearFuture(true);
+        onNearFuture(true, false);
     }
 
-    private void onNearFuture(boolean callSystemAlarm) {
+    /**
+     * Translate state to {@link #STATE_FUTURE}.
+     *
+     * @param callSystemAlarm If true then call {@link SystemAlarm#onNearFuture()}, otherwise ship the call.
+     * @param force           If false then considers a ringing or snoozed alarm: if there is a ringing or snoozed alarm then do nothing.
+     */
+    private void onNearFuture(boolean callSystemAlarm, boolean force) {
         Log.d(TAG, "onNearFuture(callSystemAlarm=" + callSystemAlarm + ")");
 
         Context context = AlarmMorningApplication.getAppContext();
@@ -657,7 +715,7 @@ public class GlobalManager {
         analytics.setDay(getDayWithNextAlarmToRing());
         analytics.save();
 
-        if (isRingingOrSnoozed()) {
+        if (!force && isRingingOrSnoozed()) {
             Log.i(TAG, "The previous alarm is still ringing. Ignoring this event.");
 
             if (callSystemAlarm) {
@@ -751,7 +809,7 @@ public class GlobalManager {
         if (dayWithNextAlarmToRing != null && afterNearFuture(dayWithNextAlarmToRing.getDateTime())) {
             Log.i(TAG, "Immediately starting \"alarm in near future\" period.");
 
-            onNearFuture(false);
+            onNearFuture(false, false);
         }
     }
 
@@ -832,7 +890,7 @@ public class GlobalManager {
         if (afterNearFuture()) {
             Log.i(TAG, "Immediately starting \"alarm in near future\" period.");
 
-            onNearFuture(false);
+            onNearFuture(false, false);
         }
     }
 
@@ -878,11 +936,14 @@ public class GlobalManager {
         Context context = AlarmMorningApplication.getAppContext();
 
         if (isRingingOrSnoozed()) {
-            Analytics analytics = new Analytics(context, Analytics.Event.Dismiss, Analytics.Channel.Time, Analytics.ChannelName.Alarm);
+            /* Note for Analytics - Situation: Alarm at 9:00 is snoozed and set at 10:00. Currently the events are in the order:
+                 1. Set alarm to 10:00.
+                 2. Dismiss alarm at 9:00.
+               Naturally, order should be switched. But it is implemented this way. */
+            Analytics analytics = new Analytics(context, Analytics.Event.Dismiss, Analytics.Channel.External, Analytics.ChannelName.Alarm);
             analytics.set(Analytics.Param.Dismiss_type, Analytics.DISMISS__AUTO);
             analytics.setDay(getDayWithNextAlarmToRing());
             analytics.save();
-            // FIXME Analytics - Situation: Alarm at 9:00 is snoozed. Currently the events are in the order 1. Set alarm to 10:00, 2. Dismiss alarm at 9:00. Expected: The order should be switched. Moreover, currently there is time 10:00 with the Dismiss record, which is not correct as the alarm at 9:00 is dismissed.
         }
 
         SystemNotification systemNotification = SystemNotification.getInstance(context);

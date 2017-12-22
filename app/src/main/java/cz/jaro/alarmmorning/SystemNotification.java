@@ -74,12 +74,6 @@ public class SystemNotification {
      * ======
      */
 
-    public void onAlarmSet() {
-        Log.d(TAG, "onAlarmSet()");
-
-        hideNotification();
-    }
-
     protected void onNearFuture() {
         Log.d(TAG, "onNearFuture()");
 
