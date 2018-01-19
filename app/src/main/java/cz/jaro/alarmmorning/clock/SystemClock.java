@@ -15,4 +15,9 @@ public class SystemClock implements Clock {
         return Calendar.getInstance();
     }
 
+    @Override
+    public String toString() {
+        return now().getTime().toString();
+    }
+
 }
