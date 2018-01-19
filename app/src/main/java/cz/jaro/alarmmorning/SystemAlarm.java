@@ -345,5 +345,11 @@ class NextAction {
         result = 31 * result + (alarmTime != null ? alarmTime.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "action=" + action + ", time=" + time.getTime() + ", alarmTime=" + (alarmTime != null ? alarmTime.getTime() : "null");
+    }
+
 }
 

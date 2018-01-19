@@ -45,4 +45,9 @@ public class FixedClock implements Clock {
         return this;
     }
 
+    @Override
+    public String toString() {
+        return clock.getTime().toString();
+    }
+
 }
