@@ -619,6 +619,76 @@ public class CalendarTest extends FixedTimeTest {
     }
 
     @Test
+    public void t32_dismissWhileRingingAndNextAlarmIsInNearPeriod() {
+        // Section 1: analogous to prepareUntilNear() but with alarms at 23:30 and 1:00
+
+        // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
+        consumeNextScheduledAlarm();
+
+        // Set alarms at 23:30 and 1:00
+        Calendar todayAlarm = new GregorianCalendar(YEAR, MONTH, DAY, 23, 30);
+        setAlarm(todayAlarm);
+
+        Calendar tomorrowAlarm = new GregorianCalendar(YEAR, MONTH, DAY + 1, 1, 0);
+        setAlarm(tomorrowAlarm);
+
+        // Consume the alarm with action ACTION_RING_IN_NEAR_FUTURE
+        consumeNextScheduledAlarm();
+
+        // Shift clock
+        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, 23 - 2, 30)));
+
+        // Call the receiver
+        Intent intent = new Intent();
+        intent.setAction(SystemAlarm.ACTION_RING_IN_NEAR_FUTURE);
+        AlarmReceiver alarmReceiver = new AlarmReceiver();
+        alarmReceiver.onReceive(context, intent);
+
+        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, 23 - 2, 30, 10)));
+
+        // Section 2: analogous to prepareUntilRing()
+
+        // Consume the alarm with action ACTION_RING
+        consumeNextScheduledAlarm();
+
+        // Shift clock
+        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, 23, 30)));
+
+        // Call the receiver
+        Intent intent2 = new Intent();
+        intent2.setAction(SystemAlarm.ACTION_RING);
+        AlarmReceiver alarmReceiver2 = new AlarmReceiver();
+        alarmReceiver2.onReceive(context, intent2);
+
+        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, 23, 30, 10)));
+
+        // Section 3: checks
+
+        // Start ring activity
+        Calendar alarmTime = new GregorianCalendar(YEAR, MONTH, DAY, 23, 30, 10);
+        startActivityRing(alarmTime);
+
+        dismissButton.performClick();
+
+        // Check system alarm
+        assertSystemAlarm(YEAR, MONTH, DAY + 1, 1, 0, SystemAlarm.ACTION_RING);
+
+        // Check system alarm clock
+        assertSystemAlarmClock(YEAR, MONTH, DAY + 1, 1, 0);
+
+        // Check notification
+//        assertNotificationCount(1);
+//
+//        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
+//        assertNotification(notification, "Alarm at 1:00 AM", "Touch to view all alarms");
+//        assertNotificationActionCount(notification, 1);
+//        assertNotificationAction(notification, 0, "Dismiss", NotificationReceiver.ACTION_DISMISS_BEFORE_RINGING);
+
+        // Check widget
+        assertWidget(R.drawable.ic_alarm_white, "01:00", "Tomorrow");
+    }
+
+    @Test
     public void t40_dismissWhileSnoozed() {
         // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
         prepareUntilSnooze();
