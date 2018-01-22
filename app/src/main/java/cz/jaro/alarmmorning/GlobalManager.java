@@ -28,9 +28,11 @@ import cz.jaro.alarmmorning.checkalarmtime.CheckAlarmTime;
 import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.clock.SystemClock;
 import cz.jaro.alarmmorning.model.AlarmDataSource;
+import cz.jaro.alarmmorning.model.AppAlarm;
+import cz.jaro.alarmmorning.model.AppAlarmFilter;
 import cz.jaro.alarmmorning.model.Day;
-import cz.jaro.alarmmorning.model.DayFilter;
 import cz.jaro.alarmmorning.model.Defaults;
+import cz.jaro.alarmmorning.model.OneTimeAlarm;
 
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.addDay;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.addMilliSecondsClone;
@@ -128,25 +130,55 @@ public class GlobalManager {
      *
      * @return Day with next alarm.
      */
-    public Day getDayWithNextAlarmToRing() {
-        Log.v(TAG, "getDayWithNextAlarmToRing()");
+    public AppAlarm getNextAlarmToRing() {
+        Log.v(TAG, "getNextAlarmToRing()");
 
-        Day day;
+        AppAlarm appAlarm = null;
         if (isRingingOrSnoozed()) {
             Log.v(TAG, "   loading the ringing or snoozed alarm");
-            day = dataSource.loadDay(clock().now());
+            // TODO Improve architecture of one-time alarms (when it is changed while snoozed) - store the one-time alarm ID so we can return the proper object
+
+            // 1. Try the Day first...
+
+            Day day = dataSource.loadDay(clock().now());
+            if (day.isEnabled() && day.getDateTime().equals(getAlarmTimeOfRingingAlarm())) {
+                appAlarm = day;
+            } else {
+                // 2. Try to find the one-time alarm with this alarm time
+
+                List<OneTimeAlarm> oneTimeAlarms = loadOneTimeAlarms(null);
+                for (OneTimeAlarm oneTimeAlarm : oneTimeAlarms) {
+                    if (oneTimeAlarm.getDateTime().equals(getAlarmTimeOfRingingAlarm())) {
+                        appAlarm = oneTimeAlarm;
+                        break;
+                    }
+                }
+                if (appAlarm == null) {
+                    // 3. The only remaining possibility is the the one-time alarm was snoozed and it's time was changed. Currently we have to reconsruct the
+                    // object (but without the id), which is OK as it is used only for Analytics (in this special case).
+
+                    Calendar alarmTimeOfRingingAlarm = getAlarmTimeOfRingingAlarm();
+
+                    OneTimeAlarm oneTimeAlarm = new OneTimeAlarm();
+                    oneTimeAlarm.setDate(alarmTimeOfRingingAlarm);
+                    oneTimeAlarm.setHour(alarmTimeOfRingingAlarm.get(Calendar.HOUR_OF_DAY));
+                    oneTimeAlarm.setMinute(alarmTimeOfRingingAlarm.get(Calendar.MINUTE));
+
+                    appAlarm = oneTimeAlarm;
+                }
+            }
         } else {
-            day = getNextAlarm(clock(), new DayFilter() { // TODO Hotfix - Robolectric doesn't allow shadow of a class with lambda
+            appAlarm = getNextAlarm(clock(), new AppAlarmFilter() { // TODO Hotfix - Robolectric doesn't allow shadow of a class with lambda
                 @Override
-                public boolean match(Day day) {
-                    Log.v(TAG, "   checking filter condition for " + day.getDateTime().getTime());
-                    int state = getState(day.getDateTime());
+                public boolean match(AppAlarm appAlarm) {
+                    Log.v(TAG, "   checking filter condition for " + appAlarm.getDateTime().getTime());
+                    int state = getState(appAlarm.getDateTime());
                     return state != STATE_DISMISSED_BEFORE_RINGING && state != STATE_DISMISSED;
                 }
             });
         }
 
-        return day;
+        return appAlarm;
     }
 
     /**
@@ -154,19 +186,19 @@ public class GlobalManager {
      *
      * @return Day with next alarm.
      */
-    public Day getDayWithNextAlarm() {
-        Log.v(TAG, "getDayWithNextAlarm()");
+    public AppAlarm getNextAlarm() {
+        Log.v(TAG, "getNextAlarm()");
 
-        Day day = getNextAlarm(clock(), new DayFilter() { // TODO Hotfix - Robolectric doesn't allow shadow of a class with lambda
+        AppAlarm appAlarm = getNextAlarm(clock(), new AppAlarmFilter() { // TODO Hotfix - Robolectric doesn't allow shadow of a class with lambda
             @Override
-            public boolean match(Day day) {
-                Log.v(TAG, "   checking filter condition for " + day.getDateTime().getTime());
-                int state = getState(day.getDateTime());
+            public boolean match(AppAlarm alarmTime) {
+                Log.v(TAG, "   checking filter condition for " + alarmTime.getDateTime().getTime());
+                int state = getState(alarmTime.getDateTime());
                 return state != STATE_DISMISSED_BEFORE_RINGING && state != STATE_DISMISSED && state != STATE_RINGING && state != STATE_SNOOZED;
             }
         });
 
-        return day;
+        return appAlarm;
     }
 
     /**
@@ -183,8 +215,6 @@ public class GlobalManager {
      * @return true if the current alarm state {@link #STATE_RINGING} or {@link #STATE_SNOOZED}
      */
     private boolean isRingingOrSnoozed() {
-//        Calendar alarmTimeOfRingingAlarm = getAlarmTimeOfRingingAlarm();
-//        int state = getState(alarmTimeOfRingingAlarm);
         int state = getState();
         return state == STATE_RINGING || state == STATE_SNOOZED;
     }
@@ -640,6 +670,60 @@ public class GlobalManager {
     }
 
     /**
+     * Returns the list of one-time alarms.
+     *
+     * @param from If not null, then only one-time alarms with alarm time on of after from are returned.
+     * @return List of one-time alarms.
+     */
+    public List<OneTimeAlarm> loadOneTimeAlarms(Calendar from) {
+        return dataSource.loadOneTimeAlarms(from);
+    }
+
+    /**
+     * Add a new one-time alarm or save an (updated) existing one-time alarm.
+     *
+     * @param oneTimeAlarm One-time alar mto save.
+     * @param analytics    Analytics
+     */
+    public void saveOneTimeAlarm(OneTimeAlarm oneTimeAlarm, Analytics analytics) {
+        Log.d(TAG, "saveOneTimeAlarm()");
+
+        Context context = AlarmMorningApplication.getAppContext();
+        analytics.setContext(context);
+        analytics.setEvent(Analytics.Event.Set_alarm);
+        analytics.setOneTimeAlarm(oneTimeAlarm);
+        analytics.save();
+
+        Log.i(TAG, "Set alarm at " + oneTimeAlarm.getDateTime().getTime().toString());
+
+        dataSource.saveOneTimeAlarm(oneTimeAlarm);
+
+        onAlarmSet();
+    }
+
+    /**
+     * Remove the one-time alarm.
+     *
+     * @param oneTimeAlarm One-time alar mto save.
+     * @param analytics    Analytics
+     */
+    public void removeOneTimeAlarm(OneTimeAlarm oneTimeAlarm, Analytics analytics) {
+        Log.d(TAG, "removeOneTimeAlarm()");
+
+        Context context = AlarmMorningApplication.getAppContext();
+        analytics.setContext(context);
+        analytics.setEvent(Analytics.Event.Dismiss);
+        analytics.setOneTimeAlarm(oneTimeAlarm);
+        analytics.save();
+
+        Log.i(TAG, "Dismiss alarm at " + oneTimeAlarm.getDateTime());
+
+        dataSource.removeOneTimeAlarm(oneTimeAlarm);
+
+        onAlarmSet();
+    }
+
+    /**
      * This event is triggered when the user sets the alarm. This change may be on any day and may or may not change the next alarm time. This also includes
      * disabling an alarm.
      */
@@ -712,7 +796,7 @@ public class GlobalManager {
         Context context = AlarmMorningApplication.getAppContext();
 
         Analytics analytics = new Analytics(context, Analytics.Event.Show, Analytics.Channel.Notification, Analytics.ChannelName.Alarm);
-        analytics.setDay(getDayWithNextAlarmToRing());
+        analytics.setAppAlarm(getNextAlarmToRing());
         analytics.save();
 
         if (!force && isRingingOrSnoozed()) {
@@ -747,10 +831,10 @@ public class GlobalManager {
     public void onDismissAuto(Analytics analytics) {
         Log.d(TAG, "onDismissAuto()");
 
-        Day dayWithNextAlarmToRing = getDayWithNextAlarmToRing();
+        AppAlarm nextAlarmToRing = getNextAlarmToRing();
         Calendar now = clock().now();
 
-        if (now.after(dayWithNextAlarmToRing.getDateTime())) {
+        if (now.after(nextAlarmToRing.getDateTime())) {
             onDismiss(analytics);
         } else {
             onDismissBeforeRinging(analytics);
@@ -761,12 +845,12 @@ public class GlobalManager {
         Log.d(TAG, "onDismissBeforeRinging()");
 
         Context context = AlarmMorningApplication.getAppContext();
-        Day dayWithNextAlarmToRing = getDayWithNextAlarmToRing();
+        AppAlarm nextAlarmToRing = getNextAlarmToRing();
 
         analytics.setContext(context);
         analytics.setEvent(Analytics.Event.Dismiss);
         analytics.set(Analytics.Param.Dismiss_type, Analytics.DISMISS__BEFORE);
-        analytics.setDay(dayWithNextAlarmToRing);
+        analytics.setAppAlarm(nextAlarmToRing);
         analytics.save();
 
         setState(STATE_DISMISSED_BEFORE_RINGING, getAlarmTimeOfRingingAlarm());
@@ -786,7 +870,7 @@ public class GlobalManager {
         updateCalendarActivity(context, AlarmMorningActivity.ACTION_DISMISS_BEFORE_RINGING);
 
         // translate to STATE_FUTURE if in the near future
-        if (dayWithNextAlarmToRing != null && afterNearFuture(dayWithNextAlarmToRing.getDateTime())) {
+        if (nextAlarmToRing != null && afterNearFuture(nextAlarmToRing.getDateTime())) {
             Log.i(TAG, "Immediately starting \"alarm in near future\" period.");
 
             // TODO Start "alarm in near future" period. We cannot handle 1. early dismissed alarm till alarm time and 2. next alarm in near period at the same time, because get/setNextAction can store only one of such alarm. Instead this notification will be displayed at "alarm time of early dismissed alarm" (remove it from there once this is fixed).
@@ -805,8 +889,8 @@ public class GlobalManager {
         updateCalendarActivity(context, AlarmMorningActivity.ACTION_ALARM_TIME_OF_EARLY_DISMISSED_ALARM);
 
         // translate to STATE_FUTURE if in the near future
-        Day dayWithNextAlarmToRing = getDayWithNextAlarmToRing();
-        if (dayWithNextAlarmToRing != null && afterNearFuture(dayWithNextAlarmToRing.getDateTime())) {
+        AppAlarm nextAlarmToRing = getNextAlarmToRing();
+        if (nextAlarmToRing != null && afterNearFuture(nextAlarmToRing.getDateTime())) {
             Log.i(TAG, "Immediately starting \"alarm in near future\" period.");
 
             onNearFuture(false, false);
@@ -835,7 +919,7 @@ public class GlobalManager {
         }
 
         Analytics analytics = new Analytics(context, Analytics.Event.Ring, Analytics.Channel.Time, Analytics.ChannelName.Alarm);
-        analytics.setDay(getDayWithNextAlarmToRing());
+        analytics.setAppAlarm(getNextAlarmToRing());
         // TODO Analytics - add number of snoozes
         // TODO Analytics - add device location
         analytics.save();
@@ -866,7 +950,7 @@ public class GlobalManager {
         analytics.setContext(context);
         analytics.setEvent(Analytics.Event.Dismiss);
         analytics.set(Analytics.Param.Dismiss_type, Analytics.DISMISS__AFTER);
-        analytics.setDay(getDayWithNextAlarmToRing());
+        analytics.setAppAlarm(getNextAlarmToRing());
         analytics.save();
 
         if (getState() == STATE_SNOOZED) {
@@ -905,7 +989,7 @@ public class GlobalManager {
 
         analytics.setContext(context);
         analytics.setEvent(Analytics.Event.Snooze);
-        analytics.setDay(getDayWithNextAlarmToRing());
+        analytics.setAppAlarm(getNextAlarmToRing());
         // TODO Analytics - add number of snoozes
         analytics.save();
 
@@ -942,7 +1026,7 @@ public class GlobalManager {
                Naturally, order should be switched. But it is implemented this way. */
             Analytics analytics = new Analytics(context, Analytics.Event.Dismiss, Analytics.Channel.External, Analytics.ChannelName.Alarm);
             analytics.set(Analytics.Param.Dismiss_type, Analytics.DISMISS__AUTO);
-            analytics.setDay(getDayWithNextAlarmToRing());
+            analytics.setAppAlarm(getNextAlarmToRing());
             analytics.save();
         }
 
@@ -1057,9 +1141,9 @@ public class GlobalManager {
      * @return next alarm time. Return null if the is no alarm in the next {@link #HORIZON_DAYS} days.
      */
     public Calendar getNextAlarm(Clock clock) {
-        Day day = getNextAlarm(clock, null);
-        if (day != null) {
-            Calendar alarmTime = day.getDateTime();
+        AppAlarm appAlarm = getNextAlarm(clock, null);
+        if (appAlarm != null) {
+            Calendar alarmTime = appAlarm.getDateTime();
             Log.v(TAG, "Next alarm is at " + alarmTime.getTime().toString());
             return alarmTime;
         } else {
@@ -1069,12 +1153,49 @@ public class GlobalManager {
     }
 
     /**
+     * Return the nearest {@link AppAlarm} with alarm such it matches the filter. Only the Days that are enabled and not in the past are consireed, and all the
+     * one-time alarms that are not in the past are considered.
+     * <p>
+     * Note that there may be multiple alarms at the same data and time (one Day alarm + several one-time alarms) at the same time. Only one (the first found)
+     * alarm is returned. This is OK because the important thing is the date and time of next alarm (and not the count or type).
+     *
+     * @param clock Clock
+     * @return Nearest alarm. Return null if the is no Day alarm in the next {@link #HORIZON_DAYS} days or no one-time alarm in the (unlimited) future.
+     */
+    public AppAlarm getNextAlarm(Clock clock, AppAlarmFilter filter) {
+        Day day = getNextAlarmDay(clock, filter);
+        OneTimeAlarm oneTimeAlarm = getNextAlarmOneTimeAlarm(clock, filter);
+
+        AppAlarm getNextAlarm;
+        if (day == null) {
+            if (oneTimeAlarm == null) {
+                getNextAlarm = null;
+            } else {
+                getNextAlarm = oneTimeAlarm;
+            }
+        } else {
+            if (oneTimeAlarm == null) {
+                getNextAlarm = day;
+            } else {
+                getNextAlarm = day.getDateTime().before(oneTimeAlarm.getDateTime()) ? day : oneTimeAlarm;
+            }
+        }
+
+        if (getNextAlarm != null) {
+            Log.v(TAG, "   Next alarm is at " + getNextAlarm.getDateTime().getTime().toString());
+        } else {
+            Log.v(TAG, "   Next alarm is never");
+        }
+        return getNextAlarm;
+    }
+
+    /**
      * Return the nearest Day with alarm such that the Day matches the filter. The filter that such a Day is enabled and not in past is also checked.
      *
      * @param clock clock
      * @return nearest Day with alarm. Return null if the is no alarm in the next {@link #HORIZON_DAYS} days.
      */
-    public Day getNextAlarm(Clock clock, DayFilter filter) {
+    private Day getNextAlarmDay(Clock clock, AppAlarmFilter filter) {
         Calendar date = clock.now();
 
         for (int daysInAdvance = 0; daysInAdvance < HORIZON_DAYS; daysInAdvance++, addDay(date)) {
@@ -1092,12 +1213,41 @@ public class GlobalManager {
                 continue;
             }
 
-            Log.v(TAG, "   The day that satisfies filter is " + day.getDate().getTime());
+            Log.v(TAG, "   The day that satisfies filter is " + day.getDateTime().getTime().toString());
             return day;
         }
 
-        Log.v(TAG, "Next alarm is never");
+        Log.v(TAG, "   No next alarm defined by Days and Defaults");
         return null;
+    }
+
+    private OneTimeAlarm getNextAlarmOneTimeAlarm(Clock clock, AppAlarmFilter filter) {
+        OneTimeAlarm nextOneTimeAlarm = null;
+
+        Calendar now = clock.now();
+        List<OneTimeAlarm> oneTimeAlarms = loadOneTimeAlarms(now);
+
+        for (OneTimeAlarm oneTimeAlarm : oneTimeAlarms) {
+            if (oneTimeAlarm.isPassed(clock)) {
+                continue;
+            }
+
+            if (filter != null && !filter.match(oneTimeAlarm)) {
+                continue;
+            }
+
+            if (nextOneTimeAlarm == null || oneTimeAlarm.getDateTime().before(nextOneTimeAlarm.getDateTime())) {
+                nextOneTimeAlarm = oneTimeAlarm;
+            }
+        }
+
+        if (nextOneTimeAlarm == null) {
+            Log.v(TAG, "   No next alarm defined by one-time alarms");
+            return null;
+        } else {
+            Log.v(TAG, "   The one-time alarm that satisfies filter is " + nextOneTimeAlarm.getDateTime().getTime().toString());
+            return nextOneTimeAlarm;
+        }
     }
 
     /**

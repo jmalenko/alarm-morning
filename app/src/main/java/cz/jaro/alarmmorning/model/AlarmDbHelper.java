@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 /**
  * Represent changes of the database model.
@@ -17,19 +18,24 @@ public class AlarmDbHelper extends SQLiteOpenHelper {
 
     private static final String DATABASE_NAME = "alarms.db";
 
-    public static final String TABLE_DEFAULTS = "defaults";
-    public static final String COLUMN_DEFAULTS_ID = "_id";
-    public static final String COLUMN_DEFAULTS_DAY_OF_WEEK = "day_of_week";
-    public static final String COLUMN_DEFAULTS_STATE = "state";
-    public static final String COLUMN_DEFAULTS_HOUR = "hour";
-    public static final String COLUMN_DEFAULTS_MINUTE = "minute";
+    static final String TABLE_DEFAULTS = "defaults";
+    static final String COLUMN_DEFAULTS_ID = "_id";
+    static final String COLUMN_DEFAULTS_DAY_OF_WEEK = "day_of_week";
+    static final String COLUMN_DEFAULTS_STATE = "state";
+    static final String COLUMN_DEFAULTS_HOUR = "hour";
+    static final String COLUMN_DEFAULTS_MINUTE = "minute";
 
-    public static final String TABLE_DAY = "day";
-    public static final String COLUMN_DAY_ID = "_id";
-    public static final String COLUMN_DAY_DATE = "date";
-    public static final String COLUMN_DAY_STATE = "state";
-    public static final String COLUMN_DAY_HOUR = "hour";
-    public static final String COLUMN_DAY_MINUTE = "minute";
+    static final String TABLE_DAY = "day";
+    static final String COLUMN_DAY_ID = "_id";
+    static final String COLUMN_DAY_DATE = "date";
+    static final String COLUMN_DAY_STATE = "state";
+    static final String COLUMN_DAY_HOUR = "hour";
+    static final String COLUMN_DAY_MINUTE = "minute";
+
+    static final String TABLE_ONETIMEALARM = "one_time_alarm";
+    static final String COLUMN_ONETIMEALARM_ID = "_id";
+    static final String COLUMN_ONETIMEALARM_ALARM_TIME = "alarm_time"; // Note: the alarm time is always stored in UTC timezone (irrespective of default locale)
+    static final String COLUMN_ONETIMEALARM_NAME = "name";
 
     /**
      * Hour of default alarm time. Used to initialize configuration.
@@ -41,12 +47,13 @@ public class AlarmDbHelper extends SQLiteOpenHelper {
      */
     public static final int DEFAULT_ALARM_MINUTE = 0;
 
-    public AlarmDbHelper(Context context) {
+    AlarmDbHelper(Context context) {
         super(context, DATABASE_NAME, null, PATCHES.length);
     }
 
     @Override
     public void onCreate(SQLiteDatabase database) {
+        Log.d(TAG, "Creating database");
         for (Patch PATCH : PATCHES) {
             PATCH.apply(database);
         }
@@ -54,14 +61,18 @@ public class AlarmDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        Log.d(TAG, "Upgrading database from " + oldVersion + " to " + newVersion);
         for (int i = oldVersion; i < newVersion; i++) {
+            Log.d(TAG, "Applying patch " + i);
             PATCHES[i].apply(db);
         }
     }
 
     @Override
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        Log.d(TAG, "Downgrading database from " + oldVersion + " to " + newVersion);
         for (int i = oldVersion; i > newVersion; i--) {
+            Log.d(TAG, "Reverting patch " + i);
             PATCHES[i - 1].revert(db);
         }
     }
@@ -89,36 +100,57 @@ public class AlarmDbHelper extends SQLiteOpenHelper {
     /**
      * Set of patches.
      */
-    private static final Patch[] PATCHES = new Patch[]{new Patch() {
-        public void apply(SQLiteDatabase database) {
-            String DATABASE_CREATE_TABLE_DEFAULTS = "create table " + TABLE_DEFAULTS + "(" +
-                    COLUMN_DEFAULTS_ID + " integer primary key autoincrement, " +
-                    COLUMN_DEFAULTS_DAY_OF_WEEK + " integer unique not null," +
-                    COLUMN_DEFAULTS_STATE + " integer not null," +
-                    COLUMN_DEFAULTS_HOUR + " integer," +
-                    COLUMN_DEFAULTS_MINUTE + " integer" +
-                    ");";
-            String DATABASE_CREATE_TABLE_DAY = "create table " + TABLE_DAY + "(" +
-                    COLUMN_DAY_ID + " integer primary key autoincrement, " +
-                    COLUMN_DAY_DATE + " text unique not null," +
-                    COLUMN_DAY_STATE + " integer not null," +
-                    COLUMN_DAY_HOUR + " integer," +
-                    COLUMN_DAY_MINUTE + " integer" +
-                    ");";
+    private static final Patch[] PATCHES = new Patch[]{
+            new Patch() { // Version 0
+                public void apply(SQLiteDatabase database) {
+                    String DATABASE_CREATE_TABLE_DEFAULTS = "create table " + TABLE_DEFAULTS + "(" +
+                            COLUMN_DEFAULTS_ID + " integer primary key autoincrement, " +
+                            COLUMN_DEFAULTS_DAY_OF_WEEK + " integer unique not null," +
+                            COLUMN_DEFAULTS_STATE + " integer not null," +
+                            COLUMN_DEFAULTS_HOUR + " integer," +
+                            COLUMN_DEFAULTS_MINUTE + " integer" +
+                            ");";
+                    String DATABASE_CREATE_TABLE_DAY = "create table " + TABLE_DAY + "(" +
+                            COLUMN_DAY_ID + " integer primary key autoincrement, " +
+                            COLUMN_DAY_DATE + " text unique not null," +
+                            COLUMN_DAY_STATE + " integer not null," +
+                            COLUMN_DAY_HOUR + " integer," +
+                            COLUMN_DAY_MINUTE + " integer" +
+                            ");";
 
-            // Create tables
-            database.execSQL(DATABASE_CREATE_TABLE_DEFAULTS);
-            database.execSQL(DATABASE_CREATE_TABLE_DAY);
+                    // Create tables
+                    database.execSQL(DATABASE_CREATE_TABLE_DEFAULTS);
+                    database.execSQL(DATABASE_CREATE_TABLE_DAY);
 
-            // Initialize
-            resetDefaults(database);
-        }
+                    // Initialize
+                    resetDefaults(database);
+                }
 
-        public void revert(SQLiteDatabase database) {
-            database.execSQL("DROP TABLE IF EXISTS " + TABLE_DEFAULTS);
-            database.execSQL("DROP TABLE IF EXISTS " + TABLE_DAY);
-        }
-    }};
+                public void revert(SQLiteDatabase database) {
+                    database.execSQL("DROP TABLE IF EXISTS " + TABLE_DEFAULTS);
+                    database.execSQL("DROP TABLE IF EXISTS " + TABLE_DAY);
+                }
+            },
+            new Patch() { // Version 1
+                public void apply(SQLiteDatabase database) {
+                    String CREATE_TABLE_ALARM = "CREATE TABLE " + TABLE_ONETIMEALARM + "(" +
+                            COLUMN_ONETIMEALARM_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                            COLUMN_ONETIMEALARM_ALARM_TIME + " INT," +
+                            COLUMN_ONETIMEALARM_NAME + " TEXT" +
+                            ")";
+
+                    // Create table
+                    database.execSQL(CREATE_TABLE_ALARM);
+                }
+
+                public void revert(SQLiteDatabase database) {
+                    String DROP_TABLE_ALARM = "DROP TABLE IF EXISTS " + TABLE_ONETIMEALARM;
+
+                    // Drop table
+                    database.execSQL(DROP_TABLE_ALARM);
+                }
+            }
+    };
 
     static void resetDefaults(SQLiteDatabase database) {
         ContentValues values = new ContentValues();

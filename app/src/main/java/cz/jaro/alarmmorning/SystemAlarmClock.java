@@ -11,7 +11,7 @@ import android.util.Log;
 import java.util.Calendar;
 
 import cz.jaro.alarmmorning.calendar.CalendarUtils;
-import cz.jaro.alarmmorning.model.Day;
+import cz.jaro.alarmmorning.model.AppAlarm;
 import cz.jaro.alarmmorning.receivers.VoidReceiver;
 
 /**
@@ -100,10 +100,10 @@ public class SystemAlarmClock {
         Log.v(TAG, "register()");
 
         GlobalManager globalManager = GlobalManager.getInstance();
-        Day day = globalManager.getDayWithNextAlarm();
+        AppAlarm nextAlarm = globalManager.getNextAlarm();
 
-        if (day != null) {
-            Calendar alarmTime = day.getDateTime();
+        if (nextAlarm != null) {
+            Calendar alarmTime = nextAlarm.getDateTime();
 
             Intent intent = new Intent(context, VoidReceiver.class);
             PendingIntent operation = PendingIntent.getBroadcast(context, REQUEST_CODE_INTENT_ACTION, intent, PendingIntent.FLAG_UPDATE_CURRENT);

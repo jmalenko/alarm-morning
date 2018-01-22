@@ -3,16 +3,14 @@ package cz.jaro.alarmmorning.model;
 import java.util.Calendar;
 
 import cz.jaro.alarmmorning.Analytics;
-import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.holiday.HolidayHelper;
 
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.roundDown;
 
 /**
- * Represents the alarm clock setting for a particular date. The default values are inherited from
- * {@link #defaults}, but can be changed (and stored here).
- * All methods are ment "with respect to the particulat date".
+ * Represents the alarm clock setting for a particular date. The default values are inherited from {@link #defaults}, but can be changed (and stored here).
+ * All methods are meant "with respect to the particular date".
  * <p/>
  * Terminology: We use a slightly different terminology than standard English.<br>
  * We use "alarm", while English uses "alarm clock".<br>
@@ -21,11 +19,10 @@ import static cz.jaro.alarmmorning.calendar.CalendarUtils.roundDown;
  * We use "alarm rings at 7:30", while English uses "alarm goes off at 7:30".
  * We use "ring the alarm", while English uses "raised the alarm".
  * <p/>
- * The alarm time is a combination of {@link #getDate()}, {@link #getHourX()} and {@link
- * #getMinuteX()}. For convenience, the method {@link #getDateTime()} combines al three items
- * together and returns the alarm time..
+ * The alarm time is a combination of {@link #getDate()}, {@link #getHourX()} and {@link#getMinuteX()}. For convenience, the method {@link #getDateTime()}
+ * combines all three items together and returns the alarm time..
  */
-public class Day {
+public class Day extends AppAlarm {
 
     /**
      * Value of the {@code state} field indicating the disabled state.
@@ -50,6 +47,7 @@ public class Day {
     private long id;
 
     private Calendar date;
+
     /**
      * The state of the default.
      * <p/>
@@ -116,21 +114,11 @@ public class Day {
 
     /**
      * Check if the alarm time is passed, e.g. if the alarm is enabled and the alarm time was in past (or the alarm is now).
-     * <p>
-     * Note: the part "or the alarm is now" of definition is defined for ease of testing: in tests, on the alarm time, we intend to check that the
-     * system alarm for next alarm is registered. In reality (with real time) there would be a slight delay between the alarm time and setting the next
-     * system alarm (which calls this method).
      *
      * @return true if the alarm time is passed
      */
     public boolean isPassed(Clock clock) {
-        Calendar now = clock.now();
-        if (isEnabled()) {
-            if (!getDateTime().after(now)) {
-                return true;
-            }
-        }
-        return false;
+        return isEnabled() && super.isPassed(clock);
     }
 
     /**
@@ -188,7 +176,6 @@ public class Day {
      * @return alarm time
      */
     public Calendar getDateTime() {
-        // TOTO Refactor to return Date
         Calendar alarmTime = (Calendar) date.clone();
 
         alarmTime.set(Calendar.HOUR_OF_DAY, getHourX());
@@ -219,35 +206,6 @@ public class Day {
                 setState(STATE_ENABLED);
                 break;
         }
-    }
-
-    /**
-     * Checks if this is the next alarm. Specifically: there is no other alarm between now and
-     * alarm time.
-     *
-     * @param clock   clock
-     * @return true if this is the next alarm
-     */
-    public boolean isNextAlarm(Clock clock) {
-        Calendar alarmTime1 = getDateTime();
-
-        GlobalManager globalManager = GlobalManager.getInstance();
-        Calendar alarmTime2 = globalManager.getNextAlarm(clock);
-
-        return alarmTime1.equals(alarmTime2);
-    }
-
-    /**
-     * Returns the time to alarm time.
-     *
-     * @return miliseconds between now and the alarm time. The negative value means that alarm time
-     * was in past.
-     */
-    public long getTimeToRing(Clock clock) {
-        Calendar alarmTime1 = getDateTime();
-        Calendar now = clock.now();
-
-        return alarmTime1.getTimeInMillis() - now.getTimeInMillis();
     }
 
     /**

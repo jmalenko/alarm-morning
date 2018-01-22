@@ -13,7 +13,7 @@ import android.widget.RemoteViews;
 import java.util.Calendar;
 
 import cz.jaro.alarmmorning.clock.Clock;
-import cz.jaro.alarmmorning.model.Day;
+import cz.jaro.alarmmorning.model.AppAlarm;
 import cz.jaro.alarmmorning.receivers.WidgetReceiver;
 
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.inNextWeek;
@@ -71,14 +71,14 @@ public class WidgetProvider extends AppWidgetProvider {
 
         // Set content
         GlobalManager globalManager = GlobalManager.getInstance();
-        Day day = globalManager.getDayWithNextAlarmToRing();
+        AppAlarm nextAlarmToRing = globalManager.getNextAlarmToRing();
 
         int iconSrcId;
         String timeText;
         String dateText = null;
 
-        if (day != null) {
-            Calendar alarmTime = day.getDateTime();
+        if (nextAlarmToRing != null) {
+            Calendar alarmTime = nextAlarmToRing.getDateTime();
 
             iconSrcId = R.drawable.ic_alarm_white;
 

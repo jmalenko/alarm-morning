@@ -38,7 +38,7 @@ public class NotificationReceiver extends BroadcastReceiver {
         switch (action) {
             case ACTION_CLICK_NOTIFICATION: {
                 Analytics analytics = new Analytics(context, Analytics.Event.Click, Analytics.Channel.Notification, Analytics.ChannelName.Alarm);
-                analytics.setDay(globalManager.getDayWithNextAlarmToRing());
+                analytics.setAppAlarm(globalManager.getNextAlarmToRing());
                 analytics.save();
 
                 String activity = intent.getStringExtra(NotificationReceiver.EXTRA_ACTIVITY);
@@ -58,7 +58,7 @@ public class NotificationReceiver extends BroadcastReceiver {
             }
             case ACTION_DELETE_NOTIFICATION: {
                 Analytics analytics = new Analytics(context, Analytics.Event.Hide, Analytics.Channel.Notification, Analytics.ChannelName.Alarm);
-                analytics.setDay(globalManager.getDayWithNextAlarmToRing());
+                analytics.setAppAlarm(globalManager.getNextAlarmToRing());
                 analytics.save();
 
                 deleteNotification();

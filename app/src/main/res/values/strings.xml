@@ -128,12 +128,14 @@
     <string name="action_set_time">Set time</string>
     <string name="action_disable">Disable</string>
     <string name="action_revert">Revert to time by rule (<xliff:g example="07:00" id="time">%1$s</xliff:g>)</string>
+    <string name="action_add_alarm">Add alarm</string>
 
     <string name="time_to_ring_toast_days">This alarm is set for <xliff:g example="1" id="days">%1$d</xliff:g> days, <xliff:g example="2" id="hours">%2$d</xliff:g> hours and <xliff:g example="3" id="minutes">%3$d</xliff:g> minutes from now</string>
     <string name="time_to_ring_toast_hours">This alarm is set for <xliff:g example="2" id="hours">%1$d</xliff:g> hours and <xliff:g example="3" id="minutes">%2$d</xliff:g> minutes from now</string>
     <string name="time_to_ring_toast_minutes">This alarm is set for <xliff:g example="3" id="minutes">%1$d</xliff:g> minutes and <xliff:g example="4" id="seconds">%2$d</xliff:g> seconds from now</string>
     <string name="time_to_ring_toast_off">This alarm is off</string>
     <string name="time_to_ring_toast_passed">This alarm is set to passed time; it will not ring</string>
+    <string name="time_to_ring_toast_removed">The alarm was removed</string>
 
     <string name="time_to_ring_message_days"><xliff:g example="1" id="days">%1$d</xliff:g>d <xliff:g example="2" id="hours">%2$d</xliff:g>h</string>
     <string name="time_to_ring_message_hours"><xliff:g example="2" id="hours">%1$d</xliff:g>h <xliff:g example="3" id="minutes">%2$d</xliff:g>m</string>

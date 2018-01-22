@@ -18,16 +18,22 @@ import android.view.ViewGroup;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.graphics.RecyclerViewWithContextMenu;
 import cz.jaro.alarmmorning.graphics.SimpleDividerItemDecoration;
 import cz.jaro.alarmmorning.graphics.TimePickerDialogWithDisable;
+import cz.jaro.alarmmorning.model.AppAlarm;
 import cz.jaro.alarmmorning.model.Day;
 import cz.jaro.alarmmorning.model.Defaults;
+import cz.jaro.alarmmorning.model.OneTimeAlarm;
 
-import static cz.jaro.alarmmorning.calendar.CalendarUtils.addDay;
+import static cz.jaro.alarmmorning.GlobalManager.HORIZON_DAYS;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.addDaysClone;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.beginningOfToday;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.onTheSameDate;
@@ -43,14 +49,21 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
     private RecyclerView recyclerView;
 
-    private Calendar today;
-    private Day day; // day corresponding to position in variable position
-    private int position; // position of the operation (via context menu)
+    private ArrayList<AppAlarm> items; // Kept in order: 1. date, 2. on a particular date, the Day is first and the one time alarms follow in natural order
 
-    private int positionNextAlarm; // position of the next alarm
-    private static final int POSITION_UNSET = -1; // constant representing "position of the next alarm" when no next alarm exists
+    private Calendar today;
+
+    private int menuAction; // type of the action
+    private int positionAction; // position of the item wit which the action is performed (via context menu of via click)
+    private static final int POSITION_UNSET = -1; // constant representing "positionAction of the next alarm" when no next alarm exists
+
+    private List<Integer> positionNextAlarm; // positionAction of the next alarm
 
     private final HandlerOnClockChange handler = new HandlerOnClockChange();
+
+    // TODO Improve architecture of actions (adding, removing, changing when snoozed) with one-time alarm
+    private boolean oneTimeAlarmJustRemoved; // used for an ugly hack to know that a one-time alarm was removed (and showing a relevantn toast)
+    private OneTimeAlarm oneTimeAlarmJustAdded; // used for an ugly hack to know that (and which) one-time alarm was added (and showing a relevantn toast)
 
     public CalendarFragment() {
         // Empty constructor required for fragment subclasses
@@ -80,7 +93,48 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
         registerForContextMenu(recyclerView);
 
+        loadItems();
+
         return rootView;
+    }
+
+    public int getItemCount() {
+        return items.size();
+    }
+
+    private void loadItems() {
+        GlobalManager globalManager = GlobalManager.getInstance();
+        Calendar now = clock().now();
+
+        items = new ArrayList<>();
+
+        // Add days
+        for (int i = 0; i < HORIZON_DAYS; i++) {
+            Calendar date = addDaysClone(now, i);
+            Day day = globalManager.loadDay(date);
+            items.add(day);
+        }
+
+        // Add one time alarms
+        Calendar beginningOfToday = beginningOfToday(now);
+        List<OneTimeAlarm> oneTimeAlarms = globalManager.loadOneTimeAlarms(beginningOfToday);
+        items.addAll(oneTimeAlarms);
+
+        // Sort
+        Collections.sort(items, new Comparator<AppAlarm>() {
+            public int compare(AppAlarm appAlarm, AppAlarm appAlarm2) {
+                Calendar c1 = appAlarm.getDateTime();
+                Calendar c2 = appAlarm2.getDateTime();
+                // On a particular date, Day should be first
+                if (onTheSameDate(c1, c2) && (appAlarm instanceof Day || appAlarm2 instanceof Day)) {
+                    return appAlarm instanceof Day ? -1 : 1;
+                }
+                // Natural order
+                return c1.before(c2)
+                        ? -1
+                        : c2.before(c1) ? 1 : 0;
+            }
+        });
     }
 
     @Override
@@ -112,28 +166,54 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     public void onAlarmSet() {
         Log.d(TAG, "onAlarmSet()");
 
-        adapter.notifyItemChanged(position);
+        // In case the one-time alarm was removed, show "Alarm was removed" toast instead of "Alarm is off"
+        if (oneTimeAlarmJustRemoved) {
+            String toastText = getResources().getString(R.string.time_to_ring_toast_removed);
+            Toast.makeText(getActivity(), toastText, Toast.LENGTH_LONG).show();
+
+            oneTimeAlarmJustRemoved = false;
+
+            return;
+        }
+        // In case the one-time alarm was added, show toast with proper time to ring
+        if (oneTimeAlarmJustAdded != null) {
+            String toastText = formatToastText(oneTimeAlarmJustAdded);
+            Toast.makeText(getActivity(), toastText, Toast.LENGTH_LONG).show();
+
+            oneTimeAlarmJustAdded = null;
+
+            return;
+        }
+
+        adapter.notifyItemChanged(positionAction);
         updatePositionNextAlarm();
 
-        if (day != null) { // otherwise the alarm is set because a default alarm time was set. (The DefaultsActivity is running and I don't know why CalendarFragment gets the broadcast message...)
-            String toastText = formatToastText(day);
+        if (positionAction != POSITION_UNSET) { // otherwise the alarm is set because a default alarm time was set. (The DefaultsActivity is running and I don't know why CalendarFragment gets the broadcast message...)
+            AppAlarm appAlarmAtPosition = loadPosition(positionAction);
+            String toastText = formatToastText(appAlarmAtPosition);
             Toast.makeText(getActivity(), toastText, Toast.LENGTH_LONG).show();
         }
     }
 
     public void onDismissBeforeRinging() {
         Log.d(TAG, "onDismissBeforeRinging()");
-        updatePositionNextAlarm();
+        for (int pos : positionNextAlarm) {
+            adapter.notifyItemChanged(pos);
+        }
     }
 
     public void onAlarmTimeOfEarlyDismissedAlarm() {
         Log.d(TAG, "onAlarmTimeOfEarlyDismissedAlarm()");
-        adapter.notifyItemChanged(positionNextAlarm);
+        for (int pos : positionNextAlarm) {
+            adapter.notifyItemChanged(pos);
+        }
     }
 
     public void onRing() {
         Log.d(TAG, "onRing()");
-        adapter.notifyItemChanged(positionNextAlarm);
+        for (int pos : positionNextAlarm) {
+            adapter.notifyItemChanged(pos);
+        }
     }
 
     public void onDismiss() {
@@ -143,7 +223,9 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
     public void onSnooze() {
         Log.d(TAG, "onSnooze()");
-        adapter.notifyItemChanged(positionNextAlarm);
+        for (int pos : positionNextAlarm) {
+            adapter.notifyItemChanged(pos);
+        }
     }
 
     public void onCancel() {
@@ -166,16 +248,21 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         Log.v(TAG, "onSystemTimeChange()");
 
         // Update time to next alarm
-        if (positionNextAlarm != POSITION_UNSET)
-            adapter.notifyItemChanged(positionNextAlarm);
+        for (int pos : positionNextAlarm) {
+            adapter.notifyItemChanged(pos);
+        }
 
         // Shift items when date changes
         Calendar today2 = getToday(clock());
 
         if (!today.equals(today2)) {
             int diffInDays = -1;
-            for (int i = 1; i < GlobalManager.HORIZON_DAYS; i++) {
-                Calendar date = addDaysClone(today, i);
+            for (int i = 1; i < items.size(); i++) {
+                AppAlarm appAlarm = loadPosition(i);
+                if (!(appAlarm instanceof Day))
+                    continue;
+                Day day = (Day) appAlarm;
+                Calendar date = day.getDate();
                 if (today2.equals(date)) {
                     diffInDays = i;
                     break;
@@ -202,70 +289,166 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         return globalManager.clock();
     }
 
-    private int calcPositionNextAlarm() {
+    private List<Integer> calcPositionNextAlarm() {
         GlobalManager globalManager = GlobalManager.getInstance();
-        Day day = globalManager.getDayWithNextAlarmToRing();
+        AppAlarm nextAlarmToRing = globalManager.getNextAlarmToRing();
 
-        return day == null ? POSITION_UNSET : dayToPosition(day);
+        return nextAlarmToRing == null ? new ArrayList<>() : alarmTimeToPosition(nextAlarmToRing);
     }
 
-    private int dayToPosition(Day day) {
-        Calendar date = getToday(clock());
+    private List<Integer> alarmTimeToPosition(AppAlarm appAlarm) {
+        List<Integer> positions = new ArrayList<>();
 
-        for (int daysInAdvance = 0; daysInAdvance < GlobalManager.HORIZON_DAYS; daysInAdvance++, addDay(date)) {
-            if (onTheSameDate(day.getDate(), date)) {
-                return daysInAdvance;
+        for (int pos = 0; pos < items.size(); pos++) {
+            AppAlarm appAlarm2 = loadPosition(pos);
+            if (appAlarm.getDateTime().equals(appAlarm2.getDateTime())) {
+                positions.add(pos);
             }
         }
-        return POSITION_UNSET;
+
+        return positions;
     }
 
     private void updatePositionNextAlarm() {
-        int newPositionNextAlarm = calcPositionNextAlarm();
+        List<Integer> newPositionNextAlarm = calcPositionNextAlarm();
 
-        if (positionNextAlarm != newPositionNextAlarm) {
-            Log.d(TAG, "Next alarm is at position " + newPositionNextAlarm);
+        boolean same = positionNextAlarm.containsAll(newPositionNextAlarm) && newPositionNextAlarm.containsAll(positionNextAlarm);
+        if (!same) {
+            Log.d(TAG, "Next alarm is at positionAction " + newPositionNextAlarm);
 
-            int oldPositionNextAlarm = positionNextAlarm;
+            List<Integer> oldPositionNextAlarm = positionNextAlarm;
             positionNextAlarm = newPositionNextAlarm;
 
-            if (oldPositionNextAlarm != POSITION_UNSET)
-                adapter.notifyItemChanged(oldPositionNextAlarm);
-            if (newPositionNextAlarm != POSITION_UNSET)
-                adapter.notifyItemChanged(newPositionNextAlarm);
+            for (int pos : oldPositionNextAlarm) {
+                adapter.notifyItemChanged(pos);
+            }
+            for (int pos : newPositionNextAlarm) {
+                adapter.notifyItemChanged(pos);
+            }
         }
     }
 
-    public boolean positionWithNextAlarm(int position) {
-        return position == positionNextAlarm;
+    public boolean isPositionWithNextAlarm(int position) {
+        return positionNextAlarm.contains(position);
     }
 
-    private void setCurrent(Day day, int position) {
-        this.day = day;
-        this.position = position;
-    }
-
-    private void save(Day day) {
+    private void save(AppAlarm appAlarm) {
         Analytics analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
-
         GlobalManager globalManager = GlobalManager.getInstance();
-        globalManager.saveDay(day, analytics);
 
-        adapter.notifyItemChanged(position);
+        if (appAlarm instanceof Day) {
+            Day day = (Day) appAlarm;
+            globalManager.saveDay(day, analytics);
+        } else if (appAlarm instanceof OneTimeAlarm) {
+            OneTimeAlarm oneTimeAlarm = (OneTimeAlarm) appAlarm;
+            globalManager.saveOneTimeAlarm(oneTimeAlarm, analytics);
+
+            // Reorder
+            int positionNew = resetPositionOnSave(oneTimeAlarm, positionAction);
+            adapter.notifyItemChanged(positionAction);
+            // FUTURE Blink the item
+            adapter.notifyItemMoved(positionAction, positionNew);
+        } else {
+            throw new IllegalArgumentException("Unexpected class " + appAlarm.getClass());
+        }
+
+        adapter.notifyItemChanged(positionAction);
         updatePositionNextAlarm();
     }
 
-    private String formatToastText(Day day) {
-        return formatToastText(getResources(), clock(), day);
+    private void add(OneTimeAlarm oneTimeAlarm) {
+        Analytics analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
+        GlobalManager globalManager = GlobalManager.getInstance();
+
+        globalManager.saveOneTimeAlarm(oneTimeAlarm, analytics);
+
+        // Update activity
+        updatePositionNextAlarm();
+
+        int pos = findPosition(oneTimeAlarm);
+        items.add(pos, oneTimeAlarm);
+        adapter.notifyItemInserted(pos);
+
+        oneTimeAlarmJustAdded = oneTimeAlarm;
     }
 
-    static public String formatToastText(Resources res, Clock clock, Day day) {
+    private void remove(OneTimeAlarm oneTimeAlarm) {
+        Analytics analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
+        GlobalManager globalManager = GlobalManager.getInstance();
+
+        globalManager.removeOneTimeAlarm(oneTimeAlarm, analytics);
+
+        // Update activity
+
+        items.remove(positionAction);
+
+        adapter.notifyItemRangeRemoved(positionAction, 1);
+        updatePositionNextAlarm();
+
+        oneTimeAlarmJustRemoved = true;
+    }
+
+    private int findPosition(OneTimeAlarm oneTimeAlarm) {
+        Calendar c = oneTimeAlarm.getDateTime();
+        int pos = 0;
+
+        Calendar beginningOfToday = beginningOfToday(clock().now());
+        if (c.before(beginningOfToday))
+            return pos;
+
+        // Find the Day on the dame date
+        while (true) {
+            if (pos == items.size())
+                break;
+
+            Calendar c2 = items.get(pos).getDateTime();
+
+            if (onTheSameDate(c, c2))
+                break;
+
+            pos++;
+        }
+        // Assert: pos is the index of the respective Day
+        // Increase positionAction
+        pos++;
+        // Use natural order. If there are several alarms at the same same, put it at the end o such alarms.
+        while (true) {
+            if (pos == items.size())
+                break;
+
+            Calendar c2 = items.get(pos).getDateTime();
+
+            if (!onTheSameDate(c, c2))
+                break;
+
+            if (!c2.before(c))
+                break;
+
+            pos++;
+        }
+
+        return pos;
+    }
+
+    private int resetPositionOnSave(OneTimeAlarm oneTimeAlarm, int positionOld) {
+        items.remove(positionOld);
+        int positionNew = findPosition(oneTimeAlarm);
+        // TODO If (there are several alarms set at the same time and) the alarm time did not change, then leave the item at the original positionAction
+        items.add(positionNew, oneTimeAlarm);
+        return positionNew;
+    }
+
+    private String formatToastText(AppAlarm appAlarm) {
+        return formatToastText(getResources(), clock(), appAlarm);
+    }
+
+    static public String formatToastText(Resources res, Clock clock, AppAlarm appAlarm) {
         String toastText;
 
-        if (!day.isEnabled()) {
+        if (appAlarm instanceof Day && !((Day) appAlarm).isEnabled()) {
             toastText = res.getString(R.string.time_to_ring_toast_off);
         } else {
-            long diff = day.getTimeToRing(clock);
+            long diff = appAlarm.getTimeToRing(clock);
 
             if (diff < 0) {
                 toastText = res.getString(R.string.time_to_ring_toast_passed);
@@ -283,10 +466,8 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         return toastText;
     }
 
-    public Day loadPosition(int position) {
-        GlobalManager globalManager = GlobalManager.getInstance();
-        Calendar date = addDaysClone(today, position);
-        return globalManager.loadDay(date);
+    public AppAlarm loadPosition(int position) {
+        return items.get(position);
     }
 
     public static Calendar getToday(Clock clock) {
@@ -308,12 +489,10 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
     @Override
     public void onClick(View view) {
-        int position = recyclerView.getChildAdapterPosition(view);
-        Log.d(TAG, "Clicked item on position " + position);
+        positionAction = recyclerView.getChildAdapterPosition(view);
+        Log.d(TAG, "Clicked item on positionAction " + positionAction);
 
-        Day day = loadPosition(position);
-        setCurrent(day, position);
-
+        menuAction = R.id.day_set_time;
         showTimePicker();
     }
 
@@ -326,10 +505,13 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         Calendar now = clock().now();
 
         GlobalManager globalManager = GlobalManager.getInstance();
-        int state = globalManager.getState(day.getDateTime());
-        boolean presetNap = position == 0 && (day.isEnabled() ?
-                (state == GlobalManager.STATE_SNOOZED || state == GlobalManager.STATE_DISMISSED || state == GlobalManager.STATE_DISMISSED_BEFORE_RINGING)
-                : now.after(day.getDateTime()));
+        AppAlarm appAlarmAtPosition = loadPosition(positionAction);
+        int state = globalManager.getState(appAlarmAtPosition.getDateTime());
+        boolean presetNap = appAlarmAtPosition instanceof Day && menuAction == R.id.day_set_time && (
+                positionAction == 0 && (((Day) appAlarmAtPosition).isEnabled()
+                        ? (state == GlobalManager.STATE_SNOOZED || state == GlobalManager.STATE_DISMISSED || state == GlobalManager.STATE_DISMISSED_BEFORE_RINGING)
+                        : now.after(appAlarmAtPosition.getDateTime()))
+        );
 
         Bundle bundle = new Bundle();
         if (presetNap) {
@@ -341,8 +523,30 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
             bundle.putInt(TimePickerFragment.HOURS, now.get(Calendar.HOUR_OF_DAY));
             bundle.putInt(TimePickerFragment.MINUTES, now.get(Calendar.MINUTE));
         } else {
-            bundle.putInt(TimePickerFragment.HOURS, day.getHourX());
-            bundle.putInt(TimePickerFragment.MINUTES, day.getMinuteX());
+            if (menuAction == R.id.day_add_alarm) {
+                // If today, then preset to the next hour (so the alarm rings in next hour).
+                // If tomorrow or later, set to the current hour and zero minutes (so it coincides with the possible appointment that is currently in progress).
+                // (There are other options too: 1. use now + nap time, or 2. use previously set time for one-time alarm (in case the user manually enters a
+                // recurrent alarm))
+                int hour = now.get(Calendar.HOUR_OF_DAY);
+                if (onTheSameDate(appAlarmAtPosition.getDate(), today)) {
+                    if (hour + 1 < 24) hour++;
+                }
+                bundle.putInt(TimePickerFragment.HOURS, hour);
+                bundle.putInt(TimePickerFragment.MINUTES, 0);
+            } else if (menuAction == R.id.day_set_time) {
+                if (appAlarmAtPosition instanceof Day) {
+                    Day day = (Day) appAlarmAtPosition;
+                    bundle.putInt(TimePickerFragment.HOURS, day.getHourX());
+                    bundle.putInt(TimePickerFragment.MINUTES, day.getMinuteX());
+                } else {
+                    OneTimeAlarm oneTimeAlarm = (OneTimeAlarm) appAlarmAtPosition;
+                    bundle.putInt(TimePickerFragment.HOURS, oneTimeAlarm.getHour());
+                    bundle.putInt(TimePickerFragment.MINUTES, oneTimeAlarm.getMinute());
+                }
+            } else {
+                throw new IllegalArgumentException("Unexpected action " + menuAction);
+            }
         }
         fragment.setArguments(bundle);
 
@@ -352,15 +556,48 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     @Override
     public void onTimeSetWithDisable(TimePicker view, boolean disable, int hourOfDay, int minute) {
         if (view.isShown()) {
+            AppAlarm appAlarmAtPosition = loadPosition(positionAction);
             if (disable) {
-                day.setState(Day.STATE_DISABLED);
-            } else {
-                day.setState(Day.STATE_ENABLED);
-                day.setHour(hourOfDay);
-                day.setMinute(minute);
-            }
+                if (appAlarmAtPosition instanceof Day) {
+                    Day day = (Day) appAlarmAtPosition;
+                    day.setState(Day.STATE_DISABLED);
+                    save(appAlarmAtPosition);
+                    return;
+                } else {
+                    switch (menuAction) {
+                        case R.id.day_set_time:
+                            OneTimeAlarm oneTimeAlarm = (OneTimeAlarm) appAlarmAtPosition;
+                            remove(oneTimeAlarm);
+                            break;
 
-            save(day);
+                        case R.id.day_add_alarm:
+                            // do nothing (setting time of a (to be) newly created alarm)
+                    }
+                    return;
+                }
+            } else {
+                switch (menuAction) {
+                    case R.id.day_set_time:
+                        if (appAlarmAtPosition instanceof Day) {
+                            Day day = (Day) appAlarmAtPosition;
+                            day.setState(Day.STATE_ENABLED);
+                        }
+                        appAlarmAtPosition.setHour(hourOfDay);
+                        appAlarmAtPosition.setMinute(minute);
+
+                        save(appAlarmAtPosition);
+                        return;
+
+                    case R.id.day_add_alarm:
+                        OneTimeAlarm oneTimeAlarm = new OneTimeAlarm();
+                        oneTimeAlarm.setDate(appAlarmAtPosition.getDate());
+                        oneTimeAlarm.setHour(hourOfDay);
+                        oneTimeAlarm.setMinute(minute);
+
+                        add(oneTimeAlarm);
+                        return;
+                }
+            }
         }
     }
 
@@ -371,42 +608,57 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        int position = ((RecyclerViewWithContextMenu.RecyclerViewContextMenuInfo) menuInfo).position;
-        Log.d(TAG, "Long clicked item on position " + position);
+        positionAction = ((RecyclerViewWithContextMenu.RecyclerViewContextMenuInfo) menuInfo).position;
+        Log.d(TAG, "Long clicked item on positionAction " + positionAction);
 
         MenuInflater inflater = getActivity().getMenuInflater();
         inflater.inflate(R.menu.day_context_menu, menu);
 
-        Day day = loadPosition(position);
-        setCurrent(day, position);
+        AppAlarm appAlarm = loadPosition(positionAction);
+        Day day = null;
+        OneTimeAlarm oneTimeAlarm = null;
+        if (appAlarm instanceof Day) {
+            day = (Day) appAlarm;
+        } else if (appAlarm instanceof OneTimeAlarm) {
+            oneTimeAlarm = (OneTimeAlarm) appAlarm;
+        } else {
+            throw new IllegalArgumentException("Unexpected class " + appAlarm.getClass());
+        }
 
         // Set header
 
-        Calendar date = day.getDate();
+        Calendar date = appAlarm.getDateTime();
         int dayOfWeek = date.get(Calendar.DAY_OF_WEEK);
         String dayOfWeekText = Localization.dayOfWeekToStringShort(getResources(), dayOfWeek);
 
         String dateText = Localization.dateToStringVeryShort(getResources(), date.getTime());
 
         String headerTitle;
-        if (day.isEnabled()) {
-            String timeText = Localization.timeToString(day.getHourX(), day.getMinuteX(), getActivity());
-            headerTitle = getResources().getString(R.string.menu_day_header, timeText, dayOfWeekText, dateText);
+        if (appAlarm instanceof Day) {
+            if (day.isEnabled()) {
+                String timeText = Localization.timeToString(day.getHourX(), day.getMinuteX(), getActivity());
+                headerTitle = getResources().getString(R.string.menu_day_header, timeText, dayOfWeekText, dateText);
+            } else {
+                headerTitle = getResources().getString(R.string.menu_day_header_disabled, dayOfWeekText, dateText);
+            }
         } else {
-            headerTitle = getResources().getString(R.string.menu_day_header_disabled, dayOfWeekText, dateText);
+            String timeText = Localization.timeToString(oneTimeAlarm.getHour(), oneTimeAlarm.getMinute(), getActivity());
+            headerTitle = getResources().getString(R.string.menu_day_header, timeText, dayOfWeekText, dateText);
         }
         menu.setHeaderTitle(headerTitle);
 
-        // Set title
-        MenuItem revertItem = menu.findItem(R.id.day_revert);
-        Defaults defaults = day.getDefaults();
-        String timeText;
-        if (defaults.isEnabled()) {
-            timeText = Localization.timeToString(defaults.getHour(), defaults.getMinute(), getActivity());
-        } else {
-            timeText = getResources().getString(R.string.alarm_unset);
+        // Set title of revert item
+        if (appAlarm instanceof Day) {
+            MenuItem revertItem = menu.findItem(R.id.day_revert);
+            Defaults defaults = day.getDefaults();
+            String timeText;
+            if (defaults.isEnabled()) {
+                timeText = Localization.timeToString(defaults.getHour(), defaults.getMinute(), getActivity());
+            } else {
+                timeText = getResources().getString(R.string.alarm_unset);
+            }
+            revertItem.setTitle(getString(R.string.action_revert, timeText));
         }
-        revertItem.setTitle(getString(R.string.action_revert, timeText));
 
         // Hide irrelevant items
 
@@ -415,19 +667,29 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         MenuItem revert = menu.findItem(R.id.day_revert);
         MenuItem dismiss = menu.findItem(R.id.day_dismiss);
         MenuItem snooze = menu.findItem(R.id.day_snooze);
+        MenuItem addAlarm = menu.findItem(R.id.day_add_alarm);
 
         GlobalManager globalManager = GlobalManager.getInstance();
-        int state = globalManager.getState(day.getDateTime());
+        int state = globalManager.getState(appAlarm.getDateTime());
+
         switch (state) {
             case GlobalManager.STATE_FUTURE:
-                if (position == positionNextAlarm && day.isEnabled() && globalManager.afterNearFuture(day.getDateTime())) {
-                    disable.setVisible(false);
-                    revert.setVisible(false);
-                    dismiss.setVisible(true);
+                if (appAlarm instanceof Day) {
+                    if (positionNextAlarm.contains(positionAction) && day.isEnabled() && globalManager.afterNearFuture(appAlarm.getDateTime())) {
+                        disable.setVisible(false);
+                        revert.setVisible(false);
+                        dismiss.setVisible(true);
+                    } else {
+                        disable.setVisible(true);
+                        revert.setVisible(day.getState() != Day.STATE_RULE);
+                        dismiss.setVisible(false);
+                    }
                 } else {
-                    disable.setVisible(true);
-                    revert.setVisible(day.getState() != Day.STATE_RULE);
-                    dismiss.setVisible(false);
+                    if (positionNextAlarm.contains(positionAction) && globalManager.afterNearFuture(appAlarm.getDateTime())) {
+                        dismiss.setVisible(true);
+                    } else {
+                        dismiss.setVisible(false);
+                    }
                 }
                 snooze.setVisible(false);
                 break;
@@ -453,26 +715,51 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
             default:
                 throw new IllegalArgumentException("Unexpected argument " + state);
         }
+
+        // Fix visibility for one time alarm
+        if (appAlarm instanceof OneTimeAlarm) {
+            disable.setVisible(false);
+            revert.setVisible(false);
+        }
     }
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
+        Day day = null;
+        OneTimeAlarm oneTimeAlarm = null;
+        AppAlarm appAlarmAtPosition = loadPosition(positionAction);
+        if (appAlarmAtPosition instanceof Day) {
+            day = (Day) appAlarmAtPosition;
+        } else if (appAlarmAtPosition instanceof OneTimeAlarm) {
+            oneTimeAlarm = (OneTimeAlarm) appAlarmAtPosition;
+        } else {
+            throw new IllegalArgumentException("Unexpected class " + appAlarmAtPosition.getClass());
+        }
+
         switch (item.getItemId()) {
             case R.id.day_set_time:
+            case R.id.day_add_alarm:
                 Log.d(TAG, "Set time");
+                menuAction = item.getItemId();
                 showTimePicker();
                 break;
 
             case R.id.day_disable:
                 Log.d(TAG, "Disable");
-                day.setState(Day.STATE_DISABLED);
-                save(day);
+                if (appAlarmAtPosition instanceof Day) {
+                    day.setState(Day.STATE_DISABLED);
+                    save(day);
+                } else {
+                    remove(oneTimeAlarm);
+                }
                 break;
 
             case R.id.day_revert:
                 Log.i(TAG, "Revert");
-                day.setState(Day.STATE_RULE);
-                save(day);
+                if (appAlarmAtPosition instanceof Day) {
+                    day.setState(Day.STATE_RULE);
+                    save(day);
+                }
                 break;
 
             case R.id.day_dismiss:

@@ -9,9 +9,12 @@ import android.util.Log;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import cz.jaro.alarmmorning.calendar.CalendarUtils;
 
@@ -29,6 +32,7 @@ public class AlarmDataSource {
     // Table fields
     private static final String[] allColumnsDefaults = {AlarmDbHelper.COLUMN_DEFAULTS_ID, AlarmDbHelper.COLUMN_DEFAULTS_DAY_OF_WEEK, AlarmDbHelper.COLUMN_DEFAULTS_STATE, AlarmDbHelper.COLUMN_DEFAULTS_HOUR, AlarmDbHelper.COLUMN_DEFAULTS_MINUTE};
     private static final String[] allColumnsDay = {AlarmDbHelper.COLUMN_DAY_ID, AlarmDbHelper.COLUMN_DAY_DATE, AlarmDbHelper.COLUMN_DAY_STATE, AlarmDbHelper.COLUMN_DAY_HOUR, AlarmDbHelper.COLUMN_DAY_MINUTE};
+    private static final String[] allColumnsOneTimeAlarm = {AlarmDbHelper.COLUMN_ONETIMEALARM_ID, AlarmDbHelper.COLUMN_ONETIMEALARM_ALARM_TIME, AlarmDbHelper.COLUMN_ONETIMEALARM_NAME};
 
     public static final int[] allDaysOfWeek = new int[]{Calendar.SUNDAY, Calendar.MONDAY, Calendar.TUESDAY, Calendar.WEDNESDAY, Calendar.THURSDAY, Calendar.FRIDAY, Calendar.SATURDAY};
 
@@ -156,6 +160,101 @@ public class AlarmDataSource {
         long id = database.insertWithOnConflict(AlarmDbHelper.TABLE_DAY, null, values, SQLiteDatabase.CONFLICT_REPLACE);
     }
 
+    /**
+     * Retrieve a {@code OneTimeAlarm} object from the database.
+     *
+     * @param id identifier of the object
+     * @return The retrieved object
+     */
+    public OneTimeAlarm loadOneTimeAlarm(int id) {
+        OneTimeAlarm oneTimeAlarm;
+
+        Cursor cursor = database.query(AlarmDbHelper.TABLE_ONETIMEALARM, allColumnsOneTimeAlarm, AlarmDbHelper.COLUMN_ONETIMEALARM_ID + " = ?", new String[]{String.valueOf(id)}, null, null, null);
+        if (cursor.getCount() == 0) {
+            oneTimeAlarm = null;
+        } else {
+            cursor.moveToFirst();
+            oneTimeAlarm = cursorToOneTimeAlarm(cursor);
+            cursor.close();
+        }
+
+        return oneTimeAlarm;
+    }
+
+    // TODO Remove one-time alarms older than today (if we keep the passed alarms in calednar, or now) (but not the currently ringing one).
+
+    /**
+     * Retrieve a set of {@code OneTimeAlarm}s objects from the database.
+     *
+     * @param from If not null, then only the objects with alarm time on or after {@code from} are retrieved.
+     * @return The list of retrieved objects
+     */
+    public List<OneTimeAlarm> loadOneTimeAlarms(Calendar from) {
+        List<OneTimeAlarm> oneTimeAlarms = new ArrayList<OneTimeAlarm>();
+
+        String selection;
+        String[] selectionArgs;
+        if (from == null) {
+            selection = null;
+            selectionArgs = null;
+        } else {
+            TimeZone utcTZ = TimeZone.getTimeZone(OneTimeAlarm.UTC);
+            Calendar fromUTC = Calendar.getInstance(utcTZ);
+            CalendarUtils.copyAllFields(from, fromUTC);
+            long fromMS = fromUTC.getTimeInMillis();
+
+            selection = "? <= " + AlarmDbHelper.COLUMN_ONETIMEALARM_ALARM_TIME;
+            selectionArgs = new String[]{String.valueOf(fromMS)};
+        }
+
+        Cursor cursor = database.query(AlarmDbHelper.TABLE_ONETIMEALARM, allColumnsOneTimeAlarm, selection, selectionArgs, null, null, null);
+        for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
+            OneTimeAlarm oneTimeAlarm = cursorToOneTimeAlarm(cursor);
+            oneTimeAlarms.add(oneTimeAlarm);
+        }
+
+        return oneTimeAlarms;
+    }
+
+    /**
+     * Retrieve the set of all {@code OneTimeAlarm}s objects from the database.
+     *
+     * @return The list of all retrieved objects
+     */
+    public List<OneTimeAlarm> loadOneTimeAlarms() {
+        return loadOneTimeAlarms(null);
+    }
+
+    /**
+     * Store the {@code OneTimeAlarm} object in the database.
+     * <p>
+     * If the object is inserted into the database, then the {@link OneTimeAlarm#id} is set to a new id.
+     *
+     * @param oneTimeAlarm object to be stored
+     */
+    public void saveOneTimeAlarm(OneTimeAlarm oneTimeAlarm) {
+        ContentValues values = new ContentValues();
+        values.put(AlarmDbHelper.COLUMN_ONETIMEALARM_ALARM_TIME, oneTimeAlarm.getAlarmTime());
+
+        if (oneTimeAlarm.getId() == 0) {
+            // Insert
+            long newID = database.insertWithOnConflict(AlarmDbHelper.TABLE_ONETIMEALARM, null, values, SQLiteDatabase.CONFLICT_REPLACE);
+            oneTimeAlarm.setId(newID);
+        } else {
+            // Update
+            long numberOfAffectedRows = database.updateWithOnConflict(AlarmDbHelper.TABLE_ONETIMEALARM, values, AlarmDbHelper.COLUMN_ONETIMEALARM_ID + " = " + oneTimeAlarm.getId(), null, SQLiteDatabase.CONFLICT_REPLACE);
+        }
+    }
+
+    /**
+     * Delete the {@code OneTimeAlarm} object from the database.
+     *
+     * @param oneTimeAlarm object to be deleted.
+     */
+    public void removeOneTimeAlarm(OneTimeAlarm oneTimeAlarm) {
+        database.delete(AlarmDbHelper.TABLE_ONETIMEALARM, AlarmDbHelper.COLUMN_ONETIMEALARM_ID + " = ?", new String[]{String.valueOf(oneTimeAlarm.getId())});
+    }
+
     private String dateToText(Calendar date) {
         return iso8601Format.format(date.getTime());
     }
@@ -195,9 +294,20 @@ public class AlarmDataSource {
         return day;
     }
 
+    private OneTimeAlarm cursorToOneTimeAlarm(Cursor cursor) {
+        OneTimeAlarm oneTimeAlarm = new OneTimeAlarm();
+
+        oneTimeAlarm.setId(cursor.getLong(0));
+        oneTimeAlarm.setAlarmTime(cursor.getLong(1));
+        oneTimeAlarm.setName(cursor.getString(2));
+
+        return oneTimeAlarm;
+    }
+
     public String dumpDB() {
         StringBuilder str = new StringBuilder();
 
+        // Table Defaults
         Cursor cursor = database.query(AlarmDbHelper.TABLE_DEFAULTS, allColumnsDefaults, null, null, null, null, null);
         str.append("Table Defaults, rows ").append(cursor.getCount()).append("\n");
         str.append("id |DoW|Sta| H | M \n");
@@ -216,6 +326,7 @@ public class AlarmDataSource {
         }
         cursor.close();
 
+        // Table Day
         cursor = database.query(AlarmDbHelper.TABLE_DAY, allColumnsDay, null, null, null, null, null);
         str.append("Table Day, rows ").append(cursor.getCount()).append("\n");
         str.append("id | Date       |Sta| H | M \n");
@@ -234,21 +345,45 @@ public class AlarmDataSource {
         }
         cursor.close();
 
+        // Table OneTimeAlarm
+        cursor = database.query(AlarmDbHelper.TABLE_ONETIMEALARM, allColumnsOneTimeAlarm, null, null, null, null, null);
+        str.append("Table OneTimeAlarm, rows ").append(cursor.getCount()).append("\n");
+        str.append("id | Date       | H | M \n");
+        str.append("---+------------+---+---\n");
+
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            OneTimeAlarm oneTimeAlarm = cursorToOneTimeAlarm(cursor);
+            str.
+                    append(" ").append(oneTimeAlarm.getId()).
+                    append(" | ").append(dateToText(oneTimeAlarm.getDateTime())).
+                    append(" | ").append(oneTimeAlarm.getDateTime().get(Calendar.HOUR_OF_DAY)).
+                    append(" | ").append(oneTimeAlarm.getDateTime().get(Calendar.MINUTE)).append("\n");
+            cursor.moveToNext();
+        }
+        cursor.close();
+
         return str.toString();
     }
 
     /**
      * Reset the database to the initial state.
      * <p>
-     * Deletes all Days and disables the Defaults.
+     * Deletes all Days and disables the Defaults, deletes all one-time alarms.
      */
     public void resetDatabase() {
         deleteAllDays();
         AlarmDbHelper.resetDefaults(database);
+
+        deleteAllOneTimeAlarms();
     }
 
     private void deleteAllDays() {
         database.delete(AlarmDbHelper.TABLE_DAY, null, null);
+    }
+
+    private void deleteAllOneTimeAlarms() {
+        database.delete(AlarmDbHelper.TABLE_ONETIMEALARM, null, null);
     }
 
 }

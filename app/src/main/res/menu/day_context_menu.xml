@@ -19,4 +19,8 @@
     <item
         android:id="@+id/day_revert"
         android:title="" />
+
+    <item
+        android:id="@+id/day_add_alarm"
+        android:title="@string/action_add_alarm" />
 </menu>

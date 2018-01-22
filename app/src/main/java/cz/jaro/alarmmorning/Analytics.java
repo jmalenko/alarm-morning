@@ -34,8 +34,10 @@ import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.clock.SystemClock;
 import cz.jaro.alarmmorning.holiday.HolidayHelper;
 import cz.jaro.alarmmorning.model.AlarmDataSource;
+import cz.jaro.alarmmorning.model.AppAlarm;
 import cz.jaro.alarmmorning.model.Day;
 import cz.jaro.alarmmorning.model.Defaults;
+import cz.jaro.alarmmorning.model.OneTimeAlarm;
 import cz.jaro.alarmmorning.wizard.Wizard;
 import de.jollyday.Holiday;
 
@@ -107,6 +109,7 @@ public class Analytics {
         Day_of_week_type,
         Alarm_state,
         Default_alarm_time,
+        Alarm_id,
 
         Alarm_time_old,
         Skipped_alarm_times,
@@ -302,6 +305,18 @@ public class Analytics {
         return this;
     }
 
+    public Analytics setAppAlarm(AppAlarm appAlarm) {
+        if (appAlarm instanceof Day) {
+            Day day = (Day) appAlarm;
+            return setDay(day);
+        } else if (appAlarm instanceof OneTimeAlarm) {
+            OneTimeAlarm oneTimeAlarm = (OneTimeAlarm) appAlarm;
+            return setOneTimeAlarm(oneTimeAlarm);
+        } else {
+            throw new IllegalArgumentException("Unexpected class " + appAlarm.getClass());
+        }
+    }
+
     public Analytics setDay(Day day) {
         if (day == null) {
             // TODO Verify that this invalid state doe not happen (see crash reporting). Then, this block can be deleted.
@@ -415,6 +430,29 @@ public class Analytics {
         defaultAlarmTime.set(Calendar.MINUTE, minute);
 
         return calendarToTime(defaultAlarmTime);
+    }
+
+    public Analytics setOneTimeAlarm(OneTimeAlarm oneTimeAlarm) {
+        Calendar alarmTime = oneTimeAlarm.getDateTime();
+
+        String alarmDateString = calendarToDate(alarmTime);
+        mPayload.putString(Param.Alarm_date.name(), alarmDateString);
+
+        String alarmTimeString = calendarToTime(alarmTime);
+        mPayload.putString(Param.Alarm_time.name(), alarmTimeString);
+
+        String dayOfWeekString = alarmTime.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.US);
+        mPayload.putString(Param.Day_of_week.name(), dayOfWeekString);
+
+        com.ibm.icu.util.Calendar c = com.ibm.icu.util.Calendar.getInstance();
+        int dayOfWeek = alarmTime.get(Calendar.DAY_OF_WEEK);
+        int dayOfWeekType = c.getDayOfWeekType(dayOfWeek);
+        String dayOfWeekTypeString = dayOfWeekType == com.ibm.icu.util.Calendar.WEEKEND ? DAY_OF_WEEK_TYPE__WEEKEND : DAY_OF_WEEK_TYPE__WEEKDAY;
+        mPayload.putString(Param.Day_of_week_type.name(), dayOfWeekTypeString);
+
+        mPayload.putLong(Param.Alarm_id.name(), oneTimeAlarm.getId());
+
+        return this;
     }
 
     public Analytics setConfigurationInfo() {
@@ -719,7 +757,7 @@ public class Analytics {
 
     public static String calendarToTime(int hour, int minute) {
         Calendar calendar = CalendarUtils.newGregorianCalendar();
-        calendar.set(Calendar.HOUR, hour);
+        calendar.set(Calendar.HOUR_OF_DAY, hour);
         calendar.set(Calendar.MINUTE, minute);
 
         return calendarToTime(calendar);

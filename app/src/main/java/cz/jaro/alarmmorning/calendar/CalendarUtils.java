@@ -479,4 +479,23 @@ public class CalendarUtils {
     public static Calendar newGregorianCalendar() {
         return beginningOfToday(new GregorianCalendar());
     }
+
+    /**
+     * Copies all fields from source calendar to target calendar.
+     * <p>
+     * This method is useful for setting all the fields of the target calendar in a different time zone such that all the fields should be the same as in the
+     * source calendar.
+     *
+     * @param source source calendar
+     * @param target target calendar
+     */
+    public static void copyAllFields(Calendar source, Calendar target) {
+        target.set(Calendar.YEAR, source.get(Calendar.YEAR));
+        target.set(Calendar.MONTH, source.get(Calendar.MONTH));
+        target.set(Calendar.DATE, source.get(Calendar.DATE));
+        target.set(Calendar.HOUR_OF_DAY, source.get(Calendar.HOUR_OF_DAY));
+        target.set(Calendar.MINUTE, source.get(Calendar.MINUTE));
+        target.set(Calendar.SECOND, source.get(Calendar.SECOND));
+        target.set(Calendar.MILLISECOND, source.get(Calendar.MILLISECOND));
+    }
 }

@@ -18,6 +18,8 @@ import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.RemoteViews;
 import android.widget.TextView;
 
 import org.junit.After;
@@ -33,6 +35,8 @@ import org.robolectric.fakes.RoboMenuItem;
 import org.robolectric.shadows.ShadowActivity;
 import org.robolectric.shadows.ShadowAlarmManager;
 import org.robolectric.shadows.ShadowAppWidgetManager;
+import org.robolectric.shadows.ShadowDrawable;
+import org.robolectric.shadows.ShadowNotification;
 import org.robolectric.shadows.ShadowNotificationManager;
 import org.robolectric.shadows.ShadowPendingIntent;
 import org.robolectric.shadows.ShadowTimePickerDialog;
@@ -155,7 +159,7 @@ public class CalendarTest extends FixedTimeTest {
         assertSystemAlarmClockNone();
 
         // Check notification
-        assertThat(shadowNotificationManager.size(), is(0));
+        assertNotificationCount(0);
 
         // Check widget
         assertWidget(R.drawable.ic_alarm_off_white, "No alarm", null);
@@ -201,14 +205,14 @@ public class CalendarTest extends FixedTimeTest {
         assertSystemAlarmClock(YEAR, MONTH, DAY, DEFAULT_ALARM_HOUR, DEFAULT_ALARM_MINUTE);
 
         // Check notification
-        assertThat(shadowNotificationManager.size(), is(0));
+        assertNotificationCount(0);
 
         // Check widget
         assertWidget(R.drawable.ic_alarm_white, "07:00", "Mon");
     }
 
     @Test
-    public void t11_setAlarmTwice() {
+    public void t11_changeAlarm() {
         // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
         consumeNextScheduledAlarm();
 
@@ -263,7 +267,7 @@ public class CalendarTest extends FixedTimeTest {
         assertSystemAlarmClock(YEAR, MONTH, DAY, DEFAULT_ALARM_HOUR + 2, DEFAULT_ALARM_MINUTE + 2);
 
         // Check notification
-        assertThat(shadowNotificationManager.size(), is(0));
+        assertNotificationCount(0);
 
         // Check widget
         assertWidget(R.drawable.ic_alarm_white, "9:02 AM", "Mon");
@@ -311,7 +315,7 @@ public class CalendarTest extends FixedTimeTest {
         }
 
         // Check notification
-        assertThat(shadowNotificationManager.size(), is(0));
+        assertNotificationCount(0);
 
         // Check widget
         assertWidget(R.drawable.ic_alarm_off_white, "No alarm", null);
@@ -354,7 +358,7 @@ public class CalendarTest extends FixedTimeTest {
         assertSystemAlarmClock(YEAR, MONTH, DAY, DEFAULT_ALARM_HOUR, DEFAULT_ALARM_MINUTE);
 
         // Check notification
-        assertThat(shadowNotificationManager.size(), is(0));
+        assertNotificationCount(0);
 
         // Check widget
         assertWidget(R.drawable.ic_alarm_white, "7:00 AM", "Mon");
@@ -394,7 +398,7 @@ public class CalendarTest extends FixedTimeTest {
         assertSystemAlarmClock(YEAR, MONTH, DAY + 1, DEFAULT_ALARM_HOUR, DEFAULT_ALARM_MINUTE);
 
         // Check notification
-        assertThat(shadowNotificationManager.size(), is(0));
+        assertNotificationCount(0);
 
         // Check widget
         assertWidget(R.drawable.ic_alarm_white, "7:00 AM", "Tue");
@@ -411,14 +415,10 @@ public class CalendarTest extends FixedTimeTest {
         assertSystemAlarmClock(YEAR, MONTH, DAY, DEFAULT_ALARM_HOUR, DEFAULT_ALARM_MINUTE);
 
         // Check notification
-        // TODO Fails when run with other test (fine when run as the only test)
-//        assertThat(shadowNotificationManager.size(), is(1));
+//        assertNotificationCount(1);
 //
 //        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
-//        ShadowNotification shadowNotification = Shadows.shadowOf(notification);
-//
-//        assertThat(shadowNotification.getBigContentTitle(), is("Alarm at 7:00 AM"));
-//        assertThat(shadowNotification.getBigContentText(), is("Touch to view all alarms"));
+//        assertNotification(notification, "Alarm at 7:00 AM", "Touch to view all alarms");
 //        assertNotificationActionCount(notification, 1);
 //        assertNotificationAction(notification, 0, "Dismiss", NotificationReceiver.ACTION_DISMISS_BEFORE_RINGING);
 
@@ -456,7 +456,7 @@ public class CalendarTest extends FixedTimeTest {
         assertSystemAlarmClockNone();
 
         // Check notification
-        assertThat(shadowNotificationManager.size(), is(0));
+        assertNotificationCount(0);
 
         // Check widget
         assertWidget(R.drawable.ic_alarm_off_white, "No alarm", null);
@@ -482,14 +482,10 @@ public class CalendarTest extends FixedTimeTest {
         assertSystemAlarmClockNone();
 
         // Check notification
-        // TODO Fails when run with other test (fine when run as the only test)
-//        assertThat(shadowNotificationManager.size(), is(1));
+//        assertNotificationCount(1);
 //
 //        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
-//        ShadowNotification shadowNotification = Shadows.shadowOf(notification);
-//
-//        assertThat(shadowNotification.getBigContentTitle(), is("Alarm at 7:00 AM"));
-//        assertThat(shadowNotification.getBigContentText(), is("Ringing"));
+//        assertNotification(notification, "Alarm at 7:00 AM", "Ringing");
 //        assertNotificationActionCount(notification, 2);
 //        assertNotificationAction(notification, 0, "Dismiss", NotificationReceiver.ACTION_DISMISS);
 //        assertNotificationAction(notification, 1, "Snooze", NotificationReceiver.ACTION_SNOOZE);
@@ -538,14 +534,10 @@ public class CalendarTest extends FixedTimeTest {
         assertSystemAlarmClock(YEAR, MONTH, DAY + 1, DEFAULT_ALARM_HOUR + 1, DEFAULT_ALARM_MINUTE + 1);
 
         // Check notification
-        // TODO Fails when run with other test (fine when run as the only test)
-//        assertThat(shadowNotificationManager.size(), is(1));
+//        assertNotificationCount(1);
 //
 //        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
-//        ShadowNotification shadowNotification = Shadows.shadowOf(notification);
-//
-//        assertThat(shadowNotification.getBigContentTitle(), is("Alarm at 7:00 AM"));
-//        assertThat(shadowNotification.getBigContentText(), is("Ringing"));
+//        assertNotification(notification, "Alarm at 7:00 AM", "Ringing");
 //        assertNotificationActionCount(notification, 2);
 //        assertNotificationAction(notification, 0, "Dismiss", NotificationReceiver.ACTION_DISMISS);
 //        assertNotificationAction(notification, 1, "Snooze", NotificationReceiver.ACTION_SNOOZE);
@@ -579,7 +571,7 @@ public class CalendarTest extends FixedTimeTest {
         assertSystemAlarmClockNone();
 
         // Check notification
-        assertThat(shadowNotificationManager.size(), is(0));
+        assertNotificationCount(0);
 
         // Check widget
         assertWidget(R.drawable.ic_alarm_off_white, "No alarm", null);
@@ -598,6 +590,16 @@ public class CalendarTest extends FixedTimeTest {
 
         snoozeButton.performClick();
 
+        // Start Calendar
+        startActivityCalendar();
+
+        // Check calendar
+        loadItemAtPosition(0);
+        assertThat(textDate.getText(), is("2/1"));
+        assertThat(textDoW.getText(), is("Mon"));
+        assertThat(textTime.getText(), is("7:00 AM"));
+        assertThat(textState.getText(), is("Snoozed"));
+
         // Check system alarm
         assertSystemAlarm(YEAR, MONTH, DAY, DEFAULT_ALARM_HOUR, DEFAULT_ALARM_MINUTE + 10, SystemAlarm.ACTION_RING);
 
@@ -605,14 +607,10 @@ public class CalendarTest extends FixedTimeTest {
         assertSystemAlarmClockNone();
 
         // Check notification
-        // TODO Fails when run with other test (fine when run as the only test)
-//        assertThat(shadowNotificationManager.size(), is(1));
+//        assertNotificationCount(1);
 //
 //        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
-//        ShadowNotification shadowNotification = Shadows.shadowOf(notification);
-//
-//        assertThat(shadowNotification.getBigContentTitle(), is("Alarm at 7:00 AM"));
-//        assertThat(shadowNotification.getBigContentText(), is("Snoozed till 7:10 AM"));
+//        assertNotification(notification, "Alarm at 7:00 AM", "Snoozed till 7:10 AM");
 //        assertNotificationActionCount(notification, 1);
 //        assertNotificationAction(notification, 0, "Dismiss", NotificationReceiver.ACTION_DISMISS);
 
@@ -648,7 +646,7 @@ public class CalendarTest extends FixedTimeTest {
         assertSystemAlarmClockNone();
 
         // Check notification
-        assertThat(shadowNotificationManager.size(), is(0));
+        assertNotificationCount(0);
 
         // Check widget
         assertWidget(R.drawable.ic_alarm_off_white, "No alarm", null);
@@ -690,7 +688,7 @@ public class CalendarTest extends FixedTimeTest {
         assertSystemAlarmClock(YEAR, MONTH, DAY, DEFAULT_ALARM_HOUR + 6, DEFAULT_ALARM_MINUTE);
 
         // Check notification
-        assertThat(shadowNotificationManager.size(), is(0));
+        assertNotificationCount(0);
 
         // Check widget
         assertWidget(R.drawable.ic_alarm_white, "13:00", "Mon");
@@ -727,7 +725,7 @@ public class CalendarTest extends FixedTimeTest {
         assertSystemAlarmClockNone();
 
         // Check notification
-        assertThat(shadowNotificationManager.size(), is(0));
+        assertNotificationCount(0);
 
         // Check widget
         assertWidget(R.drawable.ic_alarm_off_white, "No alarm", null);
@@ -757,7 +755,7 @@ public class CalendarTest extends FixedTimeTest {
         assertSystemAlarmClockNone();
 
         // Check notification
-        assertThat(shadowNotificationManager.size(), is(0));
+        assertNotificationCount(0);
 
         // Check widget
         assertWidget(R.drawable.ic_alarm_off_white, "No alarm", null);
@@ -786,13 +784,9 @@ public class CalendarTest extends FixedTimeTest {
     }
 
     private void prepareUntilRing() {
-        // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
-        consumeNextScheduledAlarm();
+        prepareUntilNear();
 
-        // Save day
-        setAlarmToToday();
-
-        // Consume the alarm with action ACTION_RING_IN_NEAR_FUTURE
+        // Consume the alarm with action ACTION_RING
         consumeNextScheduledAlarm();
 
         // Shift clock
@@ -808,29 +802,10 @@ public class CalendarTest extends FixedTimeTest {
     }
 
     private void prepareUntilSnooze() {
+        prepareUntilRing();
+
         // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
         consumeNextScheduledAlarm();
-
-        // Save day
-        setAlarmToToday();
-
-        // Consume the alarm with action ACTION_RING_IN_NEAR_FUTURE
-        consumeNextScheduledAlarm();
-
-        // Shift clock - must go through onNearFuture() as it calls globalManager.setNextAction()
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DEFAULT, MINUTE_DEFAULT)));
-
-        // Call the receiver
-        Intent intent = new Intent();
-        intent.setAction(SystemAlarm.ACTION_RING);
-        AlarmReceiver alarmReceiver = new AlarmReceiver();
-        alarmReceiver.onReceive(context, intent);
-
-        // Consume the alarm with action ACTION_RING
-        consumeNextScheduledAlarm();
-
-        // Shift clock
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DEFAULT, MINUTE_DEFAULT, 10)));
 
         // Start ring activity
         Calendar alarmTime = new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DEFAULT, MINUTE_DEFAULT);
@@ -841,7 +816,7 @@ public class CalendarTest extends FixedTimeTest {
         // Consume the alarm with action ACTION_RING
         consumeNextScheduledAlarm();
 
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DEFAULT, MINUTE_DEFAULT, 10)));
+        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DEFAULT, MINUTE_DEFAULT, 20)));
     }
 
     public static void setNearFuturePeriodPreferenceToZero(Context context) {
@@ -854,7 +829,6 @@ public class CalendarTest extends FixedTimeTest {
         editor.putInt(SettingsActivity.PREF_NEAR_FUTURE_TIME, minutes);
         editor.commit();
     }
-
 
     private void consumeNextScheduledAlarm() {
         assertThat(shadowAlarmManager.getScheduledAlarms().size(), is(1));
@@ -970,6 +944,11 @@ public class CalendarTest extends FixedTimeTest {
     }
 
     private void assertSystemAlarmClock(int year, int month, int day, int hour, int minute) {
+        assertSystemAlarmClock(context, alarmManager, shadowAlarmManager, year, month, day, hour, minute);
+    }
+
+    public static void assertSystemAlarmClock(Context context, AlarmManager alarmManager, ShadowAlarmManagerAPI21 shadowAlarmManager,
+                                              int year, int month, int day, int hour, int minute) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             AlarmManager.AlarmClockInfo alarmClockInfo = alarmManager.getNextAlarmClock();
 
@@ -1008,19 +987,46 @@ public class CalendarTest extends FixedTimeTest {
     }
 
     private void assertSystemAlarmClockNone() {
+        assertSystemAlarmClockNone(alarmManager);
+    }
+
+    public static void assertSystemAlarmClockNone(AlarmManager alarmManager) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             AlarmManager.AlarmClockInfo alarmClockInfo = alarmManager.getNextAlarmClock();
             assertNull(alarmClockInfo);
         }
     }
 
-    private void assertNotificationActionCount(Notification notification, int count) {
+    private void assertNotificationCount(int count) {
+        assertNotificationCount(shadowNotificationManager, count);
+    }
+
+    public static void assertNotificationCount(ShadowNotificationManager shadowNotificationManager, int count) {
+        // TODO Fix test of notification - Fails when test run as class (fine when run as the only method in a test) (and uncomment the calls of this method)
+        assertThat(shadowNotificationManager.size(), is(count));
+    }
+
+    public static void assertNotification(Notification notification, String bigContentTitle, String bigContentText) {
+        // TODO Fix test of notification - Fails when test run as class (fine when run as the only method in a test) (and uncomment the calls of this method)
+        ShadowNotification shadowNotification = Shadows.shadowOf(notification);
+
+        assertThat(shadowNotification.getBigContentTitle(), is(bigContentTitle));
+        assertThat(shadowNotification.getBigContentText(), is(bigContentText));
+    }
+
+    public static void assertNotificationActionCount(Notification notification, int count) {
+        // TODO Fix test of notification - Fails when test run as class (fine when run as the only method in a test) (and uncomment the calls of this method)
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
             assertThat(notification.actions.length, is(count));
         }
     }
 
     private void assertNotificationAction(Notification notification, int index, String title, String actionString) {
+        assertNotificationAction(context, notification, index, title, actionString);
+    }
+
+    public static void assertNotificationAction(Context context, Notification notification, int index, String title, String actionString) {
+        // TODO Fix test of notification - Fails when test run as class (fine when run as the only method in a test)
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
             Notification.Action actionButton = notification.actions[index];
             assertThat(actionButton.title, is(title));
@@ -1038,20 +1044,22 @@ public class CalendarTest extends FixedTimeTest {
     }
 
     private void assertWidget(int iconResId, String time, String date) {
+        assertWidget(context, shadowAppWidgetManager, iconResId, time, date);
+    }
+
+    public static void assertWidget(Context context, ShadowAppWidgetManager shadowAppWidgetManager, int iconResId, String time, String date) {
         // TODO Fix test of widget
-
-//        Activity activity = buildActivity(Activity.class).create().get();
-//        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.widget_layout);
+        Activity activity = buildActivity(Activity.class).create().get();
+        RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.widget_layout);
 //        View view = remoteViews.apply(activity, null);
-//
-//        int widgetId = shadowAppWidgetManager.createWidget(WidgetProvider.class, R.layout.widget_layout);
-//        View view = shadowAppWidgetManager.getViewFor(widgetId);
-//
-//        ImageView widgetIcon = (ImageView) view.findViewById(R.id.icon);
-//        ShadowDrawable shadowWidgetIconDrawable = Shadows.shadowOf(widgetIcon.getDrawable());
-//        TextView widgetTime = (TextView) view.findViewById(R.id.alarm_time);
-//        TextView widgetDate = (TextView) view.findViewById(R.id.alarm_date);
 
+        int widgetId = shadowAppWidgetManager.createWidget(WidgetProvider.class, R.layout.widget_layout);
+        View view = shadowAppWidgetManager.getViewFor(widgetId);
+
+        ImageView widgetIcon = (ImageView) view.findViewById(R.id.icon);
+        ShadowDrawable shadowWidgetIconDrawable = Shadows.shadowOf(widgetIcon.getDrawable());
+        TextView widgetTime = (TextView) view.findViewById(R.id.alarm_time);
+        TextView widgetDate = (TextView) view.findViewById(R.id.alarm_date);
 
 //        assertThat(shadowWidgetIconDrawable.getCreatedFromResId(), is(iconResId));
 //        assertThat(widgetTime.getText().toString(), is(time));

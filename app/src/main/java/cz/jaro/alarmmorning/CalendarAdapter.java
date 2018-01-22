@@ -10,7 +10,9 @@ import android.widget.TextView;
 
 import java.util.Calendar;
 
+import cz.jaro.alarmmorning.model.AppAlarm;
 import cz.jaro.alarmmorning.model.Day;
+import cz.jaro.alarmmorning.model.OneTimeAlarm;
 
 /**
  * Provide views to RecyclerView with data from mDataSet.
@@ -49,16 +51,35 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
     public void onBindViewHolder(CalendarViewHolder viewHolder, final int position) {
         Log.v(TAG, "onBindViewHolder(position=" + position);
 
-        Day day = fragment.loadPosition(position);
-        Calendar date = day.getDateTime();
+        AppAlarm appAlarm = fragment.loadPosition(position);
+        Day day = null;
+        OneTimeAlarm oneTimeAlarm = null;
+        if (appAlarm instanceof Day) {
+            day = (Day) appAlarm;
+        } else if (appAlarm instanceof OneTimeAlarm) {
+            oneTimeAlarm = (OneTimeAlarm) appAlarm;
+        } else {
+            throw new IllegalArgumentException("Unexpected class " + appAlarm.getClass());
+        }
 
+        Calendar date = appAlarm.getDateTime();
+        int dayOfWeek = date.get(Calendar.DAY_OF_WEEK);
         Resources res = fragment.getResources();
 
-        int dayOfWeek = date.get(Calendar.DAY_OF_WEEK);
-        String dayOfWeekText = Localization.dayOfWeekToStringShort(res, dayOfWeek);
+        String dayOfWeekText;
+        if (appAlarm instanceof Day) {
+            dayOfWeekText = Localization.dayOfWeekToStringShort(res, dayOfWeek);
+        } else {
+            dayOfWeekText = "";
+        }
         viewHolder.getTextDayOfWeek().setText(dayOfWeekText);
 
-        String dateText = Localization.dateToStringVeryShort(res, date.getTime());
+        String dateText;
+        if (appAlarm instanceof Day) {
+            dateText = Localization.dateToStringVeryShort(res, date.getTime());
+        } else {
+            dateText = oneTimeAlarm.getName() != null ? oneTimeAlarm.getName() : "";
+        }
         viewHolder.getTextDate().setText(dateText);
 
         int backgroundColor;
@@ -76,30 +97,37 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         viewHolder.getTextDate().setBackgroundColor(backgroundColor);
 
         String timeText;
-        if (day.isEnabled()) {
-            timeText = Localization.timeToString(day.getHourX(), day.getMinuteX(), fragment.getActivity());
+        if (appAlarm instanceof Day) {
+            if (day.isEnabled()) {
+                timeText = Localization.timeToString(day.getHourX(), day.getMinuteX(), fragment.getActivity());
+            } else {
+                timeText = res.getString(R.string.alarm_unset);
+            }
         } else {
-            timeText = res.getString(R.string.alarm_unset);
+            timeText = Localization.timeToString(oneTimeAlarm.getHour(), oneTimeAlarm.getMinute(), fragment.getActivity());
         }
         viewHolder.getTextTime().setText(timeText);
 
         GlobalManager globalManager = GlobalManager.getInstance();
-        int state = globalManager.getState(day.getDateTime());
+        int state = globalManager.getState(appAlarm.getDateTime());
 
         boolean enabled;
-        enabled = !day.isEnabled() || (state != GlobalManager.STATE_DISMISSED_BEFORE_RINGING && state != GlobalManager.STATE_DISMISSED);
+        enabled = (appAlarm instanceof Day && !day.isEnabled()) || (state != GlobalManager.STATE_DISMISSED_BEFORE_RINGING && state != GlobalManager.STATE_DISMISSED);
         viewHolder.getTextTime().setEnabled(enabled);
 
         String stateText;
-        if (day.isHoliday() && day.getState() == Day.STATE_RULE) {
+        if (appAlarm instanceof Day && day.isHoliday() && day.getState() == Day.STATE_RULE) {
             stateText = res.getString(R.string.holiday);
-        } else if (!day.isEnabled()) {
+        } else if (appAlarm instanceof Day && !day.isEnabled()) {
             stateText = day.sameAsDefault() && !day.isHoliday() ? "" : res.getString(R.string.alarm_state_changed);
         } else {
             if (state == GlobalManager.STATE_FUTURE) {
-                stateText = day.sameAsDefault() && !day.isHoliday() ? "" : res.getString(R.string.alarm_state_changed);
+                if (appAlarm instanceof Day)
+                    stateText = day.sameAsDefault() && !day.isHoliday() ? "" : res.getString(R.string.alarm_state_changed);
+                else
+                    stateText = "";
             } else if (state == GlobalManager.STATE_DISMISSED_BEFORE_RINGING) {
-                if (day.isPassed(fragment.clock()))
+                if (appAlarm.isPassed(fragment.clock()))
                     stateText = res.getString(R.string.alarm_state_passed);
                 else
                     stateText = res.getString(R.string.alarm_state_dismissed_before_ringing);
@@ -116,11 +144,11 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         viewHolder.getTextState().setText(stateText);
 
         String messageText;
-        if (day.isHoliday() && day.getState() == Day.STATE_RULE) {
+        if (appAlarm instanceof Day && day.isHoliday() && day.getState() == Day.STATE_RULE) {
             messageText = day.getHolidayDescription();
         } else {
-            if (fragment.positionWithNextAlarm(position)) {
-                long diff = day.getTimeToRing(fragment.clock());
+            if (fragment.isPositionWithNextAlarm(position)) {
+                long diff = appAlarm.getTimeToRing(fragment.clock());
 
                 TimeDifference timeDifference = TimeDifference.split(diff);
 
@@ -143,9 +171,8 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
      */
     @Override
     public int getItemCount() {
-        return GlobalManager.HORIZON_DAYS;
+        return fragment.getItemCount();
     }
-
 
     /**
      * Provide a reference to the type of views that you are using (custom ViewHolder)
