@@ -652,7 +652,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
             MenuItem revertItem = menu.findItem(R.id.day_revert);
             Defaults defaults = day.getDefaults();
             String timeText;
-            if (defaults.isEnabled()) {
+            if (defaults.isEnabled() && !day.isHoliday()) {
                 timeText = Localization.timeToString(defaults.getHour(), defaults.getMinute(), getActivity());
             } else {
                 timeText = getResources().getString(R.string.alarm_unset);
