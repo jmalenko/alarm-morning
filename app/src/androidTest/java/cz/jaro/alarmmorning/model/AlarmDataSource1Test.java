@@ -15,8 +15,11 @@ import cz.jaro.alarmmorning.GlobalManager;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 
+/**
+ * Tests without the need for resetting the database.
+ */
 @RunWith(AndroidJUnit4.class)
-public class AlarmDataSourceTest {
+public class AlarmDataSource1Test {
 
     // February 2016 starts with Monday
     public static final int YEAR = 2016;

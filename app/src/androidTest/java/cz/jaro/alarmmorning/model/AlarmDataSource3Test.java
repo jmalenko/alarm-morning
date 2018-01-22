@@ -13,14 +13,17 @@ import java.util.List;
 import cz.jaro.alarmmorning.Analytics;
 import cz.jaro.alarmmorning.GlobalManager;
 
-import static cz.jaro.alarmmorning.model.AlarmDataSourceTest.DAY;
-import static cz.jaro.alarmmorning.model.AlarmDataSourceTest.HOUR_DAY;
-import static cz.jaro.alarmmorning.model.AlarmDataSourceTest.MINUTE_DAY;
-import static cz.jaro.alarmmorning.model.AlarmDataSourceTest.MONTH;
-import static cz.jaro.alarmmorning.model.AlarmDataSourceTest.YEAR;
+import static cz.jaro.alarmmorning.model.AlarmDataSource1Test.DAY;
+import static cz.jaro.alarmmorning.model.AlarmDataSource1Test.HOUR_DAY;
+import static cz.jaro.alarmmorning.model.AlarmDataSource1Test.MINUTE_DAY;
+import static cz.jaro.alarmmorning.model.AlarmDataSource1Test.MONTH;
+import static cz.jaro.alarmmorning.model.AlarmDataSource1Test.YEAR;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 
+/**
+ * Tests with a database preset to particular scenario: there are several Days and defaults are off.
+ */
 @RunWith(AndroidJUnit4.class)
 public class AlarmDataSource3Test {
 
@@ -31,6 +34,7 @@ public class AlarmDataSource3Test {
     @Before
     public void before() throws Exception {
         globalManager = GlobalManager.getInstance();
+        globalManager.reset();
 
         for (int i = 0; i < DAYS; i++) {
             Day day = new Day();

@@ -12,11 +12,11 @@ import cz.jaro.alarmmorning.Analytics;
 import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.clock.FixedClock;
 
-import static cz.jaro.alarmmorning.model.AlarmDataSourceTest.DAY;
-import static cz.jaro.alarmmorning.model.AlarmDataSourceTest.HOUR_DAY;
-import static cz.jaro.alarmmorning.model.AlarmDataSourceTest.MINUTE_DAY;
-import static cz.jaro.alarmmorning.model.AlarmDataSourceTest.MONTH;
-import static cz.jaro.alarmmorning.model.AlarmDataSourceTest.YEAR;
+import static cz.jaro.alarmmorning.model.AlarmDataSource1Test.DAY;
+import static cz.jaro.alarmmorning.model.AlarmDataSource1Test.HOUR_DAY;
+import static cz.jaro.alarmmorning.model.AlarmDataSource1Test.MINUTE_DAY;
+import static cz.jaro.alarmmorning.model.AlarmDataSource1Test.MONTH;
+import static cz.jaro.alarmmorning.model.AlarmDataSource1Test.YEAR;
 import static junit.framework.Assert.assertEquals;
 
 @RunWith(AndroidJUnit4.class)
