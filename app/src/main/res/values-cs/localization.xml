@@ -20,5 +20,5 @@
 
     <string name="date_format_very_short">d. M.</string>
     <string name="date_format_full"></string>
-    <string name="time_format">HH:mm</string>
+    <string name="time_format"></string>
 </resources>
