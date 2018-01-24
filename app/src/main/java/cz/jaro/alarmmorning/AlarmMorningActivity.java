@@ -68,7 +68,33 @@ public class AlarmMorningActivity extends AppCompatActivity {
     public static final String URL_TRANSLATE = "https://crowdin.com/project/alarm-morning";
     public static final String URL_DONATE = "https://www.paypal.me/jaromirmalenko/10usd";
 
-    private static final List<String> TRANSLATIONS = Arrays.asList("en_US", "cs_CZ"); // TODO Set programmatically (when that becomes possible in Android). For now, keep consistent with res\values directories. https://stackoverflow.com/questions/34797956/android-programmatically-check-if-app-is-localized-for-a-language
+    // TODO Set programmatically (when that becomes possible in Android). For now, keep consistent with res\values directories. https://stackoverflow.com/questions/34797956/android-programmatically-check-if-app-is-localized-for-a-language
+    private static final List<String> TRANSLATIONS = Arrays.asList(
+            "en_US", // default language
+            "cs_CZ", // manually updated by author Jaromír Malenko
+            /*
+            The following translations are updated from Crowdin.com.
+
+            Only the translations that satisfy certain criteria are accepted:
+              1. Translated by a human
+              2. No syntax errors
+
+            There a problem with translating "Balinese" as displayed in Crowdin website to "ban" Android locale . Currently, the relevant part of Crowdin URLs
+            is used. Event after that, testing Balinese in Android is impossible as there is no item Balinese in Android language settings.
+            */
+            "ban_ID",
+            "es_ES",
+            "es_CO",
+            "mk_rMK",
+            "nl_NL",
+            "pl_PL",
+            "pt_PT",
+            "ro_RO",
+            "zh_CN",
+            "zh_HK",
+            "zh_SG",
+            "zh_TW"
+    );
 
     public static final int REQUEST_CODE_WIZARD = 1;
 
