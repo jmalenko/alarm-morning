@@ -52,9 +52,9 @@
     <string name="wizard_set_actions_title">Nastavit akce při zvonění</string>
     <string name="wizard_set_actions_description">Také můžete reagovat na stisk klávesy nebo senzor vzdálenosti.</string>
 
-    <string name="mute_alarm_for_10_seconds_on_device_move">Ztišit na 10 sekund pro pohybu zařízení</string>
-    <string name="snooze_alarm_on_device_flip">Odložit při obrázení vzůru nohama</string>
-    <string name="dismiss_alarm_on_device_shake">Ukončit při zatřesení</string>
+    <string name="mute_alarm_for_10_seconds_on_device_move">Ztišit budík na 10 sekund při pohybu zařízením</string>
+    <string name="snooze_alarm_on_device_flip">Odložit budík při obrácení zařízení vzhůru nohama</string>
+    <string name="dismiss_alarm_on_device_shake">Ukončit budík při zatřesení zařízením</string>
 
     <string name="wizard_set_features_title">Nastavit pokročilé funkce budíku</string>
     <string name="wizard_set_features_description">Každý večer ve <xliff:g example="22:00" id="time">%1$s</xliff:g> dělej…</string>
@@ -72,7 +72,7 @@
 <p><b>INTERNET</b> – pro použití sítě (aktualizace seznamu svátků)</p>
 ]]></string>
 
-    <string name="wizard_done_title">Vše je připraveno</string>
+    <string name="wizard_done_title">Vše je hotovo</string>
     <string name="wizard_done_description">Přejeme klidný spánek a ať se nemusíte starat o nastavování budíku.</string>
 
     <!-- Set alarm by voice -->
@@ -81,7 +81,7 @@
     <string name="blink_set">Nastaven budík na</string>
     <string name="blink_snooze">Odložen na</string>
     <string name="blink_dismiss">Ukončený</string>
-    <string name="blink_invalid">Špatný příkaz</string>
+    <string name="blink_invalid">Neplatný příkaz</string>
 
     <!-- Notification -->
     <string name="notification_title">Budík v <xliff:g example="07:00" id="time">%1$s</xliff:g></string>
