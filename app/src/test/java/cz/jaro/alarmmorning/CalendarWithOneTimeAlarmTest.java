@@ -1088,10 +1088,10 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE)));
 
         // Call the receiver
-        Intent intent2 = new Intent();
-        intent2.setAction(SystemAlarm.ACTION_RING);
+        Intent intent = new Intent();
+        intent.setAction(SystemAlarm.ACTION_RING);
         AlarmReceiver alarmReceiver2 = new AlarmReceiver();
-        alarmReceiver2.onReceive(context, intent2);
+        alarmReceiver2.onReceive(context, intent);
 
         shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE, 10)));
     }
