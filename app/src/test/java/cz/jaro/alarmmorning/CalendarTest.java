@@ -1013,6 +1013,10 @@ public class CalendarTest extends FixedTimeTest {
         assertThat("Action", shadowOperation.getSavedIntent().getAction(), is(action));
     }
 
+    public static void assertSystemAlarmNone(ShadowAlarmManager shadowAlarmManager) {
+        assertThat("Alarm count", shadowAlarmManager.getScheduledAlarms().size(), is(0));
+    }
+
     private void assertSystemAlarmClock(int year, int month, int day, int hour, int minute) {
         assertSystemAlarmClock(context, alarmManager, shadowAlarmManager, year, month, day, hour, minute);
     }

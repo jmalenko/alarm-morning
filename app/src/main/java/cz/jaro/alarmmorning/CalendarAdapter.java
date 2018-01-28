@@ -1,15 +1,24 @@
 package cz.jaro.alarmmorning;
 
 import android.content.res.Resources;
+import android.graphics.Rect;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.TouchDelegate;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.Calendar;
 
+import cz.jaro.alarmmorning.calendar.CalendarUtils;
 import cz.jaro.alarmmorning.model.AppAlarm;
 import cz.jaro.alarmmorning.model.Day;
 import cz.jaro.alarmmorning.model.OneTimeAlarm;
@@ -38,9 +47,6 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
     @Override
     public CalendarViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.calendar_row_item, viewGroup, false);
-
-        view.setOnClickListener(fragment);
-
         return new CalendarViewHolder(view);
     }
 
@@ -62,12 +68,30 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
             throw new IllegalArgumentException("Unexpected class " + appAlarm.getClass());
         }
 
+        // Set listeners
+        viewHolder.itemView.setOnClickListener(fragment);
+
+        if (appAlarm instanceof OneTimeAlarm) {
+            LinearLayout headerView = viewHolder.getHeaderDate();
+            headerView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    fragment.onSetDate(viewHolder.itemView);
+                }
+            });
+        }
+
+        // Set appearance
+
         Calendar date = appAlarm.getDateTime();
         int dayOfWeek = date.get(Calendar.DAY_OF_WEEK);
         Resources res = fragment.getResources();
 
         String dayOfWeekText;
-        if (appAlarm instanceof Day) {
+        boolean showDate = appAlarm instanceof Day ||
+                position == 0 ||
+                !CalendarUtils.onTheSameDate(date, fragment.loadPosition(position - 1).getDateTime());
+        if (showDate) {
             dayOfWeekText = Localization.dayOfWeekToStringShort(res, dayOfWeek);
         } else {
             dayOfWeekText = "";
@@ -75,10 +99,10 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         viewHolder.getTextDayOfWeek().setText(dayOfWeekText);
 
         String dateText;
-        if (appAlarm instanceof Day) {
+        if (showDate) {
             dateText = Localization.dateToStringVeryShort(res, date.getTime());
         } else {
-            dateText = oneTimeAlarm.getName() != null ? oneTimeAlarm.getName() : "";
+            dateText = "";
         }
         viewHolder.getTextDate().setText(dateText);
 
@@ -143,27 +167,84 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         }
         viewHolder.getTextState().setText(stateText);
 
-        String messageText;
+        if (appAlarm instanceof Day) {
+            viewHolder.getTextName().setVisibility(View.GONE);
+        } else {
+            String name = oneTimeAlarm.getName();
+
+            viewHolder.getTextName().setVisibility(View.VISIBLE);
+            viewHolder.getTextName().setText(name == null || name.isEmpty() ? "" : name);
+
+            // Increase touch area
+            View delegate = viewHolder.getTextName();
+            final View parent = (View) delegate.getParent();
+            parent.post(new Runnable() {
+                // Post in the parent's message queue to make sure the parent lays out its children before we call getHitRect()
+                public void run() {
+                    final Rect r = new Rect();
+                    delegate.getHitRect(r);
+                    RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) delegate.getLayoutParams();
+                    r.top -= params.rightMargin;
+                    r.bottom += params.rightMargin;
+                    r.left -= params.rightMargin;
+                    r.right += params.rightMargin;
+                    parent.setTouchDelegate(new TouchDelegate(r, delegate));
+                }
+            });
+
+            // Listeners for setting name
+            viewHolder.getTextName().setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+                    if (hasFocus) {
+                        fragment.onEditNameBegin(viewHolder);
+                    }
+                }
+            });
+
+            viewHolder.getTextName().setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                @Override
+                public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                    if (actionId == EditorInfo.IME_ACTION_DONE) {
+                        fragment.onEditNameEnd();
+
+                        return true;
+                    }
+                    return false;
+                }
+            });
+        }
+
+        String commentText;
         if (appAlarm instanceof Day && day.isHoliday() && day.getState() == Day.STATE_RULE) {
-            messageText = day.getHolidayDescription();
+            commentText = day.getHolidayDescription();
         } else {
             if (fragment.isPositionWithNextAlarm(position)) {
-                long diff = appAlarm.getTimeToRing(fragment.clock());
-
-                TimeDifference timeDifference = TimeDifference.split(diff);
-
-                if (timeDifference.days > 0) {
-                    messageText = res.getString(R.string.time_to_ring_message_days, timeDifference.days, timeDifference.hours);
-                } else if (timeDifference.hours > 0) {
-                    messageText = res.getString(R.string.time_to_ring_message_hours, timeDifference.hours, timeDifference.minutes);
-                } else {
-                    messageText = res.getString(R.string.time_to_ring_message_minutes, timeDifference.minutes, timeDifference.seconds);
-                }
+                commentText = getTimeToAlarm(appAlarm);
             } else {
-                messageText = "";
+                commentText = "";
             }
         }
-        viewHolder.getTextComment().setText(messageText);
+        viewHolder.getTextComment().setText(commentText);
+    }
+
+    @NonNull
+    String getTimeToAlarm(AppAlarm appAlarm) {
+        String messageText;
+        long diff = appAlarm.getTimeToRing(fragment.clock());
+
+        TimeDifference timeDifference = TimeDifference.split(diff);
+        Resources res = fragment.getResources();
+
+        if (timeDifference.days > 0) {
+            messageText = res.getString(R.string.time_to_ring_message_days, timeDifference.days, timeDifference.hours);
+        } else if (timeDifference.hours > 0) {
+            messageText = res.getString(R.string.time_to_ring_message_hours, timeDifference.hours, timeDifference.minutes);
+        } else {
+            messageText = res.getString(R.string.time_to_ring_message_minutes, timeDifference.minutes, timeDifference.seconds);
+        }
+
+        return messageText;
     }
 
     /**
@@ -182,7 +263,9 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         private final TextView textDate;
         private final TextView textTime;
         private final TextView textState;
+        private final EditText textName;
         private final TextView textComment;
+        private final LinearLayout headerDate;
 
         public CalendarViewHolder(View view) {
             super(view);
@@ -191,7 +274,9 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
             textDate = (TextView) view.findViewById(R.id.textDate);
             textTime = (TextView) view.findViewById(R.id.textTimeCal);
             textState = (TextView) view.findViewById(R.id.textState);
+            textName = (EditText) view.findViewById(R.id.textName);
             textComment = (TextView) view.findViewById(R.id.textComment);
+            headerDate = (LinearLayout) view.findViewById(R.id.headerDate);
 
             view.setOnLongClickListener(this);
         }
@@ -212,8 +297,16 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
             return textState;
         }
 
+        public EditText getTextName() {
+            return textName;
+        }
+
         public TextView getTextComment() {
             return textComment;
+        }
+
+        public LinearLayout getHeaderDate() {
+            return headerDate;
         }
 
         @Override

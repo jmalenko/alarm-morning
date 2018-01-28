@@ -104,6 +104,22 @@
                 android:layout_weight="1" />
 
             <TextView
+                android:id="@+id/oneTimeAlarmName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginLeft="@dimen/margin_medium"
+                android:layout_marginRight="@dimen/margin_medium"
+                android:gravity="center"
+                android:text="Take the pill"
+                android:textColor="@color/accent" />
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="0dip"
+                android:layout_weight="1" />
+
+            <TextView
                 android:id="@+id/nextCalendar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

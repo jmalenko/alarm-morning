@@ -12,6 +12,8 @@ import android.util.Log;
 import java.util.Calendar;
 
 import cz.jaro.alarmmorning.clock.Clock;
+import cz.jaro.alarmmorning.model.AppAlarm;
+import cz.jaro.alarmmorning.model.OneTimeAlarm;
 import cz.jaro.alarmmorning.receivers.AlarmReceiver;
 
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.beginningOfTomorrow;
@@ -76,7 +78,7 @@ public class SystemAlarm {
     }
 
     /**
-     * Register ssytem alarm that works reliably - triggers on a specific time, regardles the Android version, and whether the devicee is asleep (in low-power
+     * Register system alarm that works reliably - triggers on a specific time, regardles the Android version, and whether the devicee is asleep (in low-power
      * idle mode).
      *
      * @param alarmManager alarmManager
@@ -93,8 +95,8 @@ public class SystemAlarm {
         }
     }
 
-    private void registerSystemAlarm(String action, Calendar time, Calendar alarmTime) {
-        NextAction nextAction = new NextAction(action, time, alarmTime);
+    private void registerSystemAlarm(String action, Calendar time, Calendar alarmTime, Long oneTimeAlarmId) {
+        NextAction nextAction = new NextAction(action, time, alarmTime, oneTimeAlarmId);
         registerSystemAlarm(nextAction);
     }
 
@@ -164,22 +166,25 @@ public class SystemAlarm {
         Calendar now = clock.now();
 
         GlobalManager globalManager = GlobalManager.getInstance();
-        Calendar alarmTime = globalManager.getNextAlarm(clock);
+        AppAlarm appAlarm = globalManager.getNextAlarm(clock, null);
 
-        if (alarmTime == null) {
+        if (appAlarm == null) {
             Calendar resetTime = getResetTime(now);
 
-            return new NextAction(ACTION_SET_SYSTEM_ALARM, resetTime, alarmTime);
+            return new NextAction(ACTION_SET_SYSTEM_ALARM, resetTime, null, null);
         } else {
+            Calendar alarmTime = appAlarm.getDateTime();
+            Long oneTimeAlarmId = appAlarm instanceof OneTimeAlarm ? ((OneTimeAlarm) appAlarm).getId() : null;
+
             if (useNearFutureTime()) {
                 Calendar nearFutureTime = getNearFutureTime(alarmTime);
 
                 if (now.before(nearFutureTime)) {
-                    return new NextAction(ACTION_RING_IN_NEAR_FUTURE, nearFutureTime, alarmTime);
+                    return new NextAction(ACTION_RING_IN_NEAR_FUTURE, nearFutureTime, alarmTime, oneTimeAlarmId);
                 }
             }
 
-            return new NextAction(ACTION_RING, alarmTime, alarmTime);
+            return new NextAction(ACTION_RING, alarmTime, alarmTime, oneTimeAlarmId);
         }
     }
 
@@ -264,9 +269,13 @@ public class SystemAlarm {
         GlobalManager globalManager = GlobalManager.getInstance();
         Clock clock = globalManager.clock();
 
-        Calendar alarmTime = globalManager.getNextAlarm(clock);
+        AppAlarm appAlarm = globalManager.getNextAlarm(clock, null);
+        assert appAlarm != null;
+        Calendar alarmTime = appAlarm.getDateTime();
         assert alarmTime != null;
-        registerSystemAlarm(ACTION_RING, alarmTime, alarmTime);
+        Long oneTimeAlarmId = appAlarm instanceof OneTimeAlarm ? ((OneTimeAlarm) appAlarm).getId() : null;
+
+        registerSystemAlarm(ACTION_RING, alarmTime, alarmTime, oneTimeAlarmId);
     }
 
     public void onDismissBeforeRinging() {
@@ -276,8 +285,9 @@ public class SystemAlarm {
 
         GlobalManager globalManager = GlobalManager.getInstance();
         Calendar alarmTime = globalManager.getAlarmTimeOfRingingAlarm();
+        Long oneTimeAlarmId = globalManager.getOneTimeAlarmOfRingingAlarm() != null ? globalManager.getOneTimeAlarmOfRingingAlarm().getId() : null;
 
-        registerSystemAlarm(ACTION_ALARM_TIME_OF_EARLY_DISMISSED_ALARM, alarmTime, alarmTime);
+        registerSystemAlarm(ACTION_ALARM_TIME_OF_EARLY_DISMISSED_ALARM, alarmTime, alarmTime, oneTimeAlarmId);
     }
 
     public void onAlarmTimeOfEarlyDismissedAlarm() {
@@ -299,8 +309,9 @@ public class SystemAlarm {
 
         GlobalManager globalManager = GlobalManager.getInstance();
         Calendar alarmTimeOfRingingAlarm = globalManager.getAlarmTimeOfRingingAlarm();
+        Long oneTimeAlarmId = globalManager.getOneTimeAlarmOfRingingAlarm() != null ? globalManager.getOneTimeAlarmOfRingingAlarm().getId() : null;
 
-        registerSystemAlarm(ACTION_RING, ringAfterSnoozeTime, alarmTimeOfRingingAlarm);
+        registerSystemAlarm(ACTION_RING, ringAfterSnoozeTime, alarmTimeOfRingingAlarm, oneTimeAlarmId);
     }
 
 }
@@ -309,11 +320,13 @@ class NextAction {
     String action;
     Calendar time;
     Calendar alarmTime;
+    Long oneTimeAlarmId;
 
-    public NextAction(String action, Calendar time, Calendar alarmTime) {
+    public NextAction(String action, Calendar time, Calendar alarmTime, Long oneTimeAlarmId) {
         this.action = action;
         this.time = time;
         this.alarmTime = alarmTime;
+        this.oneTimeAlarmId = oneTimeAlarmId;
     }
 
     /**
@@ -334,8 +347,9 @@ class NextAction {
         NextAction that = (NextAction) o;
 
         if (action != null ? !action.equals(that.action) : that.action != null) return false;
-        if (time != null ? time.getTimeInMillis() != that.time.getTimeInMillis() : that.time != null) return false;
-        return !(alarmTime != null ? alarmTime.getTimeInMillis() != that.alarmTime.getTimeInMillis() : that.alarmTime != null);
+        if (time != null ? !time.equals(that.time) : that.time != null) return false;
+        if (alarmTime != null ? !alarmTime.equals(that.alarmTime) : that.alarmTime != null) return false;
+        return oneTimeAlarmId != null ? oneTimeAlarmId.equals(that.oneTimeAlarmId) : that.oneTimeAlarmId == null;
     }
 
     @Override
@@ -343,12 +357,16 @@ class NextAction {
         int result = action != null ? action.hashCode() : 0;
         result = 31 * result + (time != null ? time.hashCode() : 0);
         result = 31 * result + (alarmTime != null ? alarmTime.hashCode() : 0);
+        result = 31 * result + (oneTimeAlarmId != null ? oneTimeAlarmId.hashCode() : 0);
         return result;
     }
 
     @Override
     public String toString() {
-        return "action=" + action + ", time=" + time.getTime() + ", alarmTime=" + (alarmTime != null ? alarmTime.getTime() : "null");
+        return "action=" + action +
+                ", time=" + time.getTime() +
+                ", alarmTime=" + (alarmTime != null ? alarmTime.getTime() : "null") +
+                ", oneTimeAlarmId=" + (oneTimeAlarmId != null ? oneTimeAlarmId.toString() : "null");
     }
 
 }

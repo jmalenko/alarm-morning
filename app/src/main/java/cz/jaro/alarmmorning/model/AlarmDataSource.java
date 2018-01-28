@@ -166,7 +166,7 @@ public class AlarmDataSource {
      * @param id identifier of the object
      * @return The retrieved object
      */
-    public OneTimeAlarm loadOneTimeAlarm(int id) {
+    public OneTimeAlarm loadOneTimeAlarm(long id) {
         OneTimeAlarm oneTimeAlarm;
 
         Cursor cursor = database.query(AlarmDbHelper.TABLE_ONETIMEALARM, allColumnsOneTimeAlarm, AlarmDbHelper.COLUMN_ONETIMEALARM_ID + " = ?", new String[]{String.valueOf(id)}, null, null, null);
@@ -235,6 +235,7 @@ public class AlarmDataSource {
     public void saveOneTimeAlarm(OneTimeAlarm oneTimeAlarm) {
         ContentValues values = new ContentValues();
         values.put(AlarmDbHelper.COLUMN_ONETIMEALARM_ALARM_TIME, oneTimeAlarm.getAlarmTime());
+        values.put(AlarmDbHelper.COLUMN_ONETIMEALARM_NAME, oneTimeAlarm.getName());
 
         if (oneTimeAlarm.getId() == 0) {
             // Insert

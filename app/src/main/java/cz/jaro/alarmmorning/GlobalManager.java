@@ -103,6 +103,13 @@ public class GlobalManager {
     public static final int STATE_DISMISSED = 4;
     public static final int STATE_DISMISSED_BEFORE_RINGING = 5;
 
+    private static final String STRING_STATE_UNDEFINED = "Undefined";
+    private static final String STRING_STATE_FUTURE = "Future";
+    private static final String STRING_STATE_RINGING = "Ringing";
+    private static final String STRING_STATE_SNOOZED = "Snoozed";
+    private static final String STRING_STATE_DISMISSED = "Dismissed";
+    private static final String STRING_STATE_DISMISSED_BEFORE_RINGING = "Dismissed before ringing";
+
     private static final int RECENT_PERIOD = 30; // minutes
 
     private static GlobalManager instance;
@@ -261,6 +268,7 @@ public class GlobalManager {
     private static final String PERSIST_ACTION = "persist_system_alarm_action";
     private static final String PERSIST_TIME = "persist_system_alarm_time";
     private static final String PERSIST_ALARM_TIME = "persist_alarm_time";
+    private static final String PERSIST_ONE_TIME_ALARM_ID = "persist_one_time_alarm_id";
 
     /*
      * Contains info about the last alarm. Last alarm is the one that rans, possibly is snoozed and was dismissed or cancelled.
@@ -275,6 +283,7 @@ public class GlobalManager {
 
     private static final String ACTION_UNDEFINED = "";
     private static final long TIME_UNDEFINED = -1;
+    private static final long ONE_TIME_ALARM_ID_UNDEFINED = -1;
 
     protected NextAction getNextAction() {
         Log.v(TAG, "getNextAction()");
@@ -284,6 +293,7 @@ public class GlobalManager {
         String action = preferences.getString(PERSIST_ACTION, ACTION_UNDEFINED);
         long timeInMS = preferences.getLong(PERSIST_TIME, TIME_UNDEFINED);
         long alarmTimeInMS = preferences.getLong(PERSIST_ALARM_TIME, TIME_UNDEFINED);
+        long oneTimeAlarmId = preferences.getLong(PERSIST_ONE_TIME_ALARM_ID, ONE_TIME_ALARM_ID_UNDEFINED);
 
         Calendar time = CalendarUtils.newGregorianCalendar(timeInMS);
 
@@ -292,7 +302,7 @@ public class GlobalManager {
             alarmTime = CalendarUtils.newGregorianCalendar(alarmTimeInMS);
         }
 
-        NextAction nextAction = new NextAction(action, time, alarmTime);
+        NextAction nextAction = new NextAction(action, time, alarmTime, oneTimeAlarmId == ONE_TIME_ALARM_ID_UNDEFINED ? null : oneTimeAlarmId);
         return nextAction;
     }
 
@@ -305,7 +315,8 @@ public class GlobalManager {
 
         editor.putString(PERSIST_ACTION, nextAction.action);
         editor.putLong(PERSIST_TIME, nextAction.time.getTimeInMillis());
-        editor.putLong(PERSIST_ALARM_TIME, nextAction.alarmTime != null ? nextAction.alarmTime.getTimeInMillis() : -1);
+        editor.putLong(PERSIST_ALARM_TIME, nextAction.alarmTime != null ? nextAction.alarmTime.getTimeInMillis() : TIME_UNDEFINED);
+        editor.putLong(PERSIST_ONE_TIME_ALARM_ID, nextAction.oneTimeAlarmId != null ? nextAction.oneTimeAlarmId : ONE_TIME_ALARM_ID_UNDEFINED);
 
         editor.commit();
     }
@@ -330,6 +341,20 @@ public class GlobalManager {
         Calendar stateAlarmTime = CalendarUtils.newGregorianCalendar(stateAlarmTimeInMS);
 
         return stateAlarmTime;
+    }
+
+    public OneTimeAlarm getOneTimeAlarmOfRingingAlarm() {
+        Log.v(TAG, "getOneTimeAlarmOfRingingAlarm()");
+
+        Calendar alarmTimeOfRingingAlarm = getAlarmTimeOfRingingAlarm();
+        List<OneTimeAlarm> oneTimeAlarms = loadOneTimeAlarms(null);
+        for (OneTimeAlarm oneTimeAlarm : oneTimeAlarms) {
+            if (oneTimeAlarm.getDateTime().equals(alarmTimeOfRingingAlarm)) {
+                return oneTimeAlarm;
+            }
+        }
+
+        return null;
     }
 
     public void setState(int state, Calendar alarmTime) {
@@ -670,6 +695,25 @@ public class GlobalManager {
     }
 
     /**
+     * Returns the one-time alarm with a given identifier.
+     *
+     * @param id Id of the one-time alarm
+     * @return Return one-time alarm with the given Id.
+     */
+    private OneTimeAlarm loadOneTimeAlarm(Long id) {
+        return dataSource.loadOneTimeAlarm(id);
+    }
+
+    /**
+     * Returns the list of one-time alarms.
+     *
+     * @return List of one-time alarms.
+     */
+    public List<OneTimeAlarm> loadOneTimeAlarms() {
+        return dataSource.loadOneTimeAlarms();
+    }
+
+    /**
      * Returns the list of one-time alarms.
      *
      * @param from If not null, then only one-time alarms with alarm time on of after from are returned.
@@ -682,23 +726,40 @@ public class GlobalManager {
     /**
      * Add a new one-time alarm or save an (updated) existing one-time alarm.
      *
-     * @param oneTimeAlarm One-time alar mto save.
+     * @param oneTimeAlarm One-time alarm to save.
      * @param analytics    Analytics
      */
     public void saveOneTimeAlarm(OneTimeAlarm oneTimeAlarm, Analytics analytics) {
         Log.d(TAG, "saveOneTimeAlarm()");
+        saveOneTimeAlarm(oneTimeAlarm, analytics, true);
+    }
 
+    /**
+     * Add a new one-time alarm or save an (updated) existing one-time alarm. Used for updating the one-time larm object that doen't change the alarm time.
+     *
+     * @param oneTimeAlarm One-time alarm to save.
+     * @param analytics    Analytics
+     */
+    public void saveOneTimeAlarmName(OneTimeAlarm oneTimeAlarm, Analytics analytics) {
+        Log.d(TAG, "saveOneTimeAlarmName()");
+        saveOneTimeAlarm(oneTimeAlarm, analytics, false);
+        // TODO If there is a  notification regarding this one-time alarm, then update the notification
+    }
+
+    private void saveOneTimeAlarm(OneTimeAlarm oneTimeAlarm, Analytics analytics, boolean alarmTimeChanged) {
         Context context = AlarmMorningApplication.getAppContext();
         analytics.setContext(context);
         analytics.setEvent(Analytics.Event.Set_alarm);
         analytics.setOneTimeAlarm(oneTimeAlarm);
         analytics.save();
 
-        Log.i(TAG, "Set alarm at " + oneTimeAlarm.getDateTime().getTime().toString());
+        Log.i(TAG, "Save one-time alarm at " + oneTimeAlarm.getDateTime().getTime().toString());
 
         dataSource.saveOneTimeAlarm(oneTimeAlarm);
 
-        onAlarmSet();
+        if (alarmTimeChanged) {
+            onAlarmSet();
+        }
     }
 
     /**
@@ -824,7 +885,7 @@ public class GlobalManager {
     /**
      * Dismiss the alarm.
      * <p>
-     * Automatically chooses between calling {@link #onDismiss(Analytics)} and {@link @onDismissBeforeRinging}.
+     * Automatically chooses between calling {@link #onDismiss(Analytics)} and {@link #onDismissBeforeRinging(Analytics)}.
      *
      * @param analytics Analytics
      */
@@ -1075,6 +1136,9 @@ public class GlobalManager {
 //        ringIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         ringIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         ringIntent.putExtra(RingActivity.ALARM_TIME, getAlarmTimeOfRingingAlarm());
+        OneTimeAlarm oneTimeAlarmOfRingingAlarm = getOneTimeAlarmOfRingingAlarm();
+        String oneTimeAlarmName = oneTimeAlarmOfRingingAlarm == null ? null : oneTimeAlarmOfRingingAlarm.getName();
+        ringIntent.putExtra(RingActivity.ALARM_NAME, oneTimeAlarmName);
         context.startActivity(ringIntent);
     }
 
@@ -1153,7 +1217,7 @@ public class GlobalManager {
     }
 
     /**
-     * Return the nearest {@link AppAlarm} with alarm such it matches the filter. Only the Days that are enabled and not in the past are consireed, and all the
+     * Return the nearest {@link AppAlarm} with alarm such it matches the filter. Only the Days that are enabled and not in the past are considered, and all the
      * one-time alarms that are not in the past are considered.
      * <p>
      * Note that there may be multiple alarms at the same data and time (one Day alarm + several one-time alarms) at the same time. Only one (the first found)
@@ -1285,6 +1349,25 @@ public class GlobalManager {
         }
 
         return alarmTimes;
+    }
+
+    static public String stateToString(int state) {
+        switch (state) {
+            case STATE_UNDEFINED:
+                return STRING_STATE_UNDEFINED;
+            case STATE_FUTURE:
+                return STRING_STATE_FUTURE;
+            case STATE_RINGING:
+                return STRING_STATE_RINGING;
+            case STATE_SNOOZED:
+                return STRING_STATE_SNOOZED;
+            case STATE_DISMISSED:
+                return STRING_STATE_DISMISSED;
+            case STATE_DISMISSED_BEFORE_RINGING:
+                return STRING_STATE_DISMISSED_BEFORE_RINGING;
+            default:
+                throw new IllegalStateException("Unsupported state " + state);
+        }
     }
 
     /**

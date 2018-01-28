@@ -38,6 +38,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 
 import com.google.firebase.analytics.FirebaseAnalytics;
@@ -110,6 +111,8 @@ public class AlarmMorningActivity extends AppCompatActivity {
 
     private LocalBroadcastManager bManager;
     private static IntentFilter s_intentFilterInternal;
+
+    boolean consumed; // Whether the touch event ACTION_DOWN was consumed (so we can consume the following event ACTION_UP)
 
     static {
         s_intentFilterTime = new IntentFilter();
@@ -479,6 +482,30 @@ public class AlarmMorningActivity extends AppCompatActivity {
         super.onConfigurationChanged(newConfig);
         // Pass any configuration change to the drawer toggls
         mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        // Handles the  situation when user is editing the name of a one-time alarm and touches somewhere in the activity
+
+        if (mFragment instanceof CalendarFragment) {
+            CalendarFragment calendarFragment = (CalendarFragment) mFragment;
+
+            switch (ev.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    consumed = calendarFragment.onEditNameEnd();
+                    if (consumed)
+                        return true;
+                    break;
+
+                case MotionEvent.ACTION_UP:
+                    if (consumed)
+                        return true;
+                    break;
+            }
+        }
+
+        return super.dispatchTouchEvent(ev);
     }
 
     /**

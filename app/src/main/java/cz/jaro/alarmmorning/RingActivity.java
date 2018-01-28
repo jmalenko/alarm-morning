@@ -50,7 +50,8 @@ import static cz.jaro.alarmmorning.calendar.CalendarUtils.onTheSameMinute;
 /**
  * Activity that is displayed while the alarm fires.
  * <p>
- * Activity must be started with extra {@link #ALARM_TIME} that contains the Calendar instance of the alarm time.
+ * Activity must be started with extra {@link #ALARM_TIME} that contains the Calendar instance of the alarm time. The extra{@link #ALARM_NAME} may contain the
+ * name of the alarm.
  */
 public class RingActivity extends Activity implements RingInterface {
 
@@ -59,8 +60,10 @@ public class RingActivity extends Activity implements RingInterface {
     public static final String ACTION_HIDE_ACTIVITY = "cz.jaro.alarmmorning.intent.action.HIDE_ACTIVITY";
 
     public static final String ALARM_TIME = "ALARM_TIME";
+    public static final String ALARM_NAME = "ALARM_NAME";
 
     private Calendar mAlarmTime;
+    private String mAlarmName;
 
     private Ringtone ringtone;
     private MediaPlayer mediaPlayer;
@@ -149,8 +152,10 @@ public class RingActivity extends Activity implements RingInterface {
 
         if (savedInstanceState != null) {
             mAlarmTime = (Calendar) savedInstanceState.getSerializable(ALARM_TIME);
+            mAlarmName = savedInstanceState.getString(ALARM_NAME);
         } else {
             mAlarmTime = (Calendar) getIntent().getSerializableExtra(ALARM_TIME);
+            mAlarmName = getIntent().getStringExtra(ALARM_NAME);
         }
 
         if (mAlarmTime == null) {
@@ -208,6 +213,7 @@ public class RingActivity extends Activity implements RingInterface {
         super.onSaveInstanceState(savedInstanceState);
 
         savedInstanceState.putSerializable(ALARM_TIME, mAlarmTime);
+        savedInstanceState.putString(ALARM_NAME, mAlarmName);
     }
 
     @Override
@@ -436,6 +442,14 @@ public class RingActivity extends Activity implements RingInterface {
             }
         } else {
             alarmTimeView.setVisibility(View.INVISIBLE);
+        }
+
+        TextView nameView = (TextView) findViewById(R.id.oneTimeAlarmName);
+        if (mAlarmName != null) {
+            nameView.setText(mAlarmName);
+            nameView.setVisibility(View.VISIBLE);
+        } else {
+            nameView.setVisibility(View.GONE);
         }
 
         /*

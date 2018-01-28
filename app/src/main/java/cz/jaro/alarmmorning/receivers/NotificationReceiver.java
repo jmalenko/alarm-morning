@@ -50,6 +50,7 @@ public class NotificationReceiver extends BroadcastReceiver {
                     Intent ringIntent = new Intent(context, RingActivity.class);
                     ringIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     intent.putExtra(RingActivity.ALARM_TIME, intent.getSerializableExtra(RingActivity.ALARM_TIME));
+                    intent.putExtra(RingActivity.ALARM_NAME, intent.getSerializableExtra(RingActivity.ALARM_NAME));
                     context.startActivity(ringIntent);
                 } else {
                     throw new IllegalArgumentException("Unexpected argument " + activity);

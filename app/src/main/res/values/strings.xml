@@ -85,6 +85,7 @@
 
     <!-- Notification -->
     <string name="notification_title">Alarm at <xliff:g example="07:00" id="time">%1$s</xliff:g></string>
+    <string name="notification_title_with_name">Alarm at <xliff:g example="07:00" id="time">%1$s</xliff:g> – <xliff:g example="Take the pill" id="name">%2$s</xliff:g></string>
     <string name="notification_text_future">Touch to view all alarms</string>
     <string name="notification_text_ringing">Ringing</string>
     <string name="notification_text_snoozed">Snoozed till <xliff:g example="07:00" id="time">%1$s</xliff:g></string>

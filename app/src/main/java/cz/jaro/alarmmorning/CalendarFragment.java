@@ -1,5 +1,7 @@
 package cz.jaro.alarmmorning;
 
+import android.app.Activity;
+import android.app.DatePickerDialog;
 import android.app.Fragment;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
@@ -15,6 +17,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.DatePicker;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -22,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import cz.jaro.alarmmorning.clock.Clock;
@@ -41,7 +48,7 @@ import static cz.jaro.alarmmorning.calendar.CalendarUtils.onTheSameDate;
 /**
  * Fragment that appears in the "content_frame".
  */
-public class CalendarFragment extends Fragment implements View.OnClickListener, TimePickerDialogWithDisable.OnTimeSetWithDisableListener {
+public class CalendarFragment extends Fragment implements View.OnClickListener, TimePickerDialogWithDisable.OnTimeSetWithDisableListener, DatePickerDialog.OnDateSetListener {
 
     private static final String TAG = CalendarFragment.class.getSimpleName();
 
@@ -64,6 +71,8 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     // TODO Improve architecture of actions (adding, removing, changing when snoozed) with one-time alarm
     private boolean oneTimeAlarmJustRemoved; // used for an ugly hack to know that a one-time alarm was removed (and showing a relevantn toast)
     private OneTimeAlarm oneTimeAlarmJustAdded; // used for an ugly hack to know that (and which) one-time alarm was added (and showing a relevantn toast)
+
+    private CalendarAdapter.CalendarViewHolder editingNameViewHolder; // Reference to the currently edited name of a one-time alarm
 
     public CalendarFragment() {
         // Empty constructor required for fragment subclasses
@@ -248,8 +257,21 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         Log.v(TAG, "onSystemTimeChange()");
 
         // Update time to next alarm
+        LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
         for (int pos : positionNextAlarm) {
-            adapter.notifyItemChanged(pos);
+            // Cannot use adapter.notifyItemChanged(pos) as this would break editing name of the one-time alarm that is also the next alarm to ring.
+            // Therefore we need to update the TextView with time to alarm.
+
+            AppAlarm appAlarmAtPosition = loadPosition(pos);
+
+            int childAt = pos - linearLayoutManager.findFirstVisibleItemPosition();
+            if (0 <= childAt && childAt < recyclerView.getChildCount()) {
+                RelativeLayout itemView = (RelativeLayout) recyclerView.getChildAt(childAt);
+                TextView textComment = (TextView) itemView.findViewById(R.id.textComment);
+
+                String messageText = adapter.getTimeToAlarm(appAlarmAtPosition);
+                textComment.setText(messageText);
+            }
         }
 
         // Shift items when date changes
@@ -599,6 +621,98 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
                 }
             }
         }
+    }
+
+    /*
+     * On set date (for one-time alarms)
+     * =================================
+     */
+
+    public void onSetDate(View view) {
+        positionAction = recyclerView.getChildAdapterPosition(view);
+        Log.d(TAG, "Set date for item on positionAction " + positionAction);
+
+        showDatePicker();
+    }
+
+    private void showDatePicker() {
+        DatePickerFragment fragment = new DatePickerFragment();
+
+        fragment.setOnDateSetListener(this);
+
+        OneTimeAlarm oneTimeAlarmAtPosition = (OneTimeAlarm) loadPosition(positionAction);
+
+        Bundle bundle = new Bundle();
+
+        Calendar date = oneTimeAlarmAtPosition.getDate();
+        bundle.putInt(DatePickerFragment.YEAR, date.get(Calendar.YEAR));
+        bundle.putInt(DatePickerFragment.MONTH, date.get(Calendar.MONTH));
+        bundle.putInt(DatePickerFragment.DAY, date.get(Calendar.DATE));
+
+        fragment.setArguments(bundle);
+
+        fragment.show(getFragmentManager(), "datePicker");
+    }
+
+    @Override
+    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+        if (view.isShown()) {
+            OneTimeAlarm oneTimeAlarmAtPosition = (OneTimeAlarm) loadPosition(positionAction);
+
+            Calendar date = new GregorianCalendar(year, month, dayOfMonth);
+            oneTimeAlarmAtPosition.setDate(date);
+
+            save(oneTimeAlarmAtPosition);
+        }
+    }
+
+    /*
+     * On set name (for one-time alarms)
+     * =================================
+     */
+
+    public void onEditNameBegin(CalendarAdapter.CalendarViewHolder viewholder) {
+        editingNameViewHolder = viewholder;
+    }
+
+    /**
+     * @return Return true if this event was consumed.
+     */
+    public boolean onEditNameEnd() {
+        if (editingNameViewHolder != null) {
+            onNameSet(editingNameViewHolder);
+
+            editingNameViewHolder = null;
+
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    void onNameSet(CalendarAdapter.CalendarViewHolder viewHolder) {
+        positionAction = recyclerView.getChildAdapterPosition(viewHolder.itemView);
+        Log.d(TAG, "Set name for item on positionAction " + positionAction);
+
+        // Save
+
+        OneTimeAlarm oneTimeAlarmAtPosition = (OneTimeAlarm) loadPosition(positionAction);
+        oneTimeAlarmAtPosition.setName(viewHolder.getTextName().getText().toString());
+
+        Analytics analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
+
+        GlobalManager globalManager = GlobalManager.getInstance();
+        globalManager.saveOneTimeAlarmName(oneTimeAlarmAtPosition, analytics);
+
+        // Change user interface
+
+        CalendarFragment.hideSoftKeyboard(getActivity());
+        viewHolder.getTextName().clearFocus();
+    }
+
+    public static void hideSoftKeyboard(Activity activity) {
+        InputMethodManager inputMethodManager = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
     }
 
     /*

@@ -12,6 +12,7 @@ import java.util.Calendar;
 
 import cz.jaro.alarmmorning.model.AppAlarm;
 import cz.jaro.alarmmorning.model.Day;
+import cz.jaro.alarmmorning.model.OneTimeAlarm;
 import cz.jaro.alarmmorning.receivers.NotificationReceiver;
 
 /**
@@ -52,7 +53,13 @@ public class SystemNotification {
         } else {
             timeText = Localization.timeToString(nextAlarmToRing.getHour(), nextAlarmToRing.getMinute(), context);
         }
-        String contentTitle = res.getString(R.string.notification_title, timeText);
+
+        String contentTitle;
+        if (nextAlarmToRing instanceof OneTimeAlarm && ((OneTimeAlarm) nextAlarmToRing).getName() != null && !((OneTimeAlarm) nextAlarmToRing).getName().isEmpty()) {
+            contentTitle = res.getString(R.string.notification_title_with_name, timeText, ((OneTimeAlarm) nextAlarmToRing).getName());
+        } else {
+            contentTitle = res.getString(R.string.notification_title, timeText);
+        }
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
                 .setSmallIcon(R.drawable.ic_alarm_white)
@@ -127,6 +134,9 @@ public class SystemNotification {
         intent.setAction(NotificationReceiver.ACTION_CLICK_NOTIFICATION);
         intent.putExtra(NotificationReceiver.EXTRA_ACTIVITY, NotificationReceiver.EXTRA_ACTIVITY__RING);
         intent.putExtra(RingActivity.ALARM_TIME, globalManager.getAlarmTimeOfRingingAlarm()); // We must pass this to the activity as it might have been destroyed
+        OneTimeAlarm oneTimeAlarmOfRingingAlarm = globalManager.getOneTimeAlarmOfRingingAlarm();
+        String name = oneTimeAlarmOfRingingAlarm != null ? oneTimeAlarmOfRingingAlarm.getName() : null;
+        intent.putExtra(RingActivity.ALARM_NAME, name); // We must pass this to the activity as it might have been destroyed
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.setContentIntent(pendingIntent);
 
