@@ -788,22 +788,15 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
         switch (state) {
             case GlobalManager.STATE_FUTURE:
-                if (appAlarm instanceof Day) {
-                    if (positionNextAlarm.contains(positionAction) && day.isEnabled() && globalManager.afterNearFuture(appAlarm.getDateTime())) {
-                        disable.setVisible(false);
-                        revert.setVisible(false);
-                        dismiss.setVisible(true);
-                    } else {
-                        disable.setVisible(true);
-                        revert.setVisible(day.getState() != Day.STATE_RULE);
-                        dismiss.setVisible(false);
-                    }
+                boolean nextAndAfterNear = positionNextAlarm.contains(positionAction) && globalManager.afterNearFuture(appAlarm.getDateTime());
+                if (nextAndAfterNear) {
+                    disable.setVisible(false);
+                    revert.setVisible(false);
+                    dismiss.setVisible(true);
                 } else {
-                    if (positionNextAlarm.contains(positionAction) && globalManager.afterNearFuture(appAlarm.getDateTime())) {
-                        dismiss.setVisible(true);
-                    } else {
-                        dismiss.setVisible(false);
-                    }
+                    disable.setVisible(!(appAlarm instanceof Day) || day.isEnabled());
+                    revert.setVisible(appAlarm instanceof Day && day.getState() != Day.STATE_RULE);
+                    dismiss.setVisible(false);
                 }
                 snooze.setVisible(false);
                 break;
@@ -828,12 +821,6 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
                 break;
             default:
                 throw new IllegalArgumentException("Unexpected argument " + state);
-        }
-
-        // Fix visibility for one time alarm
-        if (appAlarm instanceof OneTimeAlarm) {
-            disable.setVisible(false);
-            revert.setVisible(false);
         }
     }
 
