@@ -501,6 +501,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
      * Update all the calendar items.
      */
     public void refresh() {
+        loadItems();
         adapter.notifyDataSetChanged();
     }
 

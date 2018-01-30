@@ -293,6 +293,12 @@ public class AlarmMorningActivity extends AppCompatActivity {
         GlobalManager globalManager = GlobalManager.getInstance();
         if (globalManager.isRinging()) {
             globalManager.startRingingActivity(this);
+            return;
+        }
+
+        if (mFragment instanceof CalendarFragment) {
+            CalendarFragment calendarFragment = (CalendarFragment) mFragment;
+            calendarFragment.refresh();
         }
     }
 
