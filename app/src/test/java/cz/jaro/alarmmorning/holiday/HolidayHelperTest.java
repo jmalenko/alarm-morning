@@ -4,11 +4,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
-import org.robolectric.annotation.Config;
 
 import java.util.List;
 
-import cz.jaro.alarmmorning.BuildConfig;
 import cz.jaro.alarmmorning.SettingsActivity;
 
 import static org.hamcrest.core.Is.is;
@@ -20,7 +18,6 @@ import static org.junit.Assert.assertThat;
  * Implemented as instrumentation test because the HolidayHelper needs Context to handle preferences and localized strings (when no calendar is selected).
  */
 @RunWith(RobolectricTestRunner.class)
-@Config(constants = BuildConfig.class, manifest = "app/src/main/AndroidManifest.xml", sdk = 21)
 public class HolidayHelperTest {
 
     public static final String NONE = SettingsActivity.PREF_HOLIDAY_NONE;

@@ -7,7 +7,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
-import org.robolectric.internal.ShadowExtractor;
+import org.robolectric.shadow.api.Shadow;
 import org.robolectric.shadows.ShadowApplication;
 
 import java.lang.reflect.Field;
@@ -18,7 +18,6 @@ import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.clock.FixedClock;
 import cz.jaro.alarmmorning.model.DayTest;
 import cz.jaro.alarmmorning.nighttimebell.NighttimeBell;
-import cz.jaro.alarmmorning.shadows.ShadowAlarmManagerAPI21;
 import cz.jaro.alarmmorning.shadows.ShadowGlobalManager;
 
 import static cz.jaro.alarmmorning.model.DayTest.DAY;
@@ -31,7 +30,7 @@ import static cz.jaro.alarmmorning.model.DayTest.YEAR;
  * The tests use Robolectric to mock access to database and context (needed by holidays).
  */
 @RunWith(RobolectricTestRunner.class)
-@Config(constants = BuildConfig.class, sdk = 21, shadows = {ShadowAlarmManagerAPI21.class, ShadowGlobalManager.class})
+@Config(shadows = {ShadowGlobalManager.class})
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public abstract class FixedTimeTest {
 
@@ -45,7 +44,7 @@ public abstract class FixedTimeTest {
 
         globalManager = GlobalManager.getInstance();
 
-        shadowGlobalManager = (ShadowGlobalManager) ShadowExtractor.extract(globalManager);
+        shadowGlobalManager = Shadow.extract(globalManager);
         shadowGlobalManager.setClock(clock());
 
         globalManager.reset();

@@ -26,7 +26,6 @@ import cz.jaro.alarmmorning.nighttimebell.NighttimeBell;
 import cz.jaro.alarmmorning.nighttimebell.NighttimeBellAlarmReceiver;
 import cz.jaro.alarmmorning.receivers.AlarmReceiver;
 import cz.jaro.alarmmorning.receivers.BootReceiver;
-import cz.jaro.alarmmorning.shadows.ShadowAlarmManagerAPI21;
 import cz.jaro.alarmmorning.shadows.ShadowGlobalManager;
 
 import static org.hamcrest.core.Is.is;
@@ -35,7 +34,7 @@ import static org.junit.Assert.assertThat;
 /**
  * Tests of Boot Receiver.
  */
-@Config(constants = BuildConfig.class, sdk = 21, shadows = {ShadowAlarmManagerAPI21.class, ShadowGlobalManager.class})
+@Config(shadows = {ShadowGlobalManager.class})
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class BootReceiverTest extends FixedTimeTest {
 

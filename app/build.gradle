@@ -3,6 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 25
     buildToolsVersion '26.0.2'
+    testOptions.unitTests.includeAndroidResources true
 
     defaultConfig {
         applicationId "cz.jaro.alarmmorning"
@@ -46,7 +47,7 @@ dependencies {
     // AssertJ
     testCompile "org.assertj:assertj-core:1.7.0"
     // Robolectric
-    testCompile "org.robolectric:robolectric:3.2.1"
+    testCompile "org.robolectric:robolectric:3.6.1"
     // Optional -- Mockito framework
     testCompile 'org.mockito:mockito-core:1.10.19'
 

@@ -11,6 +11,7 @@ import org.junit.runners.MethodSorters;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
+import org.robolectric.shadows.ShadowAlarmManager;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -20,7 +21,6 @@ import cz.jaro.alarmmorning.model.AlarmDataSource;
 import cz.jaro.alarmmorning.model.DayTest;
 import cz.jaro.alarmmorning.model.Defaults;
 import cz.jaro.alarmmorning.receivers.TimeChangedReceiver;
-import cz.jaro.alarmmorning.shadows.ShadowAlarmManagerAPI21;
 import cz.jaro.alarmmorning.shadows.ShadowGlobalManager;
 import cz.jaro.alarmmorning.wizard.Wizard;
 
@@ -40,14 +40,14 @@ import static org.junit.Assert.assertThat;
  * <p>
  * Test only system alarm; other features are assumed to be covered in {@link CalendarTest}.
  */
-@Config(constants = BuildConfig.class, sdk = 21, shadows = {ShadowAlarmManagerAPI21.class, ShadowGlobalManager.class})
+@Config(shadows = {ShadowGlobalManager.class})
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class TimeChangedTest extends FixedTimeTest {
 
     private Context context;
 
     private AlarmManager alarmManager;
-    private ShadowAlarmManagerAPI21 shadowAlarmManager;
+    private ShadowAlarmManager shadowAlarmManager;
 
     @Before
     public void before() {
@@ -58,7 +58,7 @@ public class TimeChangedTest extends FixedTimeTest {
         context = RuntimeEnvironment.application.getApplicationContext();
 
         alarmManager = (AlarmManager) RuntimeEnvironment.application.getSystemService(Context.ALARM_SERVICE);
-        shadowAlarmManager = (ShadowAlarmManagerAPI21) Shadows.shadowOf(alarmManager);
+        shadowAlarmManager = Shadows.shadowOf(alarmManager);
 
         // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
         consumeNextScheduledAlarm();

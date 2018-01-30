@@ -12,7 +12,6 @@ import android.appwidget.AppWidgetProviderInfo;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
@@ -32,6 +31,7 @@ import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
 import org.robolectric.fakes.RoboMenuItem;
 import org.robolectric.shadows.ShadowActivity;
+import org.robolectric.shadows.ShadowAlarmManager;
 import org.robolectric.shadows.ShadowAppWidgetManager;
 import org.robolectric.shadows.ShadowDatePickerDialog;
 import org.robolectric.shadows.ShadowNotificationManager;
@@ -46,7 +46,6 @@ import cz.jaro.alarmmorning.graphics.SlideButton;
 import cz.jaro.alarmmorning.model.DayTest;
 import cz.jaro.alarmmorning.model.OneTimeAlarm;
 import cz.jaro.alarmmorning.receivers.AlarmReceiver;
-import cz.jaro.alarmmorning.shadows.ShadowAlarmManagerAPI21;
 import cz.jaro.alarmmorning.shadows.ShadowGlobalManager;
 import cz.jaro.alarmmorning.wizard.Wizard;
 
@@ -54,21 +53,20 @@ import static cz.jaro.alarmmorning.model.DayTest.DAY;
 import static cz.jaro.alarmmorning.model.DayTest.MONTH;
 import static cz.jaro.alarmmorning.model.DayTest.YEAR;
 import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.robolectric.Robolectric.buildActivity;
 
 /**
  * Tests of alarm management in UI such that only one one-time alarm is used.
  */
-@Config(constants = BuildConfig.class, sdk = 21, shadows = {ShadowAlarmManagerAPI21.class, ShadowGlobalManager.class})
+@Config(shadows = {ShadowGlobalManager.class})
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
 
     private Context context;
 
     private AlarmManager alarmManager;
-    private ShadowAlarmManagerAPI21 shadowAlarmManager;
+    private ShadowAlarmManager shadowAlarmManager;
 
     private NotificationManager notificationManager;
     private ShadowNotificationManager shadowNotificationManager;
@@ -115,7 +113,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         AlarmMorningActivityTest.setLocale(context, "en", "US");
 
         alarmManager = (AlarmManager) RuntimeEnvironment.application.getSystemService(Context.ALARM_SERVICE);
-        shadowAlarmManager = (ShadowAlarmManagerAPI21) Shadows.shadowOf(alarmManager);
+        shadowAlarmManager = Shadows.shadowOf(alarmManager);
 
         notificationManager = (NotificationManager) RuntimeEnvironment.application.getSystemService(Context.NOTIFICATION_SERVICE);
         shadowNotificationManager = Shadows.shadowOf(notificationManager);
@@ -202,10 +200,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
 
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
 
-        // Hack: RecyclerView needs to be measured and laid out manually in Robolectric.
-        // Source: http://stackoverflow.com/questions/27052866/android-robolectric-click-recyclerview-item
-        recyclerView.measure(0, 0);
-        recyclerView.layout(0, 0, 100, 10000);
+        refreshRecyclerView();
 
         // Check calendar
         int newCount = recyclerView.getChildCount();
@@ -231,10 +226,9 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         assertThat(textComment.getText(), is("3h 30m"));
 
         // Check system alarm
-        assertSystemAlarm(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR - 2, ONE_TIME_ALARM_MINUTE, SystemAlarm.ACTION_RING_IN_NEAR_FUTURE);
-
-        // Check system alarm clock
-        assertSystemAlarmClock(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE);
+        assertSystemAlarmCount(2);
+        assertSystemAlarm(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR - 2, ONE_TIME_ALARM_MINUTE, SystemAlarm.ACTION_RING_IN_NEAR_FUTURE); // Check system alarm
+        assertSystemAlarmClock(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE); // Check system alarm clock
 
         // Check notification
         assertNotificationCount(0);
@@ -291,14 +285,8 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         assertThat(textComment.getText(), is(""));
 
         // Check system alarm
-        // The alarm that was consumed at the beginning of this method didn't change
-        assertThat(shadowAlarmManager.getScheduledAlarms().size(), is(0));
-
-        // Check system alarm clock
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            AlarmManager.AlarmClockInfo alarmClockInfo = alarmManager.getNextAlarmClock();
-            assertNull(alarmClockInfo);
-        }
+        assertSystemAlarmCount(0);
+        assertSystemAlarmClockNone();
 
         // Check notification
         assertNotificationCount(0);
@@ -356,9 +344,8 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         assertThat(textComment.getText(), is("3h 30m"));
 
         // Check system alarm
+        assertSystemAlarmCount(2);
         assertSystemAlarm(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE, SystemAlarm.ACTION_RING);
-
-        // Check system alarm clock
         assertSystemAlarmClock(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE);
 
         // Check notification
@@ -397,10 +384,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
 
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
 
-        // Hack: RecyclerView needs to be measured and laid out manually in Robolectric.
-        // Source: http://stackoverflow.com/questions/27052866/android-robolectric-click-recyclerview-item
-        recyclerView.measure(0, 0);
-        recyclerView.layout(0, 0, 100, 10000);
+        refreshRecyclerView();
 
         // Check calendar
         int newCount = recyclerView.getChildCount();
@@ -435,9 +419,8 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         assertThat(textComment.getText(), is("1d 3h"));
 
         // Check system alarm
+        assertSystemAlarmCount(2);
         assertSystemAlarm(YEAR, MONTH, DAY + 1, ONE_TIME_ALARM_HOUR - 2, ONE_TIME_ALARM_MINUTE, SystemAlarm.ACTION_RING_IN_NEAR_FUTURE);
-
-        // Check system alarm clock
         assertSystemAlarmClock(YEAR, MONTH, DAY + 1, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE);
 
         // Check notification
@@ -480,10 +463,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
 
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
 
-        // Hack: RecyclerView needs to be measured and laid out manually in Robolectric.
-        // Source: http://stackoverflow.com/questions/27052866/android-robolectric-click-recyclerview-item
-        recyclerView.measure(0, 0);
-        recyclerView.layout(0, 0, 100, 10000);
+        refreshRecyclerView();
 
         // 2nd: set
         loadItemAtPosition(0);
@@ -508,10 +488,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
 
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
 
-        // Hack: RecyclerView needs to be measured and laid out manually in Robolectric.
-        // Source: http://stackoverflow.com/questions/27052866/android-robolectric-click-recyclerview-item
-        recyclerView.measure(0, 0);
-        recyclerView.layout(0, 0, 100, 10000);
+        refreshRecyclerView();
 
         // Check calendar
         int newCount = recyclerView.getChildCount();
@@ -547,9 +524,8 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         assertThat(textComment.getText(), is("3h 30m"));
 
         // Check system alarm
+        assertSystemAlarmCount(2);
         assertSystemAlarm(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR - 2, ONE_TIME_ALARM_MINUTE, SystemAlarm.ACTION_RING_IN_NEAR_FUTURE);
-
-        // Check system alarm clock
         assertSystemAlarmClock(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE);
 
         // Check notification
@@ -592,10 +568,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
 
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
 
-        // Hack: RecyclerView needs to be measured and laid out manually in Robolectric.
-        // Source: http://stackoverflow.com/questions/27052866/android-robolectric-click-recyclerview-item
-        recyclerView.measure(0, 0);
-        recyclerView.layout(0, 0, 100, 10000);
+        refreshRecyclerView();
 
         // 2nd: set
         loadItemAtPosition(0);
@@ -620,10 +593,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
 
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
 
-        // Hack: RecyclerView needs to be measured and laid out manually in Robolectric.
-        // Source: http://stackoverflow.com/questions/27052866/android-robolectric-click-recyclerview-item
-        recyclerView.measure(0, 0);
-        recyclerView.layout(0, 0, 100, 10000);
+        refreshRecyclerView();
 
         // Check calendar
         int newCount = recyclerView.getChildCount();
@@ -659,9 +629,8 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         assertThat(textComment.getText(), is(""));
 
         // Check system alarm
+        assertSystemAlarmCount(2);
         assertSystemAlarm(YEAR, MONTH, DAY, DayTest.HOUR + 1, 1, SystemAlarm.ACTION_RING);
-
-        // Check system alarm clock
         assertSystemAlarmClock(YEAR, MONTH, DAY, DayTest.HOUR + 1, 1);
 
         // Check notification
@@ -685,10 +654,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
 
         startActivityCalendar();
 
-        // Hack: RecyclerView needs to be measured and laid out manually in Robolectric.
-        // Source: http://stackoverflow.com/questions/27052866/android-robolectric-click-recyclerview-item
-        recyclerView.measure(0, 0);
-        recyclerView.layout(0, 0, 100, 10000);
+        refreshRecyclerView();
 
         int oldCount = recyclerView.getChildCount();
 
@@ -718,10 +684,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
 
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
 
-        // Hack: RecyclerView needs to be measured and laid out manually in Robolectric.
-        // Source: http://stackoverflow.com/questions/27052866/android-robolectric-click-recyclerview-item
-        recyclerView.measure(0, 0);
-        recyclerView.layout(0, 0, 100, 10000);
+        refreshRecyclerView();
 
         // Check calendar
         int newCount = recyclerView.getChildCount();
@@ -747,9 +710,8 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         assertThat(textComment.getText(), is("4h 31m"));
 
         // Check system alarm
+        assertSystemAlarmCount(2);
         assertSystemAlarm(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR + 1 - 2, ONE_TIME_ALARM_MINUTE + 1, SystemAlarm.ACTION_RING_IN_NEAR_FUTURE);
-
-        // Check system alarm clock
         assertSystemAlarmClock(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR + 1, ONE_TIME_ALARM_MINUTE + 1);
 
         // Check notification
@@ -787,10 +749,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
 
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
 
-        // Hack: RecyclerView needs to be measured and laid out manually in Robolectric.
-        // Source: http://stackoverflow.com/questions/27052866/android-robolectric-click-recyclerview-item
-        recyclerView.measure(0, 0);
-        recyclerView.layout(0, 0, 100, 10000);
+        refreshRecyclerView();
 
         // Check calendar - the Day item is the same
         loadItemAtPosition(0);
@@ -821,9 +780,8 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         assertThat(textComment.getText(), is("1d 3h"));
 
         // Check system alarm
+        assertSystemAlarmCount(2);
         assertSystemAlarm(YEAR, MONTH, DAY + 1, ONE_TIME_ALARM_HOUR - 2, ONE_TIME_ALARM_MINUTE, SystemAlarm.ACTION_RING_IN_NEAR_FUTURE);
-
-        // Check system alarm clock
         assertSystemAlarmClock(YEAR, MONTH, DAY + 1, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE);
 
         // Check notification
@@ -850,10 +808,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         // Click Done in the soft keyboard
         textName.onEditorAction(EditorInfo.IME_ACTION_DONE);
 
-        // Hack: RecyclerView needs to be measured and laid out manually in Robolectric.
-        // Source: http://stackoverflow.com/questions/27052866/android-robolectric-click-recyclerview-item
-        recyclerView.measure(0, 0);
-        recyclerView.layout(0, 0, 100, 10000);
+        refreshRecyclerView();
 
         // Check calendar - the Day item is the same
         loadItemAtPosition(0);
@@ -875,9 +830,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         assertThat(textComment.getText(), is("3h 30m"));
 
         // Check system alarm
-        assertSystemAlarmNone();
-
-        // Check system alarm clock
+        assertSystemAlarmCount(1);
         assertSystemAlarmClock(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE);
 
         // Check notification
@@ -892,10 +845,9 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         prepareUntilNear();
 
         // Check system alarm
+        assertSystemAlarmCount(1);
         assertSystemAlarm(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE, SystemAlarm.ACTION_RING);
-
-        // Check system alarm clock
-        assertSystemAlarmClock(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE);
+        assertSystemAlarmClockNone();
 
         // Check notification
 //        assertNotificationCount(1);
@@ -946,9 +898,8 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         // FIXME assertThat(textComment.getText(), is(""));
 
         // Check system alarm
+        assertSystemAlarmCount(1);
         assertSystemAlarm(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE, SystemAlarm.ACTION_ALARM_TIME_OF_EARLY_DISMISSED_ALARM);
-
-        // Check system alarm clock
         assertSystemAlarmClockNone();
 
         // Check notification
@@ -985,10 +936,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
 
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
 
-        // Hack: RecyclerView needs to be measured and laid out manually in Robolectric.
-        // Source: http://stackoverflow.com/questions/27052866/android-robolectric-click-recyclerview-item
-        recyclerView.measure(0, 0);
-        recyclerView.layout(0, 0, 100, 10000);
+        refreshRecyclerView();
 
         // Check calendar - the Day item is the same
         loadItemAtPosition(0);
@@ -1010,9 +958,8 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         assertThat(textComment.getText(), is("3h 0m"));
 
         // Check system alarm
+        assertSystemAlarmCount(2);
         assertSystemAlarm(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR + 1 - 2, ONE_TIME_ALARM_MINUTE + 1, SystemAlarm.ACTION_RING_IN_NEAR_FUTURE);
-
-        // Check system alarm clock
         assertSystemAlarmClock(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR + 1, ONE_TIME_ALARM_MINUTE + 1);
 
         // Check notification
@@ -1050,10 +997,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
 
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
 
-        // Hack: RecyclerView needs to be measured and laid out manually in Robolectric.
-        // Source: http://stackoverflow.com/questions/27052866/android-robolectric-click-recyclerview-item
-        recyclerView.measure(0, 0);
-        recyclerView.layout(0, 0, 100, 10000);
+        refreshRecyclerView();
 
         // Check calendar - the Day item is the same
         loadItemAtPosition(0);
@@ -1084,9 +1028,8 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         assertThat(textComment.getText(), is("1d 1h"));
 
         // Check system alarm
+        assertSystemAlarmCount(2);
         assertSystemAlarm(YEAR, MONTH, DAY + 1, ONE_TIME_ALARM_HOUR - 2, ONE_TIME_ALARM_MINUTE, SystemAlarm.ACTION_RING_IN_NEAR_FUTURE);
-
-        // Check system alarm clock
         assertSystemAlarmClock(YEAR, MONTH, DAY + 1, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE);
 
         // Check notification
@@ -1113,10 +1056,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         // Click Done in the soft keyboard
         textName.onEditorAction(EditorInfo.IME_ACTION_DONE);
 
-        // Hack: RecyclerView needs to be measured and laid out manually in Robolectric.
-        // Source: http://stackoverflow.com/questions/27052866/android-robolectric-click-recyclerview-item
-        recyclerView.measure(0, 0);
-        recyclerView.layout(0, 0, 100, 10000);
+        refreshRecyclerView();
 
         // Check calendar - the Day item is the same
         loadItemAtPosition(0);
@@ -1138,10 +1078,8 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         assertThat(textComment.getText(), is("1h 59m"));
 
         // Check system alarm
-        assertSystemAlarmNone();
-
-        // Check system alarm clock
-        assertSystemAlarmClock(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE);
+        assertSystemAlarmCount(0);
+        assertSystemAlarmClockNone();
 
         // Check notification
         assertNotificationCount(0);
@@ -1164,9 +1102,8 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         assertThat(intentNext.getComponent(), is(expectedIntentNext.getComponent()));
 
         // Check system alarm
+        assertSystemAlarmCount(1);
         assertSystemAlarm(YEAR, MONTH, DAY + 1, 0, 0, SystemAlarm.ACTION_SET_SYSTEM_ALARM);
-
-        // Check system alarm clock
         assertSystemAlarmClockNone();
 
         // Check notification
@@ -1218,9 +1155,8 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         assertThat(intentNext.getComponent(), is(expectedIntentNext.getComponent()));
 
         // Check system alarm
+        assertSystemAlarmCount(2);
         assertSystemAlarm(YEAR, MONTH, DAY + 1, ONE_TIME_ALARM_HOUR - 1, ONE_TIME_ALARM_MINUTE + 1, SystemAlarm.ACTION_RING_IN_NEAR_FUTURE);
-
-        // Check system alarm clock
         assertSystemAlarmClock(YEAR, MONTH, DAY + 1, ONE_TIME_ALARM_HOUR + 1, ONE_TIME_ALARM_MINUTE + 1);
 
         // Check notification
@@ -1255,9 +1191,8 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         dismissButton.performClick();
 
         // Check system alarm
+        assertSystemAlarmCount(1);
         assertSystemAlarm(YEAR, MONTH, DAY + 1, 0, 0, SystemAlarm.ACTION_SET_SYSTEM_ALARM);
-
-        // Check system alarm clock
         assertSystemAlarmClockNone();
 
         // Check notification
@@ -1303,9 +1238,8 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         // FIXME assertThat(textComment.getText(), is("-0m 10s"));
 
         // Check system alarm
+        assertSystemAlarmCount(1);
         assertSystemAlarm(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE + 10, SystemAlarm.ACTION_RING);
-
-        // Check system alarm clock
         assertSystemAlarmClockNone();
 
         // Check notification
@@ -1347,10 +1281,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
 
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
 
-        // Hack: RecyclerView needs to be measured and laid out manually in Robolectric.
-        // Source: http://stackoverflow.com/questions/27052866/android-robolectric-click-recyclerview-item
-        recyclerView.measure(0, 0);
-        recyclerView.layout(0, 0, 100, 10000);
+        refreshRecyclerView();
 
         // Check calendar - the Day item is the same
         loadItemAtPosition(0);
@@ -1372,9 +1303,8 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         assertThat(textComment.getText(), is("1h 0m"));
 
         // Check system alarm
+        assertSystemAlarmCount(2);
         assertSystemAlarm(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR + 1, ONE_TIME_ALARM_MINUTE + 1, SystemAlarm.ACTION_RING);
-
-        // Check system alarm clock
         assertSystemAlarmClock(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR + 1, ONE_TIME_ALARM_MINUTE + 1);
 
         // Check notification
@@ -1412,10 +1342,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
 
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
 
-        // Hack: RecyclerView needs to be measured and laid out manually in Robolectric.
-        // Source: http://stackoverflow.com/questions/27052866/android-robolectric-click-recyclerview-item
-        recyclerView.measure(0, 0);
-        recyclerView.layout(0, 0, 100, 10000);
+        refreshRecyclerView();
 
         // Check calendar - the Day item is the same
         loadItemAtPosition(0);
@@ -1446,9 +1373,8 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         // FIXME assertThat(textComment.getText(), is("1d 3h"));
 
         // Check system alarm
+        assertSystemAlarmCount(2);
         assertSystemAlarm(YEAR, MONTH, DAY + 1, ONE_TIME_ALARM_HOUR - 2, ONE_TIME_ALARM_MINUTE, SystemAlarm.ACTION_RING_IN_NEAR_FUTURE);
-
-        // Check system alarm clock
         assertSystemAlarmClock(YEAR, MONTH, DAY + 1, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE);
 
         // Check notification
@@ -1475,10 +1401,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         // Click Done in the soft keyboard
         textName.onEditorAction(EditorInfo.IME_ACTION_DONE);
 
-        // Hack: RecyclerView needs to be measured and laid out manually in Robolectric.
-        // Source: http://stackoverflow.com/questions/27052866/android-robolectric-click-recyclerview-item
-        recyclerView.measure(0, 0);
-        recyclerView.layout(0, 0, 100, 10000);
+        refreshRecyclerView();
 
         // Check calendar - the Day item is the same
         loadItemAtPosition(0);
@@ -1500,9 +1423,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         // FIXME assertThat(textComment.getText(), is("-0m 10s"));
 
         // Check system alarm
-        assertSystemAlarmNone();
-
-        // Check system alarm clock
+        assertSystemAlarmCount(0);
         assertSystemAlarmClockNone();
 
         // Check notification
@@ -1547,9 +1468,8 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         assertThat(textComment.getText(), is(""));
 
         // Check system alarm
+        assertSystemAlarmCount(1);
         assertSystemAlarm(YEAR, MONTH, DAY + 1, 0, 0, SystemAlarm.ACTION_SET_SYSTEM_ALARM);
-
-        // Check system alarm clock
         assertSystemAlarmClockNone();
 
         // Check notification
@@ -1602,9 +1522,8 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         // FIXME assertThat(textComment.getText(), is("2h 6m"));
 
         // Check system alarm
+        assertSystemAlarmCount(2);
         assertSystemAlarm(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR - 2 + 6, ONE_TIME_ALARM_MINUTE + 6, SystemAlarm.ACTION_RING_IN_NEAR_FUTURE);
-
-        // Check system alarm clock
         assertSystemAlarmClock(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR + 6, ONE_TIME_ALARM_MINUTE + 6);
 
         // Check notification
@@ -1639,10 +1558,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
 
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
 
-        // Hack: RecyclerView needs to be measured and laid out manually in Robolectric.
-        // Source: http://stackoverflow.com/questions/27052866/android-robolectric-click-recyclerview-item
-        recyclerView.measure(0, 0);
-        recyclerView.layout(0, 0, 100, 10000);
+        refreshRecyclerView();
 
         // Check calendar - the Day item is the same
         loadItemAtPosition(0);
@@ -1673,9 +1589,8 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         // FIXME assertThat(textComment.getText(), is("1d 3h"));
 
         // Check system alarm
+        assertSystemAlarmCount(2);
         assertSystemAlarm(YEAR, MONTH, DAY + 1, ONE_TIME_ALARM_HOUR - 2, ONE_TIME_ALARM_MINUTE, SystemAlarm.ACTION_RING_IN_NEAR_FUTURE);
-
-        // Check system alarm clock
         assertSystemAlarmClock(YEAR, MONTH, DAY + 1, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE);
 
         // Check notification
@@ -1699,10 +1614,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         // Click Done in the soft keyboard
         textName.onEditorAction(EditorInfo.IME_ACTION_DONE);
 
-        // Hack: RecyclerView needs to be measured and laid out manually in Robolectric.
-        // Source: http://stackoverflow.com/questions/27052866/android-robolectric-click-recyclerview-item
-        recyclerView.measure(0, 0);
-        recyclerView.layout(0, 0, 100, 10000);
+        refreshRecyclerView();
 
         // Check calendar - the Day item is the same
         loadItemAtPosition(0);
@@ -1724,9 +1636,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         // FIXME assertThat(textComment.getText(), is("-0m 20s"));
 
         // Check system alarm
-        assertSystemAlarmNone();
-
-        // Check system alarm clock
+        assertSystemAlarmCount(0);
         assertSystemAlarmClockNone();
 
         // Check notification
@@ -1748,6 +1658,8 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         prepareCreate();
 
         // Consume the alarm with action ACTION_RING_IN_NEAR_FUTURE
+        consumeNextScheduledAlarm();
+        // Consume the alarm involving System Alarm Clock
         consumeNextScheduledAlarm();
 
         // Shift clock
@@ -1798,11 +1710,6 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE, 20)));
     }
 
-    private void consumeNextScheduledAlarm() {
-        assertThat(shadowAlarmManager.getScheduledAlarms().size(), is(1));
-        shadowAlarmManager.getNextScheduledAlarm();
-    }
-
     private void setAlarmToToday() {
         Calendar date = new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE);
         setAlarm(date);
@@ -1828,7 +1735,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         Intent ringIntent = new Intent(context, RingActivity.class);
         ringIntent.putExtra(RingActivity.ALARM_TIME, alarmTime);
 
-        activity = buildActivity(RingActivity.class).withIntent(ringIntent).setup().get();
+        activity = buildActivity(RingActivity.class, ringIntent).setup().get();
         shadowActivity = Shadows.shadowOf(activity);
 
         AlarmMorningActivityTest.setLocale(activity, "en", "US");
@@ -1850,10 +1757,11 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
 
         recyclerView = (RecyclerView) shadowActivity.findViewById(R.id.calendar_recycler_view);
 
-        // Hack: RecyclerView needs to be measured and laid out manually in Robolectric.
-        // Source: http://stackoverflow.com/questions/27052866/android-robolectric-click-recyclerview-item
-        recyclerView.measure(0, 0);
-        recyclerView.layout(0, 0, 100, 10000);
+        refreshRecyclerView();
+    }
+
+    private void refreshRecyclerView() {
+        CalendarTest.refreshRecyclerView(recyclerView);
     }
 
     private void loadItemAtPosition(int position) {
@@ -1875,12 +1783,16 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         calendarFragment.onContextItemSelected(contextMenuItem);
     }
 
+    private void consumeNextScheduledAlarm() {
+        CalendarTest.consumeNextScheduledAlarm(shadowAlarmManager);
+    }
+
     private void assertSystemAlarm(int year, int month, int day, int hour, int minute, String action) {
         CalendarTest.assertSystemAlarm(context, shadowAlarmManager, year, month, day, hour, minute, action);
     }
 
-    private void assertSystemAlarmNone() {
-        CalendarTest.assertSystemAlarmNone(shadowAlarmManager);
+    private void assertSystemAlarmCount(int count) {
+        CalendarTest.assertSystemAlarmCount(shadowAlarmManager, count);
     }
 
     private void assertSystemAlarmClock(int year, int month, int day, int hour, int minute) {
