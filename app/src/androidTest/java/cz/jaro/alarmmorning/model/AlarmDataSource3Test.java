@@ -40,8 +40,8 @@ public class AlarmDataSource3Test {
             Day day = new Day();
             day.setState(Day.STATE_ENABLED);
             day.setDate(new GregorianCalendar(YEAR, MONTH, DAY + i));
-            day.setHour(HOUR_DAY);
-            day.setMinute(MINUTE_DAY);
+            day.setHourDay(HOUR_DAY);
+            day.setMinuteDay(MINUTE_DAY);
 
             Analytics analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
 

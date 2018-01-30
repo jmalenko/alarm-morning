@@ -11,7 +11,6 @@ import android.util.Log;
 import java.util.Calendar;
 
 import cz.jaro.alarmmorning.model.AppAlarm;
-import cz.jaro.alarmmorning.model.Day;
 import cz.jaro.alarmmorning.model.OneTimeAlarm;
 import cz.jaro.alarmmorning.receivers.NotificationReceiver;
 
@@ -44,15 +43,7 @@ public class SystemNotification {
         AppAlarm nextAlarmToRing = globalManager.getNextAlarmToRing();
 
         Resources res = context.getResources();
-        String timeText;
-        // TODO Refactor Day such that we can use consistent approach for all types - basically rename getHour() to getHourDay() and getHourX() to GetHour()
-        // timeText = Localization.timeToString(nextAlarmToRing.getHour(), nextAlarmToRing.getMinute(),context);
-        if (nextAlarmToRing instanceof Day) {
-            Day day = (Day) nextAlarmToRing;
-            timeText = Localization.timeToString(day.getHourX(), day.getMinuteX(), context);
-        } else {
-            timeText = Localization.timeToString(nextAlarmToRing.getHour(), nextAlarmToRing.getMinute(), context);
-        }
+        String timeText = Localization.timeToString(nextAlarmToRing.getHour(), nextAlarmToRing.getMinute(), context);
 
         String contentTitle;
         if (nextAlarmToRing instanceof OneTimeAlarm && ((OneTimeAlarm) nextAlarmToRing).getName() != null && !((OneTimeAlarm) nextAlarmToRing).getName().isEmpty()) {

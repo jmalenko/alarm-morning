@@ -107,8 +107,8 @@ public class AlarmDataSource {
             day = new Day();
             day.setDate(CalendarUtils.beginningOfToday(date));
             day.setState(Day.STATE_RULE);
-            day.setHour(Day.VALUE_UNSET);
-            day.setMinute(Day.VALUE_UNSET);
+            day.setHourDay(Day.VALUE_UNSET);
+            day.setMinuteDay(Day.VALUE_UNSET);
         }
 
         int dayOfWeek = date.get(Calendar.DAY_OF_WEEK);
@@ -154,8 +154,8 @@ public class AlarmDataSource {
         ContentValues values = new ContentValues();
         values.put(AlarmDbHelper.COLUMN_DAY_DATE, dateText);
         values.put(AlarmDbHelper.COLUMN_DAY_STATE, day.getState());
-        values.put(AlarmDbHelper.COLUMN_DAY_HOUR, day.getHour());
-        values.put(AlarmDbHelper.COLUMN_DAY_MINUTE, day.getMinute());
+        values.put(AlarmDbHelper.COLUMN_DAY_HOUR, day.getHourDay());
+        values.put(AlarmDbHelper.COLUMN_DAY_MINUTE, day.getMinuteDay());
 
         long id = database.insertWithOnConflict(AlarmDbHelper.TABLE_DAY, null, values, SQLiteDatabase.CONFLICT_REPLACE);
     }
@@ -290,8 +290,8 @@ public class AlarmDataSource {
         day.setDate(date);
 
         day.setState(cursor.getInt(2));
-        day.setHour(cursor.getInt(3));
-        day.setMinute(cursor.getInt(4));
+        day.setHourDay(cursor.getInt(3));
+        day.setMinuteDay(cursor.getInt(4));
         return day;
     }
 
@@ -340,8 +340,8 @@ public class AlarmDataSource {
                     append(" ").append(day.getId()).
                     append(" | ").append(dateToText(day.getDate())).
                     append(" | ").append(day.getState()).
-                    append(" | ").append(day.getHour()).
-                    append(" | ").append(day.getMinute()).append("\n");
+                    append(" | ").append(day.getHourDay()).
+                    append(" | ").append(day.getMinuteDay()).append("\n");
             cursor.moveToNext();
         }
         cursor.close();

@@ -111,8 +111,8 @@ public class SetTimeActivity extends AppCompatActivity implements TimePickerDial
             day.setState(Day.STATE_DISABLED);
         } else {
             day.setState(Day.STATE_ENABLED);
-            day.setHour(saveAlarmTime.get(Calendar.HOUR_OF_DAY));
-            day.setMinute(saveAlarmTime.get(Calendar.MINUTE));
+            day.setHourDay(saveAlarmTime.get(Calendar.HOUR_OF_DAY));
+            day.setMinuteDay(saveAlarmTime.get(Calendar.MINUTE));
         }
 
         // Save

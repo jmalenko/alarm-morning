@@ -121,14 +121,10 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         viewHolder.getTextDate().setBackgroundColor(backgroundColor);
 
         String timeText;
-        if (appAlarm instanceof Day) {
-            if (day.isEnabled()) {
-                timeText = Localization.timeToString(day.getHourX(), day.getMinuteX(), fragment.getActivity());
-            } else {
-                timeText = res.getString(R.string.alarm_unset);
-            }
+        if (!(appAlarm instanceof Day) || day.isEnabled()) {
+            timeText = Localization.timeToString(appAlarm.getHour(), appAlarm.getMinute(), fragment.getActivity());
         } else {
-            timeText = Localization.timeToString(oneTimeAlarm.getHour(), oneTimeAlarm.getMinute(), fragment.getActivity());
+            timeText = res.getString(R.string.alarm_unset);
         }
         viewHolder.getTextTime().setText(timeText);
 

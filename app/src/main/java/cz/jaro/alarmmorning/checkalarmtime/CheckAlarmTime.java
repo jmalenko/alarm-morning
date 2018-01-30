@@ -295,7 +295,7 @@ public class CheckAlarmTime {
 
         String contentTitle;
         if (day.isEnabled()) {
-            String timeText = Localization.timeToString(day.getHourX(), day.getMinuteX(), context);
+            String timeText = Localization.timeToString(day.getHour(), day.getMinute(), context);
             contentTitle = res.getString(R.string.notification_check_title_currently_set, timeText);
         } else {
             contentTitle = res.getString(R.string.notification_check_title_currently_unset);

@@ -58,8 +58,8 @@ public class DayTest extends FixedTimeTest {
         day = new Day();
         GregorianCalendar date = new GregorianCalendar(YEAR, MONTH, DAY);
         day.setDate(date);
-        day.setHour(HOUR_DAY);
-        day.setMinute(MINUTE_DAY);
+        day.setHourDay(HOUR_DAY);
+        day.setMinuteDay(MINUTE_DAY);
         day.setDefaults(defaults);
     }
 
@@ -69,8 +69,8 @@ public class DayTest extends FixedTimeTest {
         day.setState(Day.STATE_RULE);
 
         assertThat(day.isEnabled(), is(false));
-        assertThat(day.getHourX(), is(HOUR_DEFAULT));
-        assertThat(day.getMinuteX(), is(MINUTE_DEFAULT));
+        assertThat(day.getHour(), is(HOUR_DEFAULT));
+        assertThat(day.getMinute(), is(MINUTE_DEFAULT));
         assertThat(day.sameAsDefault(), is(true));
 
         day.reverse();
@@ -83,8 +83,8 @@ public class DayTest extends FixedTimeTest {
         day.setState(Day.STATE_ENABLED);
 
         assertThat(day.isEnabled(), is(true));
-        assertThat(day.getHourX(), is(HOUR_DAY));
-        assertThat(day.getMinuteX(), is(1));
+        assertThat(day.getHour(), is(HOUR_DAY));
+        assertThat(day.getMinute(), is(1));
         assertThat(day.sameAsDefault(), is(false));
 
         day.reverse();
@@ -97,8 +97,8 @@ public class DayTest extends FixedTimeTest {
         day.setState(Day.STATE_DISABLED);
 
         assertThat(day.isEnabled(), is(false));
-        assertThat(day.getHourX(), is(HOUR_DAY));
-        assertThat(day.getMinuteX(), is(1));
+        assertThat(day.getHour(), is(HOUR_DAY));
+        assertThat(day.getMinute(), is(1));
         assertThat(day.sameAsDefault(), is(true));
 
         day.reverse();
@@ -111,8 +111,8 @@ public class DayTest extends FixedTimeTest {
         day.setState(Day.STATE_RULE);
 
         assertThat(day.isEnabled(), is(true));
-        assertThat(day.getHourX(), is(HOUR_DEFAULT));
-        assertThat(day.getMinuteX(), is(MINUTE_DEFAULT));
+        assertThat(day.getHour(), is(HOUR_DEFAULT));
+        assertThat(day.getMinute(), is(MINUTE_DEFAULT));
         assertThat(day.sameAsDefault(), is(true));
 
         day.reverse();
@@ -125,8 +125,8 @@ public class DayTest extends FixedTimeTest {
         day.setState(Day.STATE_ENABLED);
 
         assertThat(day.isEnabled(), is(true));
-        assertThat(day.getHourX(), is(HOUR_DAY));
-        assertThat(day.getMinuteX(), is(1));
+        assertThat(day.getHour(), is(HOUR_DAY));
+        assertThat(day.getMinute(), is(1));
         assertThat(day.sameAsDefault(), is(false));
 
         day.reverse();
@@ -139,8 +139,8 @@ public class DayTest extends FixedTimeTest {
         day.setState(Day.STATE_DISABLED);
 
         assertThat(day.isEnabled(), is(false));
-        assertThat(day.getHourX(), is(HOUR_DAY));
-        assertThat(day.getMinuteX(), is(1));
+        assertThat(day.getHour(), is(HOUR_DAY));
+        assertThat(day.getMinute(), is(1));
         assertThat(day.sameAsDefault(), is(false));
 
         day.reverse();

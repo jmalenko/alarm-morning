@@ -558,15 +558,8 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
                 bundle.putInt(TimePickerFragment.HOURS, hour);
                 bundle.putInt(TimePickerFragment.MINUTES, 0);
             } else if (menuAction == R.id.day_set_time) {
-                if (appAlarmAtPosition instanceof Day) {
-                    Day day = (Day) appAlarmAtPosition;
-                    bundle.putInt(TimePickerFragment.HOURS, day.getHourX());
-                    bundle.putInt(TimePickerFragment.MINUTES, day.getMinuteX());
-                } else {
-                    OneTimeAlarm oneTimeAlarm = (OneTimeAlarm) appAlarmAtPosition;
-                    bundle.putInt(TimePickerFragment.HOURS, oneTimeAlarm.getHour());
-                    bundle.putInt(TimePickerFragment.MINUTES, oneTimeAlarm.getMinute());
-                }
+                bundle.putInt(TimePickerFragment.HOURS, appAlarmAtPosition.getHour());
+                bundle.putInt(TimePickerFragment.MINUTES, appAlarmAtPosition.getMinute());
             } else {
                 throw new IllegalArgumentException("Unexpected action " + menuAction);
             }
@@ -749,16 +742,11 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         String dateText = Localization.dateToStringVeryShort(getResources(), date.getTime());
 
         String headerTitle;
-        if (appAlarm instanceof Day) {
-            if (day.isEnabled()) {
-                String timeText = Localization.timeToString(day.getHourX(), day.getMinuteX(), getActivity());
-                headerTitle = getResources().getString(R.string.menu_day_header, timeText, dayOfWeekText, dateText);
-            } else {
-                headerTitle = getResources().getString(R.string.menu_day_header_disabled, dayOfWeekText, dateText);
-            }
-        } else {
-            String timeText = Localization.timeToString(oneTimeAlarm.getHour(), oneTimeAlarm.getMinute(), getActivity());
+        if (!(appAlarm instanceof Day) || day.isEnabled()) {
+            String timeText = Localization.timeToString(appAlarm.getHour(), appAlarm.getMinute(), getActivity());
             headerTitle = getResources().getString(R.string.menu_day_header, timeText, dayOfWeekText, dateText);
+        } else {
+            headerTitle = getResources().getString(R.string.menu_day_header_disabled, dayOfWeekText, dateText);
         }
         menu.setHeaderTitle(headerTitle);
 

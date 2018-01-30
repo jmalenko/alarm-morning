@@ -41,8 +41,8 @@ public class GlobalManager1NextAlarm3DefaultAndDayTest extends FixedTimeTest {
         Day day = new Day();
         day.setDate(date);
         day.setState(Day.STATE_DISABLED);
-        day.setHour(DayTest.HOUR_DAY);
-        day.setMinute(DayTest.MINUTE_DAY);
+        day.setHourDay(DayTest.HOUR_DAY);
+        day.setMinuteDay(DayTest.MINUTE_DAY);
 
         Defaults defaults = new Defaults();
         int dayOfWeek = date.get(Calendar.DAY_OF_WEEK);

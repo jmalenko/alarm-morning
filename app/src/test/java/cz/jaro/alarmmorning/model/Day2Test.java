@@ -31,8 +31,8 @@ public class Day2Test {
         day = new Day();
         day.setState(Day.STATE_ENABLED);
         day.setDate(new GregorianCalendar(YEAR, MONTH, DAY));
-        day.setHour(HOUR_DAY);
-        day.setMinute(MINUTE_DAY);
+        day.setHourDay(HOUR_DAY);
+        day.setMinuteDay(MINUTE_DAY);
     }
 
     @Test

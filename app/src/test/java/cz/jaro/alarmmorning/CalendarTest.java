@@ -901,8 +901,8 @@ public class CalendarTest extends FixedTimeTest {
         Day day = new Day();
         day.setDate(date);
         day.setState(Day.STATE_ENABLED);
-        day.setHour(date.get(Calendar.HOUR_OF_DAY));
-        day.setMinute(date.get(Calendar.MINUTE));
+        day.setHourDay(date.get(Calendar.HOUR_OF_DAY));
+        day.setMinuteDay(date.get(Calendar.MINUTE));
 
         Defaults defaults = new Defaults();
         int dayOfWeek = date.get(Calendar.DAY_OF_WEEK);

@@ -35,8 +35,8 @@ public class Day4Test {
         day0 = new Day();
         day0.setState(Day.STATE_ENABLED);
         day0.setDate(new GregorianCalendar(YEAR, MONTH, DAY));
-        day0.setHour(HOUR_DAY);
-        day0.setMinute(MINUTE_DAY);
+        day0.setHourDay(HOUR_DAY);
+        day0.setMinuteDay(MINUTE_DAY);
 
         Analytics analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
 
@@ -46,8 +46,8 @@ public class Day4Test {
         day1 = new Day();
         day1.setState(Day.STATE_ENABLED);
         day1.setDate(new GregorianCalendar(YEAR, MONTH, DAY + 1));
-        day1.setHour(HOUR_DAY + 1);
-        day1.setMinute(MINUTE_DAY + 1);
+        day1.setHourDay(HOUR_DAY + 1);
+        day1.setMinuteDay(MINUTE_DAY + 1);
 
         analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
 
@@ -57,8 +57,8 @@ public class Day4Test {
         day2 = new Day();
         day2.setState(Day.STATE_ENABLED);
         day2.setDate(new GregorianCalendar(YEAR, MONTH, DAY + 2));
-        day2.setHour(HOUR_DAY + 2);
-        day2.setMinute(MINUTE_DAY + 2);
+        day2.setHourDay(HOUR_DAY + 2);
+        day2.setMinuteDay(MINUTE_DAY + 2);
 
         analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
 

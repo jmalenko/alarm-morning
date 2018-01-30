@@ -88,8 +88,8 @@ public class AlarmDataSource1Test {
         Day day1a = new Day();
         day1a.setState(Defaults.STATE_ENABLED);
         day1a.setDate(new GregorianCalendar(YEAR, MONTH, DAY));
-        day1a.setHour(HOUR_DEFAULT);
-        day1a.setMinute(MINUTE_DEFAULT);
+        day1a.setHourDay(HOUR_DEFAULT);
+        day1a.setMinuteDay(MINUTE_DEFAULT);
 
         globalManager.saveDay(day1a, analytics);
 
@@ -97,8 +97,8 @@ public class AlarmDataSource1Test {
 
         assertEquals(day1a.getState(), day1b.getState());
         assertEquals(day1a.getDate(), day1b.getDate());
-        assertEquals(day1a.getHour(), day1b.getHour());
-        assertEquals(day1a.getMinute(), day1b.getMinute());
+        assertEquals(day1a.getHourDay(), day1b.getHourDay());
+        assertEquals(day1a.getMinuteDay(), day1b.getMinuteDay());
         assertNotNull(day1b.getDefaults());
 
         // save 2nd object
@@ -106,8 +106,8 @@ public class AlarmDataSource1Test {
         Day day2a = new Day();
         day2a.setState(Defaults.STATE_DISABLED);
         day2a.setDate(new GregorianCalendar(YEAR, MONTH, DAY + 1));
-        day2a.setHour(HOUR_DEFAULT + 1);
-        day2a.setMinute(MINUTE_DEFAULT + 1);
+        day2a.setHourDay(HOUR_DEFAULT + 1);
+        day2a.setMinuteDay(MINUTE_DEFAULT + 1);
 
         Analytics analytics2 = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
 
@@ -117,8 +117,8 @@ public class AlarmDataSource1Test {
 
         assertEquals(day2a.getState(), day2b.getState());
         assertEquals(day2a.getDate(), day2b.getDate());
-        assertEquals(day2a.getHour(), day2b.getHour());
-        assertEquals(day2a.getMinute(), day2b.getMinute());
+        assertEquals(day2a.getHourDay(), day2b.getHourDay());
+        assertEquals(day2a.getMinuteDay(), day2b.getMinuteDay());
         assertNotNull(day2b.getDefaults());
     }
 
@@ -130,8 +130,8 @@ public class AlarmDataSource1Test {
         assertEquals(Day.STATE_RULE, day.getState());
         assertEquals(dateWithoutRecord.getTime().toString(), day.getDate().getTime().toString());
         assertEquals(dateWithoutRecord, day.getDate());
-        assertEquals(Day.VALUE_UNSET, day.getHour());
-        assertEquals(Day.VALUE_UNSET, day.getMinute());
+        assertEquals(Day.VALUE_UNSET, day.getHourDay());
+        assertEquals(Day.VALUE_UNSET, day.getMinuteDay());
         assertNotNull(day.getDefaults());
     }
 }

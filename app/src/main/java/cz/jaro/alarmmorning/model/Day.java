@@ -19,7 +19,7 @@ import static cz.jaro.alarmmorning.calendar.CalendarUtils.roundDown;
  * We use "alarm rings at 7:30", while English uses "alarm goes off at 7:30".
  * We use "ring the alarm", while English uses "raised the alarm".
  * <p/>
- * The alarm time is a combination of {@link #getDate()}, {@link #getHourX()} and {@link#getMinuteX()}. For convenience, the method {@link #getDateTime()}
+ * The alarm time is a combination of {@link #getDate()}, {@link #getHour()} and {@link#getMinute()}. For convenience, the method {@link #getDateTime()}
  * combines all three items together and returns the alarm time..
  */
 public class Day extends AppAlarm {
@@ -88,19 +88,19 @@ public class Day extends AppAlarm {
         this.state = state;
     }
 
-    public int getHour() {
+    public int getHourDay() {
         return hour;
     }
 
-    public void setHour(int hour) {
+    public void setHourDay(int hour) {
         this.hour = hour;
     }
 
-    public int getMinute() {
+    public int getMinuteDay() {
         return minute;
     }
 
-    public void setMinute(int minute) {
+    public void setMinuteDay(int minute) {
         this.minute = minute;
     }
 
@@ -138,11 +138,15 @@ public class Day extends AppAlarm {
      *
      * @return hour of the alarm (that should be used if the alarm is enabled)
      */
-    public int getHourX() {
+    public int getHour() {
         if (!isValid() || state == STATE_RULE)
             return defaults.getHour();
         else
             return hour;
+    }
+
+    public void setHour(int hour) {
+        setHourDay(hour);
     }
 
     /**
@@ -152,11 +156,15 @@ public class Day extends AppAlarm {
      *
      * @return minute of the alarm
      */
-    public int getMinuteX() {
+    public int getMinute() {
         if (!isValid() || state == STATE_RULE)
             return defaults.getMinute();
         else
             return minute;
+    }
+
+    public void setMinute(int minute) {
+        setMinuteDay(minute);
     }
 
     /**
@@ -178,8 +186,8 @@ public class Day extends AppAlarm {
     public Calendar getDateTime() {
         Calendar alarmTime = (Calendar) date.clone();
 
-        alarmTime.set(Calendar.HOUR_OF_DAY, getHourX());
-        alarmTime.set(Calendar.MINUTE, getMinuteX());
+        alarmTime.set(Calendar.HOUR_OF_DAY, getHour());
+        alarmTime.set(Calendar.MINUTE, getMinute());
         roundDown(alarmTime, Calendar.SECOND);
 
         return alarmTime;
