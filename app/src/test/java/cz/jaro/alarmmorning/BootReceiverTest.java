@@ -59,16 +59,16 @@ public class BootReceiverTest extends FixedTimeTest {
     public void t00_allSystemAlarms() {
         assertThat("Alarm count", shadowAlarmManager.getScheduledAlarms().size(), is(3));
 
-        // System alarm for Alarm
-        assertSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY + 1, 0, 0, AlarmReceiver.class, SystemAlarm.ACTION_SET_SYSTEM_ALARM);
-        shadowAlarmManager.getNextScheduledAlarm();
-
         // System alarm for Check alarm time
         assertSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY, 22, 0, CheckAlarmTimeAlarmReceiver.class, CheckAlarmTime.ACTION_CHECK_ALARM_TIME);
         shadowAlarmManager.getNextScheduledAlarm();
 
         // System alarm for Nighttime bell
         assertSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY, 22, 0, NighttimeBellAlarmReceiver.class, NighttimeBell.ACTION_PLAY);
+        shadowAlarmManager.getNextScheduledAlarm();
+
+        // System alarm for Alarm
+        assertSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY + 1, 0, 0, AlarmReceiver.class, SystemAlarm.ACTION_SET_SYSTEM_ALARM);
         shadowAlarmManager.getNextScheduledAlarm();
     }
 
