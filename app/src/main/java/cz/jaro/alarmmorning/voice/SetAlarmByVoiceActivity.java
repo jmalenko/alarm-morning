@@ -14,9 +14,9 @@ import cz.jaro.alarmmorning.Analytics;
 import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.Localization;
 import cz.jaro.alarmmorning.R;
-import cz.jaro.alarmmorning.checkalarmtime.SetTimeActivity;
 import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.graphics.Blink;
+import cz.jaro.alarmmorning.model.OneTimeAlarm;
 
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.roundDown;
 import static cz.jaro.alarmmorning.model.Day.VALUE_UNSET;
@@ -122,7 +122,6 @@ public class SetAlarmByVoiceActivity extends Activity {
             } else {
                 Log.w(TAG, "Invalid extra value \"" + extraName + "\"");
                 ok = false;
-                ok = false;
                 return VALUE_UNSET;
             }
         } else {
@@ -169,6 +168,22 @@ public class SetAlarmByVoiceActivity extends Activity {
         // Save
         Analytics analytics = new Analytics(Analytics.Channel.External, Analytics.ChannelName.Voice);
 
-        SetTimeActivity.save(this, alarmTime, analytics, false);
+        addOneTimeAlarm(alarmTime, analytics);
     }
+
+    public static void addOneTimeAlarm(Calendar saveAlarmTime, Analytics analytics) {
+        GlobalManager globalManager = GlobalManager.getInstance();
+        Clock clock = globalManager.clock();
+        Calendar now = clock.now();
+
+        // Set
+        OneTimeAlarm oneTimeAlarm = new OneTimeAlarm();
+        oneTimeAlarm.setDate(now);
+        oneTimeAlarm.setHour(saveAlarmTime.get(Calendar.HOUR_OF_DAY));
+        oneTimeAlarm.setMinute(saveAlarmTime.get(Calendar.MINUTE));
+
+        // Save
+        globalManager.saveOneTimeAlarm(oneTimeAlarm, analytics);
+    }
+
 }

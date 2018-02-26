@@ -75,32 +75,28 @@ public class SetTimeActivity extends AppCompatActivity implements TimePickerDial
             analytics.setChannelName(Analytics.ChannelName.Check_alarm_time);
 
             if (disable) {
-                save(this, disable, newAlarmTime, analytics);
+                updateDay(this, disable, newAlarmTime, analytics);
             } else {
                 Calendar saveAlarmTime = (Calendar) newAlarmTime.clone();
                 saveAlarmTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
                 saveAlarmTime.set(Calendar.MINUTE, minute);
 
-                save(this, disable, saveAlarmTime, analytics);
+                updateDay(this, disable, saveAlarmTime, analytics);
             }
 
             finish();
         }
     }
 
-    public static void save(Context context, Calendar saveAlarmTime, Analytics analytics) {
-        save(context, false, saveAlarmTime, analytics, true);
+    public static void updateDay(Context context, Calendar saveAlarmTime, Analytics analytics) {
+        updateDay(context, false, saveAlarmTime, analytics, true);
     }
 
-    public static void save(Context context, Calendar saveAlarmTime, Analytics analytics, boolean showToast) {
-        save(context, false, saveAlarmTime, analytics, showToast);
+    public static void updateDay(Context context, boolean disable, Calendar saveAlarmTime, Analytics analytics) {
+        updateDay(context, disable, saveAlarmTime, analytics, true);
     }
 
-    public static void save(Context context, boolean disable, Calendar saveAlarmTime, Analytics analytics) {
-        save(context, disable, saveAlarmTime, analytics, true);
-    }
-
-    public static void save(Context context, boolean disable, Calendar saveAlarmTime, Analytics analytics, boolean showToast) {
+    public static void updateDay(Context context, boolean disable, Calendar saveAlarmTime, Analytics analytics, boolean showToast) {
         GlobalManager globalManager = GlobalManager.getInstance();
 
         // Load
