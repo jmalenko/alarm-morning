@@ -1,8 +1,10 @@
 package cz.jaro.alarmmorning;
 
 import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.DatePickerDialog;
 import android.app.Fragment;
+import android.content.ComponentName;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -40,6 +42,7 @@ import cz.jaro.alarmmorning.model.Day;
 import cz.jaro.alarmmorning.model.Defaults;
 import cz.jaro.alarmmorning.model.OneTimeAlarm;
 
+import static android.content.Context.ACTIVITY_SERVICE;
 import static cz.jaro.alarmmorning.GlobalManager.HORIZON_DAYS;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.addDaysClone;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.beginningOfToday;
@@ -167,6 +170,13 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         handler.stop();
     }
 
+    public boolean isForeground(String className) {
+        ActivityManager manager = (ActivityManager) getActivity().getSystemService(ACTIVITY_SERVICE);
+        List<ActivityManager.RunningTaskInfo> task = manager.getRunningTasks(1);
+        ComponentName componentInfo = task.get(0).topActivity;
+        return componentInfo.getClassName().equals(className);
+    }
+
     /*
      * Events
      * ======
@@ -197,7 +207,8 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         adapter.notifyItemChanged(positionAction);
         updatePositionNextAlarm();
 
-        if (positionAction != POSITION_UNSET) { // otherwise the alarm is set because a default alarm time was set. (The DefaultsActivity is running and I don't know why CalendarFragment gets the broadcast message...)
+        boolean isCalendarInForeground = isForeground(getActivity().getClass().getName()); // Needed to detect when the wizard is running.
+        if (isCalendarInForeground && positionAction != POSITION_UNSET) { // otherwise the alarm is set because a default alarm time was set. (The DefaultsActivity is running and I don't know why CalendarFragment gets the broadcast message...)
             AppAlarm appAlarmAtPosition = loadPosition(positionAction);
             String toastText = formatToastText(appAlarmAtPosition);
             Toast.makeText(getActivity(), toastText, Toast.LENGTH_LONG).show();
