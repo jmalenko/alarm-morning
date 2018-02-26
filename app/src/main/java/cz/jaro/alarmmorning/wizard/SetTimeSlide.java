@@ -85,7 +85,7 @@ public class SetTimeSlide extends BaseFragment implements TimePicker.OnTimeChang
     }
 
     /**
-     * When run from Settings, the workdays may have different alarm times. We take median time and set if
+     * When run from Settings, the workdays may have different alarm times. We take median time and use it.
      */
     private void presetTime() {
         if (Wizard.loadWizardFinished(getContext())) {
@@ -197,9 +197,6 @@ public class SetTimeSlide extends BaseFragment implements TimePicker.OnTimeChang
         }
     }
 
-    /**
-     *
-     */
     private boolean presetTimeFromCalendar() {
         List<Integer> times = new ArrayList<>();
 
