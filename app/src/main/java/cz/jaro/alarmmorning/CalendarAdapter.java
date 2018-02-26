@@ -229,15 +229,18 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         String messageText;
         long diff = appAlarm.getTimeToRing(fragment.clock());
 
-        TimeDifference timeDifference = TimeDifference.split(diff);
+        TimeDifference timeDifference = new TimeDifference(diff);
+        String sign = timeDifference.isNegative() ? "–" : "";
         Resources res = fragment.getResources();
 
         if (timeDifference.days > 0) {
-            messageText = res.getString(R.string.time_to_ring_message_days, timeDifference.days, timeDifference.hours);
+            messageText = res.getString(R.string.time_to_ring_message_days, timeDifference.days, timeDifference.hours, sign);
         } else if (timeDifference.hours > 0) {
-            messageText = res.getString(R.string.time_to_ring_message_hours, timeDifference.hours, timeDifference.minutes);
+            messageText = res.getString(R.string.time_to_ring_message_hours, timeDifference.hours, timeDifference.minutes, sign);
+        } else if (timeDifference.minutes > 0) {
+            messageText = res.getString(R.string.time_to_ring_message_minutes, timeDifference.minutes, timeDifference.seconds, sign);
         } else {
-            messageText = res.getString(R.string.time_to_ring_message_minutes, timeDifference.minutes, timeDifference.seconds);
+            messageText = res.getString(R.string.time_to_ring_message_seconds, timeDifference.seconds, sign);
         }
 
         return messageText;
@@ -309,38 +312,6 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         public boolean onLongClick(View view) {
             itemView.showContextMenu();
             return true;
-        }
-    }
-
-
-    static class TimeDifference {
-        long days;
-        long hours;
-        long minutes;
-        long seconds;
-
-        public static TimeDifference split(long diff) {
-            TimeDifference timeDifference = new TimeDifference();
-
-            long remaining = diff;
-            long length;
-
-            length = 24 * 60 * 60 * 1000;
-            timeDifference.days = remaining / length;
-            remaining = remaining % length;
-
-            length = 60 * 60 * 1000;
-            timeDifference.hours = remaining / length;
-            remaining = remaining % length;
-
-            length = 60 * 1000;
-            timeDifference.minutes = remaining / length;
-            remaining = remaining % length;
-
-            length = 1000;
-            timeDifference.seconds = remaining / length;
-
-            return timeDifference;
         }
     }
 }

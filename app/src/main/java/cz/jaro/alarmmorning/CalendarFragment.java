@@ -475,13 +475,15 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
             if (diff < 0) {
                 toastText = res.getString(R.string.time_to_ring_toast_passed);
             } else {
-                CalendarAdapter.TimeDifference timeDifference = CalendarAdapter.TimeDifference.split(diff);
+                TimeDifference timeDifference = new TimeDifference(diff);
                 if (timeDifference.days > 0) {
                     toastText = res.getString(R.string.time_to_ring_toast_days, timeDifference.days, timeDifference.hours, timeDifference.minutes);
                 } else if (timeDifference.hours > 0) {
                     toastText = res.getString(R.string.time_to_ring_toast_hours, timeDifference.hours, timeDifference.minutes);
-                } else {
+                } else if (timeDifference.minutes > 0) {
                     toastText = res.getString(R.string.time_to_ring_toast_minutes, timeDifference.minutes, timeDifference.seconds);
+                } else {
+                    toastText = res.getString(R.string.time_to_ring_toast_seconds, timeDifference.seconds);
                 }
             }
         }
