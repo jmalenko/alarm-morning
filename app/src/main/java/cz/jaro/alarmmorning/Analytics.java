@@ -14,8 +14,8 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
+import com.crashlytics.android.Crashlytics;
 import com.google.firebase.analytics.FirebaseAnalytics;
-import com.google.firebase.crash.FirebaseCrash;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -337,7 +337,7 @@ public class Analytics {
             GlobalManager globalManager = GlobalManager.getInstance();
             str.append(globalManager.dumpDB());
 
-            FirebaseCrash.log(str.toString());
+            Crashlytics.log(str.toString());
             return this;
         }
 

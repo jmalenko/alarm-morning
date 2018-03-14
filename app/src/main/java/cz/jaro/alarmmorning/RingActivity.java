@@ -24,7 +24,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
 
-import com.google.firebase.crash.FirebaseCrash;
+import com.crashlytics.android.Crashlytics;
 
 import java.io.IOException;
 import java.util.Calendar;
@@ -160,7 +160,7 @@ public class RingActivity extends Activity implements RingInterface {
 
         if (mAlarmTime == null) {
             // TODO This should not happen, but it does sometimes (see crash reporting). Therefore we log everything. Possible explanation is that the users
-            // manually start this activity directly without specifying the extra.
+            // Activity manually started without specifying the extra.
             StringBuilder str = new StringBuilder();
             str.append("Stack trace:\n");
             str.append(Log.getStackTraceString(new IllegalStateException("Alarm time should not be null")));
@@ -183,7 +183,7 @@ public class RingActivity extends Activity implements RingInterface {
             GlobalManager globalManager = GlobalManager.getInstance();
             str.append(globalManager.dumpDB());
 
-            FirebaseCrash.log(str.toString());
+            Crashlytics.log(str.toString());
         }
 
         SlideButton dismissButton = (SlideButton) findViewById(R.id.dismissButton);
