@@ -456,160 +456,187 @@ public class Analytics {
     }
 
     public Analytics setConfigurationInfo() {
+        JSONObject conf = createConfiguration();
+        mPayload.putSerializable(Param.Configuration.name(), conf.toString());
+        return this;
+    }
+
+    @NonNull
+    public JSONObject createConfiguration() {
         JSONObject conf = new JSONObject();
 
         try {
             // Settings
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
 
+            JSONObject confPreferences = new JSONObject();
             String ringtonePreference = preferences.getString(SettingsActivity.PREF_RINGTONE, SettingsActivity.PREF_RINGTONE_DEFAULT);
-            conf.put(SettingsActivity.PREF_RINGTONE, ringtonePreference);
+            confPreferences.put(SettingsActivity.PREF_RINGTONE, ringtonePreference);
 
             int volumePreference = preferences.getInt(SettingsActivity.PREF_VOLUME, SettingsActivity.PREF_VOLUME_DEFAULT);
             int volume = SettingsActivity.getRealVolume(volumePreference, 100);
-            conf.put(SettingsActivity.PREF_VOLUME, volume);
+            confPreferences.put(SettingsActivity.PREF_VOLUME, volume);
 
             boolean increasing = preferences.getBoolean(SettingsActivity.PREF_VOLUME_INCREASING, SettingsActivity.PREF_VOLUME_INCREASING_DEFAULT);
-            conf.put(SettingsActivity.PREF_VOLUME_INCREASING, increasing);
+            confPreferences.put(SettingsActivity.PREF_VOLUME_INCREASING, increasing);
 
             boolean vibratePreference = preferences.getBoolean(SettingsActivity.PREF_VIBRATE, SettingsActivity.PREF_VIBRATE_DEFAULT);
-            conf.put(SettingsActivity.PREF_VIBRATE, vibratePreference);
+            confPreferences.put(SettingsActivity.PREF_VIBRATE, vibratePreference);
 
             int snoozeTime = preferences.getInt(SettingsActivity.PREF_SNOOZE_TIME, SettingsActivity.PREF_SNOOZE_TIME_DEFAULT);
-            conf.put(SettingsActivity.PREF_SNOOZE_TIME, snoozeTime);
+            confPreferences.put(SettingsActivity.PREF_SNOOZE_TIME, snoozeTime);
 
             int nearFutureMinutes = preferences.getInt(SettingsActivity.PREF_NEAR_FUTURE_TIME, SettingsActivity.PREF_NEAR_FUTURE_TIME_DEFAULT);
-            conf.put(SettingsActivity.PREF_NEAR_FUTURE_TIME, nearFutureMinutes);
+            confPreferences.put(SettingsActivity.PREF_NEAR_FUTURE_TIME, nearFutureMinutes);
 
             int napTime = preferences.getInt(SettingsActivity.PREF_NAP_TIME, SettingsActivity.PREF_NAP_TIME_DEFAULT);
-            conf.put(SettingsActivity.PREF_NAP_TIME, napTime);
+            confPreferences.put(SettingsActivity.PREF_NAP_TIME, napTime);
 
             String buttonActionPreference = preferences.getString(SettingsActivity.PREF_ACTION_ON_BUTTON, SettingsActivity.PREF_ACTION_DEFAULT);
-            conf.put(SettingsActivity.PREF_ACTION_ON_BUTTON, SettingsActivity.actionCodeToString(buttonActionPreference));
+            confPreferences.put(SettingsActivity.PREF_ACTION_ON_BUTTON, SettingsActivity.actionCodeToString(buttonActionPreference));
 
             String moveActionPreference = preferences.getString(SettingsActivity.PREF_ACTION_ON_BUTTON, SettingsActivity.PREF_ACTION_DEFAULT);
-            conf.put(SettingsActivity.PREF_ACTION_ON_MOVE, SettingsActivity.actionCodeToString(moveActionPreference));
+            confPreferences.put(SettingsActivity.PREF_ACTION_ON_MOVE, SettingsActivity.actionCodeToString(moveActionPreference));
 
             String flipActionPreference = preferences.getString(SettingsActivity.PREF_ACTION_ON_BUTTON, SettingsActivity.PREF_ACTION_DEFAULT);
-            conf.put(SettingsActivity.PREF_ACTION_ON_FLIP, SettingsActivity.actionCodeToString(flipActionPreference));
+            confPreferences.put(SettingsActivity.PREF_ACTION_ON_FLIP, SettingsActivity.actionCodeToString(flipActionPreference));
 
             String shakeActionPreference = preferences.getString(SettingsActivity.PREF_ACTION_ON_BUTTON, SettingsActivity.PREF_ACTION_DEFAULT);
-            conf.put(SettingsActivity.PREF_ACTION_ON_SHAKE, SettingsActivity.actionCodeToString(shakeActionPreference));
+            confPreferences.put(SettingsActivity.PREF_ACTION_ON_SHAKE, SettingsActivity.actionCodeToString(shakeActionPreference));
 
             String proximityActionPreference = preferences.getString(SettingsActivity.PREF_ACTION_ON_BUTTON, SettingsActivity.PREF_ACTION_DEFAULT);
-            conf.put(SettingsActivity.PREF_ACTION_ON_PROXIMITY, SettingsActivity.actionCodeToString(proximityActionPreference));
+            confPreferences.put(SettingsActivity.PREF_ACTION_ON_PROXIMITY, SettingsActivity.actionCodeToString(proximityActionPreference));
 
             boolean checkAlarmTimePreference = preferences.getBoolean(SettingsActivity.PREF_CHECK_ALARM_TIME, SettingsActivity.PREF_CHECK_ALARM_TIME_DEFAULT);
-            conf.put(SettingsActivity.PREF_CHECK_ALARM_TIME, checkAlarmTimePreference);
+            confPreferences.put(SettingsActivity.PREF_CHECK_ALARM_TIME, checkAlarmTimePreference);
 
             String checkAlarmTimeAtPreference = preferences.getString(SettingsActivity.PREF_CHECK_ALARM_TIME_AT, SettingsActivity.PREF_CHECK_ALARM_TIME_AT_DEFAULT);
-            conf.put(SettingsActivity.PREF_CHECK_ALARM_TIME_AT, checkAlarmTimeAtPreference);
+            confPreferences.put(SettingsActivity.PREF_CHECK_ALARM_TIME_AT, checkAlarmTimeAtPreference);
 
             int checkAlarmTimeGap = preferences.getInt(SettingsActivity.PREF_CHECK_ALARM_TIME_GAP, SettingsActivity.PREF_CHECK_ALARM_TIME_GAP_DEFAULT);
-            conf.put(SettingsActivity.PREF_CHECK_ALARM_TIME_GAP, checkAlarmTimeGap);
+            confPreferences.put(SettingsActivity.PREF_CHECK_ALARM_TIME_GAP, checkAlarmTimeGap);
 
             boolean nighttimeBellPreference = preferences.getBoolean(SettingsActivity.PREF_NIGHTTIME_BELL, SettingsActivity.PREF_NIGHTTIME_BELL_DEFAULT);
-            conf.put(SettingsActivity.PREF_NIGHTTIME_BELL, nighttimeBellPreference);
+            confPreferences.put(SettingsActivity.PREF_NIGHTTIME_BELL, nighttimeBellPreference);
 
             String nighttimeBellAtPreference = preferences.getString(SettingsActivity.PREF_NIGHTTIME_BELL_AT, SettingsActivity.PREF_NIGHTTIME_BELL_AT_DEFAULT);
-            conf.put(SettingsActivity.PREF_NIGHTTIME_BELL_AT, nighttimeBellAtPreference);
+            confPreferences.put(SettingsActivity.PREF_NIGHTTIME_BELL_AT, nighttimeBellAtPreference);
 
             String nighttimeBellRingtonePreference = preferences.getString(SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE, SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE_DEFAULT);
-            conf.put(SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE, nighttimeBellRingtonePreference);
+            confPreferences.put(SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE, nighttimeBellRingtonePreference);
 
-            // Environment
-            conf.put("build_brand", Build.BRAND);
-            conf.put("build_device", Build.DEVICE);
-            conf.put("build_display", Build.DISPLAY);
-            conf.put("build_fingerprint", Build.FINGERPRINT);
-            conf.put("build_manufacturer", Build.MANUFACTURER);
-            conf.put("build_model", Build.MODEL);
-            conf.put("build_product", Build.PRODUCT);
-            conf.put("build_hardware", Build.HARDWARE);
-            conf.put("build_host", Build.HOST);
-            conf.put("build_id", Build.ID);
-            conf.put("build_user", Build.USER);
-            conf.put("build_board", Build.BOARD);
-            conf.put("build_serial", Build.SERIAL);
+            conf.put("preferences", confPreferences);
 
-            conf.put("build_version_release", Build.VERSION.RELEASE);
-            conf.put("build_version_sdk_int", Build.VERSION.SDK_INT);
+            // System
+            JSONObject confSystem = new JSONObject();
+
+            confSystem.put("build_brand", Build.BRAND);
+            confSystem.put("build_device", Build.DEVICE);
+            confSystem.put("build_display", Build.DISPLAY);
+            confSystem.put("build_fingerprint", Build.FINGERPRINT);
+            confSystem.put("build_manufacturer", Build.MANUFACTURER);
+            confSystem.put("build_model", Build.MODEL);
+            confSystem.put("build_product", Build.PRODUCT);
+            confSystem.put("build_hardware", Build.HARDWARE);
+            confSystem.put("build_host", Build.HOST);
+            confSystem.put("build_id", Build.ID);
+            confSystem.put("build_user", Build.USER);
+            confSystem.put("build_board", Build.BOARD);
+            confSystem.put("build_serial", Build.SERIAL);
+
+            confSystem.put("build_version_release", Build.VERSION.RELEASE);
+            confSystem.put("build_version_sdk_int", Build.VERSION.SDK_INT);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                conf.put("build_version_base_os", Build.VERSION.BASE_OS);
+                confSystem.put("build_version_base_os", Build.VERSION.BASE_OS);
             }
 
-            conf.put("buildConfig_application_id", BuildConfig.APPLICATION_ID);
-            conf.put("buildConfig_build_type", BuildConfig.BUILD_TYPE);
-            conf.put("buildConfig_debug", BuildConfig.DEBUG);
-            conf.put("buildConfig_flavor", BuildConfig.FLAVOR);
-            conf.put("buildConfig_version_code", BuildConfig.VERSION_CODE);
-            conf.put("buildConfig_version_name", BuildConfig.VERSION_NAME);
+            confSystem.put("buildConfig_application_id", BuildConfig.APPLICATION_ID);
+            confSystem.put("buildConfig_build_type", BuildConfig.BUILD_TYPE);
+            confSystem.put("buildConfig_debug", BuildConfig.DEBUG);
+            confSystem.put("buildConfig_flavor", BuildConfig.FLAVOR);
+            confSystem.put("buildConfig_version_code", BuildConfig.VERSION_CODE);
+            confSystem.put("buildConfig_version_name", BuildConfig.VERSION_NAME);
 
             Configuration configuration = mContext.getResources().getConfiguration();
-            conf.put("configuration_mcc", configuration.mcc);
-            conf.put("configuration_mnc", configuration.mnc);
-            conf.put("configuration_uiMode", configuration.uiMode);
-            conf.put("configuration_locale", configuration.locale);
+            confSystem.put("configuration_mcc", configuration.mcc);
+            confSystem.put("configuration_mnc", configuration.mnc);
+            confSystem.put("configuration_uiMode", configuration.uiMode);
+            confSystem.put("configuration_locale", configuration.locale);
 
-            conf.put("settingsSystem_time_12_24", Settings.System.getString(mContext.getContentResolver(), Settings.System.TIME_12_24));
+            confSystem.put("settingsSystem_time_12_24", Settings.System.getString(mContext.getContentResolver(), Settings.System.TIME_12_24));
+
+            conf.put("system", confSystem);
 
             // Locale
+            JSONObject confLocale = new JSONObject();
+
             Locale locale = Locale.getDefault();
-            conf.put("locale", locale.toString());
+            confLocale.put("locale", locale.toString());
 
-            conf.put("locale_Country", locale.getCountry());
-            conf.put("locale_Language", locale.getLanguage());
-            conf.put("locale_Variant", locale.getVariant());
+            confLocale.put("locale_Country", locale.getCountry());
+            confLocale.put("locale_Language", locale.getLanguage());
+            confLocale.put("locale_Variant", locale.getVariant());
 
-//            conf.put("locale_DisplayCountry", locale.getDisplayCountry());
-//            conf.put("locale_DisplayLanguage", locale.getDisplayLanguage());
-//            conf.put("locale_DisplayVariant", locale.getDisplayVariant());
-//
-//            conf.put("locale_DisplayName", locale.getDisplayName());
-//            conf.put("locale_ISO3Country", locale.getISO3Country());
-//            conf.put("locale_ISO3Language", locale.getISO3Language());
-//
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//                conf.put("locale_Script", locale.getScript());
-//                conf.put("locale_DisplayScript", locale.getDisplayScript());
-//            }
+            confLocale.put("locale_DisplayCountry", locale.getDisplayCountry());
+            confLocale.put("locale_DisplayLanguage", locale.getDisplayLanguage());
+            confLocale.put("locale_DisplayVariant", locale.getDisplayVariant());
+
+            confLocale.put("locale_DisplayName", locale.getDisplayName());
+            confLocale.put("locale_ISO3Country", locale.getISO3Country());
+            confLocale.put("locale_ISO3Language", locale.getISO3Language());
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                confLocale.put("locale_Script", locale.getScript());
+                confLocale.put("locale_DisplayScript", locale.getDisplayScript());
+            }
 
             TimeZone timeZone = TimeZone.getDefault();
-            conf.put("timeZone_ID", timeZone.getID());
-            conf.put("timeZone_DisplayName", timeZone.getDisplayName());
-            conf.put("timeZone_RawOffset", timeZone.getRawOffset());
-            conf.put("timeZone_DSTSavings", timeZone.getDSTSavings());
+            confLocale.put("timeZone_ID", timeZone.getID());
+            confLocale.put("timeZone_DisplayName", timeZone.getDisplayName());
+            confLocale.put("timeZone_RawOffset", timeZone.getRawOffset());
+            confLocale.put("timeZone_DSTSavings", timeZone.getDSTSavings());
+
+            conf.put("locale", confLocale);
+
+            // Calendar
+            JSONObject confCalendar = new JSONObject();
 
             com.ibm.icu.util.Calendar cal = com.ibm.icu.util.Calendar.getInstance();
             for (int dayOfWeek : AlarmDataSource.allDaysOfWeek) {
                 String dayOfWeekText = Localization.dayOfWeekToStringShort(mContext.getResources(), dayOfWeek);
                 int dayOfWeekType = cal.getDayOfWeekType(dayOfWeek);
-                conf.put("dayOfWeekType_" + dayOfWeek + "_" + dayOfWeekText, dayOfWeekTypeToString(dayOfWeekType));
+                confCalendar.put(dayOfWeekText, dayOfWeekTypeToString(dayOfWeekType));
             }
 
+            conf.put("dayOfWeekType", confCalendar);
+
             // Holidays
+            JSONObject confHoliday = new JSONObject();
+
             HolidayHelper holidayHelper = HolidayHelper.getInstance();
             if (holidayHelper.useHoliday()) {
                 List<Holiday> holidays = holidayHelper.listHolidays();
 
-                int counter = 1;
                 for (Holiday h : holidays) {
-                    conf.put("holiday_" + counter++, h.toString());
+                    confHoliday.put(String.valueOf(h.getDate()), h.getDescription());
                 }
             }
 
+            conf.put("holiday", confHoliday);
+
             // Permissions
+            JSONObject confPermissions = new JSONObject();
+
             for (String permission : Wizard.allPermissions) {
                 int permissionCheck = ContextCompat.checkSelfPermission(getContext(), permission);
-                conf.put("permission_" + permission, permissionCheckToString(permissionCheck));
+                confPermissions.put(permission, permissionCheckToString(permissionCheck));
             }
+
+            conf.put("permission", confPermissions);
         } catch (JSONException e) {
             Log.w(TAG, "Cannot create configuration record", e);
         }
-
-        mPayload.putSerializable(Param.Configuration.name(), conf.toString());
-
-        return this;
+        return conf;
     }
 
     public static String dayOfWeekTypeToString(int dayOfWeekType) {
