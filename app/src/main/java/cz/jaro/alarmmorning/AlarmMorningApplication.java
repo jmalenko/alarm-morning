@@ -11,6 +11,8 @@ import org.json.JSONObject;
 
 import java.util.Iterator;
 
+import io.fabric.sdk.android.Fabric;
+
 // Inspired by https://nfrolov.wordpress.com/2014/07/12/android-using-context-statically-and-in-singletons/
 
 /**
@@ -28,6 +30,8 @@ public class AlarmMorningApplication extends Application {
         appContext = this;
 
         // Add values to crash logs
+
+        Fabric.with(this, new Crashlytics());
 
         // Database dump
         GlobalManager globalManager = GlobalManager.getInstance();
