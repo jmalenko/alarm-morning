@@ -37,6 +37,8 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -355,6 +357,13 @@ public class AlarmMorningActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.day_toolbar_menu, menu);
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         Analytics analytics = new Analytics(this, Analytics.Event.Click, Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
         String analyticsTarget;
@@ -458,6 +467,16 @@ public class AlarmMorningActivity extends AppCompatActivity {
                 startActivity(donateIntent);
 
                 analyticsTarget = Analytics.TARGET_MENU_DONATE;
+
+                break;
+
+            case R.id.day_add_alarm:
+                if (mFragment instanceof CalendarFragment) {
+                    CalendarFragment calendarFragment = (CalendarFragment) mFragment;
+                    calendarFragment.onAddOneTimeAlarm();
+                }
+
+                analyticsTarget = Analytics.TARGET_MENU_ADD_ONE_TIME_ALARM;
 
                 break;
 

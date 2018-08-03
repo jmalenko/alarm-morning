@@ -94,6 +94,7 @@ public class Analytics {
     public static final String TARGET_MENU_TRANSLATE = "Translate";
     public static final String TARGET_MENU_RATE = "Rate";
     public static final String TARGET_MENU_DONATE = "Donate";
+    public static final String TARGET_MENU_ADD_ONE_TIME_ALARM = "Add one time alarm";
 
     public enum Param {
         Version,

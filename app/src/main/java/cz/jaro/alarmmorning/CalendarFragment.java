@@ -518,6 +518,12 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         adapter.notifyDataSetChanged();
     }
 
+    public void onAddOneTimeAlarm() {
+        positionAction = 0;
+        menuAction = R.id.day_add_alarm;
+        showTimePicker();
+    }
+
     /*
      * On click
      * ========
@@ -622,6 +628,15 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
                         oneTimeAlarm.setDate(appAlarmAtPosition.getDate());
                         oneTimeAlarm.setHour(hourOfDay);
                         oneTimeAlarm.setMinute(minute);
+
+                        // If in the past then shift to tomorrow
+                        // Note: we do this event if the "set one time alarm" action started from the context menu on today AND the time is in the past
+                        Calendar now = clock().now();
+                        if (oneTimeAlarm.getDateTime().before(now)) {
+                            Calendar date = oneTimeAlarm.getDate();
+                            date.add(Calendar.DATE, 1);
+                            oneTimeAlarm.setDate(date);
+                        }
 
                         add(oneTimeAlarm);
                         return;
