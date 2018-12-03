@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/day_dismiss"
+        android:id="@+id/action_day_dismiss"
         android:title="@string/action_dismiss"/>
 
     <item
-        android:id="@+id/day_snooze"
+        android:id="@+id/action_day_snooze"
         android:title="@string/action_snooze"/>
 
     <item
-        android:id="@+id/day_set_time"
+        android:id="@+id/action_day_set_time"
         android:title="@string/action_set_time" />
 
     <item
-        android:id="@+id/day_disable"
+        android:id="@+id/action_day_disable"
         android:title="@string/action_disable" />
 
     <item
-        android:id="@+id/day_revert"
-        android:title="" />
+        android:id="@+id/action_day_revert"
+        android:title="@string/action_revert" />
 
     <item
-        android:id="@+id/day_add_alarm"
+        android:id="@+id/action_day_add_alarm"
         android:title="@string/action_add_alarm" />
 </menu>

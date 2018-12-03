@@ -52,7 +52,7 @@ public class AlarmDataSource1Test {
         defaults1a.setHour(HOUR_DEFAULT);
         defaults1a.setMinute(MINUTE_DEFAULT);
 
-        globalManager.saveDefault(defaults1a, analytics);
+        globalManager.modifyDefault(defaults1a, analytics);
 
         Defaults defaults1b = globalManager.loadDefault(defaults1a.getDayOfWeek());
 
@@ -71,7 +71,7 @@ public class AlarmDataSource1Test {
 
         analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
 
-        globalManager.saveDefault(defaults2a, analytics);
+        globalManager.modifyDefault(defaults2a, analytics);
 
         Defaults defaults2b = globalManager.loadDefault(defaults2a.getDayOfWeek());
 
@@ -91,7 +91,7 @@ public class AlarmDataSource1Test {
         day1a.setHourDay(HOUR_DEFAULT);
         day1a.setMinuteDay(MINUTE_DEFAULT);
 
-        globalManager.saveDay(day1a, analytics);
+        globalManager.modifyDayAlarm(day1a, analytics);
 
         Day day1b = globalManager.loadDay(day1a.getDate());
 
@@ -111,7 +111,7 @@ public class AlarmDataSource1Test {
 
         Analytics analytics2 = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
 
-        globalManager.saveDay(day2a, analytics2);
+        globalManager.modifyDayAlarm(day2a, analytics2);
 
         Day day2b = globalManager.loadDay(day2a.getDate());
 

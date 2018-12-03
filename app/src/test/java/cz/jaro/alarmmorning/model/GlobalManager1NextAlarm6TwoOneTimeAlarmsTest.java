@@ -33,7 +33,7 @@ public class GlobalManager1NextAlarm6TwoOneTimeAlarmsTest extends FixedTimeTest 
 
         Analytics analytics = new Analytics(Analytics.Channel.Test, Analytics.ChannelName.Calendar);
 
-        globalManager.saveOneTimeAlarm(oneTimeAlarm, analytics);
+        globalManager.createOneTimeAlarm(oneTimeAlarm, analytics);
     }
 
     private void setAlarm2ToToday() {
@@ -46,7 +46,7 @@ public class GlobalManager1NextAlarm6TwoOneTimeAlarmsTest extends FixedTimeTest 
 
         Analytics analytics = new Analytics(Analytics.Channel.Test, Analytics.ChannelName.Calendar);
 
-        globalManager.saveOneTimeAlarm(oneTimeAlarm, analytics);
+        globalManager.createOneTimeAlarm(oneTimeAlarm, analytics);
     }
 
     @Before

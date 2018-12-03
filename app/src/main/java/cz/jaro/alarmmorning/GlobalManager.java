@@ -34,6 +34,12 @@ import cz.jaro.alarmmorning.model.Day;
 import cz.jaro.alarmmorning.model.Defaults;
 import cz.jaro.alarmmorning.model.OneTimeAlarm;
 
+import static cz.jaro.alarmmorning.AlarmMorningActivity.EXTRA_ALARM_CLASS;
+import static cz.jaro.alarmmorning.AlarmMorningActivity.EXTRA_ALARM_DATE;
+import static cz.jaro.alarmmorning.AlarmMorningActivity.EXTRA_ALARM_ID;
+import static cz.jaro.alarmmorning.AlarmMorningActivity.EXTRA_ALARM_MONTH;
+import static cz.jaro.alarmmorning.AlarmMorningActivity.EXTRA_ALARM_YEAR;
+import static cz.jaro.alarmmorning.SystemAlarm.ACTION_RING_IN_NEAR_FUTURE;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.addDay;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.addMilliSecondsClone;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.addMinutesClone;
@@ -143,7 +149,7 @@ public class GlobalManager {
         AppAlarm appAlarm = null;
         if (isRingingOrSnoozed()) {
             Log.v(TAG, "   loading the ringing or snoozed alarm");
-            // TODO Improve architecture of one-time alarms (when it is changed while snoozed) - store the one-time alarm ID so we can return the proper object
+            // TODO 2 Improve architecture of one-time alarms (when it is changed while snoozed) - store the one-time alarm ID so we can return the proper object
 
             // 1. Try the Day first...
 
@@ -161,7 +167,7 @@ public class GlobalManager {
                     }
                 }
                 if (appAlarm == null) {
-                    // 3. The only remaining possibility is the the one-time alarm was snoozed and it's time was changed. Currently we have to reconsruct the
+                    // 3. The only remaining possibility is the the one-time alarm was snoozed and it's time was changed. Currently we have to reconstruct the
                     // object (but without the id), which is OK as it is used only for Analytics (in this special case).
 
                     Calendar alarmTimeOfRingingAlarm = getAlarmTimeOfRingingAlarm();
@@ -175,7 +181,7 @@ public class GlobalManager {
                 }
             }
         } else {
-            appAlarm = getNextAlarm(clock(), new AppAlarmFilter() { // TODO Hotfix - Robolectric doesn't allow shadow of a class with lambda
+            appAlarm = getNextAlarm(clock(), new AppAlarmFilter() { // TODO Workaround - Robolectric doesn't allow shadow of a class with lambda
                 @Override
                 public boolean match(AppAlarm appAlarm) {
                     Log.v(TAG, "   checking filter condition for " + appAlarm.getDateTime().getTime());
@@ -196,7 +202,7 @@ public class GlobalManager {
     public AppAlarm getNextAlarm() {
         Log.v(TAG, "getNextAlarm()");
 
-        AppAlarm appAlarm = getNextAlarm(clock(), new AppAlarmFilter() { // TODO Hotfix - Robolectric doesn't allow shadow of a class with lambda
+        AppAlarm appAlarm = getNextAlarm(clock(), new AppAlarmFilter() { // TODO Workaround - Robolectric doesn't allow shadow of a class with lambda
             @Override
             public boolean match(AppAlarm alarmTime) {
                 Log.v(TAG, "   checking filter condition for " + alarmTime.getDateTime().getTime());
@@ -370,6 +376,11 @@ public class GlobalManager {
         editor.commit();
     }
 
+    /**
+     * Resturns the alarm times of dismissed alarms.
+     *
+     * @return Alarm times of dismissed alarms.
+     */
     public Set<Long> getDismissedAlarms() {
         Log.v(TAG, "getDismissedAlarm()");
 
@@ -427,6 +438,8 @@ public class GlobalManager {
     private void addDismissedAlarm(Calendar alarmTime) {
         Log.v(TAG, "addDismissedAlarm(alarmTime=" + alarmTime.getTime() + ")");
 
+        // XXX Currently there is an assumption: there is at most one alarm on a particular alarm time. With introduction of one-time alarms this is not true anymore. There may be large implications for entire app, not only for the dismissed alarms.
+
         modifyDismissedAlarm(dismissedAlarms ->
                 dismissedAlarms.add(alarmTime.getTimeInMillis())
         );
@@ -455,7 +468,8 @@ public class GlobalManager {
      * <p>
      * 1. if the alarmTime is for last alarm then return the state of last alarm (same as {@link #getState()})
      * <p>
-     * 2. if the alarmTime is in the set of dismissed alarms then return {@link #STATE_DISMISSED}
+     * 2. if the alarmTime is in the set of dismissed alarms then return {@link #STATE_DISMISSED} or {@link #STATE_DISMISSED_BEFORE_RINGING} depending on the
+     * current time.
      * <p>
      * 3. if the alarmTime is in past then return {@link #STATE_DISMISSED}
      * <p>
@@ -480,11 +494,18 @@ public class GlobalManager {
         // Condition 2
         Set<Long> dismissedAlarms = getDismissedAlarms();
         if (dismissedAlarms.contains(alarmTime.getTimeInMillis())) {
-            Log.v(TAG, "   is among dismissed => DISMISSED");
-            return STATE_DISMISSED;
+            if (alarmTime.before(clock().now())) {
+                Log.v(TAG, "   is among dismissed & is in past => DISMISSED");
+                return STATE_DISMISSED;
+            } else {
+                // Condition 4
+                Log.v(TAG, "   is among dismissed is in future => STATE_DISMISSED_BEFORE_RINGING");
+                return STATE_DISMISSED_BEFORE_RINGING;
+            }
         }
 
         // Condition 3
+        // XXX Is the 3rd condition really necessary? Everything should be in the dismissedAlarms...
         if (alarmTime.before(clock().now())) {
             Log.v(TAG, "   is in past => DISMISSED");
             return STATE_DISMISSED;
@@ -627,8 +648,8 @@ public class GlobalManager {
     }
 
     /*
-     * Events
-     * ======
+     * Database (storing & loading objects)
+     * ====================================
      *
      * Do the following on each event:
      * 1. Set state
@@ -644,54 +665,8 @@ public class GlobalManager {
         return dataSource.loadDay(date);
     }
 
-    public void saveDay(Day day, Analytics analytics) {
-        Log.d(TAG, "saveDay()");
-
-        Context context = AlarmMorningApplication.getAppContext();
-        analytics.setContext(context);
-        analytics.setEvent(Analytics.Event.Set_alarm);
-        analytics.setDay(day);
-        analytics.setDayOld(day);
-        analytics.save();
-
-        switch (day.getState()) {
-            case Day.STATE_DISABLED:
-                Log.i(TAG, "Disable alarm on " + day.getDateTime().getTime());
-                break;
-            case Day.STATE_ENABLED:
-                Log.i(TAG, "Set alarm on " + day.getDateTime().getTime());
-                break;
-            default:
-                Log.i(TAG, "Reverting alarm to default on " + day.getDateTime().getTime());
-        }
-
-        dataSource.saveDay(day);
-
-        onAlarmSet();
-    }
-
     public Defaults loadDefault(int dayOfWeek) {
         return dataSource.loadDefault(dayOfWeek);
-    }
-
-    public void saveDefault(Defaults defaults, Analytics analytics) {
-        Log.d(TAG, "saveDefault()");
-
-        Context context = AlarmMorningApplication.getAppContext();
-        analytics.setContext(context);
-        analytics.setEvent(Analytics.Event.Set_default);
-        analytics.setDefaultsAll(defaults);
-        analytics.save();
-
-        String dayOfWeekText = Localization.dayOfWeekToStringShort(context.getResources(), defaults.getDayOfWeek());
-        if (defaults.getState() == Defaults.STATE_ENABLED)
-            Log.i(TAG, "Set alarm at " + defaults.getHour() + ":" + defaults.getMinute() + " on " + dayOfWeekText);
-        else
-            Log.i(TAG, "Disabling alarm on " + dayOfWeekText);
-
-        dataSource.saveDefault(defaults);
-
-        onAlarmSet();
     }
 
     /**
@@ -700,7 +675,7 @@ public class GlobalManager {
      * @param id Id of the one-time alarm
      * @return Return one-time alarm with the given Id.
      */
-    private OneTimeAlarm loadOneTimeAlarm(Long id) {
+    public OneTimeAlarm loadOneTimeAlarm(Long id) {
         return dataSource.loadOneTimeAlarm(id);
     }
 
@@ -723,30 +698,7 @@ public class GlobalManager {
         return dataSource.loadOneTimeAlarms(from);
     }
 
-    /**
-     * Add a new one-time alarm or save an (updated) existing one-time alarm.
-     *
-     * @param oneTimeAlarm One-time alarm to save.
-     * @param analytics    Analytics
-     */
-    public void saveOneTimeAlarm(OneTimeAlarm oneTimeAlarm, Analytics analytics) {
-        Log.d(TAG, "saveOneTimeAlarm()");
-        saveOneTimeAlarm(oneTimeAlarm, analytics, true);
-    }
-
-    /**
-     * Add a new one-time alarm or save an (updated) existing one-time alarm. Used for updating the one-time larm object that doen't change the alarm time.
-     *
-     * @param oneTimeAlarm One-time alarm to save.
-     * @param analytics    Analytics
-     */
-    public void saveOneTimeAlarmName(OneTimeAlarm oneTimeAlarm, Analytics analytics) {
-        Log.d(TAG, "saveOneTimeAlarmName()");
-        saveOneTimeAlarm(oneTimeAlarm, analytics, false);
-        // TODO If there is a  notification regarding this one-time alarm, then update the notification
-    }
-
-    private void saveOneTimeAlarm(OneTimeAlarm oneTimeAlarm, Analytics analytics, boolean alarmTimeChanged) {
+    private void save(OneTimeAlarm oneTimeAlarm, Analytics analytics) {
         Context context = AlarmMorningApplication.getAppContext();
         analytics.setContext(context);
         analytics.setEvent(Analytics.Event.Set_alarm);
@@ -756,33 +708,24 @@ public class GlobalManager {
         Log.i(TAG, "Save one-time alarm at " + oneTimeAlarm.getDateTime().getTime().toString());
 
         dataSource.saveOneTimeAlarm(oneTimeAlarm);
-
-        if (alarmTimeChanged) {
-            onAlarmSet();
-        }
     }
 
-    /**
-     * Remove the one-time alarm.
-     *
-     * @param oneTimeAlarm One-time alar mto save.
-     * @param analytics    Analytics
-     */
-    public void removeOneTimeAlarm(OneTimeAlarm oneTimeAlarm, Analytics analytics) {
-        Log.d(TAG, "removeOneTimeAlarm()");
-
+    private void remove(OneTimeAlarm oneTimeAlarm, Analytics analytics) {
         Context context = AlarmMorningApplication.getAppContext();
         analytics.setContext(context);
         analytics.setEvent(Analytics.Event.Dismiss);
         analytics.setOneTimeAlarm(oneTimeAlarm);
         analytics.save();
 
-        Log.i(TAG, "Dismiss alarm at " + oneTimeAlarm.getDateTime());
+        Log.i(TAG, "Delete one-time alarm at " + oneTimeAlarm.getDateTime());
 
         dataSource.removeOneTimeAlarm(oneTimeAlarm);
-
-        onAlarmSet();
     }
+
+    /*
+     * Events relevant to next alarm
+     * =============================
+     */
 
     /**
      * This event is triggered when the user sets the alarm. This change may be on any day and may or may not change the next alarm time. This also includes
@@ -826,7 +769,7 @@ public class GlobalManager {
         NextAction nextAction = systemAlarm.calcNextAction();
         switch (nextAction.action) {
             case SystemAlarm.ACTION_SET_SYSTEM_ALARM:
-            case SystemAlarm.ACTION_RING_IN_NEAR_FUTURE:
+            case ACTION_RING_IN_NEAR_FUTURE:
                 // nothing
                 break;
             case SystemAlarm.ACTION_RING:
@@ -885,25 +828,33 @@ public class GlobalManager {
     /**
      * Dismiss the alarm.
      * <p>
-     * Automatically chooses between calling {@link #onDismiss(Analytics)} and {@link #onDismissBeforeRinging(Analytics)}.
+     * Automatically chooses between calling {@link #onDismiss(Analytics)} and {@link #onDismissBeforeRinging(AppAlarm, Analytics)}.
      *
+     * @param appAlarm  The alarm to be dismissed
      * @param analytics Analytics
      */
-    public void onDismissAuto(Analytics analytics) {
-        Log.d(TAG, "onDismissAuto()");
+    public void onDismissAny(AppAlarm appAlarm, Analytics analytics) {
+        Log.d(TAG, "onDismissAny()");
 
         AppAlarm nextAlarmToRing = getNextAlarmToRing();
         Calendar now = clock().now();
 
+//        addDismissedAlarm(appAlarm.getDateTime()); // FIXME When this command was here, all the one-time test passed. But the same is done in onDismiss() and onDismissBeforeRinging()
+
         if (now.after(nextAlarmToRing.getDateTime())) {
             onDismiss(analytics);
         } else {
-            onDismissBeforeRinging(analytics);
+            onDismissBeforeRinging(appAlarm, analytics);
         }
     }
 
-    public void onDismissBeforeRinging(Analytics analytics) {
+    public void onDismissBeforeRinging(AppAlarm appAlarm, Analytics analytics) {
         Log.d(TAG, "onDismissBeforeRinging()");
+
+//        setState(STATE_DISMISSED_BEFORE_RINGING, getAlarmTimeOfRingingAlarm());
+//        setState(STATE_DISMISSED_BEFORE_RINGING, appAlarm.getDateTime());
+        setState(STATE_DISMISSED_BEFORE_RINGING, appAlarm != null ? appAlarm.getDateTime() : getAlarmTimeOfRingingAlarm());
+        addDismissedAlarm(getAlarmTimeOfRingingAlarm());
 
         Context context = AlarmMorningApplication.getAppContext();
         AppAlarm nextAlarmToRing = getNextAlarmToRing();
@@ -911,17 +862,17 @@ public class GlobalManager {
         analytics.setContext(context);
         analytics.setEvent(Analytics.Event.Dismiss);
         analytics.set(Analytics.Param.Dismiss_type, Analytics.DISMISS__BEFORE);
-        analytics.setAppAlarm(nextAlarmToRing);
+        // FIXME Get rid of the ternary operator below and above
+//        analytics.setAppAlarm(nextAlarmToRing);
+//        analytics.setAppAlarm(appAlarm);
+        analytics.setAppAlarm(appAlarm != null ? appAlarm : nextAlarmToRing);
         analytics.save();
-
-        setState(STATE_DISMISSED_BEFORE_RINGING, getAlarmTimeOfRingingAlarm());
-        addDismissedAlarm(getAlarmTimeOfRingingAlarm());
 
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
         systemAlarm.onDismissBeforeRinging();
 
         SystemNotification systemNotification = SystemNotification.getInstance(context);
-        systemNotification.onDismissBeforeRinging();
+        systemNotification.onDismissBeforeRinging(appAlarm, nextAlarmToRing);
 
         SystemAlarmClock systemAlarmClock = SystemAlarmClock.getInstance(context);
         systemAlarmClock.onDismissBeforeRinging();
@@ -934,7 +885,7 @@ public class GlobalManager {
         if (nextAlarmToRing != null && afterNearFuture(nextAlarmToRing.getDateTime())) {
             Log.i(TAG, "Immediately starting \"alarm in near future\" period.");
 
-            // TODO Start "alarm in near future" period. We cannot handle 1. early dismissed alarm till alarm time and 2. next alarm in near period at the same time, because get/setNextAction can store only one of such alarm. Instead this notification will be displayed at "alarm time of early dismissed alarm" (remove it from there once this is fixed).
+            // TODO 2 Start "alarm in near future" period. We cannot handle 1. early dismissed alarm till alarm time and 2. next alarm in near period at the same time, because get/setNextAction can store only one of such alarm. Instead this notification will be displayed at "alarm time of early dismissed alarm" (remove it from there once this is fixed).
             Log.w(TAG, "We should show the \"alarm is near\" notification now. This is not supported. Instead, we show this notification at \"alarm time of early dismissed alarm\".");
         }
     }
@@ -1103,6 +1054,197 @@ public class GlobalManager {
     }
 
     /*
+     * Actions relevant to alarm management
+     * ====================================
+     */
+
+    public void modifyDayAlarm(Day day, Analytics analytics) {
+        Log.d(TAG, "modifyDayAlarm()");
+
+        Context context = AlarmMorningApplication.getAppContext();
+        analytics.setContext(context);
+        analytics.setEvent(Analytics.Event.Set_alarm);
+        analytics.setDay(day);
+        analytics.setDayOld(day);
+        analytics.save();
+
+        switch (day.getState()) {
+            case Day.STATE_DISABLED:
+                Log.i(TAG, "Disable alarm on " + day.getDateTime().getTime());
+                break;
+            case Day.STATE_ENABLED:
+                Log.i(TAG, "Set alarm on " + day.getDateTime().getTime());
+                break;
+            default:
+                Log.i(TAG, "Reverting alarm to default on " + day.getDateTime().getTime());
+        }
+
+        dataSource.saveDay(day);
+
+        updateCalendarActivity(context, AlarmMorningActivity.EVENT_MODIFY_DAY_ALARM, day);
+
+        onAlarmSet();
+    }
+
+    public void modifyDefault(Defaults defaults, Analytics analytics) {
+        Log.d(TAG, "modifyDefault()");
+
+        Context context = AlarmMorningApplication.getAppContext();
+        analytics.setContext(context);
+        analytics.setEvent(Analytics.Event.Set_default);
+        analytics.setDefaultsAll(defaults);
+        analytics.save();
+
+        String dayOfWeekText = Localization.dayOfWeekToStringShort(context.getResources(), defaults.getDayOfWeek());
+        if (defaults.getState() == Defaults.STATE_ENABLED)
+            Log.i(TAG, "Set alarm at " + defaults.getHour() + ":" + defaults.getMinute() + " on " + dayOfWeekText);
+        else
+            Log.i(TAG, "Disabling alarm on " + dayOfWeekText);
+
+        dataSource.saveDefault(defaults);
+
+        onAlarmSet();
+    }
+
+    /**
+     * Create a new one-time alarm
+     *
+     * @param oneTimeAlarm One-time alarm to create.
+     * @param analytics    Analytics
+     */
+    public void createOneTimeAlarm(OneTimeAlarm oneTimeAlarm, Analytics analytics) {
+        Log.d(TAG, "createOneTimeAlarm()");
+
+        save(oneTimeAlarm, analytics);
+
+        Context context = AlarmMorningApplication.getAppContext();
+        updateCalendarActivity(context, AlarmMorningActivity.EVENT_CREATE_ONE_TIME_ALARM, oneTimeAlarm);
+
+        onAlarmSet();
+    }
+
+    /**
+     * Delete an one-time alarm.
+     *
+     * @param oneTimeAlarm One-time alarm to delete.
+     * @param analytics    Analytics
+     */
+    public void deleteOneTimeAlarm(OneTimeAlarm oneTimeAlarm, Analytics analytics) {
+        Log.d(TAG, "deleteOneTimeAlarm()");
+
+        remove(oneTimeAlarm, analytics);
+
+        Context context = AlarmMorningApplication.getAppContext();
+
+        SystemNotification systemNotification = SystemNotification.getInstance(context);
+        systemNotification.onDeleteOneTimeAlarm(oneTimeAlarm);
+
+        updateCalendarActivity(context, AlarmMorningActivity.EVENT_DELETE_ONE_TIME_ALARM, oneTimeAlarm);
+
+        onAlarmSet();
+    }
+
+    /**
+     * Modify the date of an one-time alarm.
+     *
+     * @param oneTimeAlarm The modified one-time alarm.
+     * @param analytics    Analytics
+     */
+    public void modifyOneTimeAlarmDate(OneTimeAlarm oneTimeAlarm, Analytics analytics) {
+        Log.d(TAG, "modifyOneTimeAlarmDate()");
+
+        // When changing the date to past, then set the alarm as dismissed
+        Calendar now = clock().now();
+        if (oneTimeAlarm.getDateTime().before(now)) {
+            setState(STATE_DISMISSED, oneTimeAlarm.getDateTime());
+            addDismissedAlarm(oneTimeAlarm.getDateTime());
+        } else {
+            setState(STATE_FUTURE, oneTimeAlarm.getDateTime());
+        }
+
+        save(oneTimeAlarm, analytics);
+
+        Context context = AlarmMorningApplication.getAppContext();
+
+        SystemNotification systemNotification = SystemNotification.getInstance(context);
+        systemNotification.onModifyOneTimeAlarmDate(oneTimeAlarm);
+
+        updateCalendarActivity(context, AlarmMorningActivity.EVENT_MODIFY_ONE_TIME_ALARM_DATE, oneTimeAlarm);
+
+        onAlarmSet();
+    }
+
+
+    /**
+     * Modify the time of an one-time alarm.
+     *
+     * @param oneTimeAlarm The modified one-time alarm.
+     * @param analytics    Analytics
+     */
+    public void modifyOneTimeAlarmTime(OneTimeAlarm oneTimeAlarm, Analytics analytics) {
+        Log.d(TAG, "modifyOneTimeAlarmTime()");
+
+//        // TODO 2 Proposal: if changed to past, refactor to 1. dismiss the old alarm (call @onDismiss(), 2. set the new one
+//
+//        // FIXME why is this condition here? this should apply universally. Probably applies to near period too (e.g. notification is already displayed)
+//
+//        // When changing the time to past, then set the alarm as dismissed
+//        if (isRingingOrSnoozed()) {
+//            OneTimeAlarm storedOneTimeAlarm = loadOneTimeAlarm(oneTimeAlarm.getId());
+//
+//            if (storedOneTimeAlarm.getDateTime().equals(getAlarmTimeOfRingingAlarm())) {
+//                Calendar now = clock().now();
+//                if (now.before(oneTimeAlarm.getDateTime())) {
+//                    setState(STATE_FUTURE, oneTimeAlarm.getDateTime());
+//                } else {
+//                    setState(STATE_DISMISSED, oneTimeAlarm.getDateTime());
+//                    addDismissedAlarm(oneTimeAlarm.getDateTime());
+//                }
+//            }
+//        }
+        // When changing the date to past, then set the alarm as dismissed
+        Calendar now = clock().now();
+        if (oneTimeAlarm.getDateTime().before(now)) {
+            setState(STATE_DISMISSED, oneTimeAlarm.getDateTime());
+            addDismissedAlarm(oneTimeAlarm.getDateTime());
+        } else {
+            setState(STATE_FUTURE, oneTimeAlarm.getDateTime());
+        }
+
+        save(oneTimeAlarm, analytics);
+
+        Context context = AlarmMorningApplication.getAppContext();
+
+        SystemNotification systemNotification = SystemNotification.getInstance(context);
+        systemNotification.onModifyOneTimeAlarmTime(oneTimeAlarm);
+
+        updateCalendarActivity(context, AlarmMorningActivity.EVENT_MODIFY_ONE_TIME_ALARM_TIME, oneTimeAlarm);
+
+        onAlarmSet();
+    }
+
+    /**
+     * Modify the name of an one-time alarm.
+     *
+     * @param oneTimeAlarm The modified one-time alarm.
+     * @param analytics    Analytics
+     */
+    public void modifyOneTimeAlarmName(OneTimeAlarm oneTimeAlarm, Analytics analytics) {
+        Log.d(TAG, "modifyOneTimeAlarmName()");
+
+        // TODO Proposal: if changed to past, refactor to 1. dismiss the old alarm (call @onDismiss(), 2. set the new one
+
+        save(oneTimeAlarm, analytics);
+
+        Context context = AlarmMorningApplication.getAppContext();
+
+        SystemNotification systemNotification = SystemNotification.getInstance(context);
+        systemNotification.onModifyOneTimeAlarmName(oneTimeAlarm);
+
+        updateCalendarActivity(context, AlarmMorningActivity.EVENT_MODIFY_ONE_TIME_ALARM_NAME, oneTimeAlarm);
+    }
+
+    /*
      * Actions
      * =======
      */
@@ -1152,9 +1294,33 @@ public class GlobalManager {
 
     private void updateCalendarActivity(Context context, String action) {
         Log.d(TAG, "updateCalendarActivity(action=" + action + ")");
+        updateCalendarActivity(context, action, getNextAlarmToRing());
+    }
+
+    /**
+     * @param context
+     * @param action
+     * @param appAlarm Alarm
+     */
+    private void updateCalendarActivity(Context context, String action, AppAlarm appAlarm) {
+        Log.d(TAG, "updateCalendarActivity(action=" + action + ", appAlarm = " + appAlarm + ")");
 
         Intent intent = new Intent(context, AlarmMorningActivity.class);
         intent.setAction(action);
+        if (appAlarm != null) {
+            intent.putExtra(EXTRA_ALARM_CLASS, appAlarm.getClass().getName());
+            if (appAlarm instanceof Day) {
+                Day day = (Day) appAlarm;
+                intent.putExtra(EXTRA_ALARM_DATE, day.getDate().get(Calendar.DATE));
+                intent.putExtra(EXTRA_ALARM_MONTH, day.getDate().get(Calendar.MONTH));
+                intent.putExtra(EXTRA_ALARM_YEAR, day.getDate().get(Calendar.YEAR));
+            } else if (appAlarm instanceof OneTimeAlarm) {
+                OneTimeAlarm oneTimeAlarm = (OneTimeAlarm) appAlarm;
+                intent.putExtra(EXTRA_ALARM_ID, oneTimeAlarm.getId());
+            } else {
+                throw new IllegalArgumentException("Unexpected class " + appAlarm.getClass());
+            }
+        }
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
@@ -1405,7 +1571,7 @@ public class GlobalManager {
         editor.commit();
 
         // Set defaults
-        // TODO Hotfix - Robolectric hasn't implemented setDefaultValues() yet, we have to set each setting individually (as the need for testing arises)
+        // TODO Workaround - Robolectric hasn't implemented setDefaultValues() yet, we have to set each setting individually (as the need for testing arises)
 //        PreferenceManager.setDefaultValues(context, R.xml.preferences, true);
         editor = preferences.edit();
         editor.putString(SettingsActivity.PREF_HOLIDAY, SettingsActivity.PREF_HOLIDAY_NONE);

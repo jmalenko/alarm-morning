@@ -70,7 +70,7 @@ public class NotificationReceiver extends BroadcastReceiver {
 
                 Analytics analytics = new Analytics(Analytics.Channel.Notification, Analytics.ChannelName.Alarm);
 
-                globalManager.onDismissBeforeRinging(analytics);
+                globalManager.onDismissBeforeRinging(null, analytics); // XXX Set appAlarm parameter properly
                 break;
             }
             case ACTION_DISMISS: {

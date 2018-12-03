@@ -10,6 +10,7 @@ import android.util.Log;
 
 import java.util.Calendar;
 
+import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.model.AppAlarm;
 import cz.jaro.alarmmorning.model.OneTimeAlarm;
 import cz.jaro.alarmmorning.receivers.NotificationReceiver;
@@ -77,8 +78,8 @@ public class SystemNotification {
     }
 
     /*
-     * Events
-     * ======
+     * Events relevant to next alarm
+     * =============================
      */
 
     protected void onNearFuture() {
@@ -104,10 +105,34 @@ public class SystemNotification {
         showNotification(mBuilder);
     }
 
-    public void onDismissBeforeRinging() {
-        Log.d(TAG, "onDismissBeforeRinging()");
+    public void onDismissBeforeRinging(AppAlarm appAlarm, AppAlarm nextAppAlarm) {
+        Log.d(TAG, "onDismissBeforeRinging(appAlarm=" + appAlarm + ", nextAppAlarm=" + nextAppAlarm + ")");
 
-        hideNotification();
+        if (currentlyDisplayedNotificationIsAbout(appAlarm)) {
+            hideNotification();
+
+            // Possibly display a following notification
+            if (nextAppAlarm != null) {
+                GlobalManager globalManager = GlobalManager.getInstance();
+                Clock clock = globalManager.clock();
+                Calendar now = clock.now();
+
+                Calendar alarmTime = nextAppAlarm.getDateTime();
+
+                if (SystemAlarm.useNearFutureTime(context)) {
+                    Calendar nearFutureTime = SystemAlarm.getNearFutureTime(context, alarmTime);
+
+                    if (nearFutureTime.before(now)) {
+                        onNearFuture();
+                    }
+                }
+            }
+        }
+    }
+
+    private boolean currentlyDisplayedNotificationIsAbout(AppAlarm appAlarm) {
+        // XXX Implement logic
+        return true;
     }
 
     protected void onRing() {
@@ -181,6 +206,114 @@ public class SystemNotification {
 
         hideNotification();
     }
+
+    /*
+     * Events relevant to alarm management
+     * ===================================
+     */
+
+    public void onDeleteOneTimeAlarm(OneTimeAlarm oneTimeAlarm) {
+        Log.d(TAG, "onDismissBeforeRinging(appAlarm=" + oneTimeAlarm + ")");
+
+        if (currentlyDisplayedNotificationIsAbout(oneTimeAlarm)) {
+            hideNotification();
+
+            // Possibly display a following notification
+            GlobalManager globalManager = GlobalManager.getInstance();
+            AppAlarm nextAlarm = globalManager.getNextAlarm();
+            if (nextAlarm != null) {
+                Clock clock = globalManager.clock();
+                Calendar now = clock.now();
+
+                Calendar alarmTime = nextAlarm.getDateTime();
+
+                if (SystemAlarm.useNearFutureTime(context)) {
+                    Calendar nearFutureTime = SystemAlarm.getNearFutureTime(context, alarmTime);
+
+                    if (nearFutureTime.before(now)) {
+                        onNearFuture();
+                    }
+                }
+            }
+        }
+    }
+
+    public void onModifyOneTimeAlarmDate(OneTimeAlarm oneTimeAlarm) {
+        Log.d(TAG, "onModifyOneTimeAlarmDate(oneTimeAlarm = " + oneTimeAlarm + ")");
+
+        GlobalManager globalManager = GlobalManager.getInstance();
+
+        Calendar now = globalManager.clock().now();
+        if (oneTimeAlarm.getDateTime().before(now)) {
+            hideNotification();
+        }
+    }
+
+    public void onModifyOneTimeAlarmTime(OneTimeAlarm oneTimeAlarm) {
+        Log.d(TAG, "onModifyOneTimeAlarmTime(oneTimeAlarm = " + oneTimeAlarm + ")");
+
+        GlobalManager globalManager = GlobalManager.getInstance();
+
+        Calendar now = globalManager.clock().now();
+        if (oneTimeAlarm.getDateTime().before(now)) {
+            hideNotification();
+        }
+    }
+
+    public void onModifyOneTimeAlarmName(OneTimeAlarm oneTimeAlarm) {
+        Log.d(TAG, "onModifyOneTimeAlarmName(oneTimeAlarm = " + oneTimeAlarm + ")");
+
+        if (currentlyDisplayedNotificationIsAbout(oneTimeAlarm)) {
+            hideNotification();
+
+            // Display a new notification
+            GlobalManager globalManager = GlobalManager.getInstance();
+            Clock clock = globalManager.clock();
+            Calendar now = clock.now();
+
+            Calendar alarmTime = oneTimeAlarm.getDateTime();
+            Calendar nearFutureTime = SystemAlarm.getNearFutureTime(context, alarmTime);
+
+            if (now.before(nearFutureTime)) {
+                // Nothing
+            } else if (now.before(alarmTime)) {
+                if (SystemAlarm.useNearFutureTime(context)) {
+                    onNearFuture();
+                }
+            } else {
+                int state = globalManager.getState(alarmTime);
+                switch (state) {
+                    case GlobalManager.STATE_RINGING:
+                        onRing();
+                        break;
+                    case GlobalManager.STATE_SNOOZED:
+                        Calendar ringAfterSnoozeTime = globalManager.getRingAfterSnoozeTime(globalManager.clock());
+                        onSnooze(ringAfterSnoozeTime);
+                        break;
+                }
+            }
+        }
+    }
+
+    /*
+     * External events
+     * ===============
+     */
+
+    public void onTimeOrTimeZoneChange() { // TODO 1 Implement here and in every manager. Create interface with all the on... methods that is implemented by the managers.
+
+        Log.d(TAG, "onTimeOrTimeZoneChange()");
+    }
+
+    private void onSystemTimeChange() { // TODO 1 Implement here and in every manager. Create interface with all the on... methods that is implemented by the managers.
+        Log.v(TAG, "onSystemTimeChange()");
+
+    }
+
+    /*
+     * Other
+     * =====
+     */
 
     public void notifyCancelledAlarm() {
         Log.d(TAG, "notifyCancelledAlarm()");

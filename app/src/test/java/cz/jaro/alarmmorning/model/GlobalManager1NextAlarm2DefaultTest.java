@@ -33,7 +33,7 @@ public class GlobalManager1NextAlarm2DefaultTest extends FixedTimeTest {
 
         Analytics analytics = new Analytics(Analytics.Channel.Test, Analytics.ChannelName.Defaults);
 
-        globalManager.saveDefault(defaults, analytics);
+        globalManager.modifyDefault(defaults, analytics);
     }
 
     @Test

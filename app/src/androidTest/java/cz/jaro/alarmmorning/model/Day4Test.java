@@ -40,7 +40,7 @@ public class Day4Test {
 
         Analytics analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
 
-        globalManager.saveDay(day0, analytics);
+        globalManager.modifyDayAlarm(day0, analytics);
 
         // day1 = day0 + 8 days
         day1 = new Day();
@@ -51,7 +51,7 @@ public class Day4Test {
 
         analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
 
-        globalManager.saveDay(day1, analytics);
+        globalManager.modifyDayAlarm(day1, analytics);
 
         // day2 = day0 + 8 days
         day2 = new Day();
@@ -62,7 +62,7 @@ public class Day4Test {
 
         analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
 
-        globalManager.saveDay(day2, analytics);
+        globalManager.modifyDayAlarm(day2, analytics);
     }
 
     @Test
@@ -106,7 +106,7 @@ public class Day4Test {
 
             Analytics analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
 
-            globalManager.saveDefault(defaults, analytics);
+            globalManager.modifyDefault(defaults, analytics);
         }
 
         assertEquals(day0.isNextAlarm(clock), false);

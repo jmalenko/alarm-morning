@@ -10,6 +10,9 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.Iterator;
+import java.util.Set;
 
 import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.model.AppAlarm;
@@ -205,6 +208,10 @@ public class SystemAlarm {
     }
 
     public boolean useNearFutureTime() {
+        return useNearFutureTime(context);
+    }
+
+    public static boolean useNearFutureTime(Context context) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         int nearFutureMinutes = preferences.getInt(SettingsActivity.PREF_NEAR_FUTURE_TIME, SettingsActivity.PREF_NEAR_FUTURE_TIME_DEFAULT);
 
@@ -284,10 +291,30 @@ public class SystemAlarm {
         cancelSystemAlarm();
 
         GlobalManager globalManager = GlobalManager.getInstance();
-        Calendar alarmTime = globalManager.getAlarmTimeOfRingingAlarm();
+
+        // Find the nearest dismissed alarm
+        Calendar alarmTime = null;
+        Calendar now = globalManager.clock().now();
+        Set<Long> dismissedAlarms = globalManager.getDismissedAlarms();
+        for (Iterator<Long> iterator = dismissedAlarms.iterator(); iterator.hasNext(); ) {
+            long dismissedAlarm = iterator.next();
+
+            Calendar dismissedAlarmCalendar = new GregorianCalendar();
+            dismissedAlarmCalendar.setTimeInMillis(dismissedAlarm);
+            if (now.before(dismissedAlarmCalendar)) {
+                if (alarmTime == null || dismissedAlarmCalendar.before(alarmTime)) {
+                    alarmTime = dismissedAlarmCalendar;
+                }
+            }
+        }
+
         Long oneTimeAlarmId = globalManager.getOneTimeAlarmOfRingingAlarm() != null ? globalManager.getOneTimeAlarmOfRingingAlarm().getId() : null;
 
         registerSystemAlarm(ACTION_ALARM_TIME_OF_EARLY_DISMISSED_ALARM, alarmTime, alarmTime, oneTimeAlarmId);
+    }
+
+    public static Calendar min(Calendar a, Calendar b) {
+        return a.before(b) ? a : b;
     }
 
     public void onAlarmTimeOfEarlyDismissedAlarm() {

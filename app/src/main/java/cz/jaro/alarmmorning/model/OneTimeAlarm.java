@@ -133,6 +133,11 @@ public class OneTimeAlarm extends AppAlarm {
         str.append(" at ");
         str.append(Analytics.calendarToTime(dateTime));
 
+        if (name != null) {
+            str.append(" ");
+            str.append(name);
+        }
+
         return str.toString();
     }
 

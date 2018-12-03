@@ -273,7 +273,7 @@ public class SetTimeSlide extends BaseFragment implements TimePicker.OnTimeChang
 
             Analytics analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Wizard);
 
-            globalManager.saveDefault(defaults, analytics);
+            globalManager.modifyDefault(defaults, analytics);
         }
     }
 

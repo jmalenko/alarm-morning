@@ -16,6 +16,7 @@ import java.util.GregorianCalendar;
 import cz.jaro.alarmmorning.checkalarmtime.CheckAlarmTime;
 import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.clock.FixedClock;
+import cz.jaro.alarmmorning.holiday.HolidayHelper;
 import cz.jaro.alarmmorning.model.DayTest;
 import cz.jaro.alarmmorning.nighttimebell.NighttimeBell;
 import cz.jaro.alarmmorning.shadows.ShadowGlobalManager;
@@ -30,7 +31,7 @@ import static cz.jaro.alarmmorning.model.DayTest.YEAR;
  * The tests use Robolectric to mock access to database and context (needed by holidays).
  */
 @RunWith(RobolectricTestRunner.class)
-@Config(shadows = {ShadowGlobalManager.class})
+@Config(sdk = 21, shadows = {ShadowGlobalManager.class})
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public abstract class FixedTimeTest {
 
@@ -60,9 +61,11 @@ public abstract class FixedTimeTest {
         // Reset all singletons
         resetSingleton(GlobalManager.class, "instance");
         resetSingleton(SystemAlarm.class, "instance");
-        resetSingleton(CheckAlarmTime.class, "instance");
         resetSingleton(SystemAlarmClock.class, "instance");
+        resetSingleton(SystemNotification.class, "instance");
+        resetSingleton(CheckAlarmTime.class, "instance");
         resetSingleton(NighttimeBell.class, "instance");
+        resetSingleton(HolidayHelper.class, "instance");
     }
 
     /**
@@ -82,7 +85,8 @@ public abstract class FixedTimeTest {
         }
     }
 
-    Clock clock() {
+    private Clock clock() {
+        // Time at which the test is executed
         return new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR, DayTest.MINUTE));
     }
 }

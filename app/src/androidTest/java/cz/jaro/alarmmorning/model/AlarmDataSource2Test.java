@@ -48,7 +48,7 @@ public class AlarmDataSource2Test {
 
         Analytics analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
 
-        globalManager.saveDay(day0, analytics);
+        globalManager.modifyDayAlarm(day0, analytics);
 
         // day1 = day0 + 8 days
         day1 = new Day();
@@ -59,7 +59,7 @@ public class AlarmDataSource2Test {
 
         analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
 
-        globalManager.saveDay(day1, analytics);
+        globalManager.modifyDayAlarm(day1, analytics);
 
         // day2 = day0 + 16 days
         day2 = new Day();
@@ -70,7 +70,7 @@ public class AlarmDataSource2Test {
 
         analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
 
-        globalManager.saveDay(day2, analytics);
+        globalManager.modifyDayAlarm(day2, analytics);
     }
 
     @Test
@@ -166,7 +166,7 @@ public class AlarmDataSource2Test {
 
             Analytics analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
 
-            globalManager.saveDefault(defaults, analytics);
+            globalManager.modifyDefault(defaults, analytics);
         }
 
         FixedClock clock = new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY + 16, HOUR_DAY + 2, MINUTE_DAY + 2)).addMinute(1);

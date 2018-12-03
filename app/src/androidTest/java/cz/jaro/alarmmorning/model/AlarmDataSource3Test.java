@@ -45,7 +45,7 @@ public class AlarmDataSource3Test {
 
             Analytics analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
 
-            globalManager.saveDay(day, analytics);
+            globalManager.modifyDayAlarm(day, analytics);
         }
     }
 

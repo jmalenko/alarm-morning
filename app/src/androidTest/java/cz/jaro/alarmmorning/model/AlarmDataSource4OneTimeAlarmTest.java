@@ -54,7 +54,7 @@ public class AlarmDataSource4OneTimeAlarmTest {
         oneTimeAlarm1.setHour(HOUR_ONE_TIME_ALARM);
         oneTimeAlarm1.setHour(MINUTE_ONE_TIME_ALARM);
 
-        globalManager.saveOneTimeAlarm(oneTimeAlarm1, analytics);
+        globalManager.createOneTimeAlarm(oneTimeAlarm1, analytics);
 
         // Check
 
@@ -80,7 +80,7 @@ public class AlarmDataSource4OneTimeAlarmTest {
         oneTimeAlarm1.setHour(HOUR_ONE_TIME_ALARM);
         oneTimeAlarm1.setHour(MINUTE_ONE_TIME_ALARM);
 
-        globalManager.saveOneTimeAlarm(oneTimeAlarm1, analytics);
+        globalManager.createOneTimeAlarm(oneTimeAlarm1, analytics);
 
         // Load
 
@@ -95,7 +95,7 @@ public class AlarmDataSource4OneTimeAlarmTest {
 
         Analytics analytics2 = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
 
-        globalManager.saveOneTimeAlarm(oneTimeAlarm1, analytics2);
+        globalManager.createOneTimeAlarm(oneTimeAlarm1, analytics2);
 
         // Check
 
@@ -121,7 +121,7 @@ public class AlarmDataSource4OneTimeAlarmTest {
         oneTimeAlarm1.setHour(HOUR_ONE_TIME_ALARM);
         oneTimeAlarm1.setHour(MINUTE_ONE_TIME_ALARM);
 
-        globalManager.saveOneTimeAlarm(oneTimeAlarm1, analytics);
+        globalManager.createOneTimeAlarm(oneTimeAlarm1, analytics);
 
         // Remove
 
@@ -130,7 +130,7 @@ public class AlarmDataSource4OneTimeAlarmTest {
 
         Analytics analytics2 = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
 
-        globalManager.removeOneTimeAlarm(oneTimeAlarm1b, analytics2);
+        globalManager.deleteOneTimeAlarm(oneTimeAlarm1b, analytics2);
 
         // Check
 
@@ -148,7 +148,7 @@ public class AlarmDataSource4OneTimeAlarmTest {
         oneTimeAlarm1.setHour(HOUR_ONE_TIME_ALARM);
         oneTimeAlarm1.setHour(MINUTE_ONE_TIME_ALARM);
 
-        globalManager.saveOneTimeAlarm(oneTimeAlarm1, analytics);
+        globalManager.createOneTimeAlarm(oneTimeAlarm1, analytics);
 
         // Add 2
 
@@ -159,7 +159,7 @@ public class AlarmDataSource4OneTimeAlarmTest {
 
         Analytics analytics2 = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
 
-        globalManager.saveOneTimeAlarm(oneTimeAlarm2, analytics2);
+        globalManager.createOneTimeAlarm(oneTimeAlarm2, analytics2);
 
         // Check
 

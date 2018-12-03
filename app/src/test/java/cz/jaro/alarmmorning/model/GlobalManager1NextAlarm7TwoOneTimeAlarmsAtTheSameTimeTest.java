@@ -34,7 +34,7 @@ public class GlobalManager1NextAlarm7TwoOneTimeAlarmsAtTheSameTimeTest extends F
 
         Analytics analytics = new Analytics(Analytics.Channel.Test, Analytics.ChannelName.Calendar);
 
-        globalManager.saveOneTimeAlarm(oneTimeAlarm, analytics);
+        globalManager.createOneTimeAlarm(oneTimeAlarm, analytics);
     }
 
     @Before

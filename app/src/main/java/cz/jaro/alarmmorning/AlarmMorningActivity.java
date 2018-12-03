@@ -46,9 +46,13 @@ import android.view.View;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
+import cz.jaro.alarmmorning.model.AppAlarm;
+import cz.jaro.alarmmorning.model.Day;
+import cz.jaro.alarmmorning.model.OneTimeAlarm;
 import cz.jaro.alarmmorning.nighttimebell.CustomAlarmTone;
 import cz.jaro.alarmmorning.wizard.Wizard;
 
@@ -56,6 +60,7 @@ public class AlarmMorningActivity extends AppCompatActivity {
 
     private static final String TAG = AlarmMorningActivity.class.getSimpleName();
 
+    // TODO 1 Change prefix to EVENT
     public static final String ACTION_ALARM_SET = "ALARM_SET";
     public static final String ACTION_DISMISS_BEFORE_RINGING = "DISMISS_BEFORE_RINGING";
     public static final String ACTION_ALARM_TIME_OF_EARLY_DISMISSED_ALARM = "ACTION_ALARM_TIME_OF_EARLY_DISMISSED_ALARM";
@@ -64,6 +69,19 @@ public class AlarmMorningActivity extends AppCompatActivity {
     public static final String ACTION_SNOOZE = "SNOOZE";
     public static final String ACTION_CANCEL = "CANCEL";
 
+    public static final String EVENT_MODIFY_DAY_ALARM = "EVENT_MODIFY_DAY_ALARM";
+    public static final String EVENT_CREATE_ONE_TIME_ALARM = "EVENT_CREATE_ONE_TIME_ALARM";
+    public static final String EVENT_DELETE_ONE_TIME_ALARM = "EVENT_DELETE_ONE_TIME_ALARM";
+    public static final String EVENT_MODIFY_ONE_TIME_ALARM_DATE = "EVENT_MODIFY_ONE_TIME_ALARM_DATE";
+    public static final String EVENT_MODIFY_ONE_TIME_ALARM_TIME = "EVENT_MODIFY_ONE_TIME_ALARM_TIME";
+    public static final String EVENT_MODIFY_ONE_TIME_ALARM_NAME = "EVENT_MODIFY_ONE_TIME_ALARM_NAME";
+
+    public static final String EXTRA_ALARM_CLASS = "EXTRA_ALARM_CLASS";
+    public static final String EXTRA_ALARM_DATE = "EXTRA_ALARM_DATE";
+    public static final String EXTRA_ALARM_MONTH = "EXTRA_ALARM_MONTH";
+    public static final String EXTRA_ALARM_YEAR = "EXTRA_ALARM_YEAR";
+    public static final String EXTRA_ALARM_ID = "EXTRA_ALARM_ID";
+
     public static final String URL_WEBSITE = "https://github.com/jmalenko/alarm-morning/wiki";
     public static final String URL_USER_GUIDE = "https://github.com/jmalenko/alarm-morning/wiki/User-Guide";
     public static final String URL_CHANGE_LOG = "https://github.com/jmalenko/alarm-morning/wiki/Change-Log";
@@ -71,7 +89,7 @@ public class AlarmMorningActivity extends AppCompatActivity {
     public static final String URL_TRANSLATE = "https://crowdin.com/project/alarm-morning";
     public static final String URL_DONATE = "https://www.paypal.me/jaromirmalenko/10usd";
 
-    // TODO Set programmatically (when that becomes possible in Android). For now, keep consistent with res\values directories. https://stackoverflow.com/questions/34797956/android-programmatically-check-if-app-is-localized-for-a-language
+    // TODO Set programmatically (when that becomes possible in Android). For now, keep consistent with res/values directories. https://stackoverflow.com/questions/34797956/android-programmatically-check-if-app-is-localized-for-a-language
     private static final List<String> TRANSLATIONS = Arrays.asList(
             "en_US", // default language
             "cs_CZ", // manually updated by author Jaromír Malenko
@@ -129,6 +147,12 @@ public class AlarmMorningActivity extends AppCompatActivity {
         s_intentFilterInternal.addAction(ACTION_DISMISS);
         s_intentFilterInternal.addAction(ACTION_SNOOZE);
         s_intentFilterInternal.addAction(ACTION_CANCEL);
+        s_intentFilterInternal.addAction(EVENT_MODIFY_DAY_ALARM);
+        s_intentFilterInternal.addAction(EVENT_CREATE_ONE_TIME_ALARM);
+        s_intentFilterInternal.addAction(EVENT_DELETE_ONE_TIME_ALARM);
+        s_intentFilterInternal.addAction(EVENT_MODIFY_ONE_TIME_ALARM_DATE);
+        s_intentFilterInternal.addAction(EVENT_MODIFY_ONE_TIME_ALARM_TIME);
+        s_intentFilterInternal.addAction(EVENT_MODIFY_ONE_TIME_ALARM_NAME);
     }
 
     private final BroadcastReceiver timeChangedReceiver = new BroadcastReceiver() {
@@ -152,27 +176,81 @@ public class AlarmMorningActivity extends AppCompatActivity {
 
             if (mFragment instanceof CalendarFragment) {
                 CalendarFragment calendarFragment = (CalendarFragment) mFragment;
+
+                // Get the AppAlarm related to the event
+                AppAlarm appAlarm = null;
+                Day day = null;
+                OneTimeAlarm oneTimeAlarm = null;
+
+                String alarmClass = intent.getStringExtra(EXTRA_ALARM_CLASS);
+                if (alarmClass != null) {
+                    if (alarmClass.equals(Day.class.getName())) {
+                        Calendar cal = Calendar.getInstance();
+                        cal.set(Calendar.DATE, intent.getIntExtra(EXTRA_ALARM_DATE, -1));
+                        cal.set(Calendar.MONTH, intent.getIntExtra(EXTRA_ALARM_MONTH, -1));
+                        cal.set(Calendar.YEAR, intent.getIntExtra(EXTRA_ALARM_YEAR, -1));
+
+                        GlobalManager globalManager = GlobalManager.getInstance();
+                        day = globalManager.loadDay(cal);
+
+                        appAlarm = day;
+                    } else if (alarmClass.equals(OneTimeAlarm.class.getName())) {
+                        GlobalManager globalManager = GlobalManager.getInstance();
+                        long alarmId = intent.getLongExtra(EXTRA_ALARM_ID, -1);
+                        oneTimeAlarm = globalManager.loadOneTimeAlarm(alarmId);
+
+                        appAlarm = oneTimeAlarm;
+                    } else {
+                        throw new IllegalArgumentException("Unexpected class " + alarmClass);
+                    }
+                }
+
                 switch (action) {
+                    // Events relevant to current alarm
+
                     case ACTION_ALARM_SET:
-                        calendarFragment.onAlarmSet();
+                        calendarFragment.onAlarmSet(appAlarm);
                         break;
                     case ACTION_DISMISS_BEFORE_RINGING:
-                        calendarFragment.onDismissBeforeRinging();
+                        calendarFragment.onDismissBeforeRinging(appAlarm);
                         break;
                     case ACTION_ALARM_TIME_OF_EARLY_DISMISSED_ALARM:
-                        calendarFragment.onAlarmTimeOfEarlyDismissedAlarm();
+                        calendarFragment.onAlarmTimeOfEarlyDismissedAlarm(appAlarm);
                         break;
                     case ACTION_RING:
-                        calendarFragment.onRing();
+                        calendarFragment.onRing(appAlarm);
                         break;
                     case ACTION_DISMISS:
-                        calendarFragment.onDismiss();
+                        calendarFragment.onDismiss(appAlarm);
                         break;
                     case ACTION_SNOOZE:
-                        calendarFragment.onSnooze();
+                        calendarFragment.onSnooze(appAlarm);
                         break;
                     case ACTION_CANCEL:
-                        calendarFragment.onCancel();
+                        calendarFragment.onCancel(appAlarm);
+                        break;
+
+                    // Events relevant to alarm management
+
+                    case EVENT_MODIFY_DAY_ALARM:
+                        calendarFragment.onModifyDayAlarm(day);
+                        break;
+                    case EVENT_CREATE_ONE_TIME_ALARM:
+                        calendarFragment.onCreateOneTimeAlarm(oneTimeAlarm);
+                        break;
+                    case EVENT_DELETE_ONE_TIME_ALARM:
+                        // Note: The alarm is already deleted from the database. Therefore we can only pass the id.
+                        long id = intent.getLongExtra(EXTRA_ALARM_ID, -1); // FIXME verify the id = -1
+                        calendarFragment.onDeleteOneTimeAlarm(id);
+                        break;
+                    case EVENT_MODIFY_ONE_TIME_ALARM_DATE:
+                        calendarFragment.onModifyOneTimeAlarmDate(oneTimeAlarm);
+                        break;
+                    case EVENT_MODIFY_ONE_TIME_ALARM_TIME:
+                        calendarFragment.onModifyOneTimeAlarmTime(oneTimeAlarm);
+                        break;
+                    case EVENT_MODIFY_ONE_TIME_ALARM_NAME:
+                        calendarFragment.onModifyOneTimeAlarmName(oneTimeAlarm);
                         break;
                     default:
                         throw new IllegalArgumentException("Unexpected argument " + action);
@@ -511,7 +589,7 @@ public class AlarmMorningActivity extends AppCompatActivity {
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        // Handles the  situation when user is editing the name of a one-time alarm and touches somewhere in the activity
+        // Handles the situation when user is editing the name of a one-time alarm and touches somewhere in the activity
 
         if (mFragment instanceof CalendarFragment) {
             CalendarFragment calendarFragment = (CalendarFragment) mFragment;
@@ -523,7 +601,7 @@ public class AlarmMorningActivity extends AppCompatActivity {
                         return true;
                     break;
 
-                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_UP: // FIXME this seems that it could be removed
                     if (consumed)
                         return true;
                     break;

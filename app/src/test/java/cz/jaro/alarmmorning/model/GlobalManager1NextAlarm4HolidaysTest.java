@@ -37,7 +37,7 @@ public class GlobalManager1NextAlarm4HolidaysTest extends FixedTimeTest {
 
             Analytics analytics = new Analytics(Analytics.Channel.Test, Analytics.ChannelName.Defaults);
 
-            globalManager.saveDefault(defaults, analytics);
+            globalManager.modifyDefault(defaults, analytics);
         }
     }
 

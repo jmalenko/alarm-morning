@@ -78,7 +78,7 @@ public class TimeChangedTest extends FixedTimeTest {
 
             Analytics analytics = new Analytics(Test, Analytics.ChannelName.Defaults);
 
-            globalManager.saveDefault(defaults, analytics);
+            globalManager.modifyDefault(defaults, analytics);
         }
     }
 

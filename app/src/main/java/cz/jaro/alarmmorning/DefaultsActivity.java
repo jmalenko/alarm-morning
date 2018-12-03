@@ -95,7 +95,7 @@ public class DefaultsActivity extends AppCompatActivity implements View.OnCreate
         Analytics analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Defaults);
 
         GlobalManager globalManager = GlobalManager.getInstance();
-        globalManager.saveDefault(defaults, analytics);
+        globalManager.modifyDefault(defaults, analytics);
     }
 
     /*
@@ -193,19 +193,19 @@ public class DefaultsActivity extends AppCompatActivity implements View.OnCreate
 
         // Hide irrelevant items
 
-        MenuItem disable = menu.findItem(R.id.default_disable);
+        MenuItem disable = menu.findItem(R.id.action_default_disable);
         disable.setVisible(defaults.isEnabled());
     }
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.default_set_time:
+            case R.id.action_default_set_time:
                 Log.d(TAG, "Set time");
                 showTimePicker();
                 break;
 
-            case R.id.default_disable:
+            case R.id.action_default_disable:
                 Log.d(TAG, "Disable");
                 saveThisAndOthers(true, defaults.getHour(), defaults.getMinute());
                 break;

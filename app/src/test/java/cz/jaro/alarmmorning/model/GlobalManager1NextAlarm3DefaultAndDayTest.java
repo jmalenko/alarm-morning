@@ -32,7 +32,7 @@ public class GlobalManager1NextAlarm3DefaultAndDayTest extends FixedTimeTest {
 
         Analytics analytics = new Analytics(Analytics.Channel.Test, Analytics.ChannelName.Defaults);
 
-        globalManager.saveDefault(defaults, analytics);
+        globalManager.modifyDefault(defaults, analytics);
     }
 
     private void setAlarmDisabledToday() {
@@ -53,7 +53,7 @@ public class GlobalManager1NextAlarm3DefaultAndDayTest extends FixedTimeTest {
 
         Analytics analytics = new Analytics(Analytics.Channel.Test, Analytics.ChannelName.Calendar);
 
-        globalManager.saveDay(day, analytics);
+        globalManager.modifyDayAlarm(day, analytics);
     }
 
     @Test

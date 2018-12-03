@@ -183,7 +183,7 @@ public class SetAlarmByVoiceActivity extends Activity {
         oneTimeAlarm.setMinute(saveAlarmTime.get(Calendar.MINUTE));
 
         // Save
-        globalManager.saveOneTimeAlarm(oneTimeAlarm, analytics);
+        globalManager.createOneTimeAlarm(oneTimeAlarm, analytics);
     }
 
 }

@@ -39,7 +39,7 @@ public class GlobalManager1NextAlarm1DayTest extends FixedTimeTest {
 
         Analytics analytics = new Analytics(Analytics.Channel.Test, Analytics.ChannelName.Calendar);
 
-        globalManager.saveDay(day, analytics);
+        globalManager.modifyDayAlarm(day, analytics);
     }
 
     @Test

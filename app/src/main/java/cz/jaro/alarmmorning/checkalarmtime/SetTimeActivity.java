@@ -112,7 +112,7 @@ public class SetTimeActivity extends AppCompatActivity implements TimePickerDial
         }
 
         // Save
-        globalManager.saveDay(day, analytics);
+        globalManager.modifyDayAlarm(day, analytics);
 
         // Show toast
         if (showToast) {
