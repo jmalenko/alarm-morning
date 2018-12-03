@@ -68,7 +68,6 @@ import static org.junit.Assert.assertThat;
 import static org.robolectric.Robolectric.buildActivity;
 
 // FIXME Inherit CalendarWithOneTimeAlarmTest from CandarTest. Move utility methods to CalendarTest.
-// TODO 1 Reorder methods by name (in another commit)
 
 /**
  * Tests of alarm management in UI.
@@ -574,47 +573,7 @@ public class CalendarTest extends FixedTimeTest {
     }
 
     @Test
-    public void t430_snoozeWhileRinging() {
-        prepareUntilRing();
-
-        // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
-        consumeNextScheduledAlarm();
-
-        // Start ring activity
-        Calendar alarmTime = new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DEFAULT, MINUTE_DEFAULT, 10);
-        startActivityRing(alarmTime);
-
-        snoozeButton.performClick();
-
-        // Start Calendar
-        startActivityCalendar();
-
-        // Check calendar
-        loadItemAtPosition(0);
-        assertThat("Date", textDate.getText(), is("2/1"));
-        assertThat("DoW", textDoW.getText(), is("Mon"));
-        assertThat("Time", textTime.getText(), is("7:00 AM"));
-        assertThat("State", textState.getText(), is("Snoozed"));
-
-        // Check system alarm
-        assertSystemAlarmCount(1);
-        assertSystemAlarm(YEAR, MONTH, DAY, DEFAULT_ALARM_HOUR, DEFAULT_ALARM_MINUTE + 10, SystemAlarm.ACTION_RING);
-        assertSystemAlarmClockNone();
-
-        // Check notification
-//        assertNotificationCount(1);
-//
-//        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
-//        assertNotification(notification, "Alarm at 7:00 AM", "Snoozed till 7:10 AM");
-//        assertNotificationActionCount(notification, 1);
-//        assertNotificationAction(notification, 0, "Dismiss", NotificationReceiver.ACTION_DISMISS);
-
-        // Check widget
-        assertWidget(R.drawable.ic_alarm_off_white, "No alarm", null);
-    }
-
-    @Test
-    public void t310_dismissWhileRingingAndNextAlarmIsInNearPeriod() {
+    public void t403_dismissWhileRingingAndNextAlarmIsInNearPeriod() {
         // Section 1: analogous to prepareUntilNear() but with alarms at 23:30 and 1:00
 
         // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
@@ -683,6 +642,46 @@ public class CalendarTest extends FixedTimeTest {
     }
 
     @Test
+    public void t430_snoozeWhileRinging() {
+        prepareUntilRing();
+
+        // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
+        consumeNextScheduledAlarm();
+
+        // Start ring activity
+        Calendar alarmTime = new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DEFAULT, MINUTE_DEFAULT, 10);
+        startActivityRing(alarmTime);
+
+        snoozeButton.performClick();
+
+        // Start Calendar
+        startActivityCalendar();
+
+        // Check calendar
+        loadItemAtPosition(0);
+        assertThat("Date", textDate.getText(), is("2/1"));
+        assertThat("DoW", textDoW.getText(), is("Mon"));
+        assertThat("Time", textTime.getText(), is("7:00 AM"));
+        assertThat("State", textState.getText(), is("Snoozed"));
+
+        // Check system alarm
+        assertSystemAlarmCount(1);
+        assertSystemAlarm(YEAR, MONTH, DAY, DEFAULT_ALARM_HOUR, DEFAULT_ALARM_MINUTE + 10, SystemAlarm.ACTION_RING);
+        assertSystemAlarmClockNone();
+
+        // Check notification
+//        assertNotificationCount(1);
+//
+//        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
+//        assertNotification(notification, "Alarm at 7:00 AM", "Snoozed till 7:10 AM");
+//        assertNotificationActionCount(notification, 1);
+//        assertNotificationAction(notification, 0, "Dismiss", NotificationReceiver.ACTION_DISMISS);
+
+        // Check widget
+        assertWidget(R.drawable.ic_alarm_off_white, "No alarm", null);
+    }
+
+    @Test
     public void t510_dismissWhileSnoozed() {
         // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
         prepareUntilSnooze();
@@ -700,6 +699,33 @@ public class CalendarTest extends FixedTimeTest {
         assertThat("DoW", textDoW.getText(), is("Mon"));
         assertThat("Time", textTime.getText(), is("7:00 AM"));
         assertThat("State", textState.getText(), is("Passed"));
+
+        // Check system alarm
+        assertSystemAlarmCount(1);
+        assertSystemAlarm(YEAR, MONTH, DAY + 1, 0, 0, SystemAlarm.ACTION_SET_SYSTEM_ALARM);
+        assertSystemAlarmClockNone();
+
+        // Check notification
+        assertNotificationCount(0);
+
+        // Check widget
+        assertWidget(R.drawable.ic_alarm_off_white, "No alarm", null);
+    }
+
+    /**
+     * Note: this action is not possible in UI.
+     */
+    @Test
+    public void t520_disableWhileSnoozed() {
+        prepareUntilSnooze();
+
+        // Click in calendar
+        startActivityCalendar();
+        loadItemAtPosition(0);
+        item.performLongClick();
+
+        // Click context menu
+        clickContextMenu(R.id.action_day_disable);
 
         // Check system alarm
         assertSystemAlarmCount(1);
@@ -773,33 +799,6 @@ public class CalendarTest extends FixedTimeTest {
         assertThat("DoW", textDoW.getText(), is("Mon"));
         assertThat("Time", textTime.getText(), is("Off"));
         assertThat("State", textState.getText(), is(""));
-
-        // Check system alarm
-        assertSystemAlarmCount(1);
-        assertSystemAlarm(YEAR, MONTH, DAY + 1, 0, 0, SystemAlarm.ACTION_SET_SYSTEM_ALARM);
-        assertSystemAlarmClockNone();
-
-        // Check notification
-        assertNotificationCount(0);
-
-        // Check widget
-        assertWidget(R.drawable.ic_alarm_off_white, "No alarm", null);
-    }
-
-    /**
-     * Note: this action is not possible in UI.
-     */
-    @Test
-    public void t510_disableWhileSnoozed() {
-        prepareUntilSnooze();
-
-        // Click in calendar
-        startActivityCalendar();
-        loadItemAtPosition(0);
-        item.performLongClick();
-
-        // Click context menu
-        clickContextMenu(R.id.action_day_disable);
 
         // Check system alarm
         assertSystemAlarmCount(1);
