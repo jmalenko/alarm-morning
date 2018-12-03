@@ -506,7 +506,6 @@ public class GlobalManager {
         }
 
         // Condition 3
-        // XXX Is the 3rd condition really necessary? Everything should be in the dismissedAlarms...
         if (alarmTime.before(clock().now())) {
             Log.v(TAG, "   is in past => DISMISSED");
             return STATE_DISMISSED;
