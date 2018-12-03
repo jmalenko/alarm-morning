@@ -60,7 +60,6 @@ public class AlarmMorningActivity extends AppCompatActivity {
 
     private static final String TAG = AlarmMorningActivity.class.getSimpleName();
 
-    // TODO 1 Change prefix to EVENT
     public static final String ACTION_ALARM_SET = "ALARM_SET";
     public static final String ACTION_DISMISS_BEFORE_RINGING = "DISMISS_BEFORE_RINGING";
     public static final String ACTION_ALARM_TIME_OF_EARLY_DISMISSED_ALARM = "ACTION_ALARM_TIME_OF_EARLY_DISMISSED_ALARM";
