@@ -105,15 +105,16 @@ public class SystemNotification {
         showNotification(mBuilder);
     }
 
-    public void onDismissBeforeRinging(AppAlarm appAlarm, AppAlarm nextAppAlarm) {
-        Log.d(TAG, "onDismissBeforeRinging(appAlarm=" + appAlarm + ", nextAppAlarm=" + nextAppAlarm + ")");
+    public void onDismissBeforeRinging(AppAlarm appAlarm) {
+        Log.d(TAG, "onDismissBeforeRinging(appAlarm=" + appAlarm + ")");
 
         if (currentlyDisplayedNotificationIsAbout(appAlarm)) {
             hideNotification();
 
             // Possibly display a following notification
+            GlobalManager globalManager = GlobalManager.getInstance();
+            AppAlarm nextAppAlarm = globalManager.getNextAlarmToRing();
             if (nextAppAlarm != null) {
-                GlobalManager globalManager = GlobalManager.getInstance();
                 Clock clock = globalManager.clock();
                 Calendar now = clock.now();
 

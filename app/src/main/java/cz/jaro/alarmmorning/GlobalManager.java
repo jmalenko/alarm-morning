@@ -363,6 +363,18 @@ public class GlobalManager {
         return null;
     }
 
+    public AppAlarm getAlarmOfRingingAlarm() {
+        Log.v(TAG, "getAlarmOfRingingAlarm()");
+
+        NextAction nextAction = getNextAction();
+
+        if (nextAction.oneTimeAlarmId != -1) {
+            return loadOneTimeAlarm(nextAction.oneTimeAlarmId);
+        } else {
+            return loadDay(nextAction.alarmTime);
+        }
+    }
+
     public void setState(int state, Calendar alarmTime) {
         Log.v(TAG, "setState(state=" + state + ", alarmTime=" + alarmTime.getTime() + ")");
 
@@ -851,28 +863,22 @@ public class GlobalManager {
     public void onDismissBeforeRinging(AppAlarm appAlarm, Analytics analytics) {
         Log.d(TAG, "onDismissBeforeRinging()");
 
-//        setState(STATE_DISMISSED_BEFORE_RINGING, getAlarmTimeOfRingingAlarm());
-//        setState(STATE_DISMISSED_BEFORE_RINGING, appAlarm.getDateTime());
-        setState(STATE_DISMISSED_BEFORE_RINGING, appAlarm != null ? appAlarm.getDateTime() : getAlarmTimeOfRingingAlarm());
+        setState(STATE_DISMISSED_BEFORE_RINGING, appAlarm.getDateTime());
         addDismissedAlarm(getAlarmTimeOfRingingAlarm());
 
         Context context = AlarmMorningApplication.getAppContext();
-        AppAlarm nextAlarmToRing = getNextAlarmToRing();
 
         analytics.setContext(context);
         analytics.setEvent(Analytics.Event.Dismiss);
         analytics.set(Analytics.Param.Dismiss_type, Analytics.DISMISS__BEFORE);
-        // FIXME Get rid of the ternary operator below and above
-//        analytics.setAppAlarm(nextAlarmToRing);
-//        analytics.setAppAlarm(appAlarm);
-        analytics.setAppAlarm(appAlarm != null ? appAlarm : nextAlarmToRing);
+        analytics.setAppAlarm(appAlarm);
         analytics.save();
 
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
         systemAlarm.onDismissBeforeRinging();
 
         SystemNotification systemNotification = SystemNotification.getInstance(context);
-        systemNotification.onDismissBeforeRinging(appAlarm, nextAlarmToRing);
+        systemNotification.onDismissBeforeRinging(appAlarm);
 
         SystemAlarmClock systemAlarmClock = SystemAlarmClock.getInstance(context);
         systemAlarmClock.onDismissBeforeRinging();
@@ -881,7 +887,8 @@ public class GlobalManager {
 
         updateCalendarActivity(context, AlarmMorningActivity.ACTION_DISMISS_BEFORE_RINGING);
 
-        // translate to STATE_FUTURE if in the near future
+        // Translate to STATE_FUTURE if in the near future
+        AppAlarm nextAlarmToRing = getNextAlarmToRing();
         if (nextAlarmToRing != null && afterNearFuture(nextAlarmToRing.getDateTime())) {
             Log.i(TAG, "Immediately starting \"alarm in near future\" period.");
 

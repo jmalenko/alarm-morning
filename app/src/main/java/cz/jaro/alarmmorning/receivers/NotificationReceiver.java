@@ -9,6 +9,7 @@ import cz.jaro.alarmmorning.AlarmMorningActivity;
 import cz.jaro.alarmmorning.Analytics;
 import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.RingActivity;
+import cz.jaro.alarmmorning.model.AppAlarm;
 
 /**
  * This receiver handles the actions with the notification.
@@ -68,9 +69,10 @@ public class NotificationReceiver extends BroadcastReceiver {
             case ACTION_DISMISS_BEFORE_RINGING: {
                 Log.i(TAG, "Dismiss");
 
+                AppAlarm appAlarm = globalManager.getAlarmOfRingingAlarm();
                 Analytics analytics = new Analytics(Analytics.Channel.Notification, Analytics.ChannelName.Alarm);
 
-                globalManager.onDismissBeforeRinging(null, analytics); // XXX Set appAlarm parameter properly
+                globalManager.onDismissBeforeRinging(appAlarm, analytics);
                 break;
             }
             case ACTION_DISMISS: {
