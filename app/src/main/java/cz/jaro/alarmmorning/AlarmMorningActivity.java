@@ -601,7 +601,7 @@ public class AlarmMorningActivity extends AppCompatActivity {
                         return true;
                     break;
 
-                case MotionEvent.ACTION_UP: // FIXME this seems that it could be removed
+                case MotionEvent.ACTION_UP:
                     if (consumed)
                         return true;
                     break;
