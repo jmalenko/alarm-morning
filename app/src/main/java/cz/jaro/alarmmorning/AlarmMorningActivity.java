@@ -240,8 +240,8 @@ public class AlarmMorningActivity extends AppCompatActivity {
                         break;
                     case EVENT_DELETE_ONE_TIME_ALARM:
                         // Note: The alarm is already deleted from the database. Therefore we can only pass the id.
-                        long id = intent.getLongExtra(EXTRA_ALARM_ID, -1); // FIXME verify the id = -1
-                        calendarFragment.onDeleteOneTimeAlarm(id);
+                        long alarmId = intent.getLongExtra(EXTRA_ALARM_ID, -1);
+                        calendarFragment.onDeleteOneTimeAlarm(alarmId);
                         break;
                     case EVENT_MODIFY_ONE_TIME_ALARM_DATE:
                         calendarFragment.onModifyOneTimeAlarmDate(oneTimeAlarm);
