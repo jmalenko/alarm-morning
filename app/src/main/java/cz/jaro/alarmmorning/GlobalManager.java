@@ -839,8 +839,6 @@ public class GlobalManager {
         AppAlarm nextAlarmToRing = getNextAlarmToRing();
         Calendar now = clock().now();
 
-//        addDismissedAlarm(appAlarm.getDateTime()); // FIXME When this command was here, all the one-time test passed. But the same is done in onDismiss() and onDismissBeforeRinging()
-
         if (now.after(nextAlarmToRing.getDateTime())) {
             onDismiss(analytics);
         } else {
