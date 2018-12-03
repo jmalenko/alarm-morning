@@ -308,7 +308,8 @@ public class SystemAlarm {
             }
         }
 
-        Long oneTimeAlarmId = globalManager.getOneTimeAlarmOfRingingAlarm() != null ? globalManager.getOneTimeAlarmOfRingingAlarm().getId() : null;
+        AppAlarm alarmOfRingingAlarm = globalManager.getAlarmOfRingingAlarm();
+        Long oneTimeAlarmId = alarmOfRingingAlarm instanceof OneTimeAlarm ? ((OneTimeAlarm) alarmOfRingingAlarm).getId() : null;
 
         registerSystemAlarm(ACTION_ALARM_TIME_OF_EARLY_DISMISSED_ALARM, alarmTime, alarmTime, oneTimeAlarmId);
     }
@@ -329,14 +330,16 @@ public class SystemAlarm {
         initialize();
     }
 
-    public void onSnooze(Calendar ringAfterSnoozeTime, Calendar alarmTime) {
+    public void onSnooze(Calendar ringAfterSnoozeTime) {
         Log.d(TAG, "onSnooze()");
 
         cancelSystemAlarm();
 
         GlobalManager globalManager = GlobalManager.getInstance();
         Calendar alarmTimeOfRingingAlarm = globalManager.getAlarmTimeOfRingingAlarm();
-        Long oneTimeAlarmId = globalManager.getOneTimeAlarmOfRingingAlarm() != null ? globalManager.getOneTimeAlarmOfRingingAlarm().getId() : null;
+
+        AppAlarm alarmOfRingingAlarm = globalManager.getAlarmOfRingingAlarm();
+        Long oneTimeAlarmId = alarmOfRingingAlarm instanceof OneTimeAlarm ? ((OneTimeAlarm) alarmOfRingingAlarm).getId() : null;
 
         registerSystemAlarm(ACTION_RING, ringAfterSnoozeTime, alarmTimeOfRingingAlarm, oneTimeAlarmId);
     }

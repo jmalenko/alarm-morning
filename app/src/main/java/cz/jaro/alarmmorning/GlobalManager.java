@@ -40,6 +40,7 @@ import static cz.jaro.alarmmorning.AlarmMorningActivity.EXTRA_ALARM_ID;
 import static cz.jaro.alarmmorning.AlarmMorningActivity.EXTRA_ALARM_MONTH;
 import static cz.jaro.alarmmorning.AlarmMorningActivity.EXTRA_ALARM_YEAR;
 import static cz.jaro.alarmmorning.SystemAlarm.ACTION_RING_IN_NEAR_FUTURE;
+import static cz.jaro.alarmmorning.SystemAlarm.ACTION_SET_SYSTEM_ALARM;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.addDay;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.addMilliSecondsClone;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.addMinutesClone;
@@ -349,26 +350,14 @@ public class GlobalManager {
         return stateAlarmTime;
     }
 
-    public OneTimeAlarm getOneTimeAlarmOfRingingAlarm() {
-        Log.v(TAG, "getOneTimeAlarmOfRingingAlarm()");
-
-        Calendar alarmTimeOfRingingAlarm = getAlarmTimeOfRingingAlarm();
-        List<OneTimeAlarm> oneTimeAlarms = loadOneTimeAlarms(null);
-        for (OneTimeAlarm oneTimeAlarm : oneTimeAlarms) {
-            if (oneTimeAlarm.getDateTime().equals(alarmTimeOfRingingAlarm)) {
-                return oneTimeAlarm;
-            }
-        }
-
-        return null;
-    }
-
     public AppAlarm getAlarmOfRingingAlarm() {
         Log.v(TAG, "getAlarmOfRingingAlarm()");
 
         NextAction nextAction = getNextAction();
 
-        if (nextAction.oneTimeAlarmId != -1) {
+        if (nextAction.action.equals(ACTION_SET_SYSTEM_ALARM)) {
+            return null;
+        } else if (nextAction.oneTimeAlarmId != null) {
             return loadOneTimeAlarm(nextAction.oneTimeAlarmId);
         } else {
             return loadDay(nextAction.alarmTime);
@@ -780,7 +769,7 @@ public class GlobalManager {
 
         NextAction nextAction = systemAlarm.calcNextAction();
         switch (nextAction.action) {
-            case SystemAlarm.ACTION_SET_SYSTEM_ALARM:
+            case ACTION_SET_SYSTEM_ALARM:
             case ACTION_RING_IN_NEAR_FUTURE:
                 // nothing
                 break;
@@ -1017,7 +1006,7 @@ public class GlobalManager {
         Calendar ringAfterSnoozeTime = getRingAfterSnoozeTime(clock());
 
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
-        systemAlarm.onSnooze(ringAfterSnoozeTime, getAlarmTimeOfRingingAlarm());
+        systemAlarm.onSnooze(ringAfterSnoozeTime);
 
         SystemNotification systemNotification = SystemNotification.getInstance(context);
         systemNotification.onSnooze(ringAfterSnoozeTime);
@@ -1285,8 +1274,8 @@ public class GlobalManager {
 //        ringIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         ringIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         ringIntent.putExtra(RingActivity.ALARM_TIME, getAlarmTimeOfRingingAlarm());
-        OneTimeAlarm oneTimeAlarmOfRingingAlarm = getOneTimeAlarmOfRingingAlarm();
-        String oneTimeAlarmName = oneTimeAlarmOfRingingAlarm == null ? null : oneTimeAlarmOfRingingAlarm.getName();
+        AppAlarm alarmOfRingingAlarm = getAlarmOfRingingAlarm();
+        String oneTimeAlarmName = alarmOfRingingAlarm instanceof OneTimeAlarm ? ((OneTimeAlarm) alarmOfRingingAlarm).getName() : null;
         ringIntent.putExtra(RingActivity.ALARM_NAME, oneTimeAlarmName);
         context.startActivity(ringIntent);
     }
