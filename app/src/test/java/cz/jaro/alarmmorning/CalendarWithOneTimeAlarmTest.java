@@ -58,7 +58,6 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.robolectric.Robolectric.buildActivity;
 
-// TODO The tests fail when run as class, but all pass when run individually (as the only method in a test)
 // TODO Migrate tests to Robolectric 4. http://robolectric.org/blog/2018/10/25/robolectric-4-0/ and http://robolectric.org/automated-migration/
 
 /**

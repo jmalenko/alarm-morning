@@ -1,5 +1,9 @@
 package cz.jaro.alarmmorning;
 
+import android.annotation.SuppressLint;
+import android.util.ArraySet;
+import android.view.View;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
@@ -9,9 +13,11 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadow.api.Shadow;
 import org.robolectric.shadows.ShadowApplication;
+import org.robolectric.util.ReflectionHelpers;
 
 import java.lang.reflect.Field;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import cz.jaro.alarmmorning.checkalarmtime.CheckAlarmTime;
 import cz.jaro.alarmmorning.clock.Clock;
@@ -24,6 +30,10 @@ import cz.jaro.alarmmorning.shadows.ShadowGlobalManager;
 import static cz.jaro.alarmmorning.model.DayTest.DAY;
 import static cz.jaro.alarmmorning.model.DayTest.MONTH;
 import static cz.jaro.alarmmorning.model.DayTest.YEAR;
+import static org.robolectric.Robolectric.flushBackgroundThreadScheduler;
+import static org.robolectric.Robolectric.flushForegroundThreadScheduler;
+import static org.robolectric.shadows.ShadowApplication.runBackgroundTasks;
+import static org.robolectric.shadows.ShadowLooper.runUiThreadTasksIncludingDelayedTasks;
 
 /**
  * The parent class of all tests which supports setting a particular fixed time.
@@ -49,6 +59,9 @@ public abstract class FixedTimeTest {
         shadowGlobalManager.setClock(clock());
 
         globalManager.reset();
+
+        // The following is an optimization for Robolectric
+        ShadowApplication.getInstance().declareActionUnbindable("com.google.android.gms.analytics.service.START");
     }
 
     /**
@@ -66,6 +79,17 @@ public abstract class FixedTimeTest {
         resetSingleton(CheckAlarmTime.class, "instance");
         resetSingleton(NighttimeBell.class, "instance");
         resetSingleton(HolidayHelper.class, "instance");
+
+        // TODO The following is a workaround for a Robolectric bug. See https://github.com/robolectric/robolectric/issues/2068
+        // https://github.com/robolectric/robolectric/issues/1700
+        // https://github.com/robolectric/robolectric/issues/2068
+        // https://github.com/robolectric/robolectric/issues/2584
+        try {
+            resetBackgroundThread();
+        } catch (Exception e) {
+            throw new Error(e);
+        }
+        resetWindowManager();
     }
 
     /**
@@ -83,6 +107,52 @@ public abstract class FixedTimeTest {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void finishThreads() {
+        runBackgroundTasks();
+        flushForegroundThreadScheduler();
+        flushBackgroundThreadScheduler();
+        runUiThreadTasksIncludingDelayedTasks();
+    }
+
+    // https://github.com/robolectric/robolectric/pull/1741
+    private void resetBackgroundThread() throws Exception {
+        final Class<?> btclass = Class.forName("com.android.internal.os.BackgroundThread");
+        final Object backgroundThreadSingleton = ReflectionHelpers.getStaticField(btclass, "sInstance");
+        if (backgroundThreadSingleton != null) {
+            btclass.getMethod("quit").invoke(backgroundThreadSingleton);
+            ReflectionHelpers.setStaticField(btclass, "sInstance", null);
+            ReflectionHelpers.setStaticField(btclass, "sHandler", null);
+        }
+    }
+
+    // https://github.com/robolectric/robolectric/issues/2068#issue-109132096
+    @SuppressLint("NewApi")
+    private void resetWindowManager() {
+        final Class<?> clazz = ReflectionHelpers.loadClass(this.getClass().getClassLoader(), "android.view.WindowManagerGlobal");
+        final Object instance = ReflectionHelpers.callStaticMethod(clazz, "getInstance");
+
+        // We essentially duplicate what's in {@link WindowManagerGlobal#closeAll} with what's below.
+        // The closeAll method has a bit of a bug where it's iterating through the "roots" but
+        // bases the number of objects to iterate through by the number of "views." This can result in
+        // an {@link java.lang.IndexOutOfBoundsException} being thrown.
+        final Object lock = ReflectionHelpers.getField(instance, "mLock");
+
+        final List<Object> roots = ReflectionHelpers.getField(instance, "mRoots");
+        //noinspection SynchronizationOnLocalVariableOrMethodParameter
+        synchronized (lock) {
+            for (int i = 0; i < roots.size(); i++) {
+                ReflectionHelpers.callInstanceMethod(instance, "removeViewLocked",
+                        ReflectionHelpers.ClassParameter.from(int.class, i),
+                        ReflectionHelpers.ClassParameter.from(boolean.class, false));
+            }
+        }
+
+        // Views will still be held by this array. We need to clear it out to ensure
+        // everything is released.
+        final ArraySet<View> dyingViews = ReflectionHelpers.getField(instance, "mDyingViews");
+        dyingViews.clear();
     }
 
     private Clock clock() {
