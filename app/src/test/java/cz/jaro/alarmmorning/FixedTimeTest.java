@@ -59,9 +59,6 @@ public abstract class FixedTimeTest {
         shadowGlobalManager.setClock(clock());
 
         globalManager.reset();
-
-        // The following is an optimization for Robolectric
-        ShadowApplication.getInstance().declareActionUnbindable("com.google.android.gms.analytics.service.START");
     }
 
     /**
