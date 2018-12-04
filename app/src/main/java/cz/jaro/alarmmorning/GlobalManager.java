@@ -1280,9 +1280,9 @@ public class GlobalManager {
     private void updateRingingActivity(Context context, String action) {
         Log.d(TAG, "updateRingingActivity(action=" + action + ")");
 
-        Intent hideIntent = new Intent(context, RingActivity.class);
-        hideIntent.setAction(action);
-        LocalBroadcastManager.getInstance(context).sendBroadcast(hideIntent);
+        Intent intent = new Intent(context, RingActivity.class);
+        intent.setAction(action);
+        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
     private void updateCalendarActivity(Context context, String action) {
