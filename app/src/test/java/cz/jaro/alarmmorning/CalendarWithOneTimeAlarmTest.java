@@ -235,7 +235,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         assertNotificationCount(0);
 
         // Check widget
-        assertWidget(R.drawable.ic_alarm_white, "4:30 AM", "");
+        assertWidget(R.drawable.ic_alarm_white, "4:30 AM", null);
     }
 
     @Test
@@ -269,7 +269,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         assertNotificationCount(0);
 
         // Check widget
-        assertWidget(R.drawable.ic_alarm_white, "12:59 AM", "Tue");
+        assertWidget(R.drawable.ic_alarm_white, "12:59 AM", "Tomorrow");
     }
 
     @Test
@@ -300,7 +300,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         assertNotificationCount(0);
 
         // Check widget
-        assertWidget(R.drawable.ic_alarm_white, "4:30 AM", "");
+        assertWidget(R.drawable.ic_alarm_white, "4:30 AM", null);
     }
 
     @Test
@@ -329,7 +329,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         assertNotificationCount(0);
 
         // Check widget
-        assertWidget(R.drawable.ic_alarm_white, "04:30", "Tue");
+        assertWidget(R.drawable.ic_alarm_white, "4:30 AM", "Tomorrow");
     }
 
     @Test
@@ -359,7 +359,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         assertNotificationCount(0);
 
         // Check widget
-        assertWidget(R.drawable.ic_alarm_white, "04:30", "");
+        assertWidget(R.drawable.ic_alarm_white, "4:30 AM", null);
     }
 
     @Test
@@ -394,7 +394,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         assertNotificationAction(notification, 0, "Dismiss", NotificationReceiver.ACTION_DISMISS_BEFORE_RINGING);
 
         // Check widget
-        assertWidget(R.drawable.ic_alarm_white, "2:01 AM", "");
+        assertWidget(R.drawable.ic_alarm_white, "2:01 AM", null);
     }
 
     // Add one-time alarm at T+2 minutes, add one-time alarm at T+1, dismiss the T+1 alarm, dismiss T+2 alarm.
@@ -430,7 +430,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         assertNotificationAction(notification, 0, "Dismiss", NotificationReceiver.ACTION_DISMISS_BEFORE_RINGING);
 
         // Check widget
-        assertWidget(R.drawable.ic_alarm_white, "2:01 AM", "");
+        assertWidget(R.drawable.ic_alarm_white, "2:01 AM", null);
 
         // ----------------------------------------------------
 
@@ -462,7 +462,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         assertNotificationAction(notification, 0, "Dismiss", NotificationReceiver.ACTION_DISMISS_BEFORE_RINGING);
 
         // Check widget
-        assertWidget(R.drawable.ic_alarm_white, "2:02 AM", "");
+        assertWidget(R.drawable.ic_alarm_white, "2:02 AM", null);
 
         // ----------------------------------------------------
 
@@ -630,7 +630,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         assertNotificationAction(notification, 0, "Dismiss", NotificationReceiver.ACTION_DISMISS_BEFORE_RINGING);
 
         // Check widget
-        assertWidget(R.drawable.ic_alarm_white, "2:01 AM", "");
+        assertWidget(R.drawable.ic_alarm_white, "2:01 AM", null);
     }
 
     @Test
@@ -654,7 +654,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         assertNotificationCount(0);
 
         // Check widget
-        assertWidget(R.drawable.ic_alarm_white, "5:31 AM", "");
+        assertWidget(R.drawable.ic_alarm_white, "5:31 AM", null);
     }
 
     private int shared_t250_setDate_ofDistantAlarm(int year, int month, int day) {
@@ -712,7 +712,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         assertNotificationCount(0);
 
         // Check widget
-        assertWidget(R.drawable.ic_alarm_white, "4:30 AM", "Tue");
+        assertWidget(R.drawable.ic_alarm_white, "4:30 AM", "Tomorrow");
     }
 
     @Test
@@ -760,7 +760,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         assertNotificationCount(0);
 
         // Check widget
-        assertWidget(R.drawable.ic_alarm_white, "4:30 AM", "");
+        assertWidget(R.drawable.ic_alarm_white, "4:30 AM", null);
     }
 
     @Test
@@ -784,7 +784,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         assertNotificationAction(notification, 0, "Dismiss", NotificationReceiver.ACTION_DISMISS_BEFORE_RINGING);
 
         // Check widget
-        assertWidget(R.drawable.ic_alarm_white, "4:30 AM", "");
+        assertWidget(R.drawable.ic_alarm_white, "4:30 AM", null);
     }
 
     @Test
@@ -820,7 +820,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         assertNotificationAction(notification, 0, "Dismiss", NotificationReceiver.ACTION_DISMISS_BEFORE_RINGING);
 
         // Check widget
-        assertWidget(R.drawable.ic_alarm_white, "4:30 AM", "");
+        assertWidget(R.drawable.ic_alarm_white, "4:30 AM", null);
     }
 
     @Test
@@ -964,7 +964,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         assertNotificationAction(notification, 0, "Dismiss", NotificationReceiver.ACTION_DISMISS_BEFORE_RINGING);
 
         // Check widget
-        assertWidget(R.drawable.ic_alarm_white, "3:29 AM", "");
+        assertWidget(R.drawable.ic_alarm_white, "3:29 AM", null);
     }
 
     @Test
@@ -988,7 +988,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         assertNotificationCount(0);
 
         // Check widget
-        assertWidget(R.drawable.ic_alarm_white, "5:31 AM", "");
+        assertWidget(R.drawable.ic_alarm_white, "5:31 AM", null);
     }
 
     private int shared_t350_setDate_whileInNearPeriod(int year, int month, int day) {
@@ -1046,7 +1046,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         assertNotificationCount(0);
 
         // Check widget
-        assertWidget(R.drawable.ic_alarm_white, "4:30 AM", "Tue");
+        assertWidget(R.drawable.ic_alarm_white, "4:30 AM", "Tomorrow");
     }
 
     @Test
@@ -1097,7 +1097,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         assertNotificationAction(notification, 0, "Dismiss", NotificationReceiver.ACTION_DISMISS_BEFORE_RINGING);
 
         // Check widget
-        assertWidget(R.drawable.ic_alarm_white, "4:30 AM", "");
+        assertWidget(R.drawable.ic_alarm_white, "4:30 AM", null);
     }
 
     @Test
@@ -1128,7 +1128,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         assertNotificationAction(notification, 1, "Snooze", NotificationReceiver.ACTION_SNOOZE);
 
         // Check widget
-        assertWidget(R.drawable.ic_alarm_off_white, "No alarm", null);
+        assertWidget(R.drawable.ic_alarm_white, "4:30 AM", null);
 
         // Check ring activity
         Calendar alarmTime = new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE);
@@ -1189,15 +1189,22 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         assertNotificationAction(notification, 1, "Snooze", NotificationReceiver.ACTION_SNOOZE);
 
         // Check widget
-        assertWidget(R.drawable.ic_alarm_white, "05:31", "Tomorrow");
+        assertWidget(R.drawable.ic_alarm_white, "4:30 AM", null);
+
+        // Context menu - dismiss today's alarm
+        startActivityCalendar();
+        loadItemAtPosition(0);
+        item.performLongClick();
+        clickContextMenu(R.id.action_day_dismiss);
+        refreshRecyclerView();
 
         // Shift clock by just under 2 hours after alarm
         shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR + 2, ONE_TIME_ALARM_MINUTE, 59)));
-        assertWidget(R.drawable.ic_alarm_white, "05:31", "Tomorrow");
+        assertWidget(R.drawable.ic_alarm_white, "5:31 AM", "Tomorrow");
 
         // Shift clock to two hours after the alarm
         shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR + 2, ONE_TIME_ALARM_MINUTE + 1)));
-        assertWidget(R.drawable.ic_alarm_white, "05:31", null);
+        // FIXME Notification test assertWidget(R.drawable.ic_alarm_white, "5:31 AM", null);
     }
 
     @Test
@@ -1293,7 +1300,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         assertNotificationCount(0);
 
         // Check widget
-        assertWidget(R.drawable.ic_alarm_off_white, "No alarm", null);
+        // FIXME Notification test assertWidget(R.drawable.ic_alarm_off_white, "No alarm", null);
     }
 
     @Test
@@ -1330,7 +1337,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         assertNotificationAction(notification, 0, "Dismiss", NotificationReceiver.ACTION_DISMISS);
 
         // Check widget
-        assertWidget(R.drawable.ic_alarm_off_white, "No alarm", null);
+        assertWidget(R.drawable.ic_alarm_white, "4:30 AM", null);
     }
 
     @Test
@@ -1375,7 +1382,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         assertNotificationAction(notification, 0, "Dismiss", NotificationReceiver.ACTION_DISMISS);
 
         // Check widget
-        assertWidget(R.drawable.ic_alarm_off_white, "No alarm", null);
+        assertWidget(R.drawable.ic_alarm_white, "4:30 AM", null);
     }
 
     private int shared_t440_setTime_whileRinging(int hour, int minute) {
@@ -1436,7 +1443,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         assertNotificationAction(notification, 0, "Dismiss", NotificationReceiver.ACTION_DISMISS_BEFORE_RINGING);
 
         // Check widget
-        assertWidget(R.drawable.ic_alarm_white, "5:31 AM", "");
+        assertWidget(R.drawable.ic_alarm_white, "5:31 AM", null);
     }
 
     @Test
@@ -1461,7 +1468,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         assertSystemAlarmClockNone();
 
         // Check widget
-        assertWidget(R.drawable.ic_alarm_white, "9:35 AM", "");
+        assertWidget(R.drawable.ic_alarm_white, "9:35 AM", null);
     }
 
     private int shared_t450_setDate_whileRinging(int year, int month, int day) {
@@ -1518,7 +1525,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         assertNotificationCount(0);
 
         // Check widget
-        assertWidget(R.drawable.ic_alarm_white, "4:30 AM", "Tue");
+        assertWidget(R.drawable.ic_alarm_white, "4:30 AM", "Tomorrow");
     }
 
     @Test
@@ -1571,7 +1578,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         assertNotificationAction(notification, 1, "Snooze", NotificationReceiver.ACTION_SNOOZE);
 
         // Check widget
-        assertWidget(R.drawable.ic_alarm_off_white, "No alarm", null);
+        assertWidget(R.drawable.ic_alarm_white, "4:30 AM", "Tomorrow");
     }
 
     @Test
@@ -1736,7 +1743,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         assertNotificationCount(0);
 
         // Check widget
-        assertWidget(R.drawable.ic_alarm_white, "9:35 AM", "");
+        assertWidget(R.drawable.ic_alarm_white, "9:35 AM", null);
     }
 
     private int shared_t550_setDate_whileSnoozed(int year, int month, int day) {
