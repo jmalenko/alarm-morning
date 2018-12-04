@@ -17,8 +17,10 @@ import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RemoteViews;
 import android.widget.TextView;
 
@@ -26,8 +28,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.robolectric.Robolectric;
+import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
@@ -55,6 +59,7 @@ import cz.jaro.alarmmorning.receivers.VoidReceiver;
 import cz.jaro.alarmmorning.shadows.ShadowGlobalManager;
 import cz.jaro.alarmmorning.wizard.Wizard;
 
+import static cz.jaro.alarmmorning.GlobalManager.HORIZON_DAYS;
 import static cz.jaro.alarmmorning.model.AlarmDbHelper.DEFAULT_ALARM_HOUR;
 import static cz.jaro.alarmmorning.model.AlarmDbHelper.DEFAULT_ALARM_MINUTE;
 import static cz.jaro.alarmmorning.model.DayTest.DAY;
@@ -67,46 +72,48 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.robolectric.Robolectric.buildActivity;
 
-// FIXME Inherit CalendarWithOneTimeAlarmTest from CandarTest. Move utility methods to CalendarTest.
-
 /**
  * Tests of alarm management in UI.
  */
-@Config(shadows = {ShadowGlobalManager.class})
+@RunWith(RobolectricTestRunner.class)
+@Config(sdk = 21, shadows = {ShadowGlobalManager.class})
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class CalendarTest extends FixedTimeTest {
+    Context context;
 
-    private Context context;
+    AlarmManager alarmManager;
+    ShadowAlarmManager shadowAlarmManager;
 
-    private AlarmManager alarmManager;
-    private ShadowAlarmManager shadowAlarmManager;
+    NotificationManager notificationManager;
+    ShadowNotificationManager shadowNotificationManager;
 
-    private NotificationManager notificationManager;
-    private ShadowNotificationManager shadowNotificationManager;
+    AppWidgetManager appWidgetManager;
+    ShadowAppWidgetManager shadowAppWidgetManager;
 
-    private AppWidgetManager appWidgetManager;
-    private ShadowAppWidgetManager shadowAppWidgetManager;
-
-    private Activity activity;
-    private ShadowActivity shadowActivity;
+    Activity activity;
+    ShadowActivity shadowActivity;
 
     // Items in CalendarFragment of AlarmMorningActivity
-    private RecyclerView recyclerView;
+    RecyclerView recyclerView;
 
-    private View item;
+    View item;
 
-    private TextView textDate;
-    private TextView textDoW;
-    private TextView textTime;
-    private TextView textState;
+    TextView textDate;
+    TextView textDoW;
+    TextView textTime;
+    TextView textState;
+    EditText textName;
+    TextView textComment;
+    LinearLayout headerDate;
 
     // Items in RingActivity
-    private TextView textAlarmTime;
-    private TextView textNextCalendar;
-    private TextView textMuted;
+    TextView textAlarmTime;
+    TextView textOneTimeAlarmName;
+    TextView textNextCalendar;
+    TextView textMuted;
 
-    private ImageButton snoozeButton;
-    private SlideButton dismissButton;
+    ImageButton snoozeButton;
+    SlideButton dismissButton;
 
     @Before
     public void before() {
@@ -153,7 +160,21 @@ public class CalendarTest extends FixedTimeTest {
 
     @Test
     public void t001_noAlarmIsScheduled() {
+        // Start activity
+        startActivityCalendar();
+
+        // Check calendar
+        int count = recyclerView.getChildCount();
+        assertThat("The number of items", count, is(HORIZON_DAYS));
+
+        assertCalendarItem(0, "2/1", "Mon", "Off", "", ""); // Today
+        assertCalendarItem(1, "2/2", "Tue", "Off", "", ""); // Tomorrow
+        assertCalendarItem(2, "2/3", "Wed", "Off", "", ""); // 3rd day
+        assertCalendarItem(3, "2/4", "Thu", "Off", "", ""); // 4th day
+        assertCalendarItem(4, "2/5", "Fri", "Off", "", ""); // 5th day
+
         // Check system alarm
+        assertSystemAlarmCount(1);
         assertSystemAlarm(YEAR, MONTH, DAY + 1, 0, 0, SystemAlarm.ACTION_SET_SYSTEM_ALARM);
 
         // Check system alarm clock
@@ -171,49 +192,26 @@ public class CalendarTest extends FixedTimeTest {
         // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
         consumeNextScheduledAlarm();
 
-        // Click in calendar
-        startActivityCalendar();
-        loadItemAtPosition(0);
-
-        assertThat("Date", textDate.getText(), is("2/1"));
-        assertThat("DoW", textDoW.getText(), is("Mon"));
-        assertThat("Time", textTime.getText(), is("Off"));
-        assertThat("State", textState.getText(), is(""));
-        // FIXME Complete tests
-//        assertThat("Name visibility", textName.getVisibility(),is(View.GONE));
-//        assertThat("Comment", textComment.getText(),is(""));
-
-        item.performClick();
-
-        // FIXME use the helper method in OneTimeTests
-        // Click the time picker
-        TimePickerFragment fragment = (TimePickerFragment) activity.getFragmentManager().findFragmentByTag("timePicker");
-
-        TimePickerDialog dialog = (TimePickerDialog) fragment.getDialog();
-        ShadowTimePickerDialog shadowDialog = Shadows.shadowOf(dialog);
-
-        assertThat("Preset hour", shadowDialog.getHourOfDay(), is(DEFAULT_ALARM_HOUR));
-        assertThat("Preset minute", shadowDialog.getMinute(), is(DEFAULT_ALARM_MINUTE));
-
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
+        // Set day alarm
+        int oldCount = calendar_setDayAlarm(0, DEFAULT_ALARM_HOUR, DEFAULT_ALARM_MINUTE, DEFAULT_ALARM_HOUR, DEFAULT_ALARM_MINUTE);
 
         // Check calendar
-        assertThat("Date", textDate.getText(), is("2/1"));
-        assertThat("DoW", textDoW.getText(), is("Mon"));
-        assertThat("Time", textTime.getText(), is("7:00 AM"));
-        assertThat("State", textState.getText(), is("Changed"));
+        int newCount = recyclerView.getChildCount();
+        assertThat("The change of number of items", newCount - oldCount, is(0));
+
+        assertCalendarItem(0, "2/1", "Mon", "7:00 AM", "Changed", "6h 0m"); // Today
+        assertCalendarItem(1, "2/2", "Tue", "Off", "", ""); // Tomorrow
 
         // Check system alarm
         assertSystemAlarmCount(2);
         assertSystemAlarm(YEAR, MONTH, DAY, DEFAULT_ALARM_HOUR - 2, DEFAULT_ALARM_MINUTE, SystemAlarm.ACTION_RING_IN_NEAR_FUTURE); // System alarm
-
         assertSystemAlarmClock(YEAR, MONTH, DAY, DEFAULT_ALARM_HOUR, DEFAULT_ALARM_MINUTE); // System alarm clock
 
         // Check notification
         assertNotificationCount(0);
 
         // Check widget
-        assertWidget(R.drawable.ic_alarm_white, "07:00", "Mon");
+        assertWidget(R.drawable.ic_alarm_white, "07:00", null);
     }
 
     @Test
@@ -221,49 +219,16 @@ public class CalendarTest extends FixedTimeTest {
         // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
         consumeNextScheduledAlarm();
 
-        // Click in calendar
-        startActivityCalendar();
-        loadItemAtPosition(0);
-
-        // 1st: set
-        item.performClick();
-
-        // Click the time picker
-        TimePickerFragment fragment = (TimePickerFragment) activity.getFragmentManager().findFragmentByTag("timePicker");
-
-        TimePickerDialog dialog = (TimePickerDialog) fragment.getDialog();
-        ShadowTimePickerDialog shadowDialog = Shadows.shadowOf(dialog);
-
-        assertThat("Date", textDate.getText(), is("2/1"));
-        assertThat("Preset hour", shadowDialog.getHourOfDay(), is(DEFAULT_ALARM_HOUR));
-        assertThat("Preset minute", shadowDialog.getMinute(), is(DEFAULT_ALARM_MINUTE));
-
-        dialog.updateTime(DEFAULT_ALARM_HOUR + 1, DEFAULT_ALARM_MINUTE + 1);
-
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
-
-        // 2nd: set
-        item.performClick();
-
-        // Click the time picker
-        fragment = (TimePickerFragment) activity.getFragmentManager().findFragmentByTag("timePicker");
-
-        dialog = (TimePickerDialog) fragment.getDialog();
-        shadowDialog = Shadows.shadowOf(dialog);
-
-        assertThat("Date", textDate.getText(), is("2/1"));
-        assertThat("Preset hour", shadowDialog.getHourOfDay(), is(DEFAULT_ALARM_HOUR + 1));
-        assertThat("Preset minute", shadowDialog.getMinute(), is(DEFAULT_ALARM_MINUTE + 1));
-
-        dialog.updateTime(DEFAULT_ALARM_HOUR + 2, DEFAULT_ALARM_MINUTE + 2);
-
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
+        // Set day alarms
+        int oldCount = calendar_setDayAlarm(0, DEFAULT_ALARM_HOUR, DEFAULT_ALARM_MINUTE, DEFAULT_ALARM_HOUR + 1, DEFAULT_ALARM_MINUTE + 1);
+        calendar_setDayAlarm(0, DEFAULT_ALARM_HOUR + 1, DEFAULT_ALARM_MINUTE + 1, DEFAULT_ALARM_HOUR + 2, DEFAULT_ALARM_MINUTE + 2);
 
         // Check calendar
-        assertThat("Date", textDate.getText(), is("2/1"));
-        assertThat("DoW", textDoW.getText(), is("Mon"));
-        assertThat("Time", textTime.getText(), is("9:02 AM"));
-        assertThat("State", textState.getText(), is("Changed"));
+        int newCount = recyclerView.getChildCount();
+        assertThat("The change of number of items", newCount - oldCount, is(0));
+
+        assertCalendarItem(0, "2/1", "Mon", "9:02 AM", "Changed", "8h 2m"); // Today
+        assertCalendarItem(1, "2/2", "Tue", "Off", "", ""); // Tomorrow
 
         // Check system alarm
         assertSystemAlarmCount(2);
@@ -274,7 +239,7 @@ public class CalendarTest extends FixedTimeTest {
         assertNotificationCount(0);
 
         // Check widget
-        assertWidget(R.drawable.ic_alarm_white, "9:02 AM", "Mon");
+        assertWidget(R.drawable.ic_alarm_white, "9:02 AM", null);
     }
 
     @Test
@@ -282,41 +247,19 @@ public class CalendarTest extends FixedTimeTest {
         // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
         consumeNextScheduledAlarm();
 
-        // Click in calendar
-        startActivityCalendar();
-        loadItemAtPosition(0);
-        item.performClick();
-
-        // Click the time picker
-        TimePickerFragment fragment = (TimePickerFragment) activity.getFragmentManager().findFragmentByTag("timePicker");
-
-        TimePickerDialog dialog = (TimePickerDialog) fragment.getDialog();
-        ShadowTimePickerDialog shadowDialog = Shadows.shadowOf(dialog);
-
-        assertThat("Preset hour", shadowDialog.getHourOfDay(), is(DEFAULT_ALARM_HOUR));
-        assertThat("Preset minute", shadowDialog.getMinute(), is(DEFAULT_ALARM_MINUTE));
-
+        // Set day alarm
         Calendar now = globalManager.clock().now();
         now.add(Calendar.MINUTE, -1);
-        dialog.updateTime(now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE));
 
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
+        calendar_setDayAlarm(0, DEFAULT_ALARM_HOUR, DEFAULT_ALARM_MINUTE, now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE));
 
         // Check calendar
-        assertThat("Date", textDate.getText(), is("2/1"));
-        assertThat("DoW", textDoW.getText(), is("Mon"));
-        assertThat("Time", textTime.getText(), is("12:59 AM"));
-        assertThat("State", textState.getText(), is("Passed"));
+        assertCalendarItem(0, "2/1", "Mon", "12:59 AM", "Passed", ""); // Today
+        assertCalendarItem(1, "2/2", "Tue", "Off", "", ""); // Tomorrow
 
         // Check system alarm
-        // The alarm that was consumed at the beginning of this method didn't change
-        assertThat("No scheduled alarms", shadowAlarmManager.getScheduledAlarms().size(), is(0));
-
-        // Check system alarm clock
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            AlarmManager.AlarmClockInfo alarmClockInfo = alarmManager.getNextAlarmClock();
-            assertNull(alarmClockInfo);
-        }
+        assertSystemAlarmCount(0);
+        assertSystemAlarmClockNone();
 
         // Check notification
         assertNotificationCount(0);
@@ -333,27 +276,12 @@ public class CalendarTest extends FixedTimeTest {
         // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
         consumeNextScheduledAlarm();
 
-        // Click in calendar
-        startActivityCalendar();
-        loadItemAtPosition(0);
-        item.performClick();
-
-        // Click the time picker
-        TimePickerFragment fragment = (TimePickerFragment) activity.getFragmentManager().findFragmentByTag("timePicker");
-
-        TimePickerDialog dialog = (TimePickerDialog) fragment.getDialog();
-        ShadowTimePickerDialog shadowDialog = Shadows.shadowOf(dialog);
-
-        assertThat("Preset hour", shadowDialog.getHourOfDay(), is(DEFAULT_ALARM_HOUR));
-        assertThat("Preset minute", shadowDialog.getMinute(), is(DEFAULT_ALARM_MINUTE));
-
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
+        // Set day alarm
+        calendar_setDayAlarm(0, DEFAULT_ALARM_HOUR, DEFAULT_ALARM_MINUTE, DEFAULT_ALARM_HOUR, DEFAULT_ALARM_MINUTE);
 
         // Check calendar
-        assertThat("Date", textDate.getText(), is("2/1"));
-        assertThat("DoW", textDoW.getText(), is("Mon"));
-        assertThat("Time", textTime.getText(), is("7:00 AM"));
-        assertThat("State", textState.getText(), is("Changed"));
+        assertCalendarItem(0, "2/1", "Mon", "7:00 AM", "Changed", "6h 0m"); // Today
+        assertCalendarItem(1, "2/2", "Tue", "Off", "", ""); // Tomorrow
 
         // Check system alarm
         assertSystemAlarmCount(2);
@@ -364,7 +292,7 @@ public class CalendarTest extends FixedTimeTest {
         assertNotificationCount(0);
 
         // Check widget
-        assertWidget(R.drawable.ic_alarm_white, "7:00 AM", "Mon");
+        assertWidget(R.drawable.ic_alarm_white, "7:00 AM", null);
     }
 
     @Test
@@ -372,27 +300,12 @@ public class CalendarTest extends FixedTimeTest {
         // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
         consumeNextScheduledAlarm();
 
-        // Click in calendar
-        startActivityCalendar();
-        loadItemAtPosition(1);
-        item.performClick();
-
-        // Click the time picker
-        TimePickerFragment fragment = (TimePickerFragment) activity.getFragmentManager().findFragmentByTag("timePicker");
-
-        TimePickerDialog dialog = (TimePickerDialog) fragment.getDialog();
-        ShadowTimePickerDialog shadowDialog = Shadows.shadowOf(dialog);
-
-        assertThat(shadowDialog.getHourOfDay(), is(DEFAULT_ALARM_HOUR));
-        assertThat(shadowDialog.getMinute(), is(DEFAULT_ALARM_MINUTE));
-
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
+        // Set day alarm
+        calendar_setDayAlarm(1, DEFAULT_ALARM_HOUR, DEFAULT_ALARM_MINUTE, DEFAULT_ALARM_HOUR, DEFAULT_ALARM_MINUTE);
 
         // Check calendar
-        assertThat("Date", textDate.getText(), is("2/2"));
-        assertThat("DoW", textDoW.getText(), is("Tue"));
-        assertThat("Time", textTime.getText(), is("7:00 AM"));
-        assertThat("State", textState.getText(), is("Changed"));
+        assertCalendarItem(0, "2/1", "Mon", "Off", "", ""); // Today
+        assertCalendarItem(1, "2/2", "Tue", "7:00 AM", "Changed", "1d 6h"); // Tomorrow
 
         // Check system alarm
         assertSystemAlarmCount(2);
@@ -416,15 +329,15 @@ public class CalendarTest extends FixedTimeTest {
         assertSystemAlarmClockNone();
 
         // Check notification
-//        assertNotificationCount(1);
-//
-//        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
-//        assertNotification(notification, "Alarm at 7:00 AM", "Touch to view all alarms");
-//        assertNotificationActionCount(notification, 1);
-//        assertNotificationAction(notification, 0, "Dismiss", NotificationReceiver.ACTION_DISMISS_BEFORE_RINGING);
+        assertNotificationCount(1);
+
+        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
+        assertNotification(notification, "Alarm at 7:00 AM", "Touch to view all alarms");
+        assertNotificationActionCount(notification, 1);
+        assertNotificationAction(notification, 0, "Dismiss", NotificationReceiver.ACTION_DISMISS_BEFORE_RINGING);
 
         // Check widget
-        assertWidget(R.drawable.ic_alarm_white, "7:00 AM", "Mon");
+        assertWidget(R.drawable.ic_alarm_white, "7:00 AM", null);
     }
 
     @Test
@@ -434,19 +347,20 @@ public class CalendarTest extends FixedTimeTest {
         // Consume the alarm with action ACTION_RING
         consumeNextScheduledAlarm();
 
-        // Click in calendar
+        // Context menu
         startActivityCalendar();
+
         loadItemAtPosition(0);
+
         item.performLongClick();
 
-        // Click context menu
         clickContextMenu(R.id.action_day_dismiss);
 
+        refreshRecyclerView();
+
         // Check calendar
-        assertThat("Date", textDate.getText(), is("2/1"));
-        assertThat("DoW", textDoW.getText(), is("Mon"));
-        assertThat("Time", textTime.getText(), is("7:00 AM"));
-        assertThat("State", textState.getText(), is("Dismissed before ringing"));
+        assertCalendarItem(0, "2/1", "Mon", "7:00 AM", "Dismissed before ringing", ""); // Today
+        assertCalendarItem(1, "2/2", "Tue", "Off", "", ""); // Tomorrow
 
         // Check system alarm
         assertSystemAlarmCount(1);
@@ -479,24 +393,25 @@ public class CalendarTest extends FixedTimeTest {
         assertSystemAlarmClockNone();
 
         // Check notification
-//        assertNotificationCount(1);
-//
-//        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
-//        assertNotification(notification, "Alarm at 7:00 AM", "Ringing");
-//        assertNotificationActionCount(notification, 2);
-//        assertNotificationAction(notification, 0, "Dismiss", NotificationReceiver.ACTION_DISMISS);
-//        assertNotificationAction(notification, 1, "Snooze", NotificationReceiver.ACTION_SNOOZE);
+        assertNotificationCount(1);
+
+        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
+        assertNotification(notification, "Alarm at 7:00 AM", "Ringing");
+        assertNotificationActionCount(notification, 2);
+        assertNotificationAction(notification, 0, "Dismiss", NotificationReceiver.ACTION_DISMISS);
+        assertNotificationAction(notification, 1, "Snooze", NotificationReceiver.ACTION_SNOOZE);
 
         // Start ring activity
         Calendar alarmTime = new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DEFAULT, MINUTE_DEFAULT);
         startActivityRing(alarmTime);
 
         // Check appearance
-        assertThat(textDate.getVisibility(), is(View.VISIBLE));
-        assertThat(textTime.getVisibility(), is(View.VISIBLE));
-        assertThat(textAlarmTime.getVisibility(), is(View.INVISIBLE));
-        assertThat(textNextCalendar.getVisibility(), is(View.GONE));
-        assertThat(textMuted.getVisibility(), is(View.INVISIBLE));
+        assertThat("Date visibility", textDate.getVisibility(), is(View.VISIBLE));
+        assertThat("Time visibility", textTime.getVisibility(), is(View.VISIBLE));
+        assertThat("Alarm time visibility", textAlarmTime.getVisibility(), is(View.INVISIBLE));
+        assertThat("Alarm name visibility", textOneTimeAlarmName.getVisibility(), is(View.GONE));
+        assertThat("Calendar visibility", textNextCalendar.getVisibility(), is(View.GONE));
+        assertThat("Muted visibility", textMuted.getVisibility(), is(View.INVISIBLE));
 
         assertThat("Date", textDate.getText(), is("Monday, February 1"));
         assertThat("Time", textTime.getText(), is("7:00 AM"));
@@ -530,13 +445,13 @@ public class CalendarTest extends FixedTimeTest {
         assertSystemAlarmClock(YEAR, MONTH, DAY + 1, DEFAULT_ALARM_HOUR + 1, DEFAULT_ALARM_MINUTE + 1);
 
         // Check notification
-//        assertNotificationCount(1);
-//
-//        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
-//        assertNotification(notification, "Alarm at 7:00 AM", "Ringing");
-//        assertNotificationActionCount(notification, 2);
-//        assertNotificationAction(notification, 0, "Dismiss", NotificationReceiver.ACTION_DISMISS);
-//        assertNotificationAction(notification, 1, "Snooze", NotificationReceiver.ACTION_SNOOZE);
+        assertNotificationCount(1);
+
+        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
+        assertNotification(notification, "Alarm at 7:00 AM", "Ringing");
+        assertNotificationActionCount(notification, 2);
+        assertNotificationAction(notification, 0, "Dismiss", NotificationReceiver.ACTION_DISMISS);
+        assertNotificationAction(notification, 1, "Snooze", NotificationReceiver.ACTION_SNOOZE);
 
         // Check widget
         assertWidget(R.drawable.ic_alarm_white, "08:01", "Tomorrow");
@@ -630,12 +545,12 @@ public class CalendarTest extends FixedTimeTest {
         assertSystemAlarmClock(YEAR, MONTH, DAY + 1, 1, 0);
 
         // Check notification
-//        assertNotificationCount(1);
-//
-//        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
-//        assertNotification(notification, "Alarm at 1:00 AM", "Touch to view all alarms");
-//        assertNotificationActionCount(notification, 1);
-//        assertNotificationAction(notification, 0, "Dismiss", NotificationReceiver.ACTION_DISMISS_BEFORE_RINGING);
+        assertNotificationCount(1);
+
+        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
+        assertNotification(notification, "Alarm at 1:00 AM", "Touch to view all alarms");
+        assertNotificationActionCount(notification, 1);
+        assertNotificationAction(notification, 0, "Dismiss", NotificationReceiver.ACTION_DISMISS_BEFORE_RINGING);
 
         // Check widget
         assertWidget(R.drawable.ic_alarm_white, "01:00", "Tomorrow");
@@ -658,11 +573,8 @@ public class CalendarTest extends FixedTimeTest {
         startActivityCalendar();
 
         // Check calendar
-        loadItemAtPosition(0);
-        assertThat("Date", textDate.getText(), is("2/1"));
-        assertThat("DoW", textDoW.getText(), is("Mon"));
-        assertThat("Time", textTime.getText(), is("7:00 AM"));
-        assertThat("State", textState.getText(), is("Snoozed"));
+        assertCalendarItem(0, "2/1", "Mon", "7:00 AM", "Snoozed", "–10s"); // Today
+        assertCalendarItem(1, "2/2", "Tue", "Off", "", ""); // Tomorrow
 
         // Check system alarm
         assertSystemAlarmCount(1);
@@ -670,12 +582,12 @@ public class CalendarTest extends FixedTimeTest {
         assertSystemAlarmClockNone();
 
         // Check notification
-//        assertNotificationCount(1);
-//
-//        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
-//        assertNotification(notification, "Alarm at 7:00 AM", "Snoozed till 7:10 AM");
-//        assertNotificationActionCount(notification, 1);
-//        assertNotificationAction(notification, 0, "Dismiss", NotificationReceiver.ACTION_DISMISS);
+        assertNotificationCount(1);
+
+        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
+        assertNotification(notification, "Alarm at 7:00 AM", "Snoozed till 7:10 AM");
+        assertNotificationActionCount(notification, 1);
+        assertNotificationAction(notification, 0, "Dismiss", NotificationReceiver.ACTION_DISMISS);
 
         // Check widget
         assertWidget(R.drawable.ic_alarm_off_white, "No alarm", null);
@@ -686,19 +598,18 @@ public class CalendarTest extends FixedTimeTest {
         // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
         prepareUntilSnooze();
 
-        // Click in calendar
+        // Context menu
         startActivityCalendar();
+
         loadItemAtPosition(0);
+
         item.performLongClick();
 
-        // Click context menu
         clickContextMenu(R.id.action_day_dismiss);
 
         // Check calendar
-        assertThat("Date", textDate.getText(), is("2/1"));
-        assertThat("DoW", textDoW.getText(), is("Mon"));
-        assertThat("Time", textTime.getText(), is("7:00 AM"));
-        assertThat("State", textState.getText(), is("Passed"));
+        assertCalendarItem(0, "2/1", "Mon", "7:00 AM", "Passed", ""); // Today
+        assertCalendarItem(1, "2/2", "Tue", "Off", "", ""); // Tomorrow
 
         // Check system alarm
         assertSystemAlarmCount(1);
@@ -719,13 +630,18 @@ public class CalendarTest extends FixedTimeTest {
     public void t520_disableWhileSnoozed() {
         prepareUntilSnooze();
 
-        // Click in calendar
+        // Context menu
         startActivityCalendar();
+
         loadItemAtPosition(0);
+
         item.performLongClick();
 
-        // Click context menu
         clickContextMenu(R.id.action_day_disable);
+
+        // Check calendar
+        // FIXME assertCalendarItem(0, "2/1", "Mon", "Off", "", ""); // Today
+        assertCalendarItem(1, "2/2", "Tue", "Off", "", ""); // Tomorrow
 
         // Check system alarm
         assertSystemAlarmCount(1);
@@ -743,28 +659,22 @@ public class CalendarTest extends FixedTimeTest {
     public void t540_setTimeWhileSnoozed() {
         prepareUntilSnooze();
 
-        // Click in calendar
+        // Context menu
         startActivityCalendar();
+
         loadItemAtPosition(0);
+
         item.performLongClick();
 
-        // Click context menu
         clickContextMenu(R.id.action_day_set_time);
 
-        // Click the time picker
-        TimePickerFragment fragment = (TimePickerFragment) activity.getFragmentManager().findFragmentByTag("timePicker");
-
-        TimePickerDialog dialog = (TimePickerDialog) fragment.getDialog();
-        ShadowTimePickerDialog shadowDialog = Shadows.shadowOf(dialog);
-
-        dialog.updateTime(DEFAULT_ALARM_HOUR + 6, DEFAULT_ALARM_MINUTE);
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
+        // Set time
+        // FIXME maybe use calendar_setDayAlarm(0, DEFAULT_ALARM_HOUR , DEFAULT_ALARM_MINUTE, DEFAULT_ALARM_HOUR + 6, DEFAULT_ALARM_MINUTE);
+        picker_setTime(DEFAULT_ALARM_HOUR, DEFAULT_ALARM_MINUTE + 30, DEFAULT_ALARM_HOUR + 6, DEFAULT_ALARM_MINUTE);
 
         // Check calendar
-        assertThat("Date", textDate.getText(), is("2/1"));
-        assertThat("DoW", textDoW.getText(), is("Mon"));
-        assertThat("Time", textTime.getText(), is("1:00 PM"));
-        assertThat("State", textState.getText(), is("Changed"));
+        assertCalendarItem(0, "2/1", "Mon", "1:00 PM", "Changed", ""); // Today
+        assertCalendarItem(1, "2/2", "Tue", "Off", "", ""); // Tomorrow
 
         // Check system alarm
         assertSystemAlarmCount(2);
@@ -775,7 +685,7 @@ public class CalendarTest extends FixedTimeTest {
         assertNotificationCount(0);
 
         // Check widget
-        assertWidget(R.drawable.ic_alarm_white, "13:00", "Mon");
+        assertWidget(R.drawable.ic_alarm_white, "1:00 PM", null);
     }
 
     /**
@@ -786,19 +696,18 @@ public class CalendarTest extends FixedTimeTest {
         // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
         prepareUntilSnooze();
 
-        // Click in calendar
+        // Context menu
         startActivityCalendar();
+
         loadItemAtPosition(0);
+
         item.performLongClick();
 
-        // Click context menu
         clickContextMenu(R.id.action_day_revert);
 
         // Check calendar
-        assertThat("Date", textDate.getText(), is("2/1")); // FIXME make sure that each assert has a text description. Refactor to setDate
-        assertThat("DoW", textDoW.getText(), is("Mon"));
-        assertThat("Time", textTime.getText(), is("Off"));
-        assertThat("State", textState.getText(), is(""));
+        assertCalendarItem(0, "2/1", "Mon", "Off", "", "–20s"); // Today
+        assertCalendarItem(1, "2/2", "Tue", "Off", "", ""); // Tomorrow
 
         // Check system alarm
         assertSystemAlarmCount(1);
@@ -912,6 +821,25 @@ public class CalendarTest extends FixedTimeTest {
         globalManager.modifyDayAlarm(day, analytics);
     }
 
+    private int calendar_setDayAlarm(int itemPosition, int hourCheck, int minuteCheck, int hour, int minute) {
+        // Start activity
+        startActivityCalendar();
+
+        int itemCount = recyclerView.getChildCount();
+
+        // Click on item
+        loadItemAtPosition(itemPosition);
+
+        item.performClick();
+
+        // Set time
+        picker_setTime(hourCheck, minuteCheck, hour, minute);
+
+        refreshRecyclerView();
+
+        return itemCount;
+    }
+
     private void startActivityRing(Calendar alarmTime) {
         Intent ringIntent = new Intent(context, RingActivity.class);
         ringIntent.putExtra(RingActivity.ALARM_TIME, alarmTime);
@@ -924,6 +852,7 @@ public class CalendarTest extends FixedTimeTest {
         textDate = (TextView) activity.findViewById(R.id.date);
         textTime = (TextView) activity.findViewById(R.id.time);
         textAlarmTime = (TextView) activity.findViewById(R.id.alarmTime);
+        textOneTimeAlarmName = (TextView) activity.findViewById(R.id.oneTimeAlarmName);
         textNextCalendar = (TextView) activity.findViewById(R.id.nextCalendar);
         textMuted = (TextView) activity.findViewById(R.id.muted);
 
@@ -951,23 +880,70 @@ public class CalendarTest extends FixedTimeTest {
         recyclerView.layout(0, 0, 100, 10000);
     }
 
-    private void loadItemAtPosition(int position) {
+    void loadItemAtPosition(int position) {
         item = recyclerView.getChildAt(position);
 
         textDate = (TextView) item.findViewById(R.id.textDate);
         textDoW = (TextView) item.findViewById(R.id.textDayOfWeekCal);
         textTime = (TextView) item.findViewById(R.id.textTimeCal);
         textState = (TextView) item.findViewById(R.id.textState);
+        textName = (EditText) item.findViewById(R.id.textName);
+        textComment = (TextView) item.findViewById(R.id.textComment);
+        headerDate = (LinearLayout) item.findViewById(R.id.headerDate);
     }
 
-    private void clickContextMenu(int id) { // FIXME refactor - call this from one-time test. Include check.
+    void clickContextMenu(int id) {
+        clickContextMenu(recyclerView, id);
+    }
+
+    public static void clickContextMenu(RecyclerView recyclerView, int id) {
         ShadowViewGroup shadowViewGroup = Shadows.shadowOf(recyclerView);
         android.app.Fragment calendarFragment = (CalendarFragment) shadowViewGroup.getOnCreateContextMenuListener();
         final RoboMenuItem contextMenuItem = new RoboMenuItem(id);
+
+        // TODO Check that the context menu contains this id and that this id is is visible (not yet easily supported by Roboletric)
+
+        // Select the context menu item
         calendarFragment.onContextItemSelected(contextMenuItem);
     }
 
-    private void consumeNextScheduledAlarm() {
+    void picker_setTime(int hourCheck, int minuteCheck, int hour, int minute) {
+        // Time picker
+        TimePickerFragment timePickerFragment = (TimePickerFragment) activity.getFragmentManager().findFragmentByTag("timePicker");
+
+        TimePickerDialog dialog = (TimePickerDialog) timePickerFragment.getDialog();
+        ShadowTimePickerDialog shadowDialog = Shadows.shadowOf(dialog);
+
+        // Check presets
+        assertThat("Preset hour", shadowDialog.getHourOfDay(), is(hourCheck));
+        assertThat("Preset minute", shadowDialog.getMinute(), is(minuteCheck));
+
+        // Change the time
+        dialog.updateTime(hour, minute);
+
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
+    }
+
+    void assertCalendarItem(int position, String date, String dow, String time, String state, String comment) {
+        assertCalendarItem(position, date, dow, time, state, null, comment);
+    }
+
+    void assertCalendarItem(int position, String date, String dow, String time, String state, String name, String comment) {
+        loadItemAtPosition(position);
+        assertThat("Date", textDate.getText(), is(date));
+        assertThat("DoW", textDoW.getText(), is(dow));
+        assertThat("Time", textTime.getText(), is(time));
+        assertThat("State", textState.getText(), is(state));
+        if (name == null)
+            assertThat("Name visibility", textName.getVisibility(), is(View.GONE));
+        else {
+            assertThat("Name visibility", textName.getVisibility(), is(View.VISIBLE));
+            assertThat("Name", textName.getText().toString(), is(name));
+        }
+        assertThat("Comment", textComment.getText(), is(comment));
+    }
+
+    void consumeNextScheduledAlarm() {
         consumeNextScheduledAlarm(shadowAlarmManager);
     }
 

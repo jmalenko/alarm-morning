@@ -25,21 +25,17 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
 import org.robolectric.Robolectric;
-import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
-import org.robolectric.fakes.RoboMenuItem;
 import org.robolectric.shadows.ShadowActivity;
 import org.robolectric.shadows.ShadowAlarmManager;
 import org.robolectric.shadows.ShadowAppWidgetManager;
 import org.robolectric.shadows.ShadowDatePickerDialog;
 import org.robolectric.shadows.ShadowNotificationManager;
 import org.robolectric.shadows.ShadowTimePickerDialog;
-import org.robolectric.shadows.ShadowViewGroup;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -68,8 +64,7 @@ import static org.robolectric.Robolectric.buildActivity;
 /**
  * Tests of alarm management in UI such that only one one-time alarm is used.
  */
-@RunWith(RobolectricTestRunner.class)
-@Config(sdk = 21, shadows = {ShadowGlobalManager.class})
+@Config(shadows = {ShadowGlobalManager.class})
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
     /*
@@ -103,46 +98,46 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
                                                      4:30:20
     ---+-----------------------+-------------------+--------------------------->
 
-     */
+    */
 
-    private Context context;
+    Context context;
 
-    private AlarmManager alarmManager;
-    private ShadowAlarmManager shadowAlarmManager;
+    AlarmManager alarmManager;
+    ShadowAlarmManager shadowAlarmManager;
 
-    private NotificationManager notificationManager;
-    private ShadowNotificationManager shadowNotificationManager;
+    NotificationManager notificationManager;
+    ShadowNotificationManager shadowNotificationManager;
 
-    private AppWidgetManager appWidgetManager;
-    private ShadowAppWidgetManager shadowAppWidgetManager;
+    AppWidgetManager appWidgetManager;
+    ShadowAppWidgetManager shadowAppWidgetManager;
 
-    private Activity activity;
-    private ShadowActivity shadowActivity;
+    Activity activity;
+    ShadowActivity shadowActivity;
 
     // Items in CalendarFragment of AlarmMorningActivity
-    private RecyclerView recyclerView;
+    RecyclerView recyclerView;
 
-    private View item;
+    View item;
 
-    private TextView textDate;
-    private TextView textDoW;
-    private TextView textTime;
-    private TextView textState;
-    private EditText textName;
-    private TextView textComment;
-    private LinearLayout headerDate;
+    TextView textDate;
+    TextView textDoW;
+    TextView textTime;
+    TextView textState;
+    EditText textName;
+    TextView textComment;
+    LinearLayout headerDate;
 
     // Items in RingActivity
-    private TextView textAlarmTime;
-    private TextView textOneTimeAlarmName;
-    private TextView textNextCalendar;
-    private TextView textMuted;
+    TextView textAlarmTime;
+    TextView textOneTimeAlarmName;
+    TextView textNextCalendar;
+    TextView textMuted;
 
-    private ImageButton snoozeButton;
-    private SlideButton dismissButton;
+    ImageButton snoozeButton;
+    SlideButton dismissButton;
 
-    private final int ONE_TIME_ALARM_HOUR = HOUR + 3;
-    private final int ONE_TIME_ALARM_MINUTE = 30;
+    final int ONE_TIME_ALARM_HOUR = HOUR + 3;
+    final int ONE_TIME_ALARM_MINUTE = 30;
 
     @Before
     public void before() {
@@ -184,7 +179,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
 
     @Test
     public void t000_prerequisities() {
-        assertThat("There is an provider in widget manager", shadowAppWidgetManager.getInstalledProviders().size(), is(1));
+        assertThat("Shadow widget manager contains a provider", shadowAppWidgetManager.getInstalledProviders().size(), is(1));
     }
 
     @Test
@@ -214,63 +209,6 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
 
         // Check widget
         assertWidget(R.drawable.ic_alarm_off_white, "No alarm", null);
-    }
-
-    private void picker_setTime(int hourCheck, int minuteCheck, int hour, int minute) {
-        // Time picker
-        TimePickerFragment timePickerFragment = (TimePickerFragment) activity.getFragmentManager().findFragmentByTag("timePicker");
-
-        TimePickerDialog dialog = (TimePickerDialog) timePickerFragment.getDialog();
-        ShadowTimePickerDialog shadowDialog = Shadows.shadowOf(dialog);
-
-        // Check presets
-        assertThat("Preset hour", shadowDialog.getHourOfDay(), is(hourCheck));
-        assertThat("Preset minute", shadowDialog.getMinute(), is(minuteCheck));
-
-        // Change the time
-        dialog.updateTime(hour, minute);
-
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
-    }
-
-    private int calendar_addOneTimeAlarm(int itemPosition, int hourCheck, int minuteCheck, int hour, int minute) {
-        // Start activity
-        startActivityCalendar();
-
-        int itemCount = recyclerView.getChildCount();
-
-        // Context menu
-        loadItemAtPosition(itemPosition);
-
-        item.performLongClick(); // Show context menu
-
-        clickContextMenu(R.id.action_day_add_alarm); // Select the item in context menu
-
-        // Set time
-        picker_setTime(hourCheck, minuteCheck, hour, minute);
-
-        refreshRecyclerView();
-
-        return itemCount;
-    }
-
-    private int calendar_setTime(int itemPosition, int hourCheck, int minuteCheck, int hour, int minute) {
-        // Start activity
-        startActivityCalendar();
-
-        int itemCount = recyclerView.getChildCount();
-
-        // Context menu
-        loadItemAtPosition(itemPosition);
-
-        item.performClick();
-
-        // Set time
-        picker_setTime(hourCheck, minuteCheck, hour, minute);
-
-        refreshRecyclerView();
-
-        return itemCount;
     }
 
     @Test
@@ -718,42 +656,6 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
 
         // Check widget
         assertWidget(R.drawable.ic_alarm_white, "5:31 AM", "");
-    }
-
-    private void picker_setDate(int yearCheck, int monthCheck, int dayCheck, int year, int month, int day) {
-        DatePickerFragment datePickerFragment = (DatePickerFragment) activity.getFragmentManager().findFragmentByTag("datePicker");
-
-        DatePickerDialog dialog = (DatePickerDialog) datePickerFragment.getDialog();
-        ShadowDatePickerDialog shadowDialog = Shadows.shadowOf(dialog);
-
-        // Check presets
-        assertThat("Preset year", shadowDialog.getYear(), is(yearCheck));
-        assertThat("Preset month", shadowDialog.getMonthOfYear(), is(monthCheck));
-        assertThat("Preset day", shadowDialog.getDayOfMonth(), is(dayCheck));
-
-        // Change the date
-        dialog.updateDate(year, month, day);
-
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
-    }
-
-    private int calendar_setDate(int itemPosition, int yearCheck, int monthCheck, int dayCheck, int year, int month, int day) {
-        // Start activity
-        startActivityCalendar();
-
-        int itemCount = recyclerView.getChildCount();
-
-        // Context menu
-        loadItemAtPosition(itemPosition);
-
-        headerDate.performClick();
-
-        // Set date
-        picker_setDate(yearCheck, monthCheck, dayCheck, year, month, day);
-
-        refreshRecyclerView();
-
-        return itemCount;
     }
 
     private int shared_t250_setDate_ofDistantAlarm(int year, int month, int day) {
@@ -2079,14 +1981,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
     }
 
     private void clickContextMenu(int id) {
-        ShadowViewGroup shadowViewGroup = Shadows.shadowOf(recyclerView);
-        android.app.Fragment calendarFragment = (CalendarFragment) shadowViewGroup.getOnCreateContextMenuListener();
-        final RoboMenuItem contextMenuItem = new RoboMenuItem(id);
-
-        // TODO Check that the context menu contains this id and that this id is is visible (not yet easily supported by Roboletric)
-
-        // Select the context menu item
-        calendarFragment.onContextItemSelected(contextMenuItem);
+        CalendarTest.clickContextMenu(recyclerView, id);
     }
 
     private void consumeNextScheduledAlarm() {
@@ -2142,6 +2037,99 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
 
     private void assertWidget(int iconResId, String time, String date) {
         CalendarTest.assertWidget(context, shadowAppWidgetManager, iconResId, time, date);
+    }
+
+    private void picker_setDate(int yearCheck, int monthCheck, int dayCheck, int year, int month, int day) {
+        DatePickerFragment datePickerFragment = (DatePickerFragment) activity.getFragmentManager().findFragmentByTag("datePicker");
+
+        DatePickerDialog dialog = (DatePickerDialog) datePickerFragment.getDialog();
+        ShadowDatePickerDialog shadowDialog = Shadows.shadowOf(dialog);
+
+        // Check presets
+        assertThat("Preset year", shadowDialog.getYear(), is(yearCheck));
+        assertThat("Preset month", shadowDialog.getMonthOfYear(), is(monthCheck));
+        assertThat("Preset day", shadowDialog.getDayOfMonth(), is(dayCheck));
+
+        // Change the date
+        dialog.updateDate(year, month, day);
+
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
+    }
+
+    private int calendar_setDate(int itemPosition, int yearCheck, int monthCheck, int dayCheck, int year, int month, int day) {
+        // Start activity
+        startActivityCalendar();
+
+        int itemCount = recyclerView.getChildCount();
+
+        // Context menu
+        loadItemAtPosition(itemPosition);
+
+        headerDate.performClick();
+
+        // Set date
+        picker_setDate(yearCheck, monthCheck, dayCheck, year, month, day);
+
+        refreshRecyclerView();
+
+        return itemCount;
+    }
+
+    private void picker_setTime(int hourCheck, int minuteCheck, int hour, int minute) {
+        // Time picker
+        TimePickerFragment timePickerFragment = (TimePickerFragment) activity.getFragmentManager().findFragmentByTag("timePicker");
+
+        TimePickerDialog dialog = (TimePickerDialog) timePickerFragment.getDialog();
+        ShadowTimePickerDialog shadowDialog = Shadows.shadowOf(dialog);
+
+        // Check presets
+        assertThat("Preset hour", shadowDialog.getHourOfDay(), is(hourCheck));
+        assertThat("Preset minute", shadowDialog.getMinute(), is(minuteCheck));
+
+        // Change the time
+        dialog.updateTime(hour, minute);
+
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
+    }
+
+    private int calendar_setTime(int itemPosition, int hourCheck, int minuteCheck, int hour, int minute) {
+        // Start activity
+        startActivityCalendar();
+
+        int itemCount = recyclerView.getChildCount();
+
+        // Context menu
+        loadItemAtPosition(itemPosition);
+
+        item.performClick();
+
+        // Set time
+        picker_setTime(hourCheck, minuteCheck, hour, minute);
+
+        refreshRecyclerView();
+
+        return itemCount;
+    }
+
+    private int calendar_addOneTimeAlarm(int itemPosition, int hourCheck, int minuteCheck, int hour, int minute) {
+        // Start activity
+        startActivityCalendar();
+
+        int itemCount = recyclerView.getChildCount();
+
+        // Context menu
+        loadItemAtPosition(itemPosition);
+
+        item.performLongClick(); // Show context menu
+
+        clickContextMenu(R.id.action_day_add_alarm); // Select the item in context menu
+
+        // Set time
+        picker_setTime(hourCheck, minuteCheck, hour, minute);
+
+        refreshRecyclerView();
+
+        return itemCount;
     }
 
 }
