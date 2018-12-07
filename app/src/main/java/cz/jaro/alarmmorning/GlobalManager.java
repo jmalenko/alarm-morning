@@ -45,6 +45,7 @@ import static cz.jaro.alarmmorning.calendar.CalendarUtils.addDay;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.addMilliSecondsClone;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.addMinutesClone;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.beginningOfToday;
+import static cz.jaro.alarmmorning.calendar.CalendarUtils.onTheSameDate;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.roundDown;
 
 /**
@@ -1070,6 +1071,17 @@ public class GlobalManager {
                 break;
             default:
                 Log.i(TAG, "Reverting alarm to default on " + day.getDateTime().getTime());
+        }
+
+        if (isRingingOrSnoozed()) {
+            AppAlarm nextAlarmToRing = getNextAlarmToRing();
+            if (nextAlarmToRing instanceof Day) {
+                Day dayOld = (Day) nextAlarmToRing;
+                if (onTheSameDate(day.getDate(), dayOld.getDate())) {
+                    setState(STATE_DISMISSED, dayOld.getDateTime());
+                    addDismissedAlarm(dayOld.getDateTime());
+                }
+            }
         }
 
         dataSource.saveDay(day);

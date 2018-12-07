@@ -649,7 +649,7 @@ public class CalendarTest extends FixedTimeTest {
         clickContextMenu(R.id.action_day_disable);
 
         // Check calendar
-        // FIXME assertCalendarItem(0, "2/1", "Mon", "Off", "", ""); // Today
+        assertCalendarItem(0, "2/1", "Mon", "Off", "", ""); // Today
         assertCalendarItem(1, "2/2", "Tue", "Off", "", ""); // Tomorrow
 
         // Check system alarm
@@ -682,7 +682,7 @@ public class CalendarTest extends FixedTimeTest {
         picker_setTime(DEFAULT_ALARM_HOUR, DEFAULT_ALARM_MINUTE + 30, DEFAULT_ALARM_HOUR + 6, DEFAULT_ALARM_MINUTE);
 
         // Check calendar
-        assertCalendarItem(0, "2/1", "Mon", "1:00 PM", "Changed", ""); // Today
+        assertCalendarItem(0, "2/1", "Mon", "1:00 PM", "Changed", "5h 59m"); // Today
         assertCalendarItem(1, "2/2", "Tue", "Off", "", ""); // Tomorrow
 
         // Check system alarm
@@ -715,7 +715,7 @@ public class CalendarTest extends FixedTimeTest {
         clickContextMenu(R.id.action_day_revert);
 
         // Check calendar
-        assertCalendarItem(0, "2/1", "Mon", "Off", "", "–20s"); // Today
+        assertCalendarItem(0, "2/1", "Mon", "Off", "", ""); // Today
         assertCalendarItem(1, "2/2", "Tue", "Off", "", ""); // Tomorrow
 
         // Check system alarm
