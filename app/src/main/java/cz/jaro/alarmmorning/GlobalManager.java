@@ -152,18 +152,21 @@ public class GlobalManager {
         if (isRingingOrSnoozed()) {
             Log.v(TAG, "   loading the ringing or snoozed alarm");
             // TODO 2 Improve architecture of one-time alarms (when it is changed while snoozed) - store the one-time alarm ID so we can return the proper object
+            // TODO Test: 1. set alarm to a time, 2. dismiss this alarm, 3. set alarm to the same time. Is it really working?
+
+            Calendar alarmTimeOfRingingAlarm = getAlarmTimeOfRingingAlarm();
 
             // 1. Try the Day first...
 
             Day day = dataSource.loadDay(clock().now());
-            if (day.isEnabled() && day.getDateTime().equals(getAlarmTimeOfRingingAlarm())) {
+            if (day.isEnabled() && day.getDateTime().equals(alarmTimeOfRingingAlarm)) {
                 appAlarm = day;
             } else {
                 // 2. Try to find the one-time alarm with this alarm time
 
                 List<OneTimeAlarm> oneTimeAlarms = loadOneTimeAlarms(null);
                 for (OneTimeAlarm oneTimeAlarm : oneTimeAlarms) {
-                    if (oneTimeAlarm.getDateTime().equals(getAlarmTimeOfRingingAlarm())) {
+                    if (oneTimeAlarm.getDateTime().equals(alarmTimeOfRingingAlarm)) {
                         appAlarm = oneTimeAlarm;
                         break;
                     }
@@ -171,8 +174,6 @@ public class GlobalManager {
                 if (appAlarm == null) {
                     // 3. The only remaining possibility is the the one-time alarm was snoozed and it's time was changed. Currently we have to reconstruct the
                     // object (but without the id), which is OK as it is used only for Analytics (in this special case).
-
-                    Calendar alarmTimeOfRingingAlarm = getAlarmTimeOfRingingAlarm();
 
                     OneTimeAlarm oneTimeAlarm = new OneTimeAlarm();
                     oneTimeAlarm.setDate(alarmTimeOfRingingAlarm);
@@ -304,13 +305,10 @@ public class GlobalManager {
         long oneTimeAlarmId = preferences.getLong(PERSIST_ONE_TIME_ALARM_ID, ONE_TIME_ALARM_ID_UNDEFINED);
 
         Calendar time = CalendarUtils.newGregorianCalendar(timeInMS);
+        Calendar alarmTime = alarmTimeInMS != -1 ? alarmTime = CalendarUtils.newGregorianCalendar(alarmTimeInMS) : null;
+        Long oneTimeAlarmId2 = oneTimeAlarmId == ONE_TIME_ALARM_ID_UNDEFINED ? null : oneTimeAlarmId;
 
-        Calendar alarmTime = null;
-        if (alarmTimeInMS != -1) {
-            alarmTime = CalendarUtils.newGregorianCalendar(alarmTimeInMS);
-        }
-
-        NextAction nextAction = new NextAction(action, time, alarmTime, oneTimeAlarmId == ONE_TIME_ALARM_ID_UNDEFINED ? null : oneTimeAlarmId);
+        NextAction nextAction = new NextAction(action, time, alarmTime, oneTimeAlarmId2);
         return nextAction;
     }
 
@@ -321,10 +319,14 @@ public class GlobalManager {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = preferences.edit();
 
+        long timeInMS = nextAction.time.getTimeInMillis();
+        long alarmTimeInMS = nextAction.alarmTime != null ? nextAction.alarmTime.getTimeInMillis() : TIME_UNDEFINED;
+        long oneTimeAlarmId = nextAction.oneTimeAlarmId != null ? nextAction.oneTimeAlarmId : ONE_TIME_ALARM_ID_UNDEFINED;
+
         editor.putString(PERSIST_ACTION, nextAction.action);
-        editor.putLong(PERSIST_TIME, nextAction.time.getTimeInMillis());
-        editor.putLong(PERSIST_ALARM_TIME, nextAction.alarmTime != null ? nextAction.alarmTime.getTimeInMillis() : TIME_UNDEFINED);
-        editor.putLong(PERSIST_ONE_TIME_ALARM_ID, nextAction.oneTimeAlarmId != null ? nextAction.oneTimeAlarmId : ONE_TIME_ALARM_ID_UNDEFINED);
+        editor.putLong(PERSIST_TIME, timeInMS);
+        editor.putLong(PERSIST_ALARM_TIME, alarmTimeInMS);
+        editor.putLong(PERSIST_ONE_TIME_ALARM_ID, oneTimeAlarmId);
 
         editor.commit();
     }
@@ -351,6 +353,7 @@ public class GlobalManager {
         return stateAlarmTime;
     }
 
+    // XXX Rename to getNextAlarmAlarm
     public AppAlarm getAlarmOfRingingAlarm() {
         Log.v(TAG, "getAlarmOfRingingAlarm()");
 
