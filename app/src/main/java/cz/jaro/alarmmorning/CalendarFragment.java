@@ -232,6 +232,9 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
         int pos = getPosition(day);
         adapter.notifyItemChanged(pos);
+
+        // Update position of next alarms
+        positionNextAlarm = calcPositionNextAlarm();
     }
 
     public void onCreateOneTimeAlarm(OneTimeAlarm oneTimeAlarm) {
@@ -251,7 +254,6 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
                 positionNextAlarmNew.add(i, p);
             else
                 positionNextAlarmNew.add(i, p + 1);
-
         }
         positionNextAlarm = positionNextAlarmNew;
 
