@@ -466,12 +466,12 @@ public class CalendarTest extends FixedTimeTest {
         assertWidget(R.drawable.ic_alarm_white, "8:01 AM", "Tomorrow");
 
         // Shift clock by just under 2 hours
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DEFAULT + 2, MINUTE_DEFAULT, 59)));
+        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DEFAULT + 1 + 2, MINUTE_DEFAULT, 59)));
         assertWidget(R.drawable.ic_alarm_white, "8:01 AM", "Tomorrow");
 
         // Shift clock
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DEFAULT + 2, MINUTE_DEFAULT + 1)));
-        // FIXME Notification test assertWidget(R.drawable.ic_alarm_white, "8:01 AM", null);
+        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DEFAULT + 1 + 2, MINUTE_DEFAULT + 1)));
+        assertWidget(R.drawable.ic_alarm_white, "8:01 AM", null);
     }
 
     @Test
@@ -661,7 +661,7 @@ public class CalendarTest extends FixedTimeTest {
         assertNotificationCount(0);
 
         // Check widget
-        // FIXME Notification test assertWidget(R.drawable.ic_alarm_off_white, "No alarm", null);
+        assertWidget(R.drawable.ic_alarm_off_white, "No alarm", null);
     }
 
     @Test
@@ -694,7 +694,7 @@ public class CalendarTest extends FixedTimeTest {
         assertNotificationCount(0);
 
         // Check widget
-        // FIXME Notification test assertWidget(R.drawable.ic_alarm_white, "1:00 PM", null);
+        assertWidget(R.drawable.ic_alarm_white, "1:00 PM", null);
     }
 
     /**
@@ -727,7 +727,7 @@ public class CalendarTest extends FixedTimeTest {
         assertNotificationCount(0);
 
         // Check widget
-        // FIXME Notification test assertWidget(R.drawable.ic_alarm_off_white, "No alarm", null);
+        assertWidget(R.drawable.ic_alarm_off_white, "No alarm", null);
     }
 
     private void prepareUntilNear() {

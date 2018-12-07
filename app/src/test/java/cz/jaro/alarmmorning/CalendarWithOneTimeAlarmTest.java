@@ -1199,12 +1199,12 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         refreshRecyclerView();
 
         // Shift clock by just under 2 hours after alarm
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR + 2, ONE_TIME_ALARM_MINUTE, 59)));
+        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR + 1 + 2, ONE_TIME_ALARM_MINUTE, 59)));
         assertWidget(R.drawable.ic_alarm_white, "5:31 AM", "Tomorrow");
 
         // Shift clock to two hours after the alarm
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR + 2, ONE_TIME_ALARM_MINUTE + 1)));
-        // FIXME Notification test assertWidget(R.drawable.ic_alarm_white, "5:31 AM", null);
+        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR + 1 + 2, ONE_TIME_ALARM_MINUTE + 1)));
+        assertWidget(R.drawable.ic_alarm_white, "5:31 AM", null);
     }
 
     @Test
@@ -1300,7 +1300,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         assertNotificationCount(0);
 
         // Check widget
-        // FIXME Notification test assertWidget(R.drawable.ic_alarm_off_white, "No alarm", null);
+        assertWidget(R.drawable.ic_alarm_off_white, "No alarm", null);
     }
 
     @Test
@@ -1657,7 +1657,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         assertNotificationCount(0);
 
         // Check widget
-        // FIXME Notification test assertWidget(R.drawable.ic_alarm_off_white, "No alarm", null);
+        assertWidget(R.drawable.ic_alarm_off_white, "No alarm", null);
     }
 
     private int shared_t540_setTime_whileSnoozed(int hour, int minute) {
@@ -1853,7 +1853,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
         assertNotificationAction(notification, 0, "Dismiss", NotificationReceiver.ACTION_DISMISS);
 
         // Check widget
-        assertWidget(R.drawable.ic_alarm_off_white, "No alarm", null);
+        assertWidget(R.drawable.ic_alarm_white, "4:30 AM", null);
     }
 
     private void prepareCreate() {

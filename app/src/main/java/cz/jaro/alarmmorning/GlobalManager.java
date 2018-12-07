@@ -1076,6 +1076,7 @@ public class GlobalManager {
                 Log.i(TAG, "Reverting alarm to default on " + day.getDateTime().getTime());
         }
 
+        // If the modified alam is ringing or snooze, then dismiss it
         if (isRingingOrSnoozed()) {
             AppAlarm nextAlarmToRing = getNextAlarmToRing();
             if (nextAlarmToRing instanceof Day) {
@@ -1140,12 +1141,26 @@ public class GlobalManager {
     public void deleteOneTimeAlarm(OneTimeAlarm oneTimeAlarm, Analytics analytics) {
         Log.d(TAG, "deleteOneTimeAlarm()");
 
+        // If the modified alam is ringing or snooze, then dismiss it
+        if (isRingingOrSnoozed()) {
+            AppAlarm nextAlarmToRing = getNextAlarmToRing();
+            if (nextAlarmToRing instanceof OneTimeAlarm) {
+                OneTimeAlarm oneTimeAlarmOld = (OneTimeAlarm) nextAlarmToRing;
+                if (oneTimeAlarm.getId() == oneTimeAlarmOld.getId()) {
+                    setState(STATE_DISMISSED, oneTimeAlarmOld.getDateTime());
+                    addDismissedAlarm(oneTimeAlarmOld.getDateTime());
+                }
+            }
+        }
+
         remove(oneTimeAlarm, analytics);
 
         Context context = AlarmMorningApplication.getAppContext();
 
         SystemNotification systemNotification = SystemNotification.getInstance(context);
         systemNotification.onDeleteOneTimeAlarm(oneTimeAlarm);
+
+        updateWidget(context);
 
         updateCalendarActivity(context, AlarmMorningActivity.EVENT_DELETE_ONE_TIME_ALARM, oneTimeAlarm);
 
