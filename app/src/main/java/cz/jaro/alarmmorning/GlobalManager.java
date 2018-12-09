@@ -294,6 +294,9 @@ public class GlobalManager {
     private static final long TIME_UNDEFINED = -1;
     private static final long ONE_TIME_ALARM_ID_UNDEFINED = -1;
 
+    // Persisted next action
+    // =====================
+
     protected NextAction getNextAction() {
         Log.v(TAG, "getNextAction()");
 
@@ -331,6 +334,23 @@ public class GlobalManager {
         editor.commit();
     }
 
+    public AppAlarm getNextActionAlarm() {
+        Log.v(TAG, "getNextActionAlarm()");
+
+        NextAction nextAction = getNextAction();
+
+        if (nextAction.action.equals(ACTION_SET_SYSTEM_ALARM)) {
+            return null;
+        } else if (nextAction.oneTimeAlarmId != null) {
+            return loadOneTimeAlarm(nextAction.oneTimeAlarmId);
+        } else {
+            return loadDay(nextAction.alarmTime);
+        }
+    }
+
+    // Persisted state
+    // ===============
+
     private int getState() {
         Log.v(TAG, "getState()");
         Context context = AlarmMorningApplication.getAppContext();
@@ -351,21 +371,6 @@ public class GlobalManager {
         Calendar stateAlarmTime = CalendarUtils.newGregorianCalendar(stateAlarmTimeInMS);
 
         return stateAlarmTime;
-    }
-
-    // XXX Rename to getNextAlarmAlarm
-    public AppAlarm getAlarmOfRingingAlarm() {
-        Log.v(TAG, "getAlarmOfRingingAlarm()");
-
-        NextAction nextAction = getNextAction();
-
-        if (nextAction.action.equals(ACTION_SET_SYSTEM_ALARM)) {
-            return null;
-        } else if (nextAction.oneTimeAlarmId != null) {
-            return loadOneTimeAlarm(nextAction.oneTimeAlarmId);
-        } else {
-            return loadDay(nextAction.alarmTime);
-        }
     }
 
     public void setState(int state, Calendar alarmTime) {
@@ -1301,7 +1306,7 @@ public class GlobalManager {
 //        ringIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         ringIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         ringIntent.putExtra(RingActivity.ALARM_TIME, getAlarmTimeOfRingingAlarm());
-        AppAlarm alarmOfRingingAlarm = getAlarmOfRingingAlarm();
+        AppAlarm alarmOfRingingAlarm = getNextActionAlarm();
         String oneTimeAlarmName = alarmOfRingingAlarm instanceof OneTimeAlarm ? ((OneTimeAlarm) alarmOfRingingAlarm).getName() : null;
         ringIntent.putExtra(RingActivity.ALARM_NAME, oneTimeAlarmName);
         context.startActivity(ringIntent);
@@ -1496,11 +1501,11 @@ public class GlobalManager {
 
         if (nextOneTimeAlarm == null) {
             Log.v(TAG, "   No next alarm defined by one-time alarms");
-            return null;
         } else {
             Log.v(TAG, "   The one-time alarm that satisfies filter is " + nextOneTimeAlarm.getDateTime().getTime().toString());
-            return nextOneTimeAlarm;
         }
+
+        return nextOneTimeAlarm;
     }
 
     /**

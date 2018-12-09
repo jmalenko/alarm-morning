@@ -151,7 +151,7 @@ public class SystemNotification {
         intent.setAction(NotificationReceiver.ACTION_CLICK_NOTIFICATION);
         intent.putExtra(NotificationReceiver.EXTRA_ACTIVITY, NotificationReceiver.EXTRA_ACTIVITY__RING);
         intent.putExtra(RingActivity.ALARM_TIME, globalManager.getAlarmTimeOfRingingAlarm()); // We must pass this to the activity as it might have been destroyed
-        AppAlarm alarmOfRingingAlarm = globalManager.getAlarmOfRingingAlarm();
+        AppAlarm alarmOfRingingAlarm = globalManager.getNextActionAlarm();
         String name = alarmOfRingingAlarm instanceof OneTimeAlarm ? ((OneTimeAlarm) alarmOfRingingAlarm).getName() : null;
         intent.putExtra(RingActivity.ALARM_NAME, name); // We must pass this to the activity as it might have been destroyed
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);

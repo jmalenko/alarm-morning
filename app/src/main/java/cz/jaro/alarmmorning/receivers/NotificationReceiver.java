@@ -69,7 +69,7 @@ public class NotificationReceiver extends BroadcastReceiver {
             case ACTION_DISMISS_BEFORE_RINGING: {
                 Log.i(TAG, "Dismiss");
 
-                AppAlarm appAlarm = globalManager.getAlarmOfRingingAlarm();
+                AppAlarm appAlarm = globalManager.getNextActionAlarm();
                 Analytics analytics = new Analytics(Analytics.Channel.Notification, Analytics.ChannelName.Alarm);
 
                 globalManager.onDismissBeforeRinging(appAlarm, analytics);
