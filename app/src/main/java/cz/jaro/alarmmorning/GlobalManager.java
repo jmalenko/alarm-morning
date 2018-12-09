@@ -1173,63 +1173,16 @@ public class GlobalManager {
     }
 
     /**
-     * Modify the date of an one-time alarm.
+     * Modify the date or time of an one-time alarm.
      *
      * @param oneTimeAlarm The modified one-time alarm.
      * @param analytics    Analytics
      */
-    public void modifyOneTimeAlarmDate(OneTimeAlarm oneTimeAlarm, Analytics analytics) {
-        Log.d(TAG, "modifyOneTimeAlarmDate()");
+    public void modifyOneTimeAlarmDateTime(OneTimeAlarm oneTimeAlarm, Analytics analytics) {
+        Log.d(TAG, "modifyOneTimeAlarmDateTime()");
 
-        // When changing the date to past, then set the alarm as dismissed
-        Calendar now = clock().now();
-        if (oneTimeAlarm.getDateTime().before(now)) {
-            setState(STATE_DISMISSED, oneTimeAlarm.getDateTime());
-            addDismissedAlarm(oneTimeAlarm.getDateTime());
-        } else {
-            setState(STATE_FUTURE, oneTimeAlarm.getDateTime());
-        }
+        // TODO 2 Proposal: if changed to past, refactor to 1. dismiss the old alarm (call @onDismiss(), 2. set the new one
 
-        save(oneTimeAlarm, analytics);
-
-        Context context = AlarmMorningApplication.getAppContext();
-
-        SystemNotification systemNotification = SystemNotification.getInstance(context);
-        systemNotification.onModifyOneTimeAlarmDate(oneTimeAlarm);
-
-        updateCalendarActivity(context, AlarmMorningActivity.EVENT_MODIFY_ONE_TIME_ALARM_DATE, oneTimeAlarm);
-
-        onAlarmSet();
-    }
-
-
-    /**
-     * Modify the time of an one-time alarm.
-     *
-     * @param oneTimeAlarm The modified one-time alarm.
-     * @param analytics    Analytics
-     */
-    public void modifyOneTimeAlarmTime(OneTimeAlarm oneTimeAlarm, Analytics analytics) {
-        Log.d(TAG, "modifyOneTimeAlarmTime()");
-
-//        // TODO 2 Proposal: if changed to past, refactor to 1. dismiss the old alarm (call @onDismiss(), 2. set the new one
-//
-//        // FIXME why is this condition here? this should apply universally. Probably applies to near period too (e.g. notification is already displayed)
-//
-//        // When changing the time to past, then set the alarm as dismissed
-//        if (isRingingOrSnoozed()) {
-//            OneTimeAlarm storedOneTimeAlarm = loadOneTimeAlarm(oneTimeAlarm.getId());
-//
-//            if (storedOneTimeAlarm.getDateTime().equals(getAlarmTimeOfRingingAlarm())) {
-//                Calendar now = clock().now();
-//                if (now.before(oneTimeAlarm.getDateTime())) {
-//                    setState(STATE_FUTURE, oneTimeAlarm.getDateTime());
-//                } else {
-//                    setState(STATE_DISMISSED, oneTimeAlarm.getDateTime());
-//                    addDismissedAlarm(oneTimeAlarm.getDateTime());
-//                }
-//            }
-//        }
         // When changing the date to past, then set the alarm as dismissed
         Calendar now = clock().now();
         if (oneTimeAlarm.getDateTime().before(now)) {
@@ -1246,7 +1199,7 @@ public class GlobalManager {
         SystemNotification systemNotification = SystemNotification.getInstance(context);
         systemNotification.onModifyOneTimeAlarmTime(oneTimeAlarm);
 
-        updateCalendarActivity(context, AlarmMorningActivity.EVENT_MODIFY_ONE_TIME_ALARM_TIME, oneTimeAlarm);
+        updateCalendarActivity(context, AlarmMorningActivity.EVENT_MODIFY_ONE_TIME_ALARM_DATETIME, oneTimeAlarm);
 
         onAlarmSet();
     }

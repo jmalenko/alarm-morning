@@ -311,14 +311,8 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
             positionAction--;
     }
 
-    public void onModifyOneTimeAlarmDate(OneTimeAlarm oneTimeAlarm) {
-        Log.d(TAG, "onModifyOneTimeAlarmDate(oneTimeAlarm = " + oneTimeAlarm + ")");
-
-        changePosition(oneTimeAlarm);
-    }
-
-    public void onModifyOneTimeAlarmTime(OneTimeAlarm oneTimeAlarm) {
-        Log.d(TAG, "onModifyOneTimeAlarmTime(oneTimeAlarm = " + oneTimeAlarm + ")");
+    public void onModifyOneTimeAlarmDateTime(OneTimeAlarm oneTimeAlarm) {
+        Log.d(TAG, "onModifyOneTimeAlarmDateTime(oneTimeAlarm = " + oneTimeAlarm + ")");
 
         changePosition(oneTimeAlarm);
     }
@@ -566,18 +560,11 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         globalManager.deleteOneTimeAlarm(oneTimeAlarm, analytics);
     }
 
-    private void modifyOneTimeAlarmDate(OneTimeAlarm oneTimeAlarm) {
+    private void modifyOneTimeAlarmDateTime(OneTimeAlarm oneTimeAlarm) {
         Analytics analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
         GlobalManager globalManager = GlobalManager.getInstance();
 
-        globalManager.modifyOneTimeAlarmDate(oneTimeAlarm, analytics);
-    }
-
-    private void modifyOneTimeAlarmTime(OneTimeAlarm oneTimeAlarm) {
-        Analytics analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
-        GlobalManager globalManager = GlobalManager.getInstance();
-
-        globalManager.modifyOneTimeAlarmTime(oneTimeAlarm, analytics);
+        globalManager.modifyOneTimeAlarmDateTime(oneTimeAlarm, analytics);
     }
 
     private void modifyOneTimeAlarmName(OneTimeAlarm oneTimeAlarm) {
@@ -784,7 +771,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
                             modifyDayAlarm(day);
                         } else {
                             OneTimeAlarm oneTimeAlarm = (OneTimeAlarm) appAlarmAtPosition;
-                            modifyOneTimeAlarmTime(oneTimeAlarm);
+                            modifyOneTimeAlarmDateTime(oneTimeAlarm);
                         }
                         return;
 
@@ -849,7 +836,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
             Calendar date = new GregorianCalendar(year, month, dayOfMonth);
             oneTimeAlarmAtPosition.setDate(date);
 
-            modifyOneTimeAlarmDate(oneTimeAlarmAtPosition);
+            modifyOneTimeAlarmDateTime(oneTimeAlarmAtPosition);
         }
     }
 

@@ -71,8 +71,7 @@ public class AlarmMorningActivity extends AppCompatActivity {
     public static final String EVENT_MODIFY_DAY_ALARM = "EVENT_MODIFY_DAY_ALARM";
     public static final String EVENT_CREATE_ONE_TIME_ALARM = "EVENT_CREATE_ONE_TIME_ALARM";
     public static final String EVENT_DELETE_ONE_TIME_ALARM = "EVENT_DELETE_ONE_TIME_ALARM";
-    public static final String EVENT_MODIFY_ONE_TIME_ALARM_DATE = "EVENT_MODIFY_ONE_TIME_ALARM_DATE";
-    public static final String EVENT_MODIFY_ONE_TIME_ALARM_TIME = "EVENT_MODIFY_ONE_TIME_ALARM_TIME";
+    public static final String EVENT_MODIFY_ONE_TIME_ALARM_DATETIME = "EVENT_MODIFY_ONE_TIME_ALARM_DATETIME";
     public static final String EVENT_MODIFY_ONE_TIME_ALARM_NAME = "EVENT_MODIFY_ONE_TIME_ALARM_NAME";
 
     public static final String EXTRA_ALARM_CLASS = "EXTRA_ALARM_CLASS";
@@ -149,8 +148,7 @@ public class AlarmMorningActivity extends AppCompatActivity {
         s_intentFilterInternal.addAction(EVENT_MODIFY_DAY_ALARM);
         s_intentFilterInternal.addAction(EVENT_CREATE_ONE_TIME_ALARM);
         s_intentFilterInternal.addAction(EVENT_DELETE_ONE_TIME_ALARM);
-        s_intentFilterInternal.addAction(EVENT_MODIFY_ONE_TIME_ALARM_DATE);
-        s_intentFilterInternal.addAction(EVENT_MODIFY_ONE_TIME_ALARM_TIME);
+        s_intentFilterInternal.addAction(EVENT_MODIFY_ONE_TIME_ALARM_DATETIME);
         s_intentFilterInternal.addAction(EVENT_MODIFY_ONE_TIME_ALARM_NAME);
     }
 
@@ -242,11 +240,8 @@ public class AlarmMorningActivity extends AppCompatActivity {
                         long alarmId = intent.getLongExtra(EXTRA_ALARM_ID, -1);
                         calendarFragment.onDeleteOneTimeAlarm(alarmId);
                         break;
-                    case EVENT_MODIFY_ONE_TIME_ALARM_DATE:
-                        calendarFragment.onModifyOneTimeAlarmDate(oneTimeAlarm);
-                        break;
-                    case EVENT_MODIFY_ONE_TIME_ALARM_TIME:
-                        calendarFragment.onModifyOneTimeAlarmTime(oneTimeAlarm);
+                    case EVENT_MODIFY_ONE_TIME_ALARM_DATETIME:
+                        calendarFragment.onModifyOneTimeAlarmDateTime(oneTimeAlarm);
                         break;
                     case EVENT_MODIFY_ONE_TIME_ALARM_NAME:
                         calendarFragment.onModifyOneTimeAlarmName(oneTimeAlarm);
