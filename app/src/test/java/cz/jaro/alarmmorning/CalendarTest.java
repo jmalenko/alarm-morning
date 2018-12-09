@@ -319,6 +319,44 @@ public class CalendarTest extends FixedTimeTest {
     }
 
     @Test
+    public void t104_setTime_viaContextMenu() {
+        // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
+        consumeNextScheduledAlarm();
+
+        // Context menu
+        startActivityCalendar();
+
+        int oldCount = recyclerView.getChildCount();
+
+        loadItemAtPosition(0);
+
+        item.performLongClick();
+
+        clickContextMenu(R.id.action_day_set_time);
+
+        // Set time
+        picker_setTime(DEFAULT_ALARM_HOUR, DEFAULT_ALARM_MINUTE, DEFAULT_ALARM_HOUR, DEFAULT_ALARM_MINUTE);
+
+        // Check calendar
+        int newCount = recyclerView.getChildCount();
+        assertThat("The change of number of items", newCount - oldCount, is(0));
+
+        assertCalendarItem(0, "2/1", "Mon", "7:00 AM", "Changed", "6h 0m"); // Today
+        assertCalendarItem(1, "2/2", "Tue", "Off", "", ""); // Tomorrow
+
+        // Check system alarm
+        assertSystemAlarmCount(2);
+        assertSystemAlarm(YEAR, MONTH, DAY, DEFAULT_ALARM_HOUR - 2, DEFAULT_ALARM_MINUTE, SystemAlarm.ACTION_RING_IN_NEAR_FUTURE); // System alarm
+        assertSystemAlarmClock(YEAR, MONTH, DAY, DEFAULT_ALARM_HOUR, DEFAULT_ALARM_MINUTE); // System alarm clock
+
+        // Check notification
+        assertNotificationCount(0);
+
+        // Check widget
+        assertWidget(R.drawable.ic_alarm_white, "7:00 AM", null);
+    }
+
+    @Test
     public void t300_onNear() {
         prepareUntilNear();
 
@@ -668,18 +706,8 @@ public class CalendarTest extends FixedTimeTest {
     public void t540_setTimeWhileSnoozed() {
         prepareUntilSnooze();
 
-        // Context menu
-        startActivityCalendar();
-
-        loadItemAtPosition(0);
-
-        item.performLongClick();
-
-        clickContextMenu(R.id.action_day_set_time);
-
-        // Set time
-        // FIXME maybe use calendar_setDayAlarm(0, DEFAULT_ALARM_HOUR , DEFAULT_ALARM_MINUTE, DEFAULT_ALARM_HOUR + 6, DEFAULT_ALARM_MINUTE);
-        picker_setTime(DEFAULT_ALARM_HOUR, DEFAULT_ALARM_MINUTE + 30, DEFAULT_ALARM_HOUR + 6, DEFAULT_ALARM_MINUTE);
+        // Set day alarm
+        calendar_setDayAlarm(0, DEFAULT_ALARM_HOUR, DEFAULT_ALARM_MINUTE + 30, DEFAULT_ALARM_HOUR + 6, DEFAULT_ALARM_MINUTE);
 
         // Check calendar
         assertCalendarItem(0, "2/1", "Mon", "1:00 PM", "Changed", "5h 59m"); // Today
