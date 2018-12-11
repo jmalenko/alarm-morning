@@ -1207,7 +1207,7 @@ public class GlobalManager {
         Context context = AlarmMorningApplication.getAppContext();
 
         SystemNotification systemNotification = SystemNotification.getInstance(context);
-        systemNotification.onModifyOneTimeAlarmTime(oneTimeAlarm);
+        systemNotification.onModifyOneTimeAlarmDateTime(oneTimeAlarm);
 
         updateCalendarActivity(context, AlarmMorningActivity.EVENT_MODIFY_ONE_TIME_ALARM_DATETIME, oneTimeAlarm);
 

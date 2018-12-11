@@ -273,19 +273,8 @@ public class SystemNotification {
         }
     }
 
-    public void onModifyOneTimeAlarmDate(OneTimeAlarm oneTimeAlarm) {
-        Log.d(TAG, "onModifyOneTimeAlarmDate(oneTimeAlarm = " + oneTimeAlarm + ")");
-
-        GlobalManager globalManager = GlobalManager.getInstance();
-
-        Calendar now = globalManager.clock().now();
-        if (oneTimeAlarm.getDateTime().before(now)) {
-            hideNotification();
-        }
-    }
-
-    public void onModifyOneTimeAlarmTime(OneTimeAlarm oneTimeAlarm) {
-        Log.d(TAG, "onModifyOneTimeAlarmTime(oneTimeAlarm = " + oneTimeAlarm + ")");
+    public void onModifyOneTimeAlarmDateTime(OneTimeAlarm oneTimeAlarm) {
+        Log.d(TAG, "onModifyOneTimeAlarmDateTime(oneTimeAlarm = " + oneTimeAlarm + ")");
 
         GlobalManager globalManager = GlobalManager.getInstance();
 
