@@ -4,7 +4,9 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
@@ -12,8 +14,11 @@ import java.util.Calendar;
 
 import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.model.AppAlarm;
+import cz.jaro.alarmmorning.model.Day;
 import cz.jaro.alarmmorning.model.OneTimeAlarm;
 import cz.jaro.alarmmorning.receivers.NotificationReceiver;
+
+import static cz.jaro.alarmmorning.calendar.CalendarUtils.onTheSameDate;
 
 /**
  * SystemNotification manages the notification about the alarm.
@@ -27,6 +32,10 @@ public class SystemNotification {
 
     private static final int NOTIFICATION_ID = 0;
     private static int NOTIFICATION_ERROR_ID = NOTIFICATION_ID;
+
+    private static final String PERSIST_NOTIFICATION_ALARM_TYPE = "PERSIST_NOTIFICATION_ALARM_TYPE";
+    private static final String PERSIST_NOTIFICATION_DAY_ALARM_DATE = "PERSIST_NOTIFICATION_DAY_ALARM_DATE";
+    private static final String PERSIST_NOTIFICATION_ONE_TIME_ALARM_ID = "PERSIST_NOTIFICATION_ONE_TIME_ALARM_ID";
 
     private SystemNotification(Context context) {
         this.context = context;
@@ -65,16 +74,20 @@ public class SystemNotification {
         return mBuilder;
     }
 
-    private void showNotification(NotificationCompat.Builder mBuilder) {
+    private void showNotification(NotificationCompat.Builder mBuilder, AppAlarm appAlarm) {
         Log.d(TAG, "showNotification()");
         NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
+
+        persist(appAlarm);
     }
 
     private void hideNotification() {
         Log.d(TAG, "hideNotification()");
         NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.cancel(NOTIFICATION_ID);
+
+        persistRemove();
     }
 
     /*
@@ -82,8 +95,8 @@ public class SystemNotification {
      * =============================
      */
 
-    protected void onNearFuture() {
-        Log.d(TAG, "onNearFuture()");
+    protected void onNearFuture(AppAlarm appAlarm) {
+        Log.d(TAG, "onNearFuture(appAlarm=" + appAlarm + ")");
 
         NotificationCompat.Builder mBuilder = buildNotification();
 
@@ -102,7 +115,7 @@ public class SystemNotification {
         PendingIntent dismissPendingIntent = PendingIntent.getBroadcast(context, 1, dismissIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.addAction(R.drawable.ic_alarm_off_white, dismissText, dismissPendingIntent);
 
-        showNotification(mBuilder);
+        showNotification(mBuilder, appAlarm);
     }
 
     public void onDismissBeforeRinging(AppAlarm appAlarm) {
@@ -124,7 +137,7 @@ public class SystemNotification {
                     Calendar nearFutureTime = SystemAlarm.getNearFutureTime(context, alarmTime);
 
                     if (nearFutureTime.before(now)) {
-                        onNearFuture();
+                        onNearFuture(nextAppAlarm);
                     }
                 }
             }
@@ -132,12 +145,33 @@ public class SystemNotification {
     }
 
     private boolean currentlyDisplayedNotificationIsAbout(AppAlarm appAlarm) {
-        // XXX Implement logic
-        return true;
+        String retrieveAlarmType = retrieveAlarmType();
+
+        if (appAlarm instanceof Day) {
+            Day day = (Day) appAlarm;
+            if (retrieveAlarmType.equals("Day")) {
+                Calendar retrieveDayAlarmDate = retrieveDayAlarmDate();
+                if (onTheSameDate(day.getDate(), retrieveDayAlarmDate)) {
+                    return true;
+                }
+            }
+        } else if (appAlarm instanceof OneTimeAlarm) {
+            OneTimeAlarm oneTimeAlarm = (OneTimeAlarm) appAlarm;
+            if (retrieveAlarmType.equals("OneTimeAlarm")) {
+                Long retrieveOneTimeAlarmId = retrieveOneTimeAlarmId();
+                if (oneTimeAlarm.getId() == retrieveOneTimeAlarmId) {
+                    return true;
+                }
+            }
+        } else {
+            throw new IllegalArgumentException("Unexpected class " + appAlarm.getClass());
+        }
+
+        return false;
     }
 
-    protected void onRing() {
-        Log.d(TAG, "onRing()");
+    protected void onRing(AppAlarm appAlarm) {
+        Log.d(TAG, "onRing(appAlarm=" + appAlarm + ")");
 
         NotificationCompat.Builder mBuilder = buildNotification();
 
@@ -169,17 +203,17 @@ public class SystemNotification {
         PendingIntent snoozePendingIntent = PendingIntent.getBroadcast(context, 1, snoozeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.addAction(R.drawable.ic_snooze_white, snoozeText, snoozePendingIntent);
 
-        showNotification(mBuilder);
+        showNotification(mBuilder, appAlarm);
     }
 
-    public void onDismiss() {
-        Log.d(TAG, "onDismiss()");
+    public void onDismiss(AppAlarm appAlarm) {
+        Log.d(TAG, "onDismiss(appAlarm=" + appAlarm + ")");
 
         hideNotification();
     }
 
-    public void onSnooze(Calendar ringAfterSnoozeTime) {
-        Log.d(TAG, "onSnooze()");
+    public void onSnooze(AppAlarm appAlarm, Calendar ringAfterSnoozeTime) {
+        Log.d(TAG, "onSnooze(appAlarm=" + appAlarm + ")");
 
         NotificationCompat.Builder mBuilder = buildNotification();
 
@@ -199,11 +233,11 @@ public class SystemNotification {
         PendingIntent dismissPendingIntent = PendingIntent.getBroadcast(context, 1, dismissIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.addAction(R.drawable.ic_alarm_off_white, dismissText, dismissPendingIntent);
 
-        showNotification(mBuilder);
+        showNotification(mBuilder, appAlarm);
     }
 
-    public void onAlarmCancel() {
-        Log.d(TAG, "onAlarmCancel()");
+    public void onAlarmCancel(AppAlarm appAlarm) {
+        Log.d(TAG, "onAlarmCancel(appAlarm=" + appAlarm + ")");
 
         hideNotification();
     }
@@ -232,7 +266,7 @@ public class SystemNotification {
                     Calendar nearFutureTime = SystemAlarm.getNearFutureTime(context, alarmTime);
 
                     if (nearFutureTime.before(now)) {
-                        onNearFuture();
+                        onNearFuture(nextAlarm);
                     }
                 }
             }
@@ -279,17 +313,17 @@ public class SystemNotification {
                 // Nothing
             } else if (now.before(alarmTime)) {
                 if (SystemAlarm.useNearFutureTime(context)) {
-                    onNearFuture();
+                    onNearFuture(oneTimeAlarm);
                 }
             } else {
                 int state = globalManager.getState(alarmTime);
                 switch (state) {
                     case GlobalManager.STATE_RINGING:
-                        onRing();
+                        onRing(oneTimeAlarm);
                         break;
                     case GlobalManager.STATE_SNOOZED:
                         Calendar ringAfterSnoozeTime = globalManager.getRingAfterSnoozeTime(globalManager.clock());
-                        onSnooze(ringAfterSnoozeTime);
+                        onSnooze(oneTimeAlarm, ringAfterSnoozeTime);
                         break;
                 }
             }
@@ -365,6 +399,71 @@ public class SystemNotification {
 
         NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.notify(++NOTIFICATION_ERROR_ID, mBuilder.build());
+    }
+
+    private String retrieveAlarmType() {
+        Log.v(TAG, "retrieveAlarmType()");
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+
+        String datatype = preferences.getString(PERSIST_NOTIFICATION_ALARM_TYPE, "");
+
+        return datatype;
+    }
+
+    private Calendar retrieveDayAlarmDate() {
+        Log.v(TAG, "retrieveDayAlarmDate()");
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+
+        String dateStr = preferences.getString(PERSIST_NOTIFICATION_DAY_ALARM_DATE, "");
+
+        Calendar dateCal = Analytics.dateStringToCalendar(dateStr);
+
+        return dateCal;
+    }
+
+    private Long retrieveOneTimeAlarmId() {
+        Log.v(TAG, "retrieveOneTimeAlarmId()");
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+
+        Long id = preferences.getLong(PERSIST_NOTIFICATION_ONE_TIME_ALARM_ID, -1);
+
+        return id;
+    }
+
+    public void persist(AppAlarm appAlarm) {
+        Log.v(TAG, "persist(appAlarm=" + appAlarm + ")");
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = preferences.edit();
+
+        editor.putString(PERSIST_NOTIFICATION_ALARM_TYPE, appAlarm.getClass().getSimpleName());
+        if (appAlarm instanceof Day) {
+            Day day = (Day) appAlarm;
+            editor.putString(PERSIST_NOTIFICATION_DAY_ALARM_DATE, Analytics.calendarToDate(day.getDate()));
+        } else if (appAlarm instanceof OneTimeAlarm) {
+            OneTimeAlarm oneTimeAlarm = (OneTimeAlarm) appAlarm;
+            editor.putLong(PERSIST_NOTIFICATION_ONE_TIME_ALARM_ID, oneTimeAlarm.getId());
+        } else {
+            throw new IllegalArgumentException("Unexpected class " + appAlarm.getClass());
+        }
+
+        editor.commit();
+    }
+
+    public void persistRemove() {
+        Log.v(TAG, "persistRemove()");
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = preferences.edit();
+
+        editor.remove(PERSIST_NOTIFICATION_ALARM_TYPE);
+        editor.remove(PERSIST_NOTIFICATION_DAY_ALARM_DATE);
+        editor.remove(PERSIST_NOTIFICATION_ONE_TIME_ALARM_ID);
+
+        editor.commit();
     }
 
 }

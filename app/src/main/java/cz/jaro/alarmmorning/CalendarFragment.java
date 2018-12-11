@@ -194,6 +194,10 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
     public void onDismissBeforeRinging(AppAlarm appAlarm) {
         Log.d(TAG, "onDismissBeforeRinging(appAparm = " + appAlarm + ")");
+
+        int pos = getPosition(appAlarm); // TODO Maybe this needs to happen in every similar method
+        adapter.notifyItemChanged(pos);
+
         updatePositionOfNextAlarm();
     }
 

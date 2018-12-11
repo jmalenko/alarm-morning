@@ -12,13 +12,18 @@ import android.util.Log;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.model.AppAlarm;
+import cz.jaro.alarmmorning.model.AppAlarmFilter;
+import cz.jaro.alarmmorning.model.Day;
 import cz.jaro.alarmmorning.model.OneTimeAlarm;
 import cz.jaro.alarmmorning.receivers.AlarmReceiver;
 
+import static cz.jaro.alarmmorning.GlobalManager.STATE_DISMISSED;
+import static cz.jaro.alarmmorning.GlobalManager.STATE_DISMISSED_BEFORE_RINGING;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.beginningOfTomorrow;
 
 /**
@@ -134,6 +139,14 @@ public class SystemAlarm {
         }
     }
 
+    private void reset() {
+        Log.v(TAG, "reset()");
+
+        cancelSystemAlarm();
+
+        initialize();
+    }
+
     /*
      * Persistence
      * ===========
@@ -169,26 +182,85 @@ public class SystemAlarm {
         Calendar now = clock.now();
 
         GlobalManager globalManager = GlobalManager.getInstance();
-        AppAlarm appAlarm = globalManager.getNextAlarm(clock, null);
+        AppAlarm nextAlarmToRingWithoutCurrent = globalManager.getNextAlarm(clock, new AppAlarmFilter() { // TODO Workaround - Robolectric doesn't allow shadow of a class with lambda
+            @Override
+            public boolean match(AppAlarm appAlarm) {
+                Log.v(TAG, "   checking filter condition for " + appAlarm.getDateTime().getTime());
+                int state = globalManager.getState(appAlarm.getDateTime());
+                return state != STATE_DISMISSED_BEFORE_RINGING && state != STATE_DISMISSED;
+            }
+        });
 
-        if (appAlarm == null) {
+        AppAlarm nearestDismissedAlarm = findNearestDismissedAlarm(clock);
+
+        if (nextAlarmToRingWithoutCurrent == null) {
             Calendar resetTime = getResetTime(now);
 
-            return new NextAction(ACTION_SET_SYSTEM_ALARM, resetTime, null, null);
+            if (nearestDismissedAlarm == null || resetTime.before(nearestDismissedAlarm.getDateTime()))
+                return new NextAction(ACTION_SET_SYSTEM_ALARM, resetTime, null, null);
+            else
+                return new NextAction(ACTION_ALARM_TIME_OF_EARLY_DISMISSED_ALARM, nearestDismissedAlarm.getDateTime(), nearestDismissedAlarm.getDateTime(), nearestDismissedAlarm instanceof OneTimeAlarm ? ((OneTimeAlarm) nearestDismissedAlarm).getId() : null);
         } else {
-            Calendar alarmTime = appAlarm.getDateTime();
-            Long oneTimeAlarmId = appAlarm instanceof OneTimeAlarm ? ((OneTimeAlarm) appAlarm).getId() : null;
+            Calendar alarmTime = nextAlarmToRingWithoutCurrent.getDateTime();
+            Long oneTimeAlarmId = nextAlarmToRingWithoutCurrent instanceof OneTimeAlarm ? ((OneTimeAlarm) nextAlarmToRingWithoutCurrent).getId() : null;
 
             if (useNearFutureTime()) {
                 Calendar nearFutureTime = getNearFutureTime(alarmTime);
 
                 if (now.before(nearFutureTime)) {
-                    return new NextAction(ACTION_RING_IN_NEAR_FUTURE, nearFutureTime, alarmTime, oneTimeAlarmId);
+                    if (nearestDismissedAlarm == null || nearFutureTime.before(nearestDismissedAlarm.getDateTime()))
+                        return new NextAction(ACTION_RING_IN_NEAR_FUTURE, nearFutureTime, alarmTime, oneTimeAlarmId);
+                    else
+                        return new NextAction(ACTION_ALARM_TIME_OF_EARLY_DISMISSED_ALARM, nearestDismissedAlarm.getDateTime(), nearestDismissedAlarm.getDateTime(), nearestDismissedAlarm instanceof OneTimeAlarm ? ((OneTimeAlarm) nearestDismissedAlarm).getId() : null);
                 }
             }
 
-            return new NextAction(ACTION_RING, alarmTime, alarmTime, oneTimeAlarmId);
+            if (nearestDismissedAlarm == null || alarmTime.before(nearestDismissedAlarm.getDateTime()))
+                return new NextAction(ACTION_RING, alarmTime, alarmTime, oneTimeAlarmId);
+            else
+                return new NextAction(ACTION_ALARM_TIME_OF_EARLY_DISMISSED_ALARM, nearestDismissedAlarm.getDateTime(), nearestDismissedAlarm.getDateTime(), nearestDismissedAlarm instanceof OneTimeAlarm ? ((OneTimeAlarm) nearestDismissedAlarm).getId() : null);
         }
+    }
+
+    private AppAlarm findNearestDismissedAlarm(Clock clock) {
+        GlobalManager globalManager = GlobalManager.getInstance();
+        Calendar now = clock.now();
+
+        // Find the nearest dismissed alarm time
+        Calendar nearestDismissedAlarmCalendar = null;
+        Set<Long> dismissedAlarmTimes = globalManager.getDismissedAlarms();
+        for (Iterator<Long> iterator = dismissedAlarmTimes.iterator(); iterator.hasNext(); ) {
+            long dismissedAlarmTime = iterator.next();
+
+            Calendar dismissedAlarmCalendar = new GregorianCalendar();
+            dismissedAlarmCalendar.setTimeInMillis(dismissedAlarmTime);
+
+            if (now.before(dismissedAlarmCalendar)) {
+                if (nearestDismissedAlarmCalendar == null || dismissedAlarmCalendar.before(nearestDismissedAlarmCalendar)) {
+                    nearestDismissedAlarmCalendar = dismissedAlarmCalendar;
+                }
+            }
+        }
+
+        // Find the corresponding alarm
+        AppAlarm nearestDismissedAlarm = null;
+        // 1st: Try one-time alarms
+        List<OneTimeAlarm> oneTimeAlarms = globalManager.loadOneTimeAlarms(now);
+        for (OneTimeAlarm oneTimeAlarm : oneTimeAlarms) {
+            if (oneTimeAlarm.getDateTime().equals(nearestDismissedAlarmCalendar)) {
+                nearestDismissedAlarm = oneTimeAlarm;
+                break;
+            }
+        }
+        // 2nd: Try Day alarm
+        if (nearestDismissedAlarm == null) {
+            Day day = globalManager.loadDay(now);
+            if (day.getDateTime().equals(nearestDismissedAlarmCalendar)) {
+                nearestDismissedAlarm = day;
+            }
+        }
+
+        return nearestDismissedAlarm;
     }
 
     protected boolean nextActionShouldChange() {
@@ -265,9 +337,7 @@ public class SystemAlarm {
     public void onAlarmSet() {
         Log.d(TAG, "onAlarmSet()");
 
-        cancelSystemAlarm();
-
-        initialize();
+        reset();
     }
 
     public void onNearFuture() {
@@ -288,30 +358,7 @@ public class SystemAlarm {
     public void onDismissBeforeRinging() {
         Log.d(TAG, "onDismissBeforeRinging()");
 
-        cancelSystemAlarm();
-
-        GlobalManager globalManager = GlobalManager.getInstance();
-
-        // Find the nearest dismissed alarm
-        Calendar alarmTime = null;
-        Calendar now = globalManager.clock().now();
-        Set<Long> dismissedAlarms = globalManager.getDismissedAlarms();
-        for (Iterator<Long> iterator = dismissedAlarms.iterator(); iterator.hasNext(); ) {
-            long dismissedAlarm = iterator.next();
-
-            Calendar dismissedAlarmCalendar = new GregorianCalendar();
-            dismissedAlarmCalendar.setTimeInMillis(dismissedAlarm);
-            if (now.before(dismissedAlarmCalendar)) {
-                if (alarmTime == null || dismissedAlarmCalendar.before(alarmTime)) {
-                    alarmTime = dismissedAlarmCalendar;
-                }
-            }
-        }
-
-        AppAlarm alarmOfRingingAlarm = globalManager.getNextActionAlarm();
-        Long oneTimeAlarmId = alarmOfRingingAlarm instanceof OneTimeAlarm ? ((OneTimeAlarm) alarmOfRingingAlarm).getId() : null;
-
-        registerSystemAlarm(ACTION_ALARM_TIME_OF_EARLY_DISMISSED_ALARM, alarmTime, alarmTime, oneTimeAlarmId);
+        reset();
     }
 
     public static Calendar min(Calendar a, Calendar b) {

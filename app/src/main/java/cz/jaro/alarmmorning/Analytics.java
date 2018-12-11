@@ -22,8 +22,10 @@ import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.security.SecureRandom;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
@@ -776,6 +778,20 @@ public class Analytics {
     public static String calendarToDate(Calendar calendar) {
         SimpleDateFormat sdfTime = new SimpleDateFormat(DATE_FORMAT, Locale.US);
         return sdfTime.format(calendar.getTime());
+    }
+
+    public static Calendar dateStringToCalendar(String dateString) {
+        SimpleDateFormat sdfTime = new SimpleDateFormat(DATE_FORMAT, Locale.US);
+        try {
+            Date date = sdfTime.parse(dateString);
+
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(date);
+
+            return cal;
+        } catch (ParseException e) {
+            throw new Error("Error while parsing date string", e);
+        }
     }
 
     public static String calendarToTime(Calendar calendar) {

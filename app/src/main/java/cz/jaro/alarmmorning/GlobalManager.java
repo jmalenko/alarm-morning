@@ -808,8 +808,10 @@ public class GlobalManager {
 
         Context context = AlarmMorningApplication.getAppContext();
 
+        AppAlarm nextAlarmToRing = getNextAlarmToRing();
+
         Analytics analytics = new Analytics(context, Analytics.Event.Show, Analytics.Channel.Notification, Analytics.ChannelName.Alarm);
-        analytics.setAppAlarm(getNextAlarmToRing());
+        analytics.setAppAlarm(nextAlarmToRing);
         analytics.save();
 
         if (!force && isRingingOrSnoozed()) {
@@ -831,7 +833,7 @@ public class GlobalManager {
         }
 
         SystemNotification systemNotification = SystemNotification.getInstance(context);
-        systemNotification.onNearFuture();
+        systemNotification.onNearFuture(nextAlarmToRing);
     }
 
     /**
@@ -872,15 +874,15 @@ public class GlobalManager {
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
         systemAlarm.onDismissBeforeRinging();
 
-        SystemNotification systemNotification = SystemNotification.getInstance(context);
-        systemNotification.onDismissBeforeRinging(appAlarm);
-
         SystemAlarmClock systemAlarmClock = SystemAlarmClock.getInstance(context);
         systemAlarmClock.onDismissBeforeRinging();
 
+        SystemNotification systemNotification = SystemNotification.getInstance(context);
+        systemNotification.onDismissBeforeRinging(appAlarm);
+
         updateWidget(context);
 
-        updateCalendarActivity(context, AlarmMorningActivity.ACTION_DISMISS_BEFORE_RINGING);
+        updateCalendarActivity(context, AlarmMorningActivity.ACTION_DISMISS_BEFORE_RINGING, appAlarm);
 
         // Translate to STATE_FUTURE if in the near future
         AppAlarm nextAlarmToRing = getNextAlarmToRing();
@@ -932,8 +934,10 @@ public class GlobalManager {
             setState(STATE_RINGING, getAlarmTimeOfRingingAlarm());
         }
 
+        AppAlarm nextAlarmToRing = getNextAlarmToRing();
+
         Analytics analytics = new Analytics(context, Analytics.Event.Ring, Analytics.Channel.Time, Analytics.ChannelName.Alarm);
-        analytics.setAppAlarm(getNextAlarmToRing());
+        analytics.setAppAlarm(nextAlarmToRing);
         // TODO Analytics - add number of snoozes
         // TODO Analytics - add device location
         analytics.save();
@@ -942,7 +946,7 @@ public class GlobalManager {
         systemAlarm.onRing();
 
         SystemNotification systemNotification = SystemNotification.getInstance(context);
-        systemNotification.onRing();
+        systemNotification.onRing(nextAlarmToRing);
 
         if (isNew) {
             SystemAlarmClock systemAlarmClock = SystemAlarmClock.getInstance(context);
@@ -961,10 +965,12 @@ public class GlobalManager {
 
         Context context = AlarmMorningApplication.getAppContext();
 
+        AppAlarm nextAlarmToRing = getNextAlarmToRing();
+
         analytics.setContext(context);
         analytics.setEvent(Analytics.Event.Dismiss);
         analytics.set(Analytics.Param.Dismiss_type, Analytics.DISMISS__AFTER);
-        analytics.setAppAlarm(getNextAlarmToRing());
+        analytics.setAppAlarm(nextAlarmToRing);
         analytics.save();
 
         if (getState() == STATE_SNOOZED) {
@@ -976,7 +982,7 @@ public class GlobalManager {
         addDismissedAlarm(getAlarmTimeOfRingingAlarm());
 
         SystemNotification systemNotification = SystemNotification.getInstance(context);
-        systemNotification.onDismiss();
+        systemNotification.onDismiss(nextAlarmToRing);
 
         updateWidget(context);
 
@@ -1001,9 +1007,11 @@ public class GlobalManager {
 
         Context context = AlarmMorningApplication.getAppContext();
 
+        AppAlarm nextAlarmToRing = getNextAlarmToRing();
+
         analytics.setContext(context);
         analytics.setEvent(Analytics.Event.Snooze);
-        analytics.setAppAlarm(getNextAlarmToRing());
+        analytics.setAppAlarm(nextAlarmToRing);
         // TODO Analytics - add number of snoozes
         analytics.save();
 
@@ -1015,7 +1023,7 @@ public class GlobalManager {
         systemAlarm.onSnooze(ringAfterSnoozeTime);
 
         SystemNotification systemNotification = SystemNotification.getInstance(context);
-        systemNotification.onSnooze(ringAfterSnoozeTime);
+        systemNotification.onSnooze(nextAlarmToRing, ringAfterSnoozeTime);
 
         updateRingingActivity(context, RingActivity.ACTION_HIDE_ACTIVITY);
 
@@ -1033,6 +1041,8 @@ public class GlobalManager {
 
         Context context = AlarmMorningApplication.getAppContext();
 
+        AppAlarm nextAlarmToRing = getNextAlarmToRing();
+
         if (isRingingOrSnoozed()) {
             /* Note for Analytics - Situation: Alarm at 9:00 is snoozed and set at 10:00. Currently the events are in the order:
                  1. Set alarm to 10:00.
@@ -1040,12 +1050,12 @@ public class GlobalManager {
                Naturally, order should be switched. But it is implemented this way. */
             Analytics analytics = new Analytics(context, Analytics.Event.Dismiss, Analytics.Channel.External, Analytics.ChannelName.Alarm);
             analytics.set(Analytics.Param.Dismiss_type, Analytics.DISMISS__AUTO);
-            analytics.setAppAlarm(getNextAlarmToRing());
+            analytics.setAppAlarm(nextAlarmToRing);
             analytics.save();
         }
 
         SystemNotification systemNotification = SystemNotification.getInstance(context);
-        systemNotification.onAlarmCancel();
+        systemNotification.onAlarmCancel(nextAlarmToRing);
 
         SystemAlarmClock systemAlarmClock = SystemAlarmClock.getInstance(context);
         systemAlarmClock.onAlarmCancel();
@@ -1367,7 +1377,7 @@ public class GlobalManager {
      * Return the nearest {@link AppAlarm} with alarm such it matches the filter. Only the Days that are enabled and not in the past are considered, and all the
      * one-time alarms that are not in the past are considered.
      * <p>
-     * Note that there may be multiple alarms at the same data and time (one Day alarm + several one-time alarms) at the same time. Only one (the first found)
+     * Note that there may be multiple alarms at the same date and time (one Day alarm + several one-time alarms). Only one (the first found)
      * alarm is returned. This is OK because the important thing is the date and time of next alarm (and not the count or type).
      *
      * @param clock Clock
