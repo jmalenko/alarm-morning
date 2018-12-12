@@ -534,8 +534,8 @@ public class GlobalManager {
     }
 
     /*
-     * Exernal events
-     * ==============
+     * External events
+     * ===============
      */
 
     /**

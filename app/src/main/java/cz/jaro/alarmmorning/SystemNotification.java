@@ -320,21 +320,6 @@ public class SystemNotification {
     }
 
     /*
-     * External events
-     * ===============
-     */
-
-    public void onTimeOrTimeZoneChange() { // TODO 1 Implement here and in every manager. Create interface with all the on... methods that is implemented by the managers.
-
-        Log.d(TAG, "onTimeOrTimeZoneChange()");
-    }
-
-    private void onSystemTimeChange() { // TODO 1 Implement here and in every manager. Create interface with all the on... methods that is implemented by the managers.
-        Log.v(TAG, "onSystemTimeChange()");
-
-    }
-
-    /*
      * Other
      * =====
      */
