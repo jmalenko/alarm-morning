@@ -117,7 +117,7 @@ public class HolidaySelector extends LinearLayout implements AdapterView.OnItemS
             return;
         }
 
-        // TODO This is sometimes called twice. When Germany–Berlin is selected an then changed to Germany–Bavaria, this is called for spinner2 and spinner3
+        // TODO This is sometimes called twice. When Germany–Berlin is selected and then changed to Germany–Bavaria, this is called for spinner2 and spinner3
 
         HolidayAdapter holidayAdapter = (HolidayAdapter) parent.getAdapter();
         String path = holidayAdapter.positionToPreferenceString(position);

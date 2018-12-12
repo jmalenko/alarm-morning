@@ -151,8 +151,8 @@ public class GlobalManager {
         AppAlarm appAlarm = null;
         if (isRingingOrSnoozed()) {
             Log.v(TAG, "   loading the ringing or snoozed alarm");
-            // TODO 2 Improve architecture of one-time alarms (when it is changed while snoozed) - store the one-time alarm ID so we can return the proper object
-            // TODO Test: 1. set alarm to a time, 2. dismiss this alarm, 3. set alarm to the same time. Is it really working?
+            // FIXME 2 Improve architecture of one-time alarms (when it is changed while snoozed) - store the one-time alarm ID so we can return the proper object
+            // FIXME 2 Test: 1. set alarm to a time, 2. dismiss this alarm, 3. set alarm to the same time. Is it really working?
 
             Calendar alarmTimeOfRingingAlarm = getAlarmTimeOfRingingAlarm();
 
@@ -184,7 +184,7 @@ public class GlobalManager {
                 }
             }
         } else {
-            appAlarm = getNextAlarm(clock(), new AppAlarmFilter() { // TODO Workaround - Robolectric doesn't allow shadow of a class with lambda
+            appAlarm = getNextAlarm(clock(), new AppAlarmFilter() { // XXX Workaround - Robolectric doesn't allow shadow of a class with lambda
                 @Override
                 public boolean match(AppAlarm appAlarm) {
                     Log.v(TAG, "   checking filter condition for " + appAlarm.getDateTime().getTime());
@@ -205,7 +205,7 @@ public class GlobalManager {
     public AppAlarm getNextAlarm() {
         Log.v(TAG, "getNextAlarm()");
 
-        AppAlarm appAlarm = getNextAlarm(clock(), new AppAlarmFilter() { // TODO Workaround - Robolectric doesn't allow shadow of a class with lambda
+        AppAlarm appAlarm = getNextAlarm(clock(), new AppAlarmFilter() { // XXX Workaround - Robolectric doesn't allow shadow of a class with lambda
             @Override
             public boolean match(AppAlarm alarmTime) {
                 Log.v(TAG, "   checking filter condition for " + alarmTime.getDateTime().getTime());
@@ -448,7 +448,7 @@ public class GlobalManager {
     private void addDismissedAlarm(Calendar alarmTime) {
         Log.v(TAG, "addDismissedAlarm(alarmTime=" + alarmTime.getTime() + ")");
 
-        // XXX Currently there is an assumption: there is at most one alarm on a particular alarm time. With introduction of one-time alarms this is not true anymore. There may be large implications for entire app, not only for the dismissed alarms.
+        // FIXME 2 Currently there is an assumption: there is at most one alarm on a particular alarm time. With introduction of one-time alarms this is not true anymore. There may be large implications for entire app, not only for the dismissed alarms.
 
         modifyDismissedAlarm(dismissedAlarms ->
                 dismissedAlarms.add(alarmTime.getTimeInMillis())
@@ -889,7 +889,7 @@ public class GlobalManager {
         if (nextAlarmToRing != null && afterNearFuture(nextAlarmToRing.getDateTime())) {
             Log.i(TAG, "Immediately starting \"alarm in near future\" period.");
 
-            // TODO 2 Start "alarm in near future" period. We cannot handle 1. early dismissed alarm till alarm time and 2. next alarm in near period at the same time, because get/setNextAction can store only one of such alarm. Instead this notification will be displayed at "alarm time of early dismissed alarm" (remove it from there once this is fixed).
+            // FIXME Start "alarm in near future" period. We cannot handle 1. early dismissed alarm till alarm time and 2. next alarm in near period at the same time, because get/setNextAction can store only one of such alarm. Instead this notification will be displayed at "alarm time of early dismissed alarm" (remove it from there once this is fixed).
             Log.w(TAG, "We should show the \"alarm is near\" notification now. This is not supported. Instead, we show this notification at \"alarm time of early dismissed alarm\".");
         }
     }
@@ -1191,7 +1191,7 @@ public class GlobalManager {
     public void modifyOneTimeAlarmDateTime(OneTimeAlarm oneTimeAlarm, Analytics analytics) {
         Log.d(TAG, "modifyOneTimeAlarmDateTime()");
 
-        // TODO 2 Proposal: if changed to past, refactor to 1. dismiss the old alarm (call @onDismiss(), 2. set the new one
+        // FIXME 1 Proposal: if changed to past, refactor to 1. dismiss the old alarm (call @onDismiss(), 2. set the new one
 
         // When changing the date to past, then set the alarm as dismissed
         Calendar now = clock().now();
@@ -1223,7 +1223,7 @@ public class GlobalManager {
     public void modifyOneTimeAlarmName(OneTimeAlarm oneTimeAlarm, Analytics analytics) {
         Log.d(TAG, "modifyOneTimeAlarmName()");
 
-        // TODO Proposal: if changed to past, refactor to 1. dismiss the old alarm (call @onDismiss(), 2. set the new one
+        // FIXME 1 Proposal: if changed to past, refactor to 1. dismiss the old alarm (call @onDismiss(), 2. set the new one
 
         save(oneTimeAlarm, analytics);
 
@@ -1562,7 +1562,7 @@ public class GlobalManager {
         editor.commit();
 
         // Set defaults
-        // TODO Workaround - Robolectric hasn't implemented setDefaultValues() yet, we have to set each setting individually (as the need for testing arises)
+        // XXX Workaround - Robolectric hasn't implemented setDefaultValues() yet, we have to set each setting individually (as the need for testing arises)
 //        PreferenceManager.setDefaultValues(context, R.xml.preferences, true);
         editor = preferences.edit();
         editor.putString(SettingsActivity.PREF_HOLIDAY, SettingsActivity.PREF_HOLIDAY_NONE);

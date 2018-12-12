@@ -51,7 +51,7 @@ public class AlarmMorningActivity0Test extends FixedTimeTest {
 
         RecyclerView recyclerView = (RecyclerView) shadowActivity.findViewById(R.id.defaults_recycler_view);
 
-        // Hack: RecyclerView needs to be measured and layed out manually in Robolectric.
+        // XXX Workaround Robolectric - RecyclerView needs to be measured and laid out manually in Robolectric.
         // Source: http://stackoverflow.com/questions/27052866/android-robolectric-click-recyclerview-item
         recyclerView.measure(0, 0);
         recyclerView.layout(0, 0, 100, 10000);
@@ -75,7 +75,7 @@ public class AlarmMorningActivity0Test extends FixedTimeTest {
 
         RecyclerView recyclerView = (RecyclerView) shadowActivity.findViewById(R.id.calendar_recycler_view);
 
-        // Hack: RecyclerView needs to be measured and layed out manually in Robolectric.
+        // XXX Workaround Robolectric - RecyclerView needs to be measured and laid out manually in Robolectric.
         // Source: http://stackoverflow.com/questions/27052866/android-robolectric-click-recyclerview-item
         recyclerView.measure(0, 0);
         recyclerView.layout(0, 0, 100, 10000);

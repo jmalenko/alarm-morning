@@ -77,7 +77,7 @@ public abstract class FixedTimeTest {
         resetSingleton(NighttimeBell.class, "instance");
         resetSingleton(HolidayHelper.class, "instance");
 
-        // TODO The following is a workaround for a Robolectric bug. See https://github.com/robolectric/robolectric/issues/2068
+        // XXX Workaround - The following is a workaround for a Robolectric bug. See https://github.com/robolectric/robolectric/issues/2068
         // https://github.com/robolectric/robolectric/issues/1700
         // https://github.com/robolectric/robolectric/issues/2068
         // https://github.com/robolectric/robolectric/issues/2584

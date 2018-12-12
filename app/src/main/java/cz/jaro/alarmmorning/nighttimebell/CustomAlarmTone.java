@@ -121,7 +121,7 @@ public class CustomAlarmTone {
             String outAbsPath = outFile.getAbsolutePath();
             ContentValues contentValues = new ContentValues();
             contentValues.put(MediaStore.MediaColumns.DATA, outAbsPath);
-            contentValues.put(MediaStore.MediaColumns.TITLE, title); // TODO Workaround - Android does not support title localization. Therefore we use title in current locale
+            contentValues.put(MediaStore.MediaColumns.TITLE, title); // XXX Workaround - Android does not support title localization. Therefore we use title in current locale
             contentValues.put(MediaStore.MediaColumns.MIME_TYPE, mimeType);
             contentValues.put(MediaStore.Audio.Media.IS_ALARM, true);
             contentValues.put(MediaStore.Audio.Media.IS_NOTIFICATION, true);

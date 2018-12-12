@@ -275,7 +275,7 @@ public class HolidayHelper {
     }
 
     /**
-     * This s hack that allows getting a {@link Context} such that it's not passed as a method argument. The <code>Context</code> is needed to read holiday
+     * This is a hack that allows getting a {@link Context} such that it's not passed as a method argument. The <code>Context</code> is needed to read holiday
      * settings from {@link SharedPreferences} and clock from {@link GlobalManager}.
      *
      * @return Context

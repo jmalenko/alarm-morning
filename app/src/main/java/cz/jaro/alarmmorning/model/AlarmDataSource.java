@@ -181,7 +181,7 @@ public class AlarmDataSource {
         return oneTimeAlarm;
     }
 
-    // TODO Remove one-time alarms older than today (if we keep the passed alarms in calednar, or now) (but not the currently ringing one).
+    // TODO Remove one-time alarms older than today (if we keep the passed alarms in calendar, or now) (but not the currently ringing one).
 
     /**
      * Retrieve a set of {@code OneTimeAlarm}s objects from the database.
