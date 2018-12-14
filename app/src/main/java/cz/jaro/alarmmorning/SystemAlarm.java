@@ -361,10 +361,6 @@ public class SystemAlarm {
         reset();
     }
 
-    public static Calendar min(Calendar a, Calendar b) {
-        return a.before(b) ? a : b;
-    }
-
     public void onAlarmTimeOfEarlyDismissedAlarm() {
         Log.d(TAG, "onAlarmTimeOfEarlyDismissedAlarm()");
 
