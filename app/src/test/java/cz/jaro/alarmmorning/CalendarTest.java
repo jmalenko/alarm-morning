@@ -1137,7 +1137,7 @@ public class CalendarTest extends FixedTimeTest {
         TextView widgetDate = (TextView) view.findViewById(R.id.alarm_date);
 
         assertThat("Widget icon", shadowWidgetIconDrawable.getCreatedFromResId(), is(iconResId));
-        assertThat("Text visibility", widgetTime.getText().toString(), is(time));
+        assertThat("Time text", widgetTime.getText().toString(), is(time));
         if (date == null) {
             assertThat("Date visibility", widgetDate.getVisibility(), is(View.GONE));
         } else {
