@@ -351,6 +351,13 @@ public class GlobalManager {
     // Persisted state
     // ===============
 
+    /**
+     * Returns the state of the persisted alarm.
+     * <p>
+     * Warning: this method does not consider the set of dismissed alarms. In practice, the logic should also consider {@link #isDismissedAlarm(Calendar)}.
+     *
+     * @return State
+     */
     private int getState() {
         Log.v(TAG, "getState()");
         Context context = AlarmMorningApplication.getAppContext();
@@ -387,7 +394,7 @@ public class GlobalManager {
     }
 
     /**
-     * Resturns the alarm times of dismissed alarms.
+     * Returns the alarm times of dismissed alarms.
      *
      * @return Alarm times of dismissed alarms.
      */
@@ -403,6 +410,19 @@ public class GlobalManager {
             Log.w(TAG, "Error getting dismissed alarms", e);
             return new HashSet<>();
         }
+    }
+
+    /**
+     * Checks whether the there is dismissed alarm at a particular alarm time.
+     * <p>
+     * This is determined based on the set of dismissed alarm times.
+     *
+     * @param alarmTime Alarm time
+     * @return True if an alarm was dismissed at the alarm time.
+     */
+    public boolean isDismissedAlarm(Calendar alarmTime) {
+        Set<Long> dismissedAlarmTimes = getDismissedAlarms();
+        return dismissedAlarmTimes.contains(alarmTime.getTimeInMillis());
     }
 
     interface SetOperation {
@@ -476,7 +496,8 @@ public class GlobalManager {
      * <p>
      * Algorithm:
      * <p>
-     * 1. if the alarmTime is for last alarm then return the state of last alarm (same as {@link #getState()})
+     * 1. if the alarmTime is for last alarm then return the state of last alarm (same as {@link #getState()}); but if the alarmTime was dismissed then
+     * return {@link #STATE_DISMISSED_BEFORE_RINGING}.
      * <p>
      * 2. if the alarmTime is in the set of dismissed alarms then return {@link #STATE_DISMISSED} or {@link #STATE_DISMISSED_BEFORE_RINGING} depending on the
      * current time.
@@ -498,6 +519,11 @@ public class GlobalManager {
 
         if (stateAlarmTime.equals(alarmTime)) {
             Log.v(TAG, "   using saved state alarm time");
+
+            if (isDismissedAlarm(alarmTime)) {
+                return STATE_DISMISSED_BEFORE_RINGING; // TODO Properly return STATE_DISMISSED_BEFORE_RINGING or STATE_DISMISSED.
+            }
+
             return getState();
         }
 
@@ -889,8 +915,7 @@ public class GlobalManager {
         if (nextAlarmToRing != null && afterNearFuture(nextAlarmToRing.getDateTime())) {
             Log.i(TAG, "Immediately starting \"alarm in near future\" period.");
 
-            // FIXME Start "alarm in near future" period. We cannot handle 1. early dismissed alarm till alarm time and 2. next alarm in near period at the same time, because get/setNextAction can store only one of such alarm. Instead this notification will be displayed at "alarm time of early dismissed alarm" (remove it from there once this is fixed).
-            Log.w(TAG, "We should show the \"alarm is near\" notification now. This is not supported. Instead, we show this notification at \"alarm time of early dismissed alarm\".");
+            onNearFuture(false, false);
         }
     }
 

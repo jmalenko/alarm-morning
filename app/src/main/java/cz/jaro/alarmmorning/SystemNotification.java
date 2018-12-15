@@ -48,16 +48,13 @@ public class SystemNotification {
         return instance;
     }
 
-    private NotificationCompat.Builder buildNotification() {
-        GlobalManager globalManager = GlobalManager.getInstance();
-        AppAlarm nextAlarmToRing = globalManager.getNextAlarmToRing();
-
+    private NotificationCompat.Builder buildNotification(AppAlarm appAlarm) {
         Resources res = context.getResources();
-        String timeText = Localization.timeToString(nextAlarmToRing.getHour(), nextAlarmToRing.getMinute(), context);
+        String timeText = Localization.timeToString(appAlarm.getHour(), appAlarm.getMinute(), context);
 
         String contentTitle;
-        if (nextAlarmToRing instanceof OneTimeAlarm && ((OneTimeAlarm) nextAlarmToRing).getName() != null && !((OneTimeAlarm) nextAlarmToRing).getName().isEmpty()) {
-            contentTitle = res.getString(R.string.notification_title_with_name, timeText, ((OneTimeAlarm) nextAlarmToRing).getName());
+        if (appAlarm instanceof OneTimeAlarm && ((OneTimeAlarm) appAlarm).getName() != null && !((OneTimeAlarm) appAlarm).getName().isEmpty()) {
+            contentTitle = res.getString(R.string.notification_title_with_name, timeText, ((OneTimeAlarm) appAlarm).getName());
         } else {
             contentTitle = res.getString(R.string.notification_title, timeText);
         }
@@ -98,7 +95,7 @@ public class SystemNotification {
     protected void onNearFuture(AppAlarm appAlarm) {
         Log.d(TAG, "onNearFuture(appAlarm=" + appAlarm + ")");
 
-        NotificationCompat.Builder mBuilder = buildNotification();
+        NotificationCompat.Builder mBuilder = buildNotification(appAlarm);
 
         Resources res = context.getResources();
         String contentText = res.getString(R.string.notification_text_future);
@@ -123,24 +120,6 @@ public class SystemNotification {
 
         if (currentlyDisplayedNotificationIsAbout(appAlarm)) {
             hideNotification();
-
-            // Possibly display a following notification
-            GlobalManager globalManager = GlobalManager.getInstance();
-            AppAlarm nextAppAlarm = globalManager.getNextAlarmToRing();
-            if (nextAppAlarm != null) {
-                Clock clock = globalManager.clock();
-                Calendar now = clock.now();
-
-                Calendar alarmTime = nextAppAlarm.getDateTime();
-
-                if (SystemAlarm.useNearFutureTime(context)) {
-                    Calendar nearFutureTime = SystemAlarm.getNearFutureTime(context, alarmTime);
-
-                    if (nearFutureTime.before(now)) {
-                        onNearFuture(nextAppAlarm);
-                    }
-                }
-            }
         }
     }
 
@@ -173,7 +152,7 @@ public class SystemNotification {
     protected void onRing(AppAlarm appAlarm) {
         Log.d(TAG, "onRing(appAlarm=" + appAlarm + ")");
 
-        NotificationCompat.Builder mBuilder = buildNotification();
+        NotificationCompat.Builder mBuilder = buildNotification(appAlarm);
 
         Resources res = context.getResources();
         String contentText = res.getString(R.string.notification_text_ringing);
@@ -215,7 +194,7 @@ public class SystemNotification {
     public void onSnooze(AppAlarm appAlarm, Calendar ringAfterSnoozeTime) {
         Log.d(TAG, "onSnooze(appAlarm=" + appAlarm + ")");
 
-        NotificationCompat.Builder mBuilder = buildNotification();
+        NotificationCompat.Builder mBuilder = buildNotification(appAlarm);
 
         Resources res = context.getResources();
         String ringAfterSnoozeTimeText = Localization.timeToString(ringAfterSnoozeTime.get(Calendar.HOUR_OF_DAY), ringAfterSnoozeTime.get(Calendar.MINUTE), context);
@@ -327,10 +306,13 @@ public class SystemNotification {
     public void notifyCancelledAlarm() {
         Log.d(TAG, "notifyCancelledAlarm()");
 
-        NotificationCompat.Builder mBuilder = buildNotification();
-
         GlobalManager globalManager = GlobalManager.getInstance();
+
+        // FIXME Create test for this. These 2 lines seem inconsistent. Ideally, add method parameter with the alarm.
+        AppAlarm nextAlarmToRing = globalManager.getNextAlarmToRing();
         Calendar alarmTime = globalManager.getAlarmTimeOfRingingAlarm();
+
+        NotificationCompat.Builder mBuilder = buildNotification(nextAlarmToRing);
 
         Resources res = context.getResources();
         String timeText = Localization.timeToString(alarmTime.get(Calendar.HOUR_OF_DAY), alarmTime.get(Calendar.MINUTE), context);
