@@ -11,9 +11,11 @@ import org.robolectric.annotation.Config;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+import cz.jaro.alarmmorning.Analytics;
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.SystemAlarm;
 import cz.jaro.alarmmorning.clock.FixedClock;
+import cz.jaro.alarmmorning.model.OneTimeAlarm;
 import cz.jaro.alarmmorning.receivers.AlarmReceiver;
 import cz.jaro.alarmmorning.receivers.NotificationReceiver;
 import cz.jaro.alarmmorning.shadows.ShadowGlobalManager;
@@ -358,6 +360,17 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
     private void setAlarmToTomorrow() {
         Calendar date = new GregorianCalendar(YEAR, MONTH, DAY + 1, ONE_TIME_ALARM_HOUR + 1, ONE_TIME_ALARM_MINUTE + 1);
         setAlarm(date);
+    }
+
+    private void setAlarm(Calendar date) {
+        OneTimeAlarm oneTimeAlarm = new OneTimeAlarm();
+        oneTimeAlarm.setDate(date);
+        oneTimeAlarm.setHour(date.get(Calendar.HOUR_OF_DAY));
+        oneTimeAlarm.setMinute(date.get(Calendar.MINUTE));
+
+        Analytics analytics = new Analytics(Analytics.Channel.Test, Analytics.ChannelName.Calendar);
+
+        globalManager.createOneTimeAlarm(oneTimeAlarm, analytics);
     }
 
 }

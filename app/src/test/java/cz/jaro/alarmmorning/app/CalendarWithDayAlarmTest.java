@@ -18,10 +18,13 @@ import org.robolectric.shadows.ShadowActivity;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+import cz.jaro.alarmmorning.Analytics;
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.RingActivity;
 import cz.jaro.alarmmorning.SystemAlarm;
 import cz.jaro.alarmmorning.clock.FixedClock;
+import cz.jaro.alarmmorning.model.Day;
+import cz.jaro.alarmmorning.model.Defaults;
 import cz.jaro.alarmmorning.receivers.AlarmReceiver;
 import cz.jaro.alarmmorning.receivers.NotificationReceiver;
 import cz.jaro.alarmmorning.shadows.ShadowGlobalManager;
@@ -721,6 +724,25 @@ public class CalendarWithDayAlarmTest extends AlarmMorningAppTest {
     private void setAlarmToTomorrow() {
         Calendar date = new GregorianCalendar(YEAR, MONTH, DAY + 1, HOUR_DEFAULT + 1, MINUTE_DEFAULT + 1);
         setAlarm(date);
+    }
+
+    private void setAlarm(Calendar date) {
+        Day day = new Day();
+        day.setDate(date);
+        day.setState(Day.STATE_ENABLED);
+        day.setHourDay(date.get(Calendar.HOUR_OF_DAY));
+        day.setMinuteDay(date.get(Calendar.MINUTE));
+
+        Defaults defaults = new Defaults();
+        int dayOfWeek = date.get(Calendar.DAY_OF_WEEK);
+        defaults.setDayOfWeek(dayOfWeek);
+        defaults.setState(Defaults.STATE_DISABLED);
+
+        day.setDefaults(defaults);
+
+        Analytics analytics = new Analytics(Analytics.Channel.Test, Analytics.ChannelName.Calendar);
+
+        globalManager.modifyDayAlarm(day, analytics);
     }
 
 }

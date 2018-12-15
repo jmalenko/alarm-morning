@@ -51,7 +51,6 @@ import java.util.GregorianCalendar;
 
 import cz.jaro.alarmmorning.AlarmMorningActivity;
 import cz.jaro.alarmmorning.AlarmMorningActivityTest;
-import cz.jaro.alarmmorning.Analytics;
 import cz.jaro.alarmmorning.CalendarFragment;
 import cz.jaro.alarmmorning.DatePickerFragment;
 import cz.jaro.alarmmorning.FixedTimeTest;
@@ -61,8 +60,6 @@ import cz.jaro.alarmmorning.SettingsActivity;
 import cz.jaro.alarmmorning.TimePickerFragment;
 import cz.jaro.alarmmorning.WidgetProvider;
 import cz.jaro.alarmmorning.graphics.SlideButton;
-import cz.jaro.alarmmorning.model.Day;
-import cz.jaro.alarmmorning.model.Defaults;
 import cz.jaro.alarmmorning.receivers.AlarmReceiver;
 import cz.jaro.alarmmorning.receivers.NotificationReceiver;
 import cz.jaro.alarmmorning.receivers.VoidReceiver;
@@ -166,25 +163,6 @@ public class AlarmMorningAppTest extends FixedTimeTest {
         SharedPreferences.Editor editor = preferences.edit();
         editor.putInt(SettingsActivity.PREF_NEAR_FUTURE_TIME, minutes);
         editor.commit();
-    }
-
-    void setAlarm(Calendar date) {
-        Day day = new Day();
-        day.setDate(date);
-        day.setState(Day.STATE_ENABLED);
-        day.setHourDay(date.get(Calendar.HOUR_OF_DAY));
-        day.setMinuteDay(date.get(Calendar.MINUTE));
-
-        Defaults defaults = new Defaults();
-        int dayOfWeek = date.get(Calendar.DAY_OF_WEEK);
-        defaults.setDayOfWeek(dayOfWeek);
-        defaults.setState(Defaults.STATE_DISABLED);
-
-        day.setDefaults(defaults);
-
-        Analytics analytics = new Analytics(Analytics.Channel.Test, Analytics.ChannelName.Calendar);
-
-        globalManager.modifyDayAlarm(day, analytics);
     }
 
     int calendar_setDayAlarm(int itemPosition, int hourCheck, int minuteCheck, int hour, int minute) {
