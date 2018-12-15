@@ -56,7 +56,7 @@ public class AlarmMorningActivityTest extends FixedTimeTest {
         res.updateConfiguration(config, res.getDisplayMetrics());
     }
 
-    static void saveWizardPreference(boolean wizardPreference) {
+    public static void saveWizardPreference(boolean wizardPreference) {
         Context context = AlarmMorningApplication.getAppContext();
 
         // Set to default

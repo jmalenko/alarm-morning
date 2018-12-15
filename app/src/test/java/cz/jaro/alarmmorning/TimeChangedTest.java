@@ -16,6 +16,7 @@ import org.robolectric.shadows.ShadowAlarmManager;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+import cz.jaro.alarmmorning.app.CalendarWithDayAlarmTest;
 import cz.jaro.alarmmorning.clock.FixedClock;
 import cz.jaro.alarmmorning.model.AlarmDataSource;
 import cz.jaro.alarmmorning.model.DayTest;
@@ -38,7 +39,7 @@ import static org.junit.Assert.assertThat;
  * <p>
  * Tests are performed by changing time; the time zone is not changed.
  * <p>
- * Test only system alarm; other features are assumed to be covered in {@link CalendarTest}.
+ * Tests only system alarm; other features are assumed to be covered in {@link CalendarWithDayAlarmTest}.
  */
 @Config(shadows = {ShadowGlobalManager.class})
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
@@ -63,7 +64,7 @@ public class TimeChangedTest extends FixedTimeTest {
         // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
         consumeNextScheduledAlarm();
 
-        CalendarTest.setNearFuturePeriodPreferenceToZero(context);
+        CalendarWithDayAlarmTest.setNearFuturePeriodPreferenceToZero(context);
 
         setDefaultAlarms();
     }
@@ -92,7 +93,7 @@ public class TimeChangedTest extends FixedTimeTest {
         assertEquals(MINUTE, 0);
 
         // Check system alarm
-        CalendarTest.assertSystemAlarm(context, shadowAlarmManager, YEAR, MONTH, DAY, 4, 1, SystemAlarm.ACTION_RING);
+        CalendarWithDayAlarmTest.assertSystemAlarm(context, shadowAlarmManager, YEAR, MONTH, DAY, 4, 1, SystemAlarm.ACTION_RING);
     }
 
     @Test
@@ -106,7 +107,7 @@ public class TimeChangedTest extends FixedTimeTest {
         timeChangedReceiver.onReceive(context, intent);
 
         // Check system alarm
-        CalendarTest.assertSystemAlarm(context, shadowAlarmManager, YEAR, MONTH, DAY, 4, 1, SystemAlarm.ACTION_RING);
+        CalendarWithDayAlarmTest.assertSystemAlarm(context, shadowAlarmManager, YEAR, MONTH, DAY, 4, 1, SystemAlarm.ACTION_RING);
     }
 
     @Test
@@ -120,7 +121,7 @@ public class TimeChangedTest extends FixedTimeTest {
         timeChangedReceiver.onReceive(context, intent);
 
         // Check system alarm
-        CalendarTest.assertSystemAlarm(context, shadowAlarmManager, YEAR, MONTH - 1, 31, 10, 7, SystemAlarm.ACTION_RING);
+        CalendarWithDayAlarmTest.assertSystemAlarm(context, shadowAlarmManager, YEAR, MONTH - 1, 31, 10, 7, SystemAlarm.ACTION_RING);
     }
 
     @Test
@@ -134,7 +135,7 @@ public class TimeChangedTest extends FixedTimeTest {
         timeChangedReceiver.onReceive(context, intent);
 
         // Check system alarm
-        CalendarTest.assertSystemAlarm(context, shadowAlarmManager, YEAR, MONTH, DAY, 4, 1, SystemAlarm.ACTION_RING);
+        CalendarWithDayAlarmTest.assertSystemAlarm(context, shadowAlarmManager, YEAR, MONTH, DAY, 4, 1, SystemAlarm.ACTION_RING);
     }
 
     @Test
@@ -148,7 +149,7 @@ public class TimeChangedTest extends FixedTimeTest {
         timeChangedReceiver.onReceive(context, intent);
 
         // Check system alarm
-        CalendarTest.assertSystemAlarm(context, shadowAlarmManager, YEAR, MONTH, DAY, 4, 1, SystemAlarm.ACTION_RING);
+        CalendarWithDayAlarmTest.assertSystemAlarm(context, shadowAlarmManager, YEAR, MONTH, DAY, 4, 1, SystemAlarm.ACTION_RING);
     }
 
     @Test
@@ -162,7 +163,7 @@ public class TimeChangedTest extends FixedTimeTest {
         timeChangedReceiver.onReceive(context, intent);
 
         // Check system alarm
-        CalendarTest.assertSystemAlarm(context, shadowAlarmManager, YEAR, MONTH, DAY + 1, 5, 2, SystemAlarm.ACTION_RING);
+        CalendarWithDayAlarmTest.assertSystemAlarm(context, shadowAlarmManager, YEAR, MONTH, DAY + 1, 5, 2, SystemAlarm.ACTION_RING);
     }
 
     @Test
@@ -176,7 +177,7 @@ public class TimeChangedTest extends FixedTimeTest {
         timeChangedReceiver.onReceive(context, intent);
 
         // Check system alarm
-        CalendarTest.assertSystemAlarm(context, shadowAlarmManager, YEAR, MONTH - 1, 30, 9, 6, SystemAlarm.ACTION_RING);
+        CalendarWithDayAlarmTest.assertSystemAlarm(context, shadowAlarmManager, YEAR, MONTH - 1, 30, 9, 6, SystemAlarm.ACTION_RING);
     }
 
     @Test
@@ -190,7 +191,7 @@ public class TimeChangedTest extends FixedTimeTest {
         timeChangedReceiver.onReceive(context, intent);
 
         // Check system alarm
-        CalendarTest.assertSystemAlarm(context, shadowAlarmManager, YEAR, MONTH, DAY + 2, 6, 3, SystemAlarm.ACTION_RING);
+        CalendarWithDayAlarmTest.assertSystemAlarm(context, shadowAlarmManager, YEAR, MONTH, DAY + 2, 6, 3, SystemAlarm.ACTION_RING);
     }
 
     private void consumeNextScheduledAlarm() {

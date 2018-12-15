@@ -4,8 +4,8 @@ import org.junit.runners.Suite;
 import cz.jaro.alarmmorning.AlarmMorningActivity0Test;
 import cz.jaro.alarmmorning.AlarmMorningActivityTest;
 import cz.jaro.alarmmorning.BootReceiverTest;
-import cz.jaro.alarmmorning.CalendarTest;
-import cz.jaro.alarmmorning.CalendarWithOneTimeAlarmTest;
+import cz.jaro.alarmmorning.app.CalendarWithDayAlarmTest;
+import cz.jaro.alarmmorning.app.CalendarWithOneTimeAlarmTest;
 import cz.jaro.alarmmorning.clock.FixedClockTest;
 import cz.jaro.alarmmorning.clock.SystemClockTest;
 import cz.jaro.alarmmorning.holiday.HolidayHelper1HolidaysTest;
@@ -48,7 +48,7 @@ import cz.jaro.alarmmorning.model.GlobalManager1NextAlarm7TwoOneTimeAlarmsAtTheS
         GlobalManager1NextAlarm6TwoOneTimeAlarmsTest.class,
         GlobalManager1NextAlarm7TwoOneTimeAlarmsAtTheSameTimeTest.class,
 
-        CalendarTest.class,
+        CalendarWithDayAlarmTest.class,
         CalendarWithOneTimeAlarmTest.class,
 
         AlarmMorningActivity0Test.class,

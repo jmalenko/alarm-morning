@@ -1,52 +1,31 @@
-package cz.jaro.alarmmorning;
+package cz.jaro.alarmmorning.app;
 
 import android.app.Activity;
-import android.app.AlarmManager;
-import android.app.AlertDialog;
-import android.app.DatePickerDialog;
 import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.TimePickerDialog;
-import android.appwidget.AppWidgetManager;
-import android.appwidget.AppWidgetProviderInfo;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.robolectric.Robolectric;
-import org.robolectric.RuntimeEnvironment;
 import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowActivity;
-import org.robolectric.shadows.ShadowAlarmManager;
-import org.robolectric.shadows.ShadowAppWidgetManager;
-import org.robolectric.shadows.ShadowDatePickerDialog;
-import org.robolectric.shadows.ShadowNotificationManager;
-import org.robolectric.shadows.ShadowTimePickerDialog;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+import cz.jaro.alarmmorning.R;
+import cz.jaro.alarmmorning.RingActivity;
+import cz.jaro.alarmmorning.SystemAlarm;
 import cz.jaro.alarmmorning.clock.FixedClock;
-import cz.jaro.alarmmorning.graphics.SlideButton;
-import cz.jaro.alarmmorning.model.OneTimeAlarm;
 import cz.jaro.alarmmorning.receivers.AlarmReceiver;
 import cz.jaro.alarmmorning.receivers.NotificationReceiver;
 import cz.jaro.alarmmorning.shadows.ShadowGlobalManager;
-import cz.jaro.alarmmorning.wizard.Wizard;
 
 import static cz.jaro.alarmmorning.GlobalManager.HORIZON_DAYS;
 import static cz.jaro.alarmmorning.model.DayTest.DAY;
@@ -56,17 +35,18 @@ import static cz.jaro.alarmmorning.model.DayTest.MONTH;
 import static cz.jaro.alarmmorning.model.DayTest.YEAR;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
-import static org.robolectric.Robolectric.buildActivity;
 
 // FIXME Fix all tests
 // TODO Migrate tests to Robolectric 4. http://robolectric.org/blog/2018/10/25/robolectric-4-0/ and http://robolectric.org/automated-migration/
 
 /**
- * Tests of alarm management in UI such that only one one-time alarm is used.
+ * Tests of alarm management in UI.
+ * <p>
+ * One one-time alarm is used.
  */
 @Config(shadows = {ShadowGlobalManager.class})
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
+public class CalendarWithOneTimeAlarmTest extends AlarmMorningAppTest {
     /*
     Overview of times:
 
@@ -100,116 +80,8 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
 
     */
 
-    Context context;
-
-    AlarmManager alarmManager;
-    ShadowAlarmManager shadowAlarmManager;
-
-    NotificationManager notificationManager;
-    ShadowNotificationManager shadowNotificationManager;
-
-    AppWidgetManager appWidgetManager;
-    ShadowAppWidgetManager shadowAppWidgetManager;
-
-    Activity activity;
-    ShadowActivity shadowActivity;
-
-    // Items in CalendarFragment of AlarmMorningActivity
-    RecyclerView recyclerView;
-
-    View item;
-
-    TextView textDate;
-    TextView textDoW;
-    TextView textTime;
-    TextView textState;
-    EditText textName;
-    TextView textComment;
-    LinearLayout headerDate;
-
-    // Items in RingActivity
-    TextView textAlarmTime;
-    TextView textOneTimeAlarmName;
-    TextView textNextCalendar;
-    TextView textMuted;
-
-    ImageButton snoozeButton;
-    SlideButton dismissButton;
-
     final int ONE_TIME_ALARM_HOUR = HOUR + 3;
     final int ONE_TIME_ALARM_MINUTE = 30;
-
-    @Before
-    public void before() {
-        super.before();
-
-        AlarmMorningActivityTest.saveWizardPreference(!Wizard.PREF_WIZARD_DEFAULT);
-
-        context = RuntimeEnvironment.application.getApplicationContext();
-
-        AlarmMorningActivityTest.setLocale(context, "en", "US");
-
-        alarmManager = (AlarmManager) RuntimeEnvironment.application.getSystemService(Context.ALARM_SERVICE);
-        shadowAlarmManager = Shadows.shadowOf(alarmManager);
-
-        notificationManager = (NotificationManager) RuntimeEnvironment.application.getSystemService(Context.NOTIFICATION_SERVICE);
-        shadowNotificationManager = Shadows.shadowOf(notificationManager);
-
-        appWidgetManager = AppWidgetManager.getInstance(context);
-        shadowAppWidgetManager = Shadows.shadowOf(appWidgetManager);
-
-        AppWidgetProviderInfo appWidgetProviderInfo = new AppWidgetProviderInfo();
-        appWidgetProviderInfo.provider = new ComponentName(context, WidgetProvider.class);
-        shadowAppWidgetManager.addInstalledProvider(appWidgetProviderInfo);
-    }
-
-    @After
-    public void after() {
-        super.after();
-
-        // Close ring activity
-        if (activity instanceof RingActivity) {
-            RingActivity ringActivity = (RingActivity) this.activity;
-            ringActivity.shutdown();
-        }
-
-        // Cancel all notifications
-        notificationManager.cancelAll();
-    }
-
-    @Test
-    public void t000_prerequisities() {
-        assertThat("Shadow widget manager contains a provider", shadowAppWidgetManager.getInstalledProviders().size(), is(1));
-    }
-
-    @Test
-    public void t001_noAlarmIsScheduled() {
-        // Start activity
-        startActivityCalendar();
-
-        // Check calendar
-        int count = recyclerView.getChildCount();
-        assertThat("The number of items", count, is(HORIZON_DAYS));
-
-        assertCalendarItem(0, "2/1", "Mon", "Off", "", null, ""); // Today
-        assertCalendarItem(1, "2/2", "Tue", "Off", "", null, ""); // Tomorrow
-        assertCalendarItem(2, "2/3", "Wed", "Off", "", null, ""); // 3rd day
-        assertCalendarItem(3, "2/4", "Thu", "Off", "", null, ""); // 4th day
-        assertCalendarItem(4, "2/5", "Fri", "Off", "", null, ""); // 5th day
-
-        // Check system alarm
-        assertSystemAlarmCount(1);
-        assertSystemAlarm(YEAR, MONTH, DAY + 1, 0, 0, SystemAlarm.ACTION_SET_SYSTEM_ALARM);
-
-        // Check system alarm clock
-        assertSystemAlarmClockNone();
-
-        // Check notification
-        assertNotificationCount(0);
-
-        // Check widget
-        assertWidget(R.drawable.ic_alarm_off_white, "No alarm", null);
-    }
 
     @Test
     public void t100_addAlarm() {
@@ -276,7 +148,7 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
     @Test
     public void t102_addAlarmWithZeroAdvancePeriod() {
         // Set the preference to zero
-        CalendarTest.setNearFuturePeriodPreferenceToZero(context);
+        CalendarWithDayAlarmTest.setNearFuturePeriodPreferenceToZero(context);
 
         // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
         consumeNextScheduledAlarm();
@@ -2132,214 +2004,6 @@ public class CalendarWithOneTimeAlarmTest extends FixedTimeTest {
     private void setAlarmToTomorrow() {
         Calendar date = new GregorianCalendar(YEAR, MONTH, DAY + 1, ONE_TIME_ALARM_HOUR + 1, ONE_TIME_ALARM_MINUTE + 1);
         setAlarm(date);
-    }
-
-    private void setAlarm(Calendar date) {
-        OneTimeAlarm oneTimeAlarm = new OneTimeAlarm();
-        oneTimeAlarm.setDate(date);
-        oneTimeAlarm.setHour(date.get(Calendar.HOUR_OF_DAY));
-        oneTimeAlarm.setMinute(date.get(Calendar.MINUTE));
-
-        Analytics analytics = new Analytics(Analytics.Channel.Test, Analytics.ChannelName.Calendar);
-
-        globalManager.createOneTimeAlarm(oneTimeAlarm, analytics);
-    }
-
-    private void startActivityRing(Calendar alarmTime) {
-        Intent ringIntent = new Intent(context, RingActivity.class);
-        ringIntent.putExtra(RingActivity.ALARM_TIME, alarmTime);
-
-        activity = buildActivity(RingActivity.class, ringIntent).setup().get();
-        shadowActivity = Shadows.shadowOf(activity);
-
-        AlarmMorningActivityTest.setLocale(activity, "en", "US");
-
-        textDate = (TextView) activity.findViewById(R.id.date);
-        textTime = (TextView) activity.findViewById(R.id.time);
-        textAlarmTime = (TextView) activity.findViewById(R.id.alarmTime);
-        textOneTimeAlarmName = (TextView) activity.findViewById(R.id.oneTimeAlarmName);
-        textNextCalendar = (TextView) activity.findViewById(R.id.nextCalendar);
-        textMuted = (TextView) activity.findViewById(R.id.muted);
-
-        snoozeButton = (ImageButton) activity.findViewById(R.id.snoozeButton);
-        dismissButton = (SlideButton) activity.findViewById(R.id.dismissButton);
-    }
-
-    private void startActivityCalendar() {
-        activity = Robolectric.setupActivity(AlarmMorningActivity.class);
-        shadowActivity = Shadows.shadowOf(activity);
-
-        recyclerView = (RecyclerView) shadowActivity.findViewById(R.id.calendar_recycler_view);
-
-        refreshRecyclerView();
-    }
-
-    private void refreshRecyclerView() {
-        CalendarTest.refreshRecyclerView(recyclerView);
-    }
-
-    private void loadItemAtPosition(int position) {
-        item = recyclerView.getChildAt(position);
-
-        textDate = (TextView) item.findViewById(R.id.textDate);
-        textDoW = (TextView) item.findViewById(R.id.textDayOfWeekCal);
-        textTime = (TextView) item.findViewById(R.id.textTimeCal);
-        textState = (TextView) item.findViewById(R.id.textState);
-        textName = (EditText) item.findViewById(R.id.textName);
-        textComment = (TextView) item.findViewById(R.id.textComment);
-        headerDate = (LinearLayout) item.findViewById(R.id.headerDate);
-    }
-
-    private void clickContextMenu(int id) {
-        CalendarTest.clickContextMenu(recyclerView, id);
-    }
-
-    private void consumeNextScheduledAlarm() {
-        CalendarTest.consumeNextScheduledAlarm(shadowAlarmManager);
-    }
-
-    private void assertCalendarItem(int position, String date, String dow, String time, String state, String name, String comment) {
-        loadItemAtPosition(position);
-        assertThat("Date", textDate.getText(), is(date));
-        assertThat("DoW", textDoW.getText(), is(dow));
-        assertThat("Time", textTime.getText(), is(time));
-        assertThat("State", textState.getText(), is(state));
-        if (name == null)
-            assertThat("Name visibility", textName.getVisibility(), is(View.GONE));
-        else {
-            assertThat("Name visibility", textName.getVisibility(), is(View.VISIBLE));
-            assertThat("Name", textName.getText().toString(), is(name));
-        }
-        assertThat("Comment", textComment.getText(), is(comment));
-    }
-
-    private void assertSystemAlarm(int year, int month, int day, int hour, int minute, String action) {
-        CalendarTest.assertSystemAlarm(context, shadowAlarmManager, year, month, day, hour, minute, action);
-    }
-
-    private void assertSystemAlarmCount(int count) {
-        CalendarTest.assertSystemAlarmCount(shadowAlarmManager, count);
-    }
-
-    private void assertSystemAlarmClock(int year, int month, int day, int hour, int minute) {
-        CalendarTest.assertSystemAlarmClock(context, alarmManager, shadowAlarmManager, year, month, day, hour, minute);
-    }
-
-    private void assertSystemAlarmClockNone() {
-        CalendarTest.assertSystemAlarmClockNone(alarmManager);
-    }
-
-    private void assertNotificationCount(int count) {
-        CalendarTest.assertNotificationCount(shadowNotificationManager, count);
-    }
-
-    private void assertNotification(Notification notification, String bigContentTitle, String bigContentText) {
-        CalendarTest.assertNotification(notification, bigContentTitle, bigContentText);
-    }
-
-    private void assertNotificationActionCount(Notification notification, int count) {
-        CalendarTest.assertNotificationActionCount(notification, count);
-    }
-
-    private void assertNotificationAction(Notification notification, int index, String title, String actionString) {
-        CalendarTest.assertNotificationAction(context, notification, index, title, actionString);
-    }
-
-    private void assertWidget(int iconResId, String time, String date) {
-        CalendarTest.assertWidget(context, shadowAppWidgetManager, iconResId, time, date);
-    }
-
-    private void picker_setDate(int yearCheck, int monthCheck, int dayCheck, int year, int month, int day) {
-        DatePickerFragment datePickerFragment = (DatePickerFragment) activity.getFragmentManager().findFragmentByTag("datePicker");
-
-        DatePickerDialog dialog = (DatePickerDialog) datePickerFragment.getDialog();
-        ShadowDatePickerDialog shadowDialog = Shadows.shadowOf(dialog);
-
-        // Check presets
-        assertThat("Preset year", shadowDialog.getYear(), is(yearCheck));
-        assertThat("Preset month", shadowDialog.getMonthOfYear(), is(monthCheck));
-        assertThat("Preset day", shadowDialog.getDayOfMonth(), is(dayCheck));
-
-        // Change the date
-        dialog.updateDate(year, month, day);
-
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
-    }
-
-    private int calendar_setDate(int itemPosition, int yearCheck, int monthCheck, int dayCheck, int year, int month, int day) {
-        // Start activity
-        startActivityCalendar();
-
-        int itemCount = recyclerView.getChildCount();
-
-        // Context menu
-        loadItemAtPosition(itemPosition);
-
-        headerDate.performClick();
-
-        // Set date
-        picker_setDate(yearCheck, monthCheck, dayCheck, year, month, day);
-
-        refreshRecyclerView();
-
-        return itemCount;
-    }
-
-    private void picker_setTime(int hourCheck, int minuteCheck, int hour, int minute) {
-        // Time picker
-        TimePickerFragment timePickerFragment = (TimePickerFragment) activity.getFragmentManager().findFragmentByTag("timePicker");
-
-        TimePickerDialog dialog = (TimePickerDialog) timePickerFragment.getDialog();
-        ShadowTimePickerDialog shadowDialog = Shadows.shadowOf(dialog);
-
-        // Check presets
-        assertThat("Preset hour", shadowDialog.getHourOfDay(), is(hourCheck));
-        assertThat("Preset minute", shadowDialog.getMinute(), is(minuteCheck));
-
-        // Change the time
-        dialog.updateTime(hour, minute);
-
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
-    }
-
-    private int calendar_setTime(int itemPosition, int hourCheck, int minuteCheck, int hour, int minute) {
-        // Start activity
-        startActivityCalendar();
-
-        int itemCount = recyclerView.getChildCount();
-
-        // Context menu
-        loadItemAtPosition(itemPosition);
-
-        item.performClick();
-
-        // Set time
-        picker_setTime(hourCheck, minuteCheck, hour, minute);
-
-        refreshRecyclerView();
-
-        return itemCount;
-    }
-
-    private int calendar_addOneTimeAlarm(int itemPosition, int hourCheck, int minuteCheck, int hour, int minute) {
-        // Start activity
-        startActivityCalendar();
-
-        int itemCount = recyclerView.getChildCount();
-
-        // Context menu
-        loadItemAtPosition(itemPosition);
-
-        item.performLongClick(); // Show context menu
-
-        clickContextMenu(R.id.action_day_add_alarm); // Select the item in context menu
-
-        // Set time
-        picker_setTime(hourCheck, minuteCheck, hour, minute);
-
-        refreshRecyclerView();
-
-        return itemCount;
     }
 
 }
