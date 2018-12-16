@@ -865,7 +865,7 @@ public class GlobalManager {
     /**
      * Dismiss the alarm.
      * <p>
-     * Automatically chooses between calling {@link #onDismiss(Analytics)} and {@link #onDismissBeforeRinging(AppAlarm, Analytics)}.
+     * Automatically chooses between calling {@link #onDismiss(AppAlarm, Analytics)} and {@link #onDismissBeforeRinging(AppAlarm, Analytics)}.
      *
      * @param appAlarm  The alarm to be dismissed
      * @param analytics Analytics
@@ -873,11 +873,10 @@ public class GlobalManager {
     public void onDismissAny(AppAlarm appAlarm, Analytics analytics) {
         Log.d(TAG, "onDismissAny()");
 
-        AppAlarm nextAlarmToRing = getNextAlarmToRing();
         Calendar now = clock().now();
 
-        if (now.after(nextAlarmToRing.getDateTime())) {
-            onDismiss(analytics);
+        if (now.after(appAlarm.getDateTime())) {
+            onDismiss(appAlarm, analytics);
         } else {
             onDismissBeforeRinging(appAlarm, analytics);
         }
@@ -988,14 +987,19 @@ public class GlobalManager {
     public void onDismiss(Analytics analytics) {
         Log.d(TAG, "onDismiss()");
 
-        Context context = AlarmMorningApplication.getAppContext();
-
         AppAlarm nextAlarmToRing = getNextAlarmToRing();
+        onDismiss(nextAlarmToRing, analytics);
+    }
+
+    public void onDismiss(AppAlarm appAlarm, Analytics analytics) {
+        Log.d(TAG, "onDismiss()");
+
+        Context context = AlarmMorningApplication.getAppContext();
 
         analytics.setContext(context);
         analytics.setEvent(Analytics.Event.Dismiss);
         analytics.set(Analytics.Param.Dismiss_type, Analytics.DISMISS__AFTER);
-        analytics.setAppAlarm(nextAlarmToRing);
+        analytics.setAppAlarm(appAlarm);
         analytics.save();
 
         if (getState() == STATE_SNOOZED) {
@@ -1007,7 +1011,7 @@ public class GlobalManager {
         addDismissedAlarm(getAlarmTimeOfRingingAlarm());
 
         SystemNotification systemNotification = SystemNotification.getInstance(context);
-        systemNotification.onDismiss(nextAlarmToRing);
+        systemNotification.onDismiss(appAlarm);
 
         updateWidget(context);
 
@@ -1216,16 +1220,7 @@ public class GlobalManager {
     public void modifyOneTimeAlarmDateTime(OneTimeAlarm oneTimeAlarm, Analytics analytics) {
         Log.d(TAG, "modifyOneTimeAlarmDateTime()");
 
-        // FIXME 1 Proposal: if changed to past, refactor to 1. dismiss the old alarm (call @onDismiss(), 2. set the new one
-
-        // When changing the date to past, then set the alarm as dismissed
-        Calendar now = clock().now();
-        if (oneTimeAlarm.getDateTime().before(now)) {
-            setState(STATE_DISMISSED, oneTimeAlarm.getDateTime());
-            addDismissedAlarm(oneTimeAlarm.getDateTime());
-        } else {
-            setState(STATE_FUTURE, oneTimeAlarm.getDateTime());
-        }
+        setState(STATE_FUTURE, oneTimeAlarm.getDateTime());
 
         save(oneTimeAlarm, analytics);
 
@@ -1237,6 +1232,13 @@ public class GlobalManager {
         updateCalendarActivity(context, AlarmMorningActivity.EVENT_MODIFY_ONE_TIME_ALARM_DATETIME, oneTimeAlarm);
 
         onAlarmSet();
+
+        // If the the datetime changed to past then properly dismiss the alarm
+        Calendar now = clock().now();
+        if (oneTimeAlarm.getDateTime().before(now)) {
+            Analytics analytics2 = new Analytics(Analytics.Channel.Time, Analytics.ChannelName.Alarm);
+            onDismiss(oneTimeAlarm, analytics2);
+        }
     }
 
     /**
@@ -1247,8 +1249,6 @@ public class GlobalManager {
      */
     public void modifyOneTimeAlarmName(OneTimeAlarm oneTimeAlarm, Analytics analytics) {
         Log.d(TAG, "modifyOneTimeAlarmName()");
-
-        // FIXME 1 Proposal: if changed to past, refactor to 1. dismiss the old alarm (call @onDismiss(), 2. set the new one
 
         save(oneTimeAlarm, analytics);
 
