@@ -401,7 +401,7 @@ public class GlobalManager {
             }
 
             return dismissedAlarms;
-        } catch (JSONException e) {
+        } catch (JSONException | ClassCastException e) {
             Log.w(TAG, "Error getting dismissed alarms", e);
             return new HashSet<>();
         }
