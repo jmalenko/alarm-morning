@@ -158,27 +158,7 @@ public class GlobalManager {
             Log.v(TAG, "   loading the ringing or snoozed alarm");
 
             AppAlarm ringingAlarm = getRingingAlarm();
-
-            // 1. Try the Day first...
-
-            Day day = dataSource.loadDay(clock().now());
-            if (day.isEnabled() && day.getDateTime().equals(ringingAlarm.getDateTime())) {
-                appAlarm = day;
-            } else {
-                // 2. Try to find the one-time alarm with this alarm time
-
-                List<OneTimeAlarm> oneTimeAlarms = loadOneTimeAlarms(null);
-                for (OneTimeAlarm oneTimeAlarm : oneTimeAlarms) {
-                    if (oneTimeAlarm.getDateTime().equals(ringingAlarm.getDateTime())) {
-                        appAlarm = oneTimeAlarm;
-                        break;
-                    }
-                }
-                if (appAlarm == null) {
-                    // 3. The only remaining possibility is the the one-time alarm was snoozed and it's time was changed.
-                    appAlarm = getNextAction().appAlarm;
-                }
-            }
+            return ringingAlarm;
         } else {
             appAlarm = getNextAlarm(clock(), new AppAlarmFilter() { // XXX Workaround - Robolectric doesn't allow shadow of a class with lambda
                 @Override
