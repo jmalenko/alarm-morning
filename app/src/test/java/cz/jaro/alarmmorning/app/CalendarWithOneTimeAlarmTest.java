@@ -81,8 +81,8 @@ public class CalendarWithOneTimeAlarmTest extends AlarmMorningAppTest {
 
     */
 
-    final int ONE_TIME_ALARM_HOUR = HOUR + 3;
-    final int ONE_TIME_ALARM_MINUTE = 30;
+    public static final int ONE_TIME_ALARM_HOUR = HOUR + 3;
+    public static final int ONE_TIME_ALARM_MINUTE = 30;
 
     @Test
     public void t100_addAlarm() {

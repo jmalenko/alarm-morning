@@ -59,6 +59,11 @@ public class OneTimeAlarm extends AppAlarm {
         return name;
     }
 
+    /**
+     * Set alarm time.
+     *
+     * @param alarmTime Alarm time in UTC.
+     */
     public void setAlarmTime(Calendar alarmTime) {
         setAlarmTime(alarmTime.getTimeInMillis());
     }

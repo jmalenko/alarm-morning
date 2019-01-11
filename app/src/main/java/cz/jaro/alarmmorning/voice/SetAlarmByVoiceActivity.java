@@ -8,18 +8,22 @@ import android.provider.AlarmClock;
 import android.util.Log;
 
 import java.util.Calendar;
+import java.util.TimeZone;
 
 import cz.jaro.alarmmorning.AlarmMorningActivity;
 import cz.jaro.alarmmorning.Analytics;
+import cz.jaro.alarmmorning.CalendarAdapter;
 import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.Localization;
 import cz.jaro.alarmmorning.R;
+import cz.jaro.alarmmorning.calendar.CalendarUtils;
 import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.graphics.Blink;
 import cz.jaro.alarmmorning.model.OneTimeAlarm;
 
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.roundDown;
 import static cz.jaro.alarmmorning.model.Day.VALUE_UNSET;
+import static cz.jaro.alarmmorning.model.OneTimeAlarm.UTC;
 
 /**
  * Set alarm time. The alarm time is passed as an argument in intent. The activity interacts with the user via voice; visual is static.
@@ -30,11 +34,11 @@ public class SetAlarmByVoiceActivity extends Activity {
 
     private Calendar alarmTime;
 
-    private int hour;
-    private int minute;
-    private int seconds;
     private boolean skip_ui;
     private boolean ok;
+    private Calendar now;
+
+    private static int ROUND_IF_LESS_THAN__SECONDS = 120;
 
     // TODO Google Now allows cancelling the timer (that was just set).
 
@@ -42,8 +46,12 @@ public class SetAlarmByVoiceActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        hour = VALUE_UNSET;
-        minute = VALUE_UNSET;
+        GlobalManager globalManager = GlobalManager.getInstance();
+        Clock clock = globalManager.clock();
+        now = clock.now();
+
+        String name = null;
+
         ok = true;
 
         Intent intent = getIntent();
@@ -51,9 +59,13 @@ public class SetAlarmByVoiceActivity extends Activity {
             Log.w(TAG, "Intent is null");
             ok = false;
         } else if (AlarmClock.ACTION_SET_ALARM.equals(intent.getAction())) {
-            hour = readParam(intent, AlarmClock.EXTRA_HOUR);
-            minute = readParam(intent, AlarmClock.EXTRA_MINUTES);
             skip_ui = intent.getBooleanExtra(AlarmClock.EXTRA_SKIP_UI, false);
+
+            int hour = readParam(intent, AlarmClock.EXTRA_HOUR);
+            int minute = readParam(intent, AlarmClock.EXTRA_MINUTES);
+            name = intent.getStringExtra(AlarmClock.EXTRA_MESSAGE);
+
+            setAlarmTime(hour, minute);
         } else if (AlarmClock.ACTION_SET_TIMER.equals(intent.getAction())) {
             // If the extra is not specified then show all timers. (This is not mentioned in the reference.)
             if (!intent.hasExtra(AlarmClock.EXTRA_LENGTH)) {
@@ -62,8 +74,18 @@ public class SetAlarmByVoiceActivity extends Activity {
                 finish();
                 return;
             }
-            seconds = readParam(intent, AlarmClock.EXTRA_LENGTH);
+
             skip_ui = intent.getBooleanExtra(AlarmClock.EXTRA_SKIP_UI, false);
+
+            int seconds = readParam(intent, AlarmClock.EXTRA_LENGTH);
+            name = intent.getStringExtra(AlarmClock.EXTRA_MESSAGE);
+
+            setAlarmTime(seconds);
+
+            if (name == null) {
+                long diff = alarmTime.getTimeInMillis() - now.getTimeInMillis();
+                name = CalendarAdapter.formatTimeDifference(diff, getResources());
+            }
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (!isVoiceInteraction()) {
                 Log.w(TAG, "Not voice interaction");
@@ -73,7 +95,17 @@ public class SetAlarmByVoiceActivity extends Activity {
 
         // Save alarm time
         if (ok) {
-            saveTime();
+            // Round to whole minute if set less or equal to 2 minutes in the future
+            if (ROUND_IF_LESS_THAN__SECONDS * 1000 <= alarmTime.getTimeInMillis() - now.getTimeInMillis()) {
+                roundDown(alarmTime, Calendar.SECOND);
+            } else {
+                roundDown(alarmTime, Calendar.MILLISECOND);
+            }
+
+            // Save
+            Analytics analytics = new Analytics(Analytics.Channel.External, Analytics.ChannelName.Voice);
+
+            addOneTimeAlarm(alarmTime, name, analytics);
         }
     }
 
@@ -131,56 +163,48 @@ public class SetAlarmByVoiceActivity extends Activity {
         }
     }
 
-    private void saveTime() {
-        GlobalManager globalManager = GlobalManager.getInstance();
-        Clock clock = globalManager.clock();
-        Calendar now = clock.now();
-
-        // Calculate alarm time
+    /**
+     * Sets the alarm time to hour:minute. The date is chosen such that the alram time is the earliest possible, now or in future.
+     *
+     * @param hour   Hour
+     * @param minute Minute
+     */
+    private void setAlarmTime(int hour, int minute) {
+        // Adjust alarm time from no
         alarmTime = (Calendar) now.clone();
 
-        Intent intent = getIntent();
-        switch (intent.getAction()) {
-            case AlarmClock.ACTION_SET_ALARM:
-                alarmTime.set(Calendar.HOUR_OF_DAY, hour);
-                alarmTime.set(Calendar.MINUTE, minute);
-                if (alarmTime.before(now)) {
-                    alarmTime.add(Calendar.DATE, 1);
-                }
-                break;
-            case AlarmClock.ACTION_SET_TIMER:
-                if (120 <= seconds) {
-                    alarmTime.add(Calendar.SECOND, seconds);
-                } else {
-                    alarmTime.add(Calendar.SECOND, seconds);
-                    if (alarmTime.get(Calendar.SECOND) <= 30) {
-                        if (alarmTime.before(now)) {
-                            alarmTime.add(Calendar.MINUTE, 1);
-                        }
-                    } else {
-                        alarmTime.add(Calendar.MINUTE, 1);
-                    }
-                }
-                break;
+        alarmTime.set(Calendar.HOUR_OF_DAY, hour);
+        alarmTime.set(Calendar.MINUTE, minute);
+        if (alarmTime.before(now)) {
+            alarmTime.add(Calendar.DATE, 1);
         }
-        roundDown(alarmTime, Calendar.SECOND);
-
-        // Save
-        Analytics analytics = new Analytics(Analytics.Channel.External, Analytics.ChannelName.Voice);
-
-        addOneTimeAlarm(alarmTime, analytics);
     }
 
-    public static void addOneTimeAlarm(Calendar saveAlarmTime, Analytics analytics) {
-        GlobalManager globalManager = GlobalManager.getInstance();
-        Clock clock = globalManager.clock();
-        Calendar now = clock.now();
+    /**
+     * Sets the alarm time to seconds from now.
+     *
+     * @param seconds Seconds
+     */
+    private void setAlarmTime(int seconds) {
+        // Adjust alarm time from no
+        alarmTime = (Calendar) now.clone();
 
-        // Set
+        alarmTime.add(Calendar.SECOND, seconds);
+    }
+
+    public static void addOneTimeAlarm(Calendar saveAlarmTime, String name, Analytics analytics) {
+        GlobalManager globalManager = GlobalManager.getInstance();
+
+        // Convert alarm time to UTC
+        TimeZone utcTZ = TimeZone.getTimeZone(UTC);
+        Calendar alarmTimeUTC = Calendar.getInstance(utcTZ);
+
+        CalendarUtils.copyAllFields(saveAlarmTime, alarmTimeUTC);
+
+        // Create one-time alarm
         OneTimeAlarm oneTimeAlarm = new OneTimeAlarm();
-        oneTimeAlarm.setDate(now);
-        oneTimeAlarm.setHour(saveAlarmTime.get(Calendar.HOUR_OF_DAY));
-        oneTimeAlarm.setMinute(saveAlarmTime.get(Calendar.MINUTE));
+        oneTimeAlarm.setAlarmTime(alarmTimeUTC);
+        oneTimeAlarm.setName(name);
 
         // Save
         globalManager.createOneTimeAlarm(oneTimeAlarm, analytics);

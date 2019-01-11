@@ -228,12 +228,18 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
 
     @NonNull
     String getTimeToAlarm(AppAlarm appAlarm) {
-        String messageText;
         long diff = appAlarm.getTimeToRing(fragment.clock());
+
+        String messageText = formatTimeDifference(diff, fragment.getResources());
+        return messageText;
+    }
+
+    @NonNull
+    public static String formatTimeDifference(long diff, Resources res) {
+        String messageText;
 
         TimeDifference timeDifference = new TimeDifference(diff);
         String sign = timeDifference.isNegative() ? "–" : "";
-        Resources res = fragment.getResources();
 
         if (timeDifference.days > 0) {
             messageText = res.getString(R.string.time_to_ring_message_days, timeDifference.days, timeDifference.hours, sign);
