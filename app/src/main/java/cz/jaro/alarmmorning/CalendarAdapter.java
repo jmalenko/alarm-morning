@@ -239,14 +239,14 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         String messageText;
 
         TimeDifference timeDifference = new TimeDifference(diff);
-        String sign = timeDifference.isNegative() ? "–" : "";
+        String sign = timeDifference.isNegative() ? res.getString(R.string.negative_sign) : "";
 
         if (timeDifference.days > 0) {
-            messageText = res.getString(R.string.time_to_ring_message_days, timeDifference.days, timeDifference.hours, sign);
+            messageText = sign + res.getString(R.string.time_to_ring_message_days, timeDifference.days, timeDifference.hours);
         } else if (timeDifference.hours > 0) {
-            messageText = res.getString(R.string.time_to_ring_message_hours, timeDifference.hours, timeDifference.minutes, sign);
+            messageText = sign + res.getString(R.string.time_to_ring_message_hours, timeDifference.hours, timeDifference.minutes);
         } else if (timeDifference.minutes > 0) {
-            messageText = res.getString(R.string.time_to_ring_message_minutes, timeDifference.minutes, timeDifference.seconds, sign);
+            messageText = sign + res.getString(R.string.time_to_ring_message_minutes, timeDifference.minutes, timeDifference.seconds);
         } else {
             messageText = res.getString(R.string.time_to_ring_message_seconds, timeDifference.seconds, sign);
         }

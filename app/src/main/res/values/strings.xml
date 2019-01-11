@@ -139,10 +139,11 @@
     <string name="time_to_ring_toast_passed">This alarm is set to passed time; it will not ring</string>
     <string name="time_to_ring_toast_removed">The alarm was removed</string>
 
-    <string name="time_to_ring_message_days"><xliff:g example="–" id="sign">%3$s</xliff:g><xliff:g example="1" id="days">%1$d</xliff:g>d <xliff:g example="2" id="hours">%2$d</xliff:g>h</string>
-    <string name="time_to_ring_message_hours"><xliff:g example="–" id="sign">%3$s</xliff:g><xliff:g example="2" id="hours">%1$d</xliff:g>h <xliff:g example="3" id="minutes">%2$d</xliff:g>m</string>
-    <string name="time_to_ring_message_minutes"><xliff:g example="–" id="sign">%3$s</xliff:g><xliff:g example="3" id="minutes">%1$d</xliff:g>m <xliff:g example="4" id="seconds">%2$d</xliff:g>s</string>
-    <string name="time_to_ring_message_seconds"><xliff:g example="–" id="sign">%2$s</xliff:g><xliff:g example="4" id="seconds">%1$d</xliff:g>s</string>
+    <string name="time_to_ring_message_days"><xliff:g example="1" id="days">%1$d</xliff:g>d <xliff:g example="2" id="hours">%2$d</xliff:g>h</string>
+    <string name="time_to_ring_message_hours"><xliff:g example="2" id="hours">%1$d</xliff:g>h <xliff:g example="3" id="minutes">%2$d</xliff:g>m</string>
+    <string name="time_to_ring_message_minutes"><xliff:g example="3" id="minutes">%1$d</xliff:g>m <xliff:g example="4" id="seconds">%2$d</xliff:g>s</string>
+    <string name="time_to_ring_message_seconds"><xliff:g example="4" id="seconds">%1$d</xliff:g>s</string>
+    <string name="negative_sign" translatable="false">-</string>
 
     <string name="tomorrow">Tomorrow</string>
     <string name="holiday">Holiday</string>
