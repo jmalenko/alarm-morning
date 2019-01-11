@@ -248,7 +248,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         } else if (timeDifference.minutes > 0) {
             messageText = sign + res.getString(R.string.time_to_ring_message_minutes, timeDifference.minutes, timeDifference.seconds);
         } else {
-            messageText = res.getString(R.string.time_to_ring_message_seconds, timeDifference.seconds, sign);
+            messageText = sign + res.getString(R.string.time_to_ring_message_seconds, timeDifference.seconds, sign);
         }
 
         return messageText;

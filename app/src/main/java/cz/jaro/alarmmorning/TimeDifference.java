@@ -39,6 +39,9 @@ public class TimeDifference {
 
         length = 1000;
         seconds = remaining / length;
+
+        if (negative && days == 0 && hours == 0 && minutes == 0 && seconds == 0)
+            negative = false;
     }
 
     public long getDays() {
