@@ -27,6 +27,8 @@ import cz.jaro.alarmmorning.receivers.NotificationReceiver;
 import cz.jaro.alarmmorning.shadows.ShadowGlobalManager;
 
 import static cz.jaro.alarmmorning.GlobalManager.HORIZON_DAYS;
+import static cz.jaro.alarmmorning.app.CalendarWithOneTimeAlarmTest.ONE_TIME_ALARM_HOUR;
+import static cz.jaro.alarmmorning.app.CalendarWithOneTimeAlarmTest.ONE_TIME_ALARM_MINUTE;
 import static cz.jaro.alarmmorning.model.DayTest.DAY;
 import static cz.jaro.alarmmorning.model.DayTest.HOUR;
 import static cz.jaro.alarmmorning.model.DayTest.MONTH;
@@ -74,9 +76,6 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
     ---+-----------------------+-------------------+--------------------------->
 
     */
-
-    final int ONE_TIME_ALARM_HOUR = HOUR + 3;
-    final int ONE_TIME_ALARM_MINUTE = 30;
 
     private void shared_t101_addTwoAlarms_BothInNearPeriod() {
         // Check calendar
