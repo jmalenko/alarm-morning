@@ -216,7 +216,8 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         if (appAlarm instanceof Day && day.isHoliday() && day.getState() == Day.STATE_RULE) {
             commentText = day.getHolidayDescription();
         } else {
-            if (fragment.isPositionWithNextAlarm(position)) {
+            if (fragment.isPositionWithNextAlarm(position) &&
+                    !(appAlarm instanceof OneTimeAlarm && (state == GlobalManager.STATE_DISMISSED_BEFORE_RINGING || state == GlobalManager.STATE_DISMISSED))) {
                 commentText = getTimeToAlarm(appAlarm);
             } else {
                 commentText = "";

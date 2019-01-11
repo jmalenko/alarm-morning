@@ -29,7 +29,6 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -128,21 +127,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         List<OneTimeAlarm> oneTimeAlarms = globalManager.loadOneTimeAlarms(beginningOfToday);
         items.addAll(oneTimeAlarms);
 
-        // Sort
-        Collections.sort(items, new Comparator<AppAlarm>() {
-            public int compare(AppAlarm appAlarm, AppAlarm appAlarm2) {
-                Calendar c1 = appAlarm.getDateTime();
-                Calendar c2 = appAlarm2.getDateTime();
-                // On a particular date, Day should be first
-                if (onTheSameDate(c1, c2) && (appAlarm instanceof Day || appAlarm2 instanceof Day)) {
-                    return appAlarm instanceof Day ? -1 : 1;
-                }
-                // Natural order
-                return c1.before(c2)
-                        ? -1
-                        : c2.before(c1) ? 1 : 0;
-            }
-        });
+        Collections.sort(items);
     }
 
     @Override
@@ -203,12 +188,12 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
     public void onAlarmTimeOfEarlyDismissedAlarm(AppAlarm appAlarm) {
         Log.d(TAG, "onAlarmTimeOfEarlyDismissedAlarm(appAparm = " + appAlarm + ")");
-        updateNextAlarmItem();
+        invalidateItemsWithNextAlarm();
     }
 
     public void onRing(AppAlarm appAlarm) {
         Log.d(TAG, "onRing(appAparm = " + appAlarm + ")");
-        updateNextAlarmItem();
+        invalidateItemsWithNextAlarm();
     }
 
     public void onDismiss(AppAlarm appAlarm) {
@@ -218,7 +203,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
     public void onSnooze(AppAlarm appAlarm) {
         Log.d(TAG, "onSnooze(appAparm = " + appAlarm + ")");
-        updateNextAlarmItem();
+        invalidateItemsWithNextAlarm();
     }
 
     public void onCancel(AppAlarm appAlarm) {
@@ -297,22 +282,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         recyclerView.removeViewAt(pos); // TODO This line should not be necessary, but the (one-time alarm) tests fail without this line. However some comments stress that his line implies an annoying glitch in the real usage by user. Look at https://stackoverflow.com/questions/31367599/how-to-update-recyclerview-adapter-data . Maybe remove this line and add the 4th line: adapter.notifyItemRangeChanged(pos, items.size());
         adapter.notifyItemRemoved(pos);
 
-        // Update positionNextAlarm
-        List<Integer> positionNextAlarmNew = new ArrayList<>();
-        for (int i = 0; i < positionNextAlarm.size(); i++) {
-            Integer p = positionNextAlarm.get(i);
-            if (p < pos)
-                positionNextAlarmNew.add(i, p);
-            else if (p == pos) { /* nothing */ } else
-                positionNextAlarmNew.add(i, p - 1);
-        }
-        positionNextAlarm = positionNextAlarmNew;
-
-        // Update positionAction
-        if (positionAction < pos) { /* nothing */ } else if (positionAction == pos)
-            positionAction = POSITION_UNSET;
-        else
-            positionAction--;
+        // Updating positionNextAlarm and positionAction is not necessary now as immediately onAlarmSet() is called (which does this)
     }
 
     public void onModifyOneTimeAlarmDateTime(OneTimeAlarm oneTimeAlarm) {
@@ -517,7 +487,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         }
     }
 
-    private void updateNextAlarmItem() {
+    private void invalidateItemsWithNextAlarm() {
         for (int pos : positionNextAlarm) {
             adapter.notifyItemChanged(pos);
         }
@@ -697,7 +667,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
         GlobalManager globalManager = GlobalManager.getInstance();
         AppAlarm appAlarmAtPosition = loadPosition(positionAction);
-        int state = globalManager.getState(appAlarmAtPosition.getDateTime());
+        int state = globalManager.getState(appAlarmAtPosition);
         boolean presetNap = appAlarmAtPosition instanceof Day && menuAction == R.id.action_day_set_time && (
                 positionAction == 0 && (((Day) appAlarmAtPosition).isEnabled()
                         ? (state == GlobalManager.STATE_SNOOZED || state == GlobalManager.STATE_DISMISSED || state == GlobalManager.STATE_DISMISSED_BEFORE_RINGING)
@@ -966,7 +936,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         MenuItem addAlarm = menu.findItem(R.id.action_day_add_alarm);
 
         GlobalManager globalManager = GlobalManager.getInstance();
-        int state = globalManager.getState(appAlarm.getDateTime());
+        int state = globalManager.getState(appAlarm);
 
         switch (state) {
             case GlobalManager.STATE_FUTURE:

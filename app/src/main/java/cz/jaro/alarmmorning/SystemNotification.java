@@ -163,8 +163,8 @@ public class SystemNotification {
         Intent intent = new Intent(context, NotificationReceiver.class);
         intent.setAction(NotificationReceiver.ACTION_CLICK_NOTIFICATION);
         intent.putExtra(NotificationReceiver.EXTRA_ACTIVITY, NotificationReceiver.EXTRA_ACTIVITY__RING);
-        intent.putExtra(RingActivity.ALARM_TIME, globalManager.getAlarmTimeOfRingingAlarm()); // We must pass this to the activity as it might have been destroyed
-        AppAlarm alarmOfRingingAlarm = globalManager.getNextActionAlarm();
+        intent.putExtra(RingActivity.ALARM_TIME, appAlarm.getDateTime()); // We must pass this to the activity as it might have been destroyed // TODO review this
+        AppAlarm alarmOfRingingAlarm = globalManager.getNextAction().appAlarm;
         String name = alarmOfRingingAlarm instanceof OneTimeAlarm ? ((OneTimeAlarm) alarmOfRingingAlarm).getName() : null;
         intent.putExtra(RingActivity.ALARM_NAME, name); // We must pass this to the activity as it might have been destroyed
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -284,7 +284,7 @@ public class SystemNotification {
                     onNearFuture(oneTimeAlarm);
                 }
             } else {
-                int state = globalManager.getState(alarmTime);
+                int state = globalManager.getState(oneTimeAlarm);
                 switch (state) {
                     case GlobalManager.STATE_RINGING:
                         onRing(oneTimeAlarm);
@@ -303,20 +303,14 @@ public class SystemNotification {
      * =====
      */
 
-    public void notifyCancelledAlarm() {
-        Log.d(TAG, "notifyCancelledAlarm()");
+    public void notifyCancelledAlarm(AppAlarm appAlarm) {
+        Log.d(TAG, "notifyCancelledAlarm(appAlarm=" + appAlarm + ")");
 
-        GlobalManager globalManager = GlobalManager.getInstance();
-
-        // FIXME Create test for this. These 2 lines seem inconsistent. Ideally, add method parameter with the alarm.
-        AppAlarm nextAlarmToRing = globalManager.getNextAlarmToRing();
-        Calendar alarmTime = globalManager.getAlarmTimeOfRingingAlarm();
-
-        NotificationCompat.Builder mBuilder = buildNotification(nextAlarmToRing);
+        NotificationCompat.Builder mBuilder = buildNotification(appAlarm);
 
         Resources res = context.getResources();
-        String timeText = Localization.timeToString(alarmTime.get(Calendar.HOUR_OF_DAY), alarmTime.get(Calendar.MINUTE), context);
-        String dateText = Localization.dateToStringVeryShort(res, alarmTime.getTime());
+        String timeText = Localization.timeToString(appAlarm.getDateTime().get(Calendar.HOUR_OF_DAY), appAlarm.getDateTime().get(Calendar.MINUTE), context);
+        String dateText = Localization.dateToStringVeryShort(res, appAlarm.getDateTime().getTime());
         String contentTitle = res.getString(R.string.notification_title_long, timeText, dateText);
         mBuilder.setContentTitle(contentTitle);
 
@@ -398,7 +392,7 @@ public class SystemNotification {
         editor.putString(PERSIST_NOTIFICATION_ALARM_TYPE, appAlarm.getClass().getSimpleName());
         if (appAlarm instanceof Day) {
             Day day = (Day) appAlarm;
-            editor.putString(PERSIST_NOTIFICATION_DAY_ALARM_DATE, Analytics.calendarToDate(day.getDate()));
+            editor.putString(PERSIST_NOTIFICATION_DAY_ALARM_DATE, Analytics.calendarToStringDate(day.getDate()));
         } else if (appAlarm instanceof OneTimeAlarm) {
             OneTimeAlarm oneTimeAlarm = (OneTimeAlarm) appAlarm;
             editor.putLong(PERSIST_NOTIFICATION_ONE_TIME_ALARM_ID, oneTimeAlarm.getId());

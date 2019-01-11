@@ -229,7 +229,7 @@ public class Analytics {
         mPayload.putInt(Param.Version.name(), versionCode);
 
         Calendar now = now();
-        String utcTime = calendarToUTC(now);
+        String utcTime = calendarToStringUTC(now);
         mPayload.putString(Param.Datetime_UTC.name(), utcTime);
 
         mPayload.putString(Param.Datetime.name(), now.getTime().toString());
@@ -346,7 +346,7 @@ public class Analytics {
 
         Calendar alarmTime = day.getDateTime();
 
-        String alarmDateString = calendarToDate(alarmTime);
+        String alarmDateString = calendarToStringDate(alarmTime);
         mPayload.putString(Param.Alarm_date.name(), alarmDateString);
 
         String alarmTimeString = calendarToTime(alarmTime);
@@ -438,7 +438,7 @@ public class Analytics {
     public Analytics setOneTimeAlarm(OneTimeAlarm oneTimeAlarm) {
         Calendar alarmTime = oneTimeAlarm.getDateTime();
 
-        String alarmDateString = calendarToDate(alarmTime);
+        String alarmDateString = calendarToStringDate(alarmTime);
         mPayload.putString(Param.Alarm_date.name(), alarmDateString);
 
         String alarmTimeString = calendarToTime(alarmTime);
@@ -770,12 +770,12 @@ public class Analytics {
         return new String(result);
     }
 
-    public static String calendarToUTC(Calendar calendar) {
+    public static String calendarToStringUTC(Calendar calendar) {
         SimpleDateFormat sdfTime = new SimpleDateFormat(DATE_FORMAT_UTC, Locale.US);
         return sdfTime.format(calendar.getTime());
     }
 
-    public static String calendarToDate(Calendar calendar) {
+    public static String calendarToStringDate(Calendar calendar) {
         SimpleDateFormat sdfTime = new SimpleDateFormat(DATE_FORMAT, Locale.US);
         return sdfTime.format(calendar.getTime());
     }

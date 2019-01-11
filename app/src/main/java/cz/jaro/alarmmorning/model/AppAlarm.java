@@ -1,14 +1,18 @@
 package cz.jaro.alarmmorning.model;
 
+import android.support.annotation.NonNull;
+
 import java.util.Calendar;
 
 import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.clock.Clock;
 
+import static cz.jaro.alarmmorning.calendar.CalendarUtils.onTheSameDate;
+
 /**
  * Represents an alarm time.
  */
-public abstract class AppAlarm {
+public abstract class AppAlarm implements Comparable {
 
     /**
      * Return the date and time of the alarm.
@@ -59,6 +63,8 @@ public abstract class AppAlarm {
      */
     abstract public void setMinute(int minute);
 
+    public abstract String getPersistenceId();
+
     /**
      * Check if the alarm time is passed, e.g. if the alarm time was in past (or the alarm is now).
      * <p>
@@ -98,5 +104,35 @@ public abstract class AppAlarm {
         Calendar now = clock.now();
 
         return alarmTime1.getTimeInMillis() - now.getTimeInMillis();
+    }
+
+    /**
+     * Compares the alarm times of two alarms.
+     * <p>
+     * Note: the alarm states (enabled/disabled) are ignored.
+     *
+     * @param o AppAlarm to compare with
+     * @return -1 if this alarm time is before the alarm time of o, 0 if the alarm time are at the same time, 1 otherwise.
+     */
+    @Override
+    public int compareTo(@NonNull Object o) {
+        if (!(o instanceof AppAlarm))
+            throw new ClassCastException("Cannot compare ApPAlarm with non-AppAlarm");
+
+        AppAlarm o1 = this;
+        AppAlarm o2 = (AppAlarm) o;
+
+        Calendar c1 = o1.getDateTime();
+        Calendar c2 = o2.getDateTime();
+
+        // On a particular date, Day should be first
+        if (onTheSameDate(c1, c2) && (o1 instanceof Day || o2 instanceof Day)) {
+            return o1 instanceof Day ? -1 : 1;
+        }
+
+        // Natural ordering
+        return c1.before(c2)
+                ? -1
+                : c2.before(c1) ? 1 : 0;
     }
 }

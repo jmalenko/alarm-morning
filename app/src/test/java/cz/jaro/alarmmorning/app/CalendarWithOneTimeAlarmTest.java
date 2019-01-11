@@ -38,7 +38,6 @@ import static cz.jaro.alarmmorning.model.DayTest.YEAR;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-// FIXME Fix all tests
 // TODO Migrate tests to Robolectric 4. http://robolectric.org/blog/2018/10/25/robolectric-4-0/ and http://robolectric.org/automated-migration/
 
 /**
@@ -284,6 +283,35 @@ public class CalendarWithOneTimeAlarmTest extends AlarmMorningAppTest {
 
         // Check widget
         assertWidget(R.drawable.ic_alarm_off_white, "No alarm", null);
+    }
+
+    // Set alarm to an alarm time of a previously dismissed alarm
+    @Test
+    public void t221_addAlarm_AtTheTimeOfAPreviouslyDismissedAlarm() {
+        t220_disable_ofDistantAlarm();
+
+        // Save day
+        setAlarmToToday();
+
+        refreshRecyclerView();
+
+        // Check calendar
+        assertThat("The number of items", recyclerView.getChildCount(), is(HORIZON_DAYS + 1));
+
+        assertCalendarItem(0, "2/1", "Mon", "Off", "", null, ""); // Today
+        assertCalendarItem(1, "", "", "4:30 AM", "", "", "3h 30m"); // The one-time alarm
+        assertCalendarItem(2, "2/2", "Tue", "Off", "", null, ""); // Tomorrow
+
+        // Check system alarm
+        assertSystemAlarmCount(2);
+        assertSystemAlarm(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR - 2, ONE_TIME_ALARM_MINUTE, SystemAlarm.ACTION_RING_IN_NEAR_FUTURE);
+        assertSystemAlarmClock(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE);
+
+        // Check notification
+        assertNotificationCount(0);
+
+        // Check widget
+        assertWidget(R.drawable.ic_alarm_white, "4:30 AM", null);
     }
 
     private int shared_t240_setTime_ofDistantAlarm(int hour, int minute) {

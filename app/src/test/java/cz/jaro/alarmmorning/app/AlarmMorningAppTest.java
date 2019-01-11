@@ -185,8 +185,14 @@ public class AlarmMorningAppTest extends FixedTimeTest {
     }
 
     void startActivityRing(Calendar alarmTime) {
+        startActivityRing(alarmTime, null);
+    }
+
+    void startActivityRing(Calendar alarmTime, String alarmName) {
         Intent ringIntent = new Intent(context, RingActivity.class);
         ringIntent.putExtra(RingActivity.ALARM_TIME, alarmTime);
+        if (alarmName != null)
+            ringIntent.putExtra(RingActivity.ALARM_NAME, alarmName);
 
         activity = buildActivity(RingActivity.class, ringIntent).setup().get();
         shadowActivity = Shadows.shadowOf(activity);
@@ -277,13 +283,13 @@ public class AlarmMorningAppTest extends FixedTimeTest {
         assertThat("Date", textDate.getText(), is(date));
         assertThat("DoW", textDoW.getText(), is(dow));
         assertThat("Time", textTime.getText(), is(time));
-        assertThat("State", textState.getText(), is(state));
         if (name == null)
             assertThat("Name visibility", textName.getVisibility(), is(View.GONE));
         else {
             assertThat("Name visibility", textName.getVisibility(), is(View.VISIBLE));
             assertThat("Name", textName.getText().toString(), is(name));
         }
+        assertThat("State", textState.getText(), is(state));
         assertThat("Comment", textComment.getText(), is(comment));
     }
 

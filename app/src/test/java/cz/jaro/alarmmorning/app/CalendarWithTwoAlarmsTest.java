@@ -1,18 +1,24 @@
 package cz.jaro.alarmmorning.app;
 
+import android.app.Activity;
 import android.app.Notification;
 import android.content.Intent;
+import android.view.View;
 
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
+import org.robolectric.Robolectric;
+import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
+import org.robolectric.shadows.ShadowActivity;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import cz.jaro.alarmmorning.Analytics;
 import cz.jaro.alarmmorning.R;
+import cz.jaro.alarmmorning.RingActivity;
 import cz.jaro.alarmmorning.SystemAlarm;
 import cz.jaro.alarmmorning.clock.FixedClock;
 import cz.jaro.alarmmorning.model.OneTimeAlarm;
@@ -72,8 +78,115 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
     final int ONE_TIME_ALARM_HOUR = HOUR + 3;
     final int ONE_TIME_ALARM_MINUTE = 30;
 
+    private void shared_t101_addTwoAlarms_BothInNearPeriod() {
+        // Check calendar
+        assertCalendarItem(0, "2/1", "Mon", "Off", "", null, ""); // Today
+        assertCalendarItem(1, "", "", "2:01 AM", "", "", "1h 1m"); // The 1st one-time alarm
+        assertCalendarItem(2, "", "", "2:02 AM", "", "", ""); // The 2nd one-time alarm
+        assertCalendarItem(3, "2/2", "Tue", "Off", "", null, ""); // Tomorrow
+
+        // Check system alarm
+        assertSystemAlarmCount(2);
+        assertSystemAlarm(YEAR, MONTH, DAY, HOUR + 1, 1, SystemAlarm.ACTION_RING);
+        assertSystemAlarmClock(YEAR, MONTH, DAY, HOUR + 1, 1);
+
+        // Check notification
+        assertNotificationCount(1);
+
+        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
+        assertNotification(notification, "Alarm at 2:01 AM", "Touch to view all alarms");
+        assertNotificationActionCount(notification, 1);
+        assertNotificationAction(notification, 0, "Dismiss", NotificationReceiver.ACTION_DISMISS_BEFORE_RINGING);
+
+        // Check widget
+        assertWidget(R.drawable.ic_alarm_white, "2:01 AM", null);
+    }
+
     @Test
-    public void t104_addTwoAlarmsAtTheSameTime() {
+    public void t101a_addTwoAlarms_inNearPeriod_order12() {
+        // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
+        consumeNextScheduledAlarm();
+
+        // Add one-time alarms
+        int oldCount = calendar_addOneTimeAlarm(0, HOUR + 1, 0, HOUR + 1, 2);
+        calendar_addOneTimeAlarm(0, HOUR + 1, 0, HOUR + 1, 1);
+
+        // Check calendar
+        int newCount = recyclerView.getChildCount();
+        assertThat("The number of items increased by one", newCount - oldCount, is(2));
+
+        shared_t101_addTwoAlarms_BothInNearPeriod();
+    }
+
+    @Test
+    public void t101b_addTwoAlarms_inNearPeriod_order21() {
+        // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
+        consumeNextScheduledAlarm();
+
+        // Add one-time alarms
+        int oldCount = calendar_addOneTimeAlarm(0, HOUR + 1, 0, HOUR + 1, 1);
+        calendar_addOneTimeAlarm(0, HOUR + 1, 0, HOUR + 1, 2);
+
+        // Check calendar
+        int newCount = recyclerView.getChildCount();
+        assertThat("The number of items increased by one", newCount - oldCount, is(2));
+
+        shared_t101_addTwoAlarms_BothInNearPeriod();
+    }
+
+    private void shared_t102_addTwoAlarms_afterNearPeriod() {
+        // Check calendar
+        assertCalendarItem(0, "2/1", "Mon", "Off", "", null, ""); // Today
+        assertCalendarItem(1, "", "", "4:31 AM", "", "", "3h 31m"); // The 1st one-time alarm
+        assertCalendarItem(2, "", "", "4:32 AM", "", "", ""); // The 2nd one-time alarm
+        assertCalendarItem(3, "2/2", "Tue", "Off", "", null, ""); // Tomorrow
+
+        // Check system alarm
+        assertSystemAlarmCount(2);
+        assertSystemAlarm(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR - 2, ONE_TIME_ALARM_MINUTE + 1, SystemAlarm.ACTION_RING_IN_NEAR_FUTURE);
+        assertSystemAlarmClock(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE + 1);
+
+        // Check notification
+        assertNotificationCount(0);
+
+        // Check widget
+        assertWidget(R.drawable.ic_alarm_white, "4:31 AM", null);
+    }
+
+    @Test
+    public void t102a_addTwoAlarms_afterNearPeriod_order12() {
+        // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
+        consumeNextScheduledAlarm();
+
+        // Add one-time alarms
+        int oldCount = calendar_addOneTimeAlarm(0, HOUR + 1, 0, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE + 1);
+        calendar_addOneTimeAlarm(0, HOUR + 1, 0, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE + 2);
+
+        // Check calendar
+        int newCount = recyclerView.getChildCount();
+        assertThat("The number of items increased by one", newCount - oldCount, is(2));
+
+        shared_t102_addTwoAlarms_afterNearPeriod();
+    }
+
+    @Test
+    public void t102b_addTwoAlarms_afterNearFuture_order21() {
+        // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
+        consumeNextScheduledAlarm();
+
+        // Add one-time alarms
+        int oldCount = calendar_addOneTimeAlarm(0, HOUR + 1, 0, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE + 2);
+        calendar_addOneTimeAlarm(0, HOUR + 1, 0, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE + 1);
+
+        // Check calendar
+        int newCount = recyclerView.getChildCount();
+        assertThat("The number of items increased by one", newCount - oldCount, is(2));
+
+        shared_t102_addTwoAlarms_afterNearPeriod();
+    }
+
+    @Test
+    public void t110_addTwoAlarmsAtTheSameTime_viaCalendar() {
         // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
         consumeNextScheduledAlarm();
 
@@ -102,114 +215,38 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
         assertWidget(R.drawable.ic_alarm_white, "4:30 AM", null);
     }
 
-    private void shared_t105_addTwoAlarms_BothInNearPeriod() {
+    @Test
+    public void t111_addTwoAlarmsAtTheSameTime_viaGlobalManager() {
+        // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
+        consumeNextScheduledAlarm();
+
+        setAlarm(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE), "One");
+        setAlarm(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE), "Two");
+
+        startActivityCalendar();
+        refreshRecyclerView();
+
         // Check calendar
+        assertThat("The number of items increased by one", recyclerView.getChildCount(), is(HORIZON_DAYS + 2));
+
         assertCalendarItem(0, "2/1", "Mon", "Off", "", null, ""); // Today
-        assertCalendarItem(1, "", "", "2:01 AM", "", "", "1h 1m"); // The 1st one-time alarm
-        assertCalendarItem(2, "", "", "2:02 AM", "", "", ""); // The 2nd one-time alarm
+        assertCalendarItem(1, "", "", "4:30 AM", "", "One", "3h 30m"); // The 1st one-time alarm
+        assertCalendarItem(2, "", "", "4:30 AM", "", "Two", "3h 30m"); // The 2nd one-time alarm
         assertCalendarItem(3, "2/2", "Tue", "Off", "", null, ""); // Tomorrow
 
         // Check system alarm
         assertSystemAlarmCount(2);
-        assertSystemAlarm(YEAR, MONTH, DAY, HOUR + 1, 1, SystemAlarm.ACTION_RING);
-        assertSystemAlarmClock(YEAR, MONTH, DAY, HOUR + 1, 1);
-
-        // Check notification
-        assertNotificationCount(1);
-
-        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
-        assertNotification(notification, "Alarm at 2:01 AM", "Touch to view all alarms");
-        assertNotificationActionCount(notification, 1);
-        assertNotificationAction(notification, 0, "Dismiss", NotificationReceiver.ACTION_DISMISS_BEFORE_RINGING);
-
-        // Check widget
-        assertWidget(R.drawable.ic_alarm_white, "2:01 AM", null);
-    }
-
-    @Test
-    public void t105a_addTwoAlarms_inNearPeriod_order12() {
-        // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
-        consumeNextScheduledAlarm();
-
-        // Add one-time alarms
-        int oldCount = calendar_addOneTimeAlarm(0, HOUR + 1, 0, HOUR + 1, 2);
-        calendar_addOneTimeAlarm(0, HOUR + 1, 0, HOUR + 1, 1);
-
-        // Check calendar
-        int newCount = recyclerView.getChildCount();
-        assertThat("The number of items increased by one", newCount - oldCount, is(2));
-
-        shared_t105_addTwoAlarms_BothInNearPeriod();
-    }
-
-    @Test
-    public void t105b_addTwoAlarms_inNearPeriod_order21() {
-        // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
-        consumeNextScheduledAlarm();
-
-        // Add one-time alarms
-        int oldCount = calendar_addOneTimeAlarm(0, HOUR + 1, 0, HOUR + 1, 1);
-        calendar_addOneTimeAlarm(0, HOUR + 1, 0, HOUR + 1, 2);
-
-        // Check calendar
-        int newCount = recyclerView.getChildCount();
-        assertThat("The number of items increased by one", newCount - oldCount, is(2));
-
-        shared_t105_addTwoAlarms_BothInNearPeriod();
-    }
-
-    private void shared_t106_addTwoAlarms_afterNearPeriod() {
-        // Check calendar
-        assertCalendarItem(0, "2/1", "Mon", "Off", "", null, ""); // Today
-        assertCalendarItem(1, "", "", "4:31 AM", "", "", "3h 31m"); // The 1st one-time alarm
-        assertCalendarItem(2, "", "", "4:32 AM", "", "", ""); // The 2nd one-time alarm
-        assertCalendarItem(3, "2/2", "Tue", "Off", "", null, ""); // Tomorrow
-
-        // Check system alarm
-        assertSystemAlarmCount(2);
-        assertSystemAlarm(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR - 2, ONE_TIME_ALARM_MINUTE + 1, SystemAlarm.ACTION_RING_IN_NEAR_FUTURE);
-        assertSystemAlarmClock(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE + 1);
+        assertSystemAlarm(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR - 2, ONE_TIME_ALARM_MINUTE, SystemAlarm.ACTION_RING_IN_NEAR_FUTURE);
+        assertSystemAlarmClock(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE);
 
         // Check notification
         assertNotificationCount(0);
 
         // Check widget
-        assertWidget(R.drawable.ic_alarm_white, "4:31 AM", null);
+        assertWidget(R.drawable.ic_alarm_white, "4:30 AM", null);
     }
 
-    @Test
-    public void t106a_addTwoAlarms_afterNearPeriod_order12() {
-        // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
-        consumeNextScheduledAlarm();
-
-        // Add one-time alarms
-        int oldCount = calendar_addOneTimeAlarm(0, HOUR + 1, 0, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE + 1);
-        calendar_addOneTimeAlarm(0, HOUR + 1, 0, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE + 2);
-
-        // Check calendar
-        int newCount = recyclerView.getChildCount();
-        assertThat("The number of items increased by one", newCount - oldCount, is(2));
-
-        shared_t106_addTwoAlarms_afterNearPeriod();
-    }
-
-    @Test
-    public void t106b_addTwoAlarms_afterNearFuture_order21() {
-        // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
-        consumeNextScheduledAlarm();
-
-        // Add one-time alarms
-        int oldCount = calendar_addOneTimeAlarm(0, HOUR + 1, 0, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE + 2);
-        calendar_addOneTimeAlarm(0, HOUR + 1, 0, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE + 1);
-
-        // Check calendar
-        int newCount = recyclerView.getChildCount();
-        assertThat("The number of items increased by one", newCount - oldCount, is(2));
-
-        shared_t106_addTwoAlarms_afterNearPeriod();
-    }
-
-    public void shared_t211_dismiss_ofDistantTwoAlarms_noneAlarm() {
+    public void shared_t200_dismiss_ofDistantTwoAlarms_noneAlarm() {
         // Check calendar
         assertThat("The number of items hasn't changed", recyclerView.getChildCount(), is(HORIZON_DAYS + 2));
         assertCalendarItem(0, "2/1", "Mon", "Off", "", null, ""); // Today
@@ -231,8 +268,8 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
 
     // There are two alarms at T+1 and T+2; dismiss the T+1 alarm, then dismiss T+2 alarm.
     @Test
-    public void t211a_dismiss_ofDistantTwoAlarms_order12() {
-        t106a_addTwoAlarms_afterNearPeriod_order12();
+    public void t200a_dismiss_ofDistantTwoAlarms_order12() {
+        t102a_addTwoAlarms_afterNearPeriod_order12();
 
         // ----------------------------------------------------
 
@@ -270,13 +307,13 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
         refreshRecyclerView();
 
         // Checks
-        shared_t211_dismiss_ofDistantTwoAlarms_noneAlarm();
+        shared_t200_dismiss_ofDistantTwoAlarms_noneAlarm();
     }
 
     // There are two alarms at T+1 and T+2; dismiss the T+2 alarm, then dismiss T+1 alarm.
     @Test
-    public void t211b_dismiss_ofDistantTwoAlarms_order21() {
-        t106a_addTwoAlarms_afterNearPeriod_order12();
+    public void t200b_dismiss_ofDistantTwoAlarms_order21() {
+        t102a_addTwoAlarms_afterNearPeriod_order12();
 
         // ----------------------------------------------------
 
@@ -314,10 +351,126 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
         refreshRecyclerView();
 
         // Checks
-        shared_t211_dismiss_ofDistantTwoAlarms_noneAlarm();
+        shared_t200_dismiss_ofDistantTwoAlarms_noneAlarm();
     }
 
-    private void shared_t311_dismiss_ofDistantTwoAlarms_noneAlarm() {
+    public void shared_t220_dismiss_ofDistantTwoAlarmsAtTheSameTime_noneAlarm() {
+        // Check calendar
+        assertThat("The number of items hasn't changed", recyclerView.getChildCount(), is(HORIZON_DAYS + 2));
+        assertCalendarItem(0, "2/1", "Mon", "Off", "", null, ""); // Today
+        assertCalendarItem(1, "", "", "4:30 AM", "Dismissed before ringing", "One", ""); // The 1st one-time alarm
+        assertCalendarItem(2, "", "", "4:30 AM", "Dismissed before ringing", "Two", ""); // The 2nd one-time alarm
+        assertCalendarItem(3, "2/2", "Tue", "Off", "", null, ""); // Tomorrow
+
+        // Check system alarm
+        assertSystemAlarmCount(1);
+        assertSystemAlarm(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE, SystemAlarm.ACTION_ALARM_TIME_OF_EARLY_DISMISSED_ALARM);
+        assertSystemAlarmClockNone();
+
+        // Check notification
+        assertNotificationCount(0);
+
+        // Check widget
+        assertWidget(R.drawable.ic_alarm_off_white, "No alarm", null);
+    }
+
+    @Test
+    public void t210a_dismiss_ofDistantTwoAlarmsAtTheSameTime_order12() {
+        // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
+        consumeNextScheduledAlarm();
+
+        setAlarm(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE), "One");
+        setAlarm(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE), "Two");
+
+        startActivityCalendar();
+        refreshRecyclerView();
+
+        // ----------------------------------------------------
+
+        // Dismiss the 1st one-time alarm
+        loadItemAtPosition(1);
+        item.performLongClick();
+        clickContextMenu(R.id.action_day_dismiss);
+        refreshRecyclerView();
+
+        // Check calendar
+        assertThat("The number of items hasn't changed", recyclerView.getChildCount(), is(HORIZON_DAYS + 2));
+        assertCalendarItem(0, "2/1", "Mon", "Off", "", null, ""); // Today
+        assertCalendarItem(1, "", "", "4:30 AM", "Dismissed before ringing", "One", ""); // The 1st one-time alarm
+        assertCalendarItem(2, "", "", "4:30 AM", "", "Two", "3h 30m"); // The 2nd one-time alarm
+        assertCalendarItem(3, "2/2", "Tue", "Off", "", null, ""); // Tomorrow
+
+        // Check system alarm
+        assertSystemAlarmCount(2);
+        assertSystemAlarm(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR - 2, ONE_TIME_ALARM_MINUTE, SystemAlarm.ACTION_RING_IN_NEAR_FUTURE);
+        assertSystemAlarmClock(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE);
+
+        // Check notification
+        assertNotificationCount(0);
+
+        // Check widget
+        assertWidget(R.drawable.ic_alarm_white, "4:30 AM", null);
+
+        // ----------------------------------------------------
+
+        // Dismiss the 2nd alarm
+        loadItemAtPosition(2);
+        item.performLongClick();
+        clickContextMenu(R.id.action_day_dismiss);
+        refreshRecyclerView();
+
+        // Checks
+        shared_t220_dismiss_ofDistantTwoAlarmsAtTheSameTime_noneAlarm();
+    }
+
+    @Test
+    public void t210b_dismiss_ofDistantTwoAlarmsAtTheSameTime_order21() {
+        // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
+        consumeNextScheduledAlarm();
+
+        setAlarm(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE), "One");
+        setAlarm(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE), "Two");
+
+        startActivityCalendar();
+        refreshRecyclerView();
+
+        // Dismiss the 1st one-time alarm
+        loadItemAtPosition(2);
+        item.performLongClick();
+        clickContextMenu(R.id.action_day_dismiss);
+        refreshRecyclerView();
+
+        // Check calendar
+        assertThat("The number of items hasn't changed", recyclerView.getChildCount(), is(HORIZON_DAYS + 2));
+        assertCalendarItem(0, "2/1", "Mon", "Off", "", null, ""); // Today
+        assertCalendarItem(1, "", "", "4:30 AM", "", "One", "3h 30m"); // The 1st one-time alarm
+        assertCalendarItem(2, "", "", "4:30 AM", "Dismissed before ringing", "Two", ""); // The 2nd one-time alarm
+        assertCalendarItem(3, "2/2", "Tue", "Off", "", null, ""); // Tomorrow
+
+        // Check system alarm
+        assertSystemAlarmCount(2);
+        assertSystemAlarm(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR - 2, ONE_TIME_ALARM_MINUTE, SystemAlarm.ACTION_RING_IN_NEAR_FUTURE);
+        assertSystemAlarmClock(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE);
+
+        // Check notification
+        assertNotificationCount(0);
+
+        // Check widget
+        assertWidget(R.drawable.ic_alarm_white, "4:30 AM", null);
+
+        // ----------------------------------------------------
+
+        // Dismiss the 2nd alarm
+        loadItemAtPosition(1);
+        item.performLongClick();
+        clickContextMenu(R.id.action_day_dismiss);
+        refreshRecyclerView();
+
+        // Checks
+        shared_t220_dismiss_ofDistantTwoAlarmsAtTheSameTime_noneAlarm();
+    }
+
+    private void shared_t310_dismiss_ofDistantTwoAlarms_noneAlarm() {
         // Check calendar
         assertThat("The number of items hasn't changed", recyclerView.getChildCount(), is(HORIZON_DAYS + 2));
         assertCalendarItem(0, "2/1", "Mon", "Off", "", null, ""); // Today
@@ -339,8 +492,8 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
 
     // There are two alarms at T+1 and T+2; dismiss the T+1 alarm, then dismiss T+2 alarm.
     @Test
-    public void t311a_dismiss_ofNearTwoAlarms_order12() {
-        t105a_addTwoAlarms_inNearPeriod_order12();
+    public void t310a_dismiss_ofNearTwoAlarms_order12() {
+        t101a_addTwoAlarms_inNearPeriod_order12();
 
         // ----------------------------------------------------
 
@@ -383,13 +536,13 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
         refreshRecyclerView();
 
         // Checks
-        shared_t311_dismiss_ofDistantTwoAlarms_noneAlarm();
+        shared_t310_dismiss_ofDistantTwoAlarms_noneAlarm();
     }
 
     // There are two alarms at T+1 and T+2; dismiss the T+2 alarm, then dismiss T+1 alarm.
     @Test
-    public void t311b_dismiss_ofNearTwoAlarms_order21() {
-        t105a_addTwoAlarms_inNearPeriod_order12();
+    public void t310b_dismiss_ofNearTwoAlarms_order21() {
+        t101a_addTwoAlarms_inNearPeriod_order12();
 
         // ----------------------------------------------------
 
@@ -432,43 +585,196 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
         refreshRecyclerView();
 
         // Checks
-        shared_t311_dismiss_ofDistantTwoAlarms_noneAlarm();
+        shared_t310_dismiss_ofDistantTwoAlarms_noneAlarm();
     }
 
-    private void prepareCreate() {
-        // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
-        consumeNextScheduledAlarm();
+    @Test
+    public void t400_onRing_withTwoAlarms_PreviousIsNotDismissed() {
+        t102a_addTwoAlarms_afterNearPeriod_order12();
 
-        // Save day
-        setAlarmToToday();
-    }
+        // ----------------------------------------------------
 
-    private void prepareUntilNear() {
-        prepareCreate();
-
-        // Consume the alarm with action ACTION_RING_IN_NEAR_FUTURE
-        consumeNextScheduledAlarm();
-        // Consume the alarm involving System Alarm Clock
-        consumeNextScheduledAlarm();
+        // Start the first alarm
 
         // Shift clock
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR - 2, ONE_TIME_ALARM_MINUTE)));
+        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE + 1)));
 
         // Call the receiver
         Intent intent = new Intent();
-        intent.setAction(SystemAlarm.ACTION_RING_IN_NEAR_FUTURE);
+        intent.setAction(SystemAlarm.ACTION_RING);
         AlarmReceiver alarmReceiver = new AlarmReceiver();
         alarmReceiver.onReceive(context, intent);
 
         // Shift clock
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR - 2, ONE_TIME_ALARM_MINUTE, 10)));
+        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE + 1, 10)));
+
+        // ----------------------------------------------------
+
+        // Check that ringing started
+        Activity activity = Robolectric.setupActivity(Activity.class);
+        ShadowActivity shadowActivity = Shadows.shadowOf(activity);
+
+        Intent intentNext = shadowActivity.peekNextStartedActivity();
+        Intent expectedIntentNext = new Intent(context, RingActivity.class);
+
+        assertThat("Intent component", intentNext.getComponent(), is(expectedIntentNext.getComponent()));
+
+        // Check ring activity
+        Calendar alarmTime = new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE + 1);
+        startActivityRing(alarmTime);
+
+        assertThat("Date visibility", textDate.getVisibility(), is(View.VISIBLE));
+        assertThat("Time visibility", textTime.getVisibility(), is(View.VISIBLE));
+        assertThat("Alarm time visibility", textAlarmTime.getVisibility(), is(View.INVISIBLE));
+        assertThat("Alarm name visibility", textOneTimeAlarmName.getVisibility(), is(View.GONE));
+        assertThat("Calendar visibility", textNextCalendar.getVisibility(), is(View.GONE));
+        assertThat("Muted visibility", textMuted.getVisibility(), is(View.INVISIBLE));
+
+        assertThat("Date", textDate.getText(), is("Monday, February 1"));
+        assertThat("Time", textTime.getText(), is("4:31 AM"));
+
+        // Check calendar
+        startActivityCalendar();
+
+        assertThat("The number of items", recyclerView.getChildCount(), is(HORIZON_DAYS + 2));
+        assertCalendarItem(0, "2/1", "Mon", "Off", "", null, ""); // Today
+        assertCalendarItem(1, "", "", "4:31 AM", "Ringing", "", "–10s"); // The one-time alarm
+        assertCalendarItem(2, "", "", "4:32 AM", "", "", ""); // The one-time alarm
+        assertCalendarItem(3, "2/2", "Tue", "Off", "", null, ""); // Tomorrow
+
+        // Check system alarm
+        assertSystemAlarmCount(2);
+        assertSystemAlarm(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE + 2, SystemAlarm.ACTION_RING);
+        assertSystemAlarmClock(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE + 2);
+
+        // Check notification
+        assertNotificationCount(1);
+
+        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
+        assertNotification(notification, "Alarm at 4:31 AM", "Ringing");
+        assertNotificationActionCount(notification, 2);
+        assertNotificationAction(notification, 0, "Dismiss", NotificationReceiver.ACTION_DISMISS);
+        assertNotificationAction(notification, 1, "Snooze", NotificationReceiver.ACTION_SNOOZE);
+
+        // Check widget
+        assertWidget(R.drawable.ic_alarm_white, "4:31 AM", null);
+
+        // ----------------------------------------------------
+
+        // Start the second alarm
+        // Note: the currenty ringing alarm is intentionally NOT dismissed by the user when the 2nd alarm starts.
+
+        // Shift clock
+        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE + 2)));
+
+        // Call the receiver
+        Intent intent2 = new Intent();
+        intent2.setAction(SystemAlarm.ACTION_RING);
+        AlarmReceiver alarmReceiver2 = new AlarmReceiver();
+        alarmReceiver2.onReceive(context, intent2);
+
+        // Shift clock
+        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE + 2, 10)));
+
+        // ----------------------------------------------------
+
+        // Check that ringing started
+        Activity activity2 = Robolectric.setupActivity(Activity.class);
+        ShadowActivity shadowActivity2 = Shadows.shadowOf(activity2);
+
+        Intent intentNext2 = shadowActivity2.peekNextStartedActivity();
+        Intent expectedIntentNext2 = new Intent(context, RingActivity.class);
+
+        assertThat("Intent component", intentNext2.getComponent(), is(expectedIntentNext2.getComponent()));
+
+        // Check ring activity
+        Calendar alarmTime2 = new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE + 2);
+        startActivityRing(alarmTime2);
+
+        assertThat("Date visibility", textDate.getVisibility(), is(View.VISIBLE));
+        assertThat("Time visibility", textTime.getVisibility(), is(View.VISIBLE));
+        assertThat("Alarm time visibility", textAlarmTime.getVisibility(), is(View.INVISIBLE));
+        assertThat("Alarm name visibility", textOneTimeAlarmName.getVisibility(), is(View.GONE));
+        assertThat("Calendar visibility", textNextCalendar.getVisibility(), is(View.GONE));
+        assertThat("Muted visibility", textMuted.getVisibility(), is(View.INVISIBLE));
+
+        assertThat("Date", textDate.getText(), is("Monday, February 1"));
+        assertThat("Time", textTime.getText(), is("4:32 AM"));
+
+        // Check calendar
+        startActivityCalendar();
+
+        assertThat("The number of items", recyclerView.getChildCount(), is(HORIZON_DAYS + 2));
+        assertCalendarItem(0, "2/1", "Mon", "Off", "", null, ""); // Today
+        assertCalendarItem(1, "", "", "4:31 AM", "Passed", "", ""); // The one-time alarm
+        assertCalendarItem(2, "", "", "4:32 AM", "Ringing", "", "–10s"); // The one-time alarm
+        assertCalendarItem(3, "2/2", "Tue", "Off", "", null, ""); // Tomorrow
+
+        // Check system alarm
+        assertSystemAlarmCount(1);
+        assertSystemAlarm(YEAR, MONTH, DAY + 1, 0, 0, SystemAlarm.ACTION_SET_SYSTEM_ALARM);
+        assertSystemAlarmClockNone();
+
+        // Check notification
+        assertNotificationCount(2);
+
+        // TODO Cannot check two notifications in one test
+//        Notification notification2 = shadowNotificationManager.getAllNotifications().get(0);
+//        assertNotification(notification2, "Alarm at 4:31 AM", "Cancelled");
+//        assertNotificationActionCount(notification2, 0);
+
+        Notification notification3 = shadowNotificationManager.getAllNotifications().get(0);
+        assertNotification(notification3, "Alarm at 4:32 AM", "Ringing");
+        assertNotificationActionCount(notification3, 2);
+        assertNotificationAction(notification3, 0, "Dismiss", NotificationReceiver.ACTION_DISMISS);
+        assertNotificationAction(notification3, 1, "Snooze", NotificationReceiver.ACTION_SNOOZE);
+
+        // Check widget
+        assertWidget(R.drawable.ic_alarm_white, "4:32 AM", null);
+
+        // ----------------------------------------------------
+
+        // Dismiss the 2nd alarm
+
+        // Start activity
+        startActivityCalendar();
+        loadItemAtPosition(2);
+        item.performLongClick();
+        clickContextMenu(R.id.action_day_dismiss);
+        refreshRecyclerView();
+
+        // ----------------------------------------------------
+
+        // Check calendar
+        assertThat("The number of items", recyclerView.getChildCount(), is(HORIZON_DAYS + 2));
+        assertCalendarItem(0, "2/1", "Mon", "Off", "", null, ""); // Today
+        assertCalendarItem(1, "", "", "4:31 AM", "Passed", "", ""); // The 1st one-time alarm
+        assertCalendarItem(2, "", "", "4:32 AM", "Passed", "", ""); // The 2nd one-time alarm
+        assertCalendarItem(3, "2/2", "Tue", "Off", "", null, ""); // Tomorrow
+
+        // Check system alarm
+        assertSystemAlarmCount(0);
+        assertSystemAlarmClockNone();
+
+        // Check notification
+        assertNotificationCount(1);
+
+        // TODO Cannot check two notifications in one test
+//        Notification notification2 = shadowNotificationManager.getAllNotifications().get(0);
+//        assertNotification(notification2, "Alarm at 4:31 AM", "Cancelled");
+//        assertNotificationActionCount(notification2, 0);
+
+        // Check widget
+        assertWidget(R.drawable.ic_alarm_off_white, "No alarm", null);
     }
 
-    private void prepareUntilRing() {
-        prepareUntilNear();
+    @Test
+    public void t410_onRing_withTwoAlarmsAtTheSameTime() {
+        t111_addTwoAlarmsAtTheSameTime_viaGlobalManager();
 
-        // Consume the alarm with action ACTION_RING
-        consumeNextScheduledAlarm();
+        // ----------------------------------------------------
+
+        // Start the alarm
 
         // Shift clock
         shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE)));
@@ -476,44 +782,110 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
         // Call the receiver
         Intent intent = new Intent();
         intent.setAction(SystemAlarm.ACTION_RING);
-        AlarmReceiver alarmReceiver2 = new AlarmReceiver();
-        alarmReceiver2.onReceive(context, intent);
+        AlarmReceiver alarmReceiver = new AlarmReceiver();
+        alarmReceiver.onReceive(context, intent);
 
         // Shift clock
         shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE, 10)));
-    }
 
-    private void prepareUntilSnooze() {
-        prepareUntilRing();
+        // ----------------------------------------------------
 
-        // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
-        consumeNextScheduledAlarm();
+        // Check that ringing started
+        Activity activity = Robolectric.setupActivity(Activity.class);
+        ShadowActivity shadowActivity = Shadows.shadowOf(activity);
 
-        // Start ring activity
+        Intent intentNext = shadowActivity.peekNextStartedActivity();
+        Intent expectedIntentNext = new Intent(context, RingActivity.class);
+
+        assertThat("Intent component", intentNext.getComponent(), is(expectedIntentNext.getComponent()));
+
+        // Check calendar
+        startActivityCalendar();
+
+        assertThat("The number of items", recyclerView.getChildCount(), is(HORIZON_DAYS + 2));
+        assertCalendarItem(0, "2/1", "Mon", "Off", "", null, ""); // Today
+        assertCalendarItem(1, "", "", "4:30 AM", "Ringing", "One", "–10s"); // The one-time alarm
+        assertCalendarItem(2, "", "", "4:30 AM", "Passed", "Two", ""); // The one-time alarm
+        assertCalendarItem(3, "2/2", "Tue", "Off", "", null, ""); // Tomorrow
+
+        // Check ring activity
         Calendar alarmTime = new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE);
-        startActivityRing(alarmTime);
+        startActivityRing(alarmTime, "One");
 
-        snoozeButton.performClick();
+        assertThat("Date visibility", textDate.getVisibility(), is(View.VISIBLE));
+        assertThat("Time visibility", textTime.getVisibility(), is(View.VISIBLE));
+        assertThat("Alarm time visibility", textAlarmTime.getVisibility(), is(View.INVISIBLE));
+        assertThat("Alarm name visibility", textOneTimeAlarmName.getVisibility(), is(View.VISIBLE));
+        assertThat("Calendar visibility", textNextCalendar.getVisibility(), is(View.GONE));
+        assertThat("Muted visibility", textMuted.getVisibility(), is(View.INVISIBLE));
 
-        // Shift clock
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE, 20)));
+        assertThat("Date", textDate.getText(), is("Monday, February 1"));
+        assertThat("Time", textTime.getText(), is("4:30 AM"));
+        assertThat("Alarm name", textOneTimeAlarmName.getText(), is("One"));
+
+        // Check system alarm
+        assertSystemAlarmCount(1);
+        assertSystemAlarm(YEAR, MONTH, DAY + 1, 0, 0, SystemAlarm.ACTION_SET_SYSTEM_ALARM);
+        assertSystemAlarmClockNone();
+
+        // Check notification
+        assertNotificationCount(2);
+
+        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
+        assertNotification(notification, "Alarm at 4:30 AM – One", "Ringing");
+        assertNotificationActionCount(notification, 2);
+        assertNotificationAction(notification, 0, "Dismiss", NotificationReceiver.ACTION_DISMISS);
+        assertNotificationAction(notification, 1, "Snooze", NotificationReceiver.ACTION_SNOOZE);
+
+        // TODO Cannot check two notifications in one test
+//        Notification notification2 = shadowNotificationManager.getAllNotifications().get(0);
+//        assertNotification(notification2, "Alarm at 4:30 AM Two", "Cancelled");
+//        assertNotificationActionCount(notification2, 0);
+
+        // Check widget
+        assertWidget(R.drawable.ic_alarm_white, "4:30 AM", null);
+
+        // ----------------------------------------------------
+
+        // Dismiss the alarm
+
+        // We are still in RingActivity
+        dismissButton.performClick();
+
+        startActivityCalendar();
+        refreshRecyclerView();
+
+        // ----------------------------------------------------
+
+        // Check calendar
+        assertThat("The number of items", recyclerView.getChildCount(), is(HORIZON_DAYS + 2));
+        assertCalendarItem(0, "2/1", "Mon", "Off", "", null, ""); // Today
+        assertCalendarItem(1, "", "", "4:30 AM", "Passed", "One", ""); // The 1st one-time alarm
+        assertCalendarItem(2, "", "", "4:30 AM", "Passed", "Two", ""); // The 2nd one-time alarm
+        assertCalendarItem(3, "2/2", "Tue", "Off", "", null, ""); // Tomorrow
+
+        // Check system alarm
+        assertSystemAlarmCount(0);
+        assertSystemAlarmClockNone();
+
+        // Check notification
+        assertNotificationCount(1);
+
+        // TODO Cannot check two notifications in one test
+//        Notification notification2 = shadowNotificationManager.getAllNotifications().get(0);
+//        assertNotification(notification2, "Alarm at 4:30 AM Two", "Cancelled");
+//        assertNotificationActionCount(notification2, 0);
+
+        // Check widget
+        assertWidget(R.drawable.ic_alarm_off_white, "No alarm", null);
     }
 
-    private void setAlarmToToday() {
-        Calendar date = new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE);
-        setAlarm(date);
-    }
-
-    private void setAlarmToTomorrow() {
-        Calendar date = new GregorianCalendar(YEAR, MONTH, DAY + 1, ONE_TIME_ALARM_HOUR + 1, ONE_TIME_ALARM_MINUTE + 1);
-        setAlarm(date);
-    }
-
-    private void setAlarm(Calendar date) {
+    private void setAlarm(Calendar datetime, String name) {
         OneTimeAlarm oneTimeAlarm = new OneTimeAlarm();
-        oneTimeAlarm.setDate(date);
-        oneTimeAlarm.setHour(date.get(Calendar.HOUR_OF_DAY));
-        oneTimeAlarm.setMinute(date.get(Calendar.MINUTE));
+        oneTimeAlarm.setDate(datetime);
+        oneTimeAlarm.setHour(datetime.get(Calendar.HOUR_OF_DAY));
+        oneTimeAlarm.setMinute(datetime.get(Calendar.MINUTE));
+        oneTimeAlarm.setName(name);
 
         Analytics analytics = new Analytics(Analytics.Channel.Test, Analytics.ChannelName.Calendar);
 

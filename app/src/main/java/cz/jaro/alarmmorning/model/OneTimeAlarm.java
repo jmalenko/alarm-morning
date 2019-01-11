@@ -125,11 +125,16 @@ public class OneTimeAlarm extends AppAlarm {
     }
 
     @Override
+    public String getPersistenceId() {
+        return String.valueOf(id);
+    }
+
+    @Override
     public String toString() {
         StringBuilder str = new StringBuilder();
         Calendar dateTime = getDateTime();
 
-        str.append(Analytics.calendarToDate(dateTime));
+        str.append(Analytics.calendarToStringDate(dateTime));
         str.append(" at ");
         str.append(Analytics.calendarToTime(dateTime));
 
@@ -141,4 +146,20 @@ public class OneTimeAlarm extends AppAlarm {
         return str.toString();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        // Note: intentionally consider only the alarm id.
+
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        OneTimeAlarm that = (OneTimeAlarm) o;
+
+        return id == that.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return (int) (id ^ (id >>> 32));
+    }
 }

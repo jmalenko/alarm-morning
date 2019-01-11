@@ -13,11 +13,11 @@ import android.widget.RemoteViews;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -39,6 +39,7 @@ import static cz.jaro.alarmmorning.AlarmMorningActivity.EXTRA_ALARM_DATE;
 import static cz.jaro.alarmmorning.AlarmMorningActivity.EXTRA_ALARM_ID;
 import static cz.jaro.alarmmorning.AlarmMorningActivity.EXTRA_ALARM_MONTH;
 import static cz.jaro.alarmmorning.AlarmMorningActivity.EXTRA_ALARM_YEAR;
+import static cz.jaro.alarmmorning.SystemAlarm.ACTION_ALARM_TIME_OF_EARLY_DISMISSED_ALARM;
 import static cz.jaro.alarmmorning.SystemAlarm.ACTION_RING_IN_NEAR_FUTURE;
 import static cz.jaro.alarmmorning.SystemAlarm.ACTION_SET_SYSTEM_ALARM;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.addDay;
@@ -118,6 +119,10 @@ public class GlobalManager {
     private static final String STRING_STATE_DISMISSED = "Dismissed";
     private static final String STRING_STATE_DISMISSED_BEFORE_RINGING = "Dismissed before ringing";
 
+    private static final String STRING_PERSIST_TYPE = "Type";
+    private static final String STRING_PERSIST_ID = "Id";
+    private static final String NULL = "null";
+
     private static final int RECENT_PERIOD = 30; // minutes
 
     private static GlobalManager instance;
@@ -151,44 +156,35 @@ public class GlobalManager {
         AppAlarm appAlarm = null;
         if (isRingingOrSnoozed()) {
             Log.v(TAG, "   loading the ringing or snoozed alarm");
-            // FIXME 2 Improve architecture of one-time alarms (when it is changed while snoozed) - store the one-time alarm ID so we can return the proper object
-            // FIXME 2 Test: 1. set alarm to a time, 2. dismiss this alarm, 3. set alarm to the same time. Is it really working?
 
-            Calendar alarmTimeOfRingingAlarm = getAlarmTimeOfRingingAlarm();
+            AppAlarm ringingAlarm = getRingingAlarm();
 
             // 1. Try the Day first...
 
             Day day = dataSource.loadDay(clock().now());
-            if (day.isEnabled() && day.getDateTime().equals(alarmTimeOfRingingAlarm)) {
+            if (day.isEnabled() && day.getDateTime().equals(ringingAlarm.getDateTime())) {
                 appAlarm = day;
             } else {
                 // 2. Try to find the one-time alarm with this alarm time
 
                 List<OneTimeAlarm> oneTimeAlarms = loadOneTimeAlarms(null);
                 for (OneTimeAlarm oneTimeAlarm : oneTimeAlarms) {
-                    if (oneTimeAlarm.getDateTime().equals(alarmTimeOfRingingAlarm)) {
+                    if (oneTimeAlarm.getDateTime().equals(ringingAlarm.getDateTime())) {
                         appAlarm = oneTimeAlarm;
                         break;
                     }
                 }
                 if (appAlarm == null) {
-                    // 3. The only remaining possibility is the the one-time alarm was snoozed and it's time was changed. Currently we have to reconstruct the
-                    // object (but without the id), which is OK as it is used only for Analytics (in this special case).
-
-                    OneTimeAlarm oneTimeAlarm = new OneTimeAlarm();
-                    oneTimeAlarm.setDate(alarmTimeOfRingingAlarm);
-                    oneTimeAlarm.setHour(alarmTimeOfRingingAlarm.get(Calendar.HOUR_OF_DAY));
-                    oneTimeAlarm.setMinute(alarmTimeOfRingingAlarm.get(Calendar.MINUTE));
-
-                    appAlarm = oneTimeAlarm;
+                    // 3. The only remaining possibility is the the one-time alarm was snoozed and it's time was changed.
+                    appAlarm = getNextAction().appAlarm;
                 }
             }
         } else {
             appAlarm = getNextAlarm(clock(), new AppAlarmFilter() { // XXX Workaround - Robolectric doesn't allow shadow of a class with lambda
                 @Override
                 public boolean match(AppAlarm appAlarm) {
-                    Log.v(TAG, "   checking filter condition for " + appAlarm.getDateTime().getTime());
-                    int state = getState(appAlarm.getDateTime());
+                    Log.v(TAG, "   checking filter condition for " + appAlarm);
+                    int state = getState(appAlarm);
                     return state != STATE_DISMISSED_BEFORE_RINGING && state != STATE_DISMISSED;
                 }
             });
@@ -207,9 +203,9 @@ public class GlobalManager {
 
         AppAlarm appAlarm = getNextAlarm(clock(), new AppAlarmFilter() { // XXX Workaround - Robolectric doesn't allow shadow of a class with lambda
             @Override
-            public boolean match(AppAlarm alarmTime) {
-                Log.v(TAG, "   checking filter condition for " + alarmTime.getDateTime().getTime());
-                int state = getState(alarmTime.getDateTime());
+            public boolean match(AppAlarm appAlarm) {
+                Log.v(TAG, "   checking filter condition for " + appAlarm);
+                int state = getState(appAlarm);
                 return state != STATE_DISMISSED_BEFORE_RINGING && state != STATE_DISMISSED && state != STATE_RINGING && state != STATE_SNOOZED;
             }
         });
@@ -249,7 +245,7 @@ public class GlobalManager {
 
     private boolean afterNearFuture() {
         NextAction nextAction = getNextAction();
-        return nextAction.alarmTime != null && afterNearFuture(nextAction.alarmTime);
+        return nextAction.appAlarm != null && afterNearFuture(nextAction.appAlarm.getDateTime());
     }
 
     public boolean afterNearFuture(Calendar alarmTime) {
@@ -276,76 +272,69 @@ public class GlobalManager {
      */
     private static final String PERSIST_ACTION = "persist_system_alarm_action";
     private static final String PERSIST_TIME = "persist_system_alarm_time";
-    private static final String PERSIST_ALARM_TIME = "persist_alarm_time";
-    private static final String PERSIST_ONE_TIME_ALARM_ID = "persist_one_time_alarm_id";
+    private static final String PERSIST_ALARM_TYPE = "persist_alarm_type";
+    private static final String PERSIST_ALARM_ID = "persist_alarm_id";
 
     /*
-     * Contains info about the last alarm. Last alarm is the one that rans, possibly is snoozed and was dismissed or cancelled.
+     * Contains info about the last alarm. Last alarm is the one that runs, possibly is snoozed and was dismissed or cancelled.
      */
-    private static final String PERSIST_STATE = "persist_state";
-    private static final String PERSIST_STATE_OF_ALARM_TIME = "persist_state_of_alarm_time";
+    private static final String PERSIST_LAST_STATE = "persist_last_state";
+    private static final String PERSIST_LAST_ALARM_TYPE = "persist_last_alarm_type";
+    private static final String PERSIST_LAST_ALARM_ID = "persist_last_alarm_id";
 
     /*
      * Contains info about the dismissed alarms.
      */
     private static final String PERSIST_DISMISSED = "persist_dismissed";
 
-    private static final String ACTION_UNDEFINED = "";
-    private static final long TIME_UNDEFINED = -1;
-    private static final long ONE_TIME_ALARM_ID_UNDEFINED = -1;
+    private static final String STRING_UNDEFINED = "";
+    private static final long LONG_UNDEFINED = -1;
 
     // Persisted next action
     // =====================
 
-    protected NextAction getNextAction() {
+    public NextAction getNextAction() throws IllegalArgumentException {
         Log.v(TAG, "getNextAction()");
 
         Context context = AlarmMorningApplication.getAppContext();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        String action = preferences.getString(PERSIST_ACTION, ACTION_UNDEFINED);
-        long timeInMS = preferences.getLong(PERSIST_TIME, TIME_UNDEFINED);
-        long alarmTimeInMS = preferences.getLong(PERSIST_ALARM_TIME, TIME_UNDEFINED);
-        long oneTimeAlarmId = preferences.getLong(PERSIST_ONE_TIME_ALARM_ID, ONE_TIME_ALARM_ID_UNDEFINED);
+
+        String action = preferences.getString(PERSIST_ACTION, STRING_UNDEFINED);
+        long timeInMS = preferences.getLong(PERSIST_TIME, LONG_UNDEFINED);
+        String alarmType = preferences.getString(PERSIST_ALARM_TYPE, STRING_UNDEFINED);
+        String alarmId = preferences.getString(PERSIST_ALARM_ID, STRING_UNDEFINED);
+
+        if (action.equals(STRING_UNDEFINED)
+                || timeInMS == LONG_UNDEFINED
+                || alarmType.equals(STRING_UNDEFINED)
+                || (!alarmType.equals(NULL) && alarmId.equals(STRING_UNDEFINED))) {
+            throw new IllegalArgumentException("The persisted data is incomplete");
+        }
 
         Calendar time = CalendarUtils.newGregorianCalendar(timeInMS);
-        Calendar alarmTime = alarmTimeInMS != -1 ? alarmTime = CalendarUtils.newGregorianCalendar(alarmTimeInMS) : null;
-        Long oneTimeAlarmId2 = oneTimeAlarmId == ONE_TIME_ALARM_ID_UNDEFINED ? null : oneTimeAlarmId;
+        AppAlarm appAlarm = alarmType.equals(NULL) ? null : load(alarmType, alarmId);
 
-        NextAction nextAction = new NextAction(action, time, alarmTime, oneTimeAlarmId2);
+        NextAction nextAction = new NextAction(action, time, appAlarm);
         return nextAction;
     }
 
     public void setNextAction(NextAction nextAction) {
-        Log.v(TAG, "setNextAction(action=" + nextAction.action + ", time=" + nextAction.time.getTime() + ", alarmTime=" + (nextAction.alarmTime != null ? nextAction.alarmTime.getTime() : "null") + ")");
+        Log.v(TAG, "setNextAction(action=" + nextAction.action + ", time=" + nextAction.time.getTime() + ", appAlarm=" + nextAction.appAlarm + ")");
 
         Context context = AlarmMorningApplication.getAppContext();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = preferences.edit();
 
-        long timeInMS = nextAction.time.getTimeInMillis();
-        long alarmTimeInMS = nextAction.alarmTime != null ? nextAction.alarmTime.getTimeInMillis() : TIME_UNDEFINED;
-        long oneTimeAlarmId = nextAction.oneTimeAlarmId != null ? nextAction.oneTimeAlarmId : ONE_TIME_ALARM_ID_UNDEFINED;
-
         editor.putString(PERSIST_ACTION, nextAction.action);
-        editor.putLong(PERSIST_TIME, timeInMS);
-        editor.putLong(PERSIST_ALARM_TIME, alarmTimeInMS);
-        editor.putLong(PERSIST_ONE_TIME_ALARM_ID, oneTimeAlarmId);
+        editor.putLong(PERSIST_TIME, nextAction.time.getTimeInMillis());
+        if (nextAction.appAlarm == null) {
+            editor.putString(PERSIST_ALARM_TYPE, NULL);
+        } else {
+            editor.putString(PERSIST_ALARM_TYPE, nextAction.appAlarm.getClass().getSimpleName());
+            editor.putString(PERSIST_ALARM_ID, nextAction.appAlarm.getPersistenceId());
+        }
 
         editor.commit();
-    }
-
-    public AppAlarm getNextActionAlarm() {
-        Log.v(TAG, "getNextActionAlarm()");
-
-        NextAction nextAction = getNextAction();
-
-        if (nextAction.action.equals(ACTION_SET_SYSTEM_ALARM)) {
-            return null;
-        } else if (nextAction.oneTimeAlarmId != null) {
-            return loadOneTimeAlarm(nextAction.oneTimeAlarmId);
-        } else {
-            return loadDay(nextAction.alarmTime);
-        }
     }
 
     // Persisted state
@@ -354,7 +343,7 @@ public class GlobalManager {
     /**
      * Returns the state of the persisted alarm.
      * <p>
-     * Warning: this method does not consider the set of dismissed alarms. In practice, the logic should also consider {@link #isDismissedAlarm(Calendar)}.
+     * Warning: this method does not consider the set of dismissed alarms. In practice, the logic should also consider {@link #isDismissedAlarm(AppAlarm)}.
      *
      * @return State
      */
@@ -363,32 +352,45 @@ public class GlobalManager {
         Context context = AlarmMorningApplication.getAppContext();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 
-        int state = preferences.getInt(PERSIST_STATE, STATE_UNDEFINED);
+        int state = preferences.getInt(PERSIST_LAST_STATE, STATE_UNDEFINED);
 
         return state;
     }
 
-    public Calendar getAlarmTimeOfRingingAlarm() {
-        Log.v(TAG, "getAlarmTimeOfRingingAlarm()");
+    public AppAlarm getRingingAlarm() {
+        Log.v(TAG, "getRingingAlarm()");
 
         Context context = AlarmMorningApplication.getAppContext();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 
-        long stateAlarmTimeInMS = preferences.getLong(PERSIST_STATE_OF_ALARM_TIME, TIME_UNDEFINED);
-        Calendar stateAlarmTime = CalendarUtils.newGregorianCalendar(stateAlarmTimeInMS);
+        String alarmType = preferences.getString(PERSIST_LAST_ALARM_TYPE, STRING_UNDEFINED);
+        String alarmId = preferences.getString(PERSIST_LAST_ALARM_ID, STRING_UNDEFINED);
 
-        return stateAlarmTime;
+        try {
+            return load(alarmType, alarmId);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
-    public void setState(int state, Calendar alarmTime) {
-        Log.v(TAG, "setState(state=" + state + ", alarmTime=" + alarmTime.getTime() + ")");
+    public void setState(int state, AppAlarm appAlarm) {
+        Log.v(TAG, "setState(state=" + state + "(" + stateToString(state) + "}, appAlarm=" + appAlarm + ")");
 
         Context context = AlarmMorningApplication.getAppContext();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         SharedPreferences.Editor editor = preferences.edit();
 
-        editor.putInt(PERSIST_STATE, state);
-        editor.putLong(PERSIST_STATE_OF_ALARM_TIME, alarmTime.getTimeInMillis());
+        editor.putInt(PERSIST_LAST_STATE, state);
+        editor.putString(PERSIST_LAST_ALARM_TYPE, appAlarm.getClass().getSimpleName());
+        if (appAlarm instanceof Day) {
+            Day day = (Day) appAlarm;
+            editor.putString(PERSIST_LAST_ALARM_ID, Analytics.calendarToStringDate(day.getDate()));
+        } else if (appAlarm instanceof OneTimeAlarm) {
+            OneTimeAlarm oneTimeAlarm = (OneTimeAlarm) appAlarm;
+            editor.putString(PERSIST_LAST_ALARM_ID, String.valueOf(oneTimeAlarm.getId()));
+        } else {
+            throw new IllegalArgumentException("Unexpected class " + appAlarm.getClass());
+        }
 
         editor.commit();
     }
@@ -398,13 +400,26 @@ public class GlobalManager {
      *
      * @return Alarm times of dismissed alarms.
      */
-    public Set<Long> getDismissedAlarms() {
+    public Set<AppAlarm> getDismissedAlarms() {
         Log.v(TAG, "getDismissedAlarm()");
 
         try {
             Context context = AlarmMorningApplication.getAppContext();
-            JSONArray dismissedAlarmsJSON = JSONSharedPreferences.loadJSONArray(context, PERSIST_DISMISSED);
-            Set<Long> dismissedAlarms = jsonToSet(dismissedAlarmsJSON);
+            JSONArray jsonArray = JSONSharedPreferences.loadJSONArray(context, PERSIST_DISMISSED);
+
+            Set<AppAlarm> dismissedAlarms = new HashSet<>(jsonArray.length());
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject obj = (JSONObject) jsonArray.get(i);
+
+                String alarmType = obj.getString(STRING_PERSIST_TYPE);
+                String alarmId = obj.getString(STRING_PERSIST_ID);
+
+                AppAlarm dimissedAlarm = load(alarmType, alarmId);
+
+                if (dimissedAlarm != null) // This  is needed as an dissabled one-time alarm may already be removed
+                    dismissedAlarms.add(dimissedAlarm);
+            }
+
             return dismissedAlarms;
         } catch (JSONException e) {
             Log.w(TAG, "Error getting dismissed alarms", e);
@@ -417,16 +432,16 @@ public class GlobalManager {
      * <p>
      * This is determined based on the set of dismissed alarm times.
      *
-     * @param alarmTime Alarm time
+     * @param appAlarm An alarm
      * @return True if an alarm was dismissed at the alarm time.
      */
-    public boolean isDismissedAlarm(Calendar alarmTime) {
-        Set<Long> dismissedAlarmTimes = getDismissedAlarms();
-        return dismissedAlarmTimes.contains(alarmTime.getTimeInMillis());
+    public boolean isDismissedAlarm(AppAlarm appAlarm) {
+        Set<AppAlarm> dismissedAlarms = getDismissedAlarms();
+        return dismissedAlarms.contains(appAlarm);
     }
 
     interface SetOperation {
-        void modify(Set<Long> dismissedAlarms);
+        void modify(Set<AppAlarm> dismissedAlarms);
     }
 
     public static <T extends Comparable<? super T>> List<T> asSortedList(Collection<T> c) {
@@ -438,14 +453,14 @@ public class GlobalManager {
     private void modifyDismissedAlarm(SetOperation setOperation) {
         Log.v(TAG, "modifyDismissedAlarm()");
 
-        Set<Long> dismissedAlarms = getDismissedAlarms();
+        Set<AppAlarm> dismissedAlarms = getDismissedAlarms();
 
         // Remove elements for yesterday and before
         Calendar beginningOfToday = beginningOfToday(clock().now());
-        for (Iterator<Long> iterator = dismissedAlarms.iterator(); iterator.hasNext(); ) {
-            long dismissedAlarm = iterator.next();
-            if (dismissedAlarm < beginningOfToday.getTimeInMillis()) {
-                Log.d(TAG, "Removing an old dismissed alarm from the set of dismissed alarms: " + new Date(dismissedAlarm));
+        for (Iterator<AppAlarm> iterator = dismissedAlarms.iterator(); iterator.hasNext(); ) {
+            AppAlarm dismissedAlarm = iterator.next();
+            if (dismissedAlarm.getDateTime().before(beginningOfToday)) {
+                Log.d(TAG, "Removing an old dismissed alarm from the set of dismissed alarms: " + dismissedAlarm);
                 iterator.remove();
             }
         }
@@ -454,38 +469,46 @@ public class GlobalManager {
         setOperation.modify(dismissedAlarms);
 
         // Log
-        List<Long> sortedDismissedAlarms = asSortedList(dismissedAlarms);
+        List<AppAlarm> sortedDismissedAlarms = asSortedList(dismissedAlarms);
         Log.v(TAG, "There are " + dismissedAlarms.size() + " dismissed alarms at");
-        for (long alarmTime2 : sortedDismissedAlarms) {
-            Log.v(TAG, "   " + new Date(alarmTime2));
+        for (AppAlarm appAlarm : sortedDismissedAlarms) {
+            Log.v(TAG, "   " + appAlarm);
         }
 
-        // Save
-        Context context = AlarmMorningApplication.getAppContext();
-        JSONSharedPreferences.saveJSONArray(context, PERSIST_DISMISSED, new JSONArray(dismissedAlarms));
+        try {
+            // Create the object to persist
+            JSONArray jsonArray = new JSONArray();
+            for (AppAlarm dismissedAlarm : sortedDismissedAlarms) {
+                JSONObject obj = new JSONObject();
+                obj.put(STRING_PERSIST_TYPE, dismissedAlarm.getClass().getSimpleName());
+                obj.put(STRING_PERSIST_ID, dismissedAlarm.getPersistenceId());
+
+                jsonArray.put(jsonArray.length(), obj);
+            }
+
+            // Save
+            Context context = AlarmMorningApplication.getAppContext();
+            JSONSharedPreferences.saveJSONArray(context, PERSIST_DISMISSED, jsonArray);
+        } catch (JSONException e) {
+            Log.w(TAG, "Cannot convert to JSON, therefore cannot store dismissed alarms", e);
+        }
     }
 
-    private void addDismissedAlarm(Calendar alarmTime) {
-        Log.v(TAG, "addDismissedAlarm(alarmTime=" + alarmTime.getTime() + ")");
-
-        // FIXME 2 Currently there is an assumption: there is at most one alarm on a particular alarm time. With introduction of one-time alarms this is not true anymore. There may be large implications for entire app, not only for the dismissed alarms.
+    private void addDismissedAlarm(AppAlarm appAlarm) {
+        Log.v(TAG, "addDismissedAlarm(appAlarm=" + appAlarm + ")");
 
         modifyDismissedAlarm(dismissedAlarms ->
-                dismissedAlarms.add(alarmTime.getTimeInMillis())
+                dismissedAlarms.add(appAlarm)
         );
     }
 
-    private void removeDismissedAlarm(Calendar alarmTime) {
-        Log.v(TAG, "removeDismissedAlarm(alarmTime=" + (alarmTime == null ? "null" : alarmTime.getTime()) + ")");
-
-        if (alarmTime == null) {
-            return;
-        }
+    private void removeDismissedAlarm(AppAlarm appAlarm) {
+        Log.v(TAG, "removeDismissedAlarm(appAlarm=" + appAlarm + ")");
 
         modifyDismissedAlarm(dismissedAlarms -> {
-                    if (dismissedAlarms.contains(alarmTime.getTimeInMillis())) {
-                        Log.d(TAG, "Removing a dismissed alarm from the set of dismissed alarms: " + new Date(alarmTime.getTimeInMillis()));
-                        dismissedAlarms.remove(alarmTime.getTimeInMillis());
+            if (dismissedAlarms.contains(appAlarm)) {
+                Log.d(TAG, "Removing a dismissed alarm from the set of dismissed alarms: " + appAlarm);
+                dismissedAlarms.remove(appAlarm);
                     }
                 }
         );
@@ -494,54 +517,62 @@ public class GlobalManager {
     /**
      * Decides the state of the alarm.
      * <p>
-     * Algorithm:
+     * Algorithm: For the given alarm...
      * <p>
-     * 1. if the alarmTime is for last alarm then return the state of last alarm (same as {@link #getState()}); but if the alarmTime was dismissed then
-     * return {@link #STATE_DISMISSED_BEFORE_RINGING}.
+     * 1. if the alarm is the ringing alarm then return the state of last alarm (same as {@link #getState()}); but if the alarm was dismissed then
+     * return {@link #STATE_DISMISSED} or {@link #STATE_DISMISSED_BEFORE_RINGING} depending on the current time.
      * <p>
-     * 2. if the alarmTime is in the set of dismissed alarms then return {@link #STATE_DISMISSED} or {@link #STATE_DISMISSED_BEFORE_RINGING} depending on the
+     * 2. if the alarm is in the set of dismissed alarms then return {@link #STATE_DISMISSED} or {@link #STATE_DISMISSED_BEFORE_RINGING} depending on the
      * current time.
      * <p>
-     * 3. if the alarmTime is in past then return {@link #STATE_DISMISSED}
+     * 3. if the alarm is in the past then return {@link #STATE_DISMISSED}
      * <p>
-     * 4. if the alarmTime is in future then return {@link #STATE_FUTURE}
+     * 4. if the alarm is in the future then return {@link #STATE_FUTURE}
      *
-     * @param alarmTime Alarm time
+     * @param appAlarm An alarm
      * @return The state of the alarm
      */
-    public int getState(Calendar alarmTime) {
-        Log.v(TAG, "getState(alarmTime=" + alarmTime.getTime() + ")");
+    public int getState(AppAlarm appAlarm) {
+        Log.v(TAG, "getState(appAlarm=" + appAlarm + ")");
 
         // Condition 1
-        Calendar stateAlarmTime = getAlarmTimeOfRingingAlarm();
+        AppAlarm ringingAlarm = getRingingAlarm();
 
-        Log.v(TAG, "   saved state alarm time is " + stateAlarmTime.getTime());
+        Log.v(TAG, "   saved alarm time is " + ringingAlarm);
 
-        if (stateAlarmTime.equals(alarmTime)) {
-            Log.v(TAG, "   using saved state alarm time");
-
-            if (isDismissedAlarm(alarmTime)) {
-                return STATE_DISMISSED_BEFORE_RINGING; // TODO Properly return STATE_DISMISSED_BEFORE_RINGING or STATE_DISMISSED.
+        if (ringingAlarm != null &&
+                (appAlarm instanceof Day && ringingAlarm instanceof Day && (((Day) ringingAlarm).getDate()).equals(((Day) appAlarm).getDate())) ||
+                (appAlarm instanceof OneTimeAlarm && ringingAlarm instanceof OneTimeAlarm && (((OneTimeAlarm) ringingAlarm).getId() == ((OneTimeAlarm) appAlarm).getId()))
+                ) {
+            if (isDismissedAlarm(appAlarm)) {
+                if (appAlarm.getDateTime().before(clock().now())) {
+                    Log.v(TAG, "   is ringing & is among dismissed & is in past => DISMISSED");
+                    return STATE_DISMISSED;
+                } else {
+                    Log.v(TAG, "   is ringing & is among dismissed is in future => STATE_DISMISSED_BEFORE_RINGING");
+                    return STATE_DISMISSED_BEFORE_RINGING;
+                }
             }
+
+            Log.v(TAG, "   using saved state alarm time");
 
             return getState();
         }
 
         // Condition 2
-        Set<Long> dismissedAlarms = getDismissedAlarms();
-        if (dismissedAlarms.contains(alarmTime.getTimeInMillis())) {
-            if (alarmTime.before(clock().now())) {
+        Set<AppAlarm> dismissedAlarms = getDismissedAlarms();
+        if (dismissedAlarms.contains(appAlarm)) {
+            if (appAlarm.getDateTime().before(clock().now())) {
                 Log.v(TAG, "   is among dismissed & is in past => DISMISSED");
                 return STATE_DISMISSED;
             } else {
-                // Condition 4
                 Log.v(TAG, "   is among dismissed is in future => STATE_DISMISSED_BEFORE_RINGING");
                 return STATE_DISMISSED_BEFORE_RINGING;
             }
         }
 
         // Condition 3
-        if (alarmTime.before(clock().now())) {
+        if (appAlarm.getDateTime().before(clock().now())) {
             Log.v(TAG, "   is in past => DISMISSED");
             return STATE_DISMISSED;
         } else {
@@ -549,14 +580,6 @@ public class GlobalManager {
             Log.v(TAG, "   is in future => FUTURE");
             return STATE_FUTURE;
         }
-    }
-
-    private Set<Long> jsonToSet(JSONArray jsonArray) throws JSONException {
-        Set<Long> set = new HashSet<>(jsonArray.length());
-        for (int i = 0; i < jsonArray.length(); i++) {
-            set.add(jsonArray.getLong(i));
-        }
-        return set;
     }
 
     /*
@@ -583,25 +606,25 @@ public class GlobalManager {
             NextAction nextAction = systemAlarm.calcNextAction();
             NextAction nextActionPersisted = getNextAction();
 
-            if (!nextActionPersisted.action.equals(ACTION_UNDEFINED)) {
+            if (!nextActionPersisted.action.equals(STRING_UNDEFINED)) {
                 Log.w(TAG, "The next system alarm changed while the app was not running.\n" +
                         "   Persisted is action=" + nextActionPersisted.action +
                         ", time=" + nextActionPersisted.time.getTime() +
-                        ", alarmTime=" + (nextActionPersisted.alarmTime == null ? "null" : nextActionPersisted.alarmTime.getTime()) + "\n" +
+                        ", appAlarm=" + nextActionPersisted.appAlarm + "\n" +
                         "   Current is   action=" + nextAction.action +
                         ", time=" + nextAction.time.getTime() +
-                        ", alarmTime=" + (nextAction.alarmTime == null ? "null" : nextAction.alarmTime.getTime()));
+                        ", appAlarm=" + nextAction.appAlarm);
                 // e.g. because it was being upgraded or the device was off
 
                 List<Calendar> skippedAlarmTimes = new ArrayList<>();
 
                 if (!isDismissedAny()) {
-                    skippedAlarmTimes.add(getAlarmTimeOfRingingAlarm());
+                    skippedAlarmTimes.add(getRingingAlarm().getDateTime());
                 }
 
-                if (nextActionPersisted.alarmTime != null) {
+                if (nextActionPersisted.appAlarm != null) {
                     // Notification about skipped alarms
-                    Calendar from = addMilliSecondsClone(nextActionPersisted.alarmTime, 1);
+                    Calendar from = addMilliSecondsClone(nextActionPersisted.appAlarm.getDateTime(), 1);
 
                     List<Calendar> alarmTimes = getAlarmsInPeriod(from, clock().now());
 
@@ -615,7 +638,7 @@ public class GlobalManager {
                         analytics.save();
 
                         SystemNotification systemNotification = SystemNotification.getInstance(context);
-                        systemNotification.notifySkippedAlarms(skippedAlarmTimes.size());
+                        systemNotification.notifySkippedAlarms(skippedAlarmTimes.size()); // TODO include names of skipped one-time alarms
 
                         lastAlarmTime = skippedAlarmTimes.get(skippedAlarmTimes.size() - 1);
                     }
@@ -623,14 +646,14 @@ public class GlobalManager {
             }
         }
 
-        // resume if the previous alarm (e.g. the one that was the last ringing one) is still ringing
+        // Resume if the previous alarm (e.g. the one that was the last ringing) is still ringing
         if (isRingingOrSnoozed()) {
             Log.w(TAG, "Previous alarm is still ringing");
 
-            if (inRecentPast(getAlarmTimeOfRingingAlarm(), RECENT_PERIOD)) {
+            if (inRecentPast(getRingingAlarm().getDateTime(), RECENT_PERIOD)) {
                 Log.i(TAG, "Resuming ringing as the previous alarm is recent");
 
-                onRing();
+                onRing(getRingingAlarm());
 
                 return;
             } else {
@@ -638,11 +661,12 @@ public class GlobalManager {
             }
         }
 
-        // resume if the last alarm (e.g. the one that was scheduled as last) is recent
+        // Resume if the last alarm (e.g. the one that was scheduled as last) is recent.
+        // This covers the case then the device was off at the alarm time, but the device (and app) started shortly afterwards
         if (lastAlarmTime != null && inRecentPast(lastAlarmTime, RECENT_PERIOD)) {
             Log.i(TAG, "Resuming ringing as the last alarm is recent");
 
-            onRing();
+            onRing(getRingingAlarm());
 
             return;
         }
@@ -774,7 +798,11 @@ public class GlobalManager {
 
         if (systemAlarm.nextActionShouldChange()) {
             // cancel the current alarm
-            onAlarmCancel();
+            try {
+                onAlarmCancel(getNextAction().appAlarm);
+            } catch (IllegalArgumentException e) {
+                Log.d(TAG, "There is no persisted alarm to cancel", e);
+            }
 
             onAlarmSetNew(systemAlarm);
         }
@@ -790,9 +818,6 @@ public class GlobalManager {
 
         Context context = AlarmMorningApplication.getAppContext();
 
-        Calendar alarmTime = getNextAlarm(clock());
-        removeDismissedAlarm(alarmTime);
-
         // register next system alarm
         systemAlarm.onAlarmSet();
 
@@ -805,6 +830,7 @@ public class GlobalManager {
         switch (nextAction.action) {
             case ACTION_SET_SYSTEM_ALARM:
             case ACTION_RING_IN_NEAR_FUTURE:
+            case ACTION_ALARM_TIME_OF_EARLY_DISMISSED_ALARM:
                 // nothing
                 break;
             case SystemAlarm.ACTION_RING:
@@ -826,7 +852,7 @@ public class GlobalManager {
     /**
      * Translate state to {@link #STATE_FUTURE}.
      *
-     * @param callSystemAlarm If true then call {@link SystemAlarm#onNearFuture()}, otherwise ship the call.
+     * @param callSystemAlarm If true then call {@link SystemAlarm#onNearFuture(AppAlarm)}, otherwise ship the call.
      * @param force           If false then considers a ringing or snoozed alarm: if there is a ringing or snoozed alarm then do nothing.
      */
     private void onNearFuture(boolean callSystemAlarm, boolean force) {
@@ -834,10 +860,10 @@ public class GlobalManager {
 
         Context context = AlarmMorningApplication.getAppContext();
 
-        AppAlarm nextAlarmToRing = getNextAlarmToRing();
+        AppAlarm appAlarm = getNextAlarmToRing();
 
         Analytics analytics = new Analytics(context, Analytics.Event.Show, Analytics.Channel.Notification, Analytics.ChannelName.Alarm);
-        analytics.setAppAlarm(nextAlarmToRing);
+        analytics.setAppAlarm(appAlarm);
         analytics.save();
 
         if (!force && isRingingOrSnoozed()) {
@@ -845,21 +871,21 @@ public class GlobalManager {
 
             if (callSystemAlarm) {
                 SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
-                systemAlarm.onNearFuture();
+                systemAlarm.onNearFuture(appAlarm);
             }
 
             return;
         }
 
-        setState(STATE_FUTURE, getNextAction().alarmTime);
+        setState(STATE_FUTURE, appAlarm);
 
         if (callSystemAlarm) {
             SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
-            systemAlarm.onNearFuture();
+            systemAlarm.onNearFuture(appAlarm);
         }
 
         SystemNotification systemNotification = SystemNotification.getInstance(context);
-        systemNotification.onNearFuture(nextAlarmToRing);
+        systemNotification.onNearFuture(appAlarm);
     }
 
     /**
@@ -871,7 +897,7 @@ public class GlobalManager {
      * @param analytics Analytics
      */
     public void onDismissAny(AppAlarm appAlarm, Analytics analytics) {
-        Log.d(TAG, "onDismissAny()");
+        Log.d(TAG, "onDismissAny(appAlarm=" + appAlarm + ")");
 
         Calendar now = clock().now();
 
@@ -882,11 +908,15 @@ public class GlobalManager {
         }
     }
 
-    public void onDismissBeforeRinging(AppAlarm appAlarm, Analytics analytics) {
-        Log.d(TAG, "onDismissBeforeRinging()");
+    public void onDismissBeforeRinging(Analytics analytics) { // TODO Consider removing (there should be arguments everywhere). This is here only because pushing it to NotificatinReceiver would cause making NextAction public
+        onDismissBeforeRinging(getNextAction().appAlarm, analytics);
+    }
 
-        setState(STATE_DISMISSED_BEFORE_RINGING, appAlarm.getDateTime());
-        addDismissedAlarm(getAlarmTimeOfRingingAlarm());
+    public void onDismissBeforeRinging(AppAlarm appAlarm, Analytics analytics) {
+        Log.d(TAG, "onDismissBeforeRinging(appAlarm=" + appAlarm + ")");
+
+        setState(STATE_DISMISSED_BEFORE_RINGING, appAlarm);
+        addDismissedAlarm(appAlarm);
 
         Context context = AlarmMorningApplication.getAppContext();
 
@@ -918,8 +948,12 @@ public class GlobalManager {
         }
     }
 
-    public void onAlarmTimeOfEarlyDismissedAlarm() {
-        Log.d(TAG, "onAlarmTimeOfEarlyDismissedAlarm()");
+    public void onAlarmTimeOfEarlyDismissedAlarm() { // TODO Consider removing (there should be arguments everywhere)
+        onAlarmTimeOfEarlyDismissedAlarm(getNextAction().appAlarm);
+    }
+
+    public void onAlarmTimeOfEarlyDismissedAlarm(AppAlarm appAlarm) {
+        Log.d(TAG, "onAlarmTimeOfEarlyDismissedAlarm(appAlarm=" + appAlarm + ")");
 
         Context context = AlarmMorningApplication.getAppContext();
 
@@ -938,30 +972,32 @@ public class GlobalManager {
     }
 
     public void onRing() {
-        Log.d(TAG, "onRing()");
+        onRing(getNextAction().appAlarm); // TODO Consider removing (there should be arguments everywhere)
+    }
+
+    public void onRing(AppAlarm appAlarm) {
+        Log.d(TAG, "onRing(appAlarm=" + appAlarm + ")");
 
         Context context = AlarmMorningApplication.getAppContext();
 
         NextAction nextAction = getNextAction();
-        boolean isNew = !nextAction.time.after(nextAction.alarmTime); // otherwise the alarm is resumed after snoozing
+        boolean isNew = !nextAction.time.after(nextAction.appAlarm.getDateTime()); // This is the first time (at the alarm time) the alarm rings, otherwise the alarm is resumed after snoozing
 
-        if (isRingingOrSnoozed() && isNew) {
+        if (isRingingOrSnoozed() && isNew) { // Another alarm is still ringing
             Log.i(TAG, "The previous alarm is still ringing. Cancelling it.");
 
-            onAlarmCancel();
+            AppAlarm ringingAlarm = getRingingAlarm();
+
+            setState(STATE_DISMISSED, ringingAlarm);
 
             SystemNotification systemNotification = SystemNotification.getInstance(context);
-            systemNotification.notifyCancelledAlarm();
-
-            setState(STATE_RINGING, nextAction.alarmTime);
-        } else {
-            setState(STATE_RINGING, getAlarmTimeOfRingingAlarm());
+            systemNotification.notifyCancelledAlarm(ringingAlarm);
         }
 
-        AppAlarm nextAlarmToRing = getNextAlarmToRing();
+        setState(STATE_RINGING, appAlarm);
 
         Analytics analytics = new Analytics(context, Analytics.Event.Ring, Analytics.Channel.Time, Analytics.ChannelName.Alarm);
-        analytics.setAppAlarm(nextAlarmToRing);
+        analytics.setAppAlarm(appAlarm);
         // TODO Analytics - add number of snoozes
         // TODO Analytics - add device location
         analytics.save();
@@ -970,13 +1006,22 @@ public class GlobalManager {
         systemAlarm.onRing();
 
         SystemNotification systemNotification = SystemNotification.getInstance(context);
-        systemNotification.onRing(nextAlarmToRing);
+        systemNotification.onRing(appAlarm);
 
         if (isNew) {
             SystemAlarmClock systemAlarmClock = SystemAlarmClock.getInstance(context);
             systemAlarmClock.onRing();
 
             updateWidget(context);
+        }
+
+        // If there is another alarm scheduled at the same time, then cancel it
+        List<OneTimeAlarm> oneTimeAlarms = loadOneTimeAlarms();
+        for (OneTimeAlarm oneTimeAlarm : oneTimeAlarms) {
+            if (!appAlarm.equals(oneTimeAlarm) && oneTimeAlarm.getDateTime().equals(appAlarm.getDateTime())) {
+                addDismissedAlarm(oneTimeAlarm);
+                systemNotification.notifyCancelledAlarm(oneTimeAlarm);
+            }
         }
 
         startRingingActivity(context);
@@ -1002,13 +1047,13 @@ public class GlobalManager {
         analytics.setAppAlarm(appAlarm);
         analytics.save();
 
-        if (getState() == STATE_SNOOZED) {
+        if (getState(appAlarm) == STATE_SNOOZED) {
             SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
             systemAlarm.onAlarmSet();
         }
 
-        setState(STATE_DISMISSED, getAlarmTimeOfRingingAlarm());
-        addDismissedAlarm(getAlarmTimeOfRingingAlarm());
+        setState(STATE_DISMISSED, appAlarm);
+        addDismissedAlarm(appAlarm);
 
         SystemNotification systemNotification = SystemNotification.getInstance(context);
         systemNotification.onDismiss(appAlarm);
@@ -1044,7 +1089,7 @@ public class GlobalManager {
         // TODO Analytics - add number of snoozes
         analytics.save();
 
-        setState(STATE_SNOOZED, getAlarmTimeOfRingingAlarm());
+        setState(STATE_SNOOZED, getRingingAlarm());
 
         Calendar ringAfterSnoozeTime = getRingAfterSnoozeTime(clock());
 
@@ -1065,12 +1110,10 @@ public class GlobalManager {
      * This event occurs when there is an alarm with state after {@link #STATE_FUTURE} and before state {@link #STATE_DISMISSED} (or {@link
      * #STATE_DISMISSED_BEFORE_RINGING}), that has to be cancelled because an earlier alarm was set by the user.
      */
-    private void onAlarmCancel() {
+    private void onAlarmCancel(AppAlarm appAlarm) {
         Log.d(TAG, "onAlarmCancel()");
 
         Context context = AlarmMorningApplication.getAppContext();
-
-        AppAlarm nextAlarmToRing = getNextAlarmToRing();
 
         if (isRingingOrSnoozed()) {
             /* Note for Analytics - Situation: Alarm at 9:00 is snoozed and set at 10:00. Currently the events are in the order:
@@ -1079,12 +1122,12 @@ public class GlobalManager {
                Naturally, order should be switched. But it is implemented this way. */
             Analytics analytics = new Analytics(context, Analytics.Event.Dismiss, Analytics.Channel.External, Analytics.ChannelName.Alarm);
             analytics.set(Analytics.Param.Dismiss_type, Analytics.DISMISS__AUTO);
-            analytics.setAppAlarm(nextAlarmToRing);
+            analytics.setAppAlarm(appAlarm);
             analytics.save();
         }
 
         SystemNotification systemNotification = SystemNotification.getInstance(context);
-        systemNotification.onAlarmCancel(nextAlarmToRing);
+        systemNotification.onAlarmCancel(appAlarm);
 
         SystemAlarmClock systemAlarmClock = SystemAlarmClock.getInstance(context);
         systemAlarmClock.onAlarmCancel();
@@ -1111,23 +1154,31 @@ public class GlobalManager {
 
         switch (day.getState()) {
             case Day.STATE_DISABLED:
-                Log.i(TAG, "Disable alarm on " + day.getDateTime().getTime());
+                Log.i(TAG, "Disable alarm on " + day);
                 break;
             case Day.STATE_ENABLED:
-                Log.i(TAG, "Set alarm on " + day.getDateTime().getTime());
+                Log.i(TAG, "Set alarm on " + day);
+                break;
+            case Day.STATE_RULE:
+                Log.i(TAG, "Reverting alarm to default on " + day);
                 break;
             default:
-                Log.i(TAG, "Reverting alarm to default on " + day.getDateTime().getTime());
+                throw new IllegalArgumentException("Unexpected state " + day.getState());
         }
 
-        // If the modified alam is ringing or snooze, then dismiss it
+        // If the modified alarm is ringing or snoozed, then adjust state
         if (isRingingOrSnoozed()) {
             AppAlarm nextAlarmToRing = getNextAlarmToRing();
             if (nextAlarmToRing instanceof Day) {
                 Day dayOld = (Day) nextAlarmToRing;
                 if (onTheSameDate(day.getDate(), dayOld.getDate())) {
-                    setState(STATE_DISMISSED, dayOld.getDateTime());
-                    addDismissedAlarm(dayOld.getDateTime());
+                    Calendar now = clock().now();
+                    if (now.before(day.getDateTime())) {
+                        setState(STATE_FUTURE, dayOld);
+                    } else {
+                        setState(STATE_DISMISSED, dayOld);
+                        addDismissedAlarm(dayOld);
+                    }
                 }
             }
         }
@@ -1191,8 +1242,9 @@ public class GlobalManager {
             if (nextAlarmToRing instanceof OneTimeAlarm) {
                 OneTimeAlarm oneTimeAlarmOld = (OneTimeAlarm) nextAlarmToRing;
                 if (oneTimeAlarm.getId() == oneTimeAlarmOld.getId()) {
-                    setState(STATE_DISMISSED, oneTimeAlarmOld.getDateTime());
-                    addDismissedAlarm(oneTimeAlarmOld.getDateTime());
+                    Log.i(TAG, "Dismissing (before actual delete) the ringing one-time alarm at " + oneTimeAlarm.getDateTime());
+                    setState(STATE_DISMISSED, oneTimeAlarm);
+                    addDismissedAlarm(oneTimeAlarm);
                 }
             }
         }
@@ -1220,9 +1272,11 @@ public class GlobalManager {
     public void modifyOneTimeAlarmDateTime(OneTimeAlarm oneTimeAlarm, Analytics analytics) {
         Log.d(TAG, "modifyOneTimeAlarmDateTime()");
 
-        setState(STATE_FUTURE, oneTimeAlarm.getDateTime());
+        setState(STATE_FUTURE, oneTimeAlarm);
 
         save(oneTimeAlarm, analytics);
+
+        removeDismissedAlarm(oneTimeAlarm);
 
         Context context = AlarmMorningApplication.getAppContext();
 
@@ -1293,8 +1347,8 @@ public class GlobalManager {
         Intent ringIntent = new Intent(context, RingActivity.class);
 //        ringIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         ringIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        ringIntent.putExtra(RingActivity.ALARM_TIME, getAlarmTimeOfRingingAlarm());
-        AppAlarm alarmOfRingingAlarm = getNextActionAlarm();
+        ringIntent.putExtra(RingActivity.ALARM_TIME, getRingingAlarm().getDateTime());
+        AppAlarm alarmOfRingingAlarm = getNextAction().appAlarm;
         String oneTimeAlarmName = alarmOfRingingAlarm instanceof OneTimeAlarm ? ((OneTimeAlarm) alarmOfRingingAlarm).getName() : null;
         ringIntent.putExtra(RingActivity.ALARM_NAME, oneTimeAlarmName);
         context.startActivity(ringIntent);
@@ -1459,7 +1513,7 @@ public class GlobalManager {
                 continue;
             }
 
-            Log.v(TAG, "   The day that satisfies filter is " + day.getDateTime().getTime().toString());
+            Log.v(TAG, "   The day that satisfies filter is " + day);
             return day;
         }
 
@@ -1490,7 +1544,7 @@ public class GlobalManager {
         if (nextOneTimeAlarm == null) {
             Log.v(TAG, "   No next alarm defined by one-time alarms");
         } else {
-            Log.v(TAG, "   The one-time alarm that satisfies filter is " + nextOneTimeAlarm.getDateTime().getTime().toString());
+            Log.v(TAG, "   The one-time alarm that satisfies filter is " + nextOneTimeAlarm.getDateTime().getTime());
         }
 
         return nextOneTimeAlarm;
@@ -1531,6 +1585,31 @@ public class GlobalManager {
         }
 
         return alarmTimes;
+    }
+
+    private AppAlarm load(String alarmType, String alarmId) throws IllegalArgumentException {
+        if (alarmType.equals(STRING_UNDEFINED))
+            throw new IllegalArgumentException("Invalid alarm type: " + alarmType);
+
+        if (alarmType.equals(Day.class.getSimpleName())) {
+            if (alarmId.equals(STRING_UNDEFINED))
+                throw new IllegalArgumentException("Invalid date string: " + alarmId);
+
+            Calendar date = Analytics.dateStringToCalendar(alarmId);
+
+            Day day = loadDay(date);
+
+            return day;
+        } else if (alarmType.equals(OneTimeAlarm.class.getSimpleName())) {
+            if (alarmId.equals(STRING_UNDEFINED))
+                throw new IllegalArgumentException("Invalid one-time alarm id: " + alarmId);
+
+            OneTimeAlarm oneTimeAlarm = loadOneTimeAlarm(Long.decode(alarmId));
+
+            return oneTimeAlarm;
+        } else {
+            throw new IllegalArgumentException("Unexpected class " + alarmType);
+        }
     }
 
     static public String stateToString(int state) {

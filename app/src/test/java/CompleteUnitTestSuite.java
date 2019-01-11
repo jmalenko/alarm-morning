@@ -6,6 +6,7 @@ import cz.jaro.alarmmorning.AlarmMorningActivityTest;
 import cz.jaro.alarmmorning.BootReceiverTest;
 import cz.jaro.alarmmorning.app.CalendarWithDayAlarmTest;
 import cz.jaro.alarmmorning.app.CalendarWithOneTimeAlarmTest;
+import cz.jaro.alarmmorning.app.CalendarWithTwoAlarmsTest;
 import cz.jaro.alarmmorning.clock.FixedClockTest;
 import cz.jaro.alarmmorning.clock.SystemClockTest;
 import cz.jaro.alarmmorning.holiday.HolidayHelper1HolidaysTest;
@@ -50,6 +51,7 @@ import cz.jaro.alarmmorning.model.GlobalManager1NextAlarm7TwoOneTimeAlarmsAtTheS
 
         CalendarWithDayAlarmTest.class,
         CalendarWithOneTimeAlarmTest.class,
+        CalendarWithTwoAlarmsTest.class,
 
         AlarmMorningActivity0Test.class,
         AlarmMorningActivityTest.class

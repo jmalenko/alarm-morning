@@ -167,6 +167,11 @@ public class Day extends AppAlarm {
         setMinuteDay(minute);
     }
 
+    @Override
+    public String getPersistenceId() {
+        return Analytics.calendarToStringDate(date);
+    }
+
     /**
      * Checks whether the data for this object are valid.
      *
@@ -251,7 +256,7 @@ public class Day extends AppAlarm {
     public String toString() {
         StringBuffer str = new StringBuffer();
 
-        str.append(Analytics.calendarToDate(date));
+        str.append(Analytics.calendarToStringDate(date));
         str.append(" ");
         str.append(Analytics.dayStateToString(state));
 
@@ -273,5 +278,24 @@ public class Day extends AppAlarm {
         }
 
         return str.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        // Note: intentionally consider only the alarm year+month+date.
+
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Day day = (Day) o;
+
+        return date.get(Calendar.YEAR) == day.date.get(Calendar.YEAR)
+                && date.get(Calendar.MONTH) == day.date.get(Calendar.MONTH)
+                && date.get(Calendar.DATE) == day.date.get(Calendar.DATE);
+    }
+
+    @Override
+    public int hashCode() {
+        return date.hashCode();
     }
 }

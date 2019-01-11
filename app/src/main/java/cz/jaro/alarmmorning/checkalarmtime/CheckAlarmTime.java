@@ -277,7 +277,7 @@ public class CheckAlarmTime {
         Calendar date = now.before(checkAlarmTimeAtToday) ? CalendarUtils.beginningOfToday(now) : CalendarUtils.beginningOfTomorrow(now);
         Day day = globalManager.loadDay(date);
 
-        Log.v(TAG, !day.isEnabled() ? "Alarm is disabled on " + day.getDate().getTime().toString() : "Is now in period between" + checkAlarmTimeAt.getTime().toString() + " and " + day.getDateTime().getTime().toString());
+        Log.v(TAG, !day.isEnabled() ? "Alarm is disabled on " + day.getDate().getTime() : "Is now in period between" + checkAlarmTimeAt.getTime() + " and " + day.getDateTime().getTime());
         boolean res = !day.isEnabled() || (now.after(checkAlarmTimeAt) && now.before(day.getDateTime()));
         Log.d(TAG, "isBetweenCheckAlarmTimeAndAlarmTime() returns " + res);
         return res;
