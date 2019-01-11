@@ -130,7 +130,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         viewHolder.getTextTime().setText(timeText);
 
         GlobalManager globalManager = GlobalManager.getInstance();
-        int state = globalManager.getState(appAlarm.getDateTime());
+        int state = globalManager.getState(appAlarm);
 
         boolean enabled;
         enabled = (appAlarm instanceof Day && !day.isEnabled()) || (state != GlobalManager.STATE_DISMISSED_BEFORE_RINGING && state != GlobalManager.STATE_DISMISSED);
