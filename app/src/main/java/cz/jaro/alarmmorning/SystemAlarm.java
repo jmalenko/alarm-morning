@@ -81,7 +81,7 @@ public class SystemAlarm {
     }
 
     /**
-     * Register system alarm that works reliably - triggers on a specific time, regardles the Android version, and whether the devicee is asleep (in low-power
+     * Register system alarm that works reliably - triggers on a specific time, regardless the Android version, and whether the device is asleep (in low-power
      * idle mode).
      *
      * @param alarmManager alarmManager
