@@ -46,7 +46,6 @@ import android.view.View;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
@@ -74,10 +73,7 @@ public class AlarmMorningActivity extends AppCompatActivity {
     public static final String EVENT_MODIFY_ONE_TIME_ALARM_DATETIME = "EVENT_MODIFY_ONE_TIME_ALARM_DATETIME";
     public static final String EVENT_MODIFY_ONE_TIME_ALARM_NAME = "EVENT_MODIFY_ONE_TIME_ALARM_NAME";
 
-    public static final String EXTRA_ALARM_CLASS = "EXTRA_ALARM_CLASS";
-    public static final String EXTRA_ALARM_DATE = "EXTRA_ALARM_DATE";
-    public static final String EXTRA_ALARM_MONTH = "EXTRA_ALARM_MONTH";
-    public static final String EXTRA_ALARM_YEAR = "EXTRA_ALARM_YEAR";
+    public static final String EXTRA_ALARM_TYPE = "EXTRA_ALARM_TYPE";
     public static final String EXTRA_ALARM_ID = "EXTRA_ALARM_ID";
 
     public static final String URL_WEBSITE = "https://github.com/jmalenko/alarm-morning/wiki";
@@ -176,31 +172,12 @@ public class AlarmMorningActivity extends AppCompatActivity {
 
                 // Get the AppAlarm related to the event
                 AppAlarm appAlarm = null;
-                Day day = null;
-                OneTimeAlarm oneTimeAlarm = null;
 
-                String alarmClass = intent.getStringExtra(EXTRA_ALARM_CLASS);
-                if (alarmClass != null) {
-                    if (alarmClass.equals(Day.class.getName())) {
-                        Calendar cal = Calendar.getInstance();
-                        cal.set(Calendar.DATE, intent.getIntExtra(EXTRA_ALARM_DATE, -1));
-                        cal.set(Calendar.MONTH, intent.getIntExtra(EXTRA_ALARM_MONTH, -1));
-                        cal.set(Calendar.YEAR, intent.getIntExtra(EXTRA_ALARM_YEAR, -1));
-
-                        GlobalManager globalManager = GlobalManager.getInstance();
-                        day = globalManager.loadDay(cal);
-
-                        appAlarm = day;
-                    } else if (alarmClass.equals(OneTimeAlarm.class.getName())) {
-                        GlobalManager globalManager = GlobalManager.getInstance();
-                        long alarmId = intent.getLongExtra(EXTRA_ALARM_ID, -1);
-                        oneTimeAlarm = globalManager.loadOneTimeAlarm(alarmId);
-
-                        appAlarm = oneTimeAlarm;
-                    } else {
-                        throw new IllegalArgumentException("Unexpected class " + alarmClass);
-                    }
-                }
+                GlobalManager globalManager = GlobalManager.getInstance();
+                String alarmType = intent.getStringExtra(EXTRA_ALARM_TYPE);
+                String alarmId = intent.getStringExtra(EXTRA_ALARM_ID);
+                if (alarmType != null && alarmId != null)
+                    appAlarm = globalManager.load(alarmType, alarmId);
 
                 switch (action) {
                     // Events relevant to current alarm
@@ -230,21 +207,20 @@ public class AlarmMorningActivity extends AppCompatActivity {
                     // Events relevant to alarm management
 
                     case EVENT_MODIFY_DAY_ALARM:
-                        calendarFragment.onModifyDayAlarm(day);
+                        calendarFragment.onModifyDayAlarm((Day) appAlarm);
                         break;
                     case EVENT_CREATE_ONE_TIME_ALARM:
-                        calendarFragment.onCreateOneTimeAlarm(oneTimeAlarm);
+                        calendarFragment.onCreateOneTimeAlarm((OneTimeAlarm) appAlarm);
                         break;
                     case EVENT_DELETE_ONE_TIME_ALARM:
                         // Note: The alarm is already deleted from the database. Therefore we can only pass the id.
-                        long alarmId = intent.getLongExtra(EXTRA_ALARM_ID, -1);
-                        calendarFragment.onDeleteOneTimeAlarm(alarmId);
+                        calendarFragment.onDeleteOneTimeAlarm(Integer.valueOf(alarmId));
                         break;
                     case EVENT_MODIFY_ONE_TIME_ALARM_DATETIME:
-                        calendarFragment.onModifyOneTimeAlarmDateTime(oneTimeAlarm);
+                        calendarFragment.onModifyOneTimeAlarmDateTime((OneTimeAlarm) appAlarm);
                         break;
                     case EVENT_MODIFY_ONE_TIME_ALARM_NAME:
-                        calendarFragment.onModifyOneTimeAlarmName(oneTimeAlarm);
+                        calendarFragment.onModifyOneTimeAlarmName((OneTimeAlarm) appAlarm);
                         break;
                     default:
                         throw new IllegalArgumentException("Unexpected argument " + action);

@@ -34,11 +34,8 @@ import cz.jaro.alarmmorning.model.Day;
 import cz.jaro.alarmmorning.model.Defaults;
 import cz.jaro.alarmmorning.model.OneTimeAlarm;
 
-import static cz.jaro.alarmmorning.AlarmMorningActivity.EXTRA_ALARM_CLASS;
-import static cz.jaro.alarmmorning.AlarmMorningActivity.EXTRA_ALARM_DATE;
 import static cz.jaro.alarmmorning.AlarmMorningActivity.EXTRA_ALARM_ID;
-import static cz.jaro.alarmmorning.AlarmMorningActivity.EXTRA_ALARM_MONTH;
-import static cz.jaro.alarmmorning.AlarmMorningActivity.EXTRA_ALARM_YEAR;
+import static cz.jaro.alarmmorning.AlarmMorningActivity.EXTRA_ALARM_TYPE;
 import static cz.jaro.alarmmorning.SystemAlarm.ACTION_ALARM_TIME_OF_EARLY_DISMISSED_ALARM;
 import static cz.jaro.alarmmorning.SystemAlarm.ACTION_RING_IN_NEAR_FUTURE;
 import static cz.jaro.alarmmorning.SystemAlarm.ACTION_SET_SYSTEM_ALARM;
@@ -1358,18 +1355,8 @@ public class GlobalManager {
         Intent intent = new Intent(context, AlarmMorningActivity.class);
         intent.setAction(action);
         if (appAlarm != null) {
-            intent.putExtra(EXTRA_ALARM_CLASS, appAlarm.getClass().getName());
-            if (appAlarm instanceof Day) {
-                Day day = (Day) appAlarm;
-                intent.putExtra(EXTRA_ALARM_DATE, day.getDate().get(Calendar.DATE));
-                intent.putExtra(EXTRA_ALARM_MONTH, day.getDate().get(Calendar.MONTH));
-                intent.putExtra(EXTRA_ALARM_YEAR, day.getDate().get(Calendar.YEAR));
-            } else if (appAlarm instanceof OneTimeAlarm) {
-                OneTimeAlarm oneTimeAlarm = (OneTimeAlarm) appAlarm;
-                intent.putExtra(EXTRA_ALARM_ID, oneTimeAlarm.getId());
-            } else {
-                throw new IllegalArgumentException("Unexpected class " + appAlarm.getClass());
-            }
+            intent.putExtra(EXTRA_ALARM_TYPE, appAlarm.getClass().getSimpleName());
+            intent.putExtra(EXTRA_ALARM_ID, appAlarm.getPersistenceId());
         }
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
@@ -1567,7 +1554,7 @@ public class GlobalManager {
         return alarmTimes;
     }
 
-    private AppAlarm load(String alarmType, String alarmId) throws IllegalArgumentException {
+    AppAlarm load(String alarmType, String alarmId) throws IllegalArgumentException {
         if (alarmType.equals(STRING_UNDEFINED))
             throw new IllegalArgumentException("Invalid alarm type: " + alarmType);
 
