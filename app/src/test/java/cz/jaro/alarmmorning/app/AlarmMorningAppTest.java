@@ -214,7 +214,7 @@ public class AlarmMorningAppTest extends FixedTimeTest {
         activity = Robolectric.setupActivity(AlarmMorningActivity.class);
         shadowActivity = Shadows.shadowOf(activity);
 
-        recyclerView = (RecyclerView) shadowActivity.findViewById(R.id.calendar_recycler_view);
+        recyclerView = (RecyclerView) activity.findViewById(R.id.calendar_recycler_view);
 
         refreshRecyclerView();
     }

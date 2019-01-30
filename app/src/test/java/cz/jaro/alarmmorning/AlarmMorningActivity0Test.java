@@ -47,9 +47,8 @@ public class AlarmMorningActivity0Test extends FixedTimeTest {
     @Test
     public void noAlarmInDefaults() {
         DefaultsActivity activity = Robolectric.setupActivity(DefaultsActivity.class);
-        ShadowActivity shadowActivity = Shadows.shadowOf(activity);
 
-        RecyclerView recyclerView = (RecyclerView) shadowActivity.findViewById(R.id.defaults_recycler_view);
+        RecyclerView recyclerView = (RecyclerView) activity.findViewById(R.id.defaults_recycler_view);
 
         // XXX Workaround Robolectric - RecyclerView needs to be measured and laid out manually in Robolectric.
         // Source: http://stackoverflow.com/questions/27052866/android-robolectric-click-recyclerview-item
@@ -73,7 +72,7 @@ public class AlarmMorningActivity0Test extends FixedTimeTest {
 
         Resources res = activity.getResources();
 
-        RecyclerView recyclerView = (RecyclerView) shadowActivity.findViewById(R.id.calendar_recycler_view);
+        RecyclerView recyclerView = (RecyclerView) activity.findViewById(R.id.calendar_recycler_view);
 
         // XXX Workaround Robolectric - RecyclerView needs to be measured and laid out manually in Robolectric.
         // Source: http://stackoverflow.com/questions/27052866/android-robolectric-click-recyclerview-item

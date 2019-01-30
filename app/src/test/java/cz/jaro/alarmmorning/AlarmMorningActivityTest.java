@@ -173,9 +173,8 @@ public class AlarmMorningActivityTest extends FixedTimeTest {
         setLocale(context, "en", "US");
 
         AlarmMorningActivity activity = Robolectric.setupActivity(AlarmMorningActivity.class);
-        ShadowActivity shadowActivity = Shadows.shadowOf(activity);
 
-        NavigationView mNavigationView = (NavigationView) shadowActivity.findViewById(R.id.left_drawer);
+        NavigationView mNavigationView = (NavigationView) activity.findViewById(R.id.left_drawer);
         MenuItem menuItem = mNavigationView.getMenu().findItem(R.id.navigation_translate);
 
         assertThat(menuItem.isVisible()).isEqualTo(false);
@@ -189,9 +188,8 @@ public class AlarmMorningActivityTest extends FixedTimeTest {
         setLocale(context, "en", "GB");
 
         AlarmMorningActivity activity = Robolectric.setupActivity(AlarmMorningActivity.class);
-        ShadowActivity shadowActivity = Shadows.shadowOf(activity);
 
-        NavigationView mNavigationView = (NavigationView) shadowActivity.findViewById(R.id.left_drawer);
+        NavigationView mNavigationView = (NavigationView) activity.findViewById(R.id.left_drawer);
         MenuItem menuItem = mNavigationView.getMenu().findItem(R.id.navigation_translate);
 
         assertThat(menuItem.isVisible()).isEqualTo(true);
@@ -209,9 +207,8 @@ public class AlarmMorningActivityTest extends FixedTimeTest {
         setLocale(context, "sk", "SK");
 
         AlarmMorningActivity activity = Robolectric.setupActivity(AlarmMorningActivity.class);
-        ShadowActivity shadowActivity = Shadows.shadowOf(activity);
 
-        NavigationView mNavigationView = (NavigationView) shadowActivity.findViewById(R.id.left_drawer);
+        NavigationView mNavigationView = (NavigationView) activity.findViewById(R.id.left_drawer);
         MenuItem menuItem = mNavigationView.getMenu().findItem(R.id.navigation_translate);
 
         assertThat(menuItem.isVisible()).isEqualTo(true);
@@ -326,11 +323,10 @@ public class AlarmMorningActivityTest extends FixedTimeTest {
         setLocale(context, "en", "US");
 
         DefaultsActivity activity = Robolectric.setupActivity(DefaultsActivity.class);
-        ShadowActivity shadowActivity = Shadows.shadowOf(activity);
 
         Resources res = activity.getResources();
 
-        RecyclerView recyclerView = (RecyclerView) shadowActivity.findViewById(R.id.defaults_recycler_view);
+        RecyclerView recyclerView = (RecyclerView) activity.findViewById(R.id.defaults_recycler_view);
 
         // XXX Workaround Robolectric - RecyclerView needs to be measured and laid out manually in Robolectric.
         // Source: http://stackoverflow.com/questions/27052866/android-robolectric-click-recyclerview-item
@@ -358,11 +354,10 @@ public class AlarmMorningActivityTest extends FixedTimeTest {
         setLocale(context, "cs", "CZ");
 
         DefaultsActivity activity = Robolectric.setupActivity(DefaultsActivity.class);
-        ShadowActivity shadowActivity = Shadows.shadowOf(activity);
 
         Resources res = activity.getResources();
 
-        RecyclerView recyclerView = (RecyclerView) shadowActivity.findViewById(R.id.defaults_recycler_view);
+        RecyclerView recyclerView = (RecyclerView) activity.findViewById(R.id.defaults_recycler_view);
 
         // XXX Workaround Robolectric - RecyclerView needs to be measured and laid out manually in Robolectric.
         // Source: http://stackoverflow.com/questions/27052866/android-robolectric-click-recyclerview-item

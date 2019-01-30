@@ -52,7 +52,7 @@ public class CalendarWithDayAlarmTest extends AlarmMorningAppTest {
 
     @Test
     public void t000_prerequisities() {
-        assertThat("Shadow widget manager contains a provider", shadowAppWidgetManager.getInstalledProviders().size(), is(1));
+        assertThat("Shadow widget manager contains a provider", appWidgetManager.getInstalledProviders().size(), is(1));
     }
 
     @Test
