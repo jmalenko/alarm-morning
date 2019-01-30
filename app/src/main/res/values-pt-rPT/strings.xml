@@ -4,7 +4,7 @@
   <!-- Calendar activity -->
   <string name="title_activity_calendar">Alarmes agendados</string>
   <string name="menu_day_header">Alarme no <xliff:g example="07:00" id="time">%1$s </xliff:g> na <xliff:g example="Sat" id="dayOfWeek">%2$s </xliff:g>, <xliff:g example="23/12" id="date">%3$s </xliff:g></string>
-  <string name="menu_day_header_disabled">Alarme desativado em <xliff:g example="Sat" id="dayOfWeek">%1$s na <xliff:g example="23/12" id="date">%2$s </xliff:g>, </xliff:g></string>
+    <string name="menu_day_header_disabled">Alarme desativado em <xliff:g example="Sat" id="dayOfWeek">%1$s</xliff:g> na <xliff:g example="23/12" id="date">%2$s </xliff:g>, </string>
   <!-- Default activity -->
   <string name="title_activity_defaults">Alarmes de padrão</string>
   <string name="change_others_title">Alarme para <xliff:g example="07:00" id="time">%1$s </xliff:g> de <xliff:g example="Sat" id="dayOfWeek">%2$s </xliff:g> também?</string>
