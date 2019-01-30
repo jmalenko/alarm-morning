@@ -38,8 +38,6 @@ import static cz.jaro.alarmmorning.model.DayTest.YEAR;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-// TODO Migrate tests to Robolectric 4. http://robolectric.org/blog/2018/10/25/robolectric-4-0/ and http://robolectric.org/automated-migration/
-
 /**
  * Tests of alarm management in UI.
  * <p>
