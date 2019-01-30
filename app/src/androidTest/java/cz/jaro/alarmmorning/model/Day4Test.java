@@ -17,7 +17,7 @@ import static cz.jaro.alarmmorning.model.AlarmDataSource1Test.HOUR_DAY;
 import static cz.jaro.alarmmorning.model.AlarmDataSource1Test.MINUTE_DAY;
 import static cz.jaro.alarmmorning.model.AlarmDataSource1Test.MONTH;
 import static cz.jaro.alarmmorning.model.AlarmDataSource1Test.YEAR;
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 @RunWith(AndroidJUnit4.class)
 public class Day4Test {

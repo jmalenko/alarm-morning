@@ -18,8 +18,8 @@ import static cz.jaro.alarmmorning.model.AlarmDataSource1Test.HOUR_DAY;
 import static cz.jaro.alarmmorning.model.AlarmDataSource1Test.MINUTE_DAY;
 import static cz.jaro.alarmmorning.model.AlarmDataSource1Test.MONTH;
 import static cz.jaro.alarmmorning.model.AlarmDataSource1Test.YEAR;
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertNotNull;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Tests with a database preset to particular scenario: there are several Days and defaults are off.

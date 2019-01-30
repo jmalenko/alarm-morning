@@ -14,8 +14,8 @@ import static cz.jaro.alarmmorning.model.DayTest.HOUR_DAY;
 import static cz.jaro.alarmmorning.model.DayTest.HOUR_DEFAULT;
 import static cz.jaro.alarmmorning.model.DayTest.MINUTE_DAY;
 import static cz.jaro.alarmmorning.model.DayTest.MINUTE_DEFAULT;
-import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests when no alarm should ring. Holiday is not defined.
