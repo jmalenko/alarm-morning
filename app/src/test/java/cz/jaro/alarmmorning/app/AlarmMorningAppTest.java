@@ -146,7 +146,7 @@ public class AlarmMorningAppTest extends FixedTimeTest {
 
         // Close ring activity
         if (activity instanceof RingActivity) {
-            RingActivity ringActivity = (RingActivity) this.activity;
+            RingActivity ringActivity = (RingActivity) activity;
             ringActivity.shutdown();
         }
 
@@ -247,13 +247,12 @@ public class AlarmMorningAppTest extends FixedTimeTest {
     }
 
     public static void clickContextMenu(RecyclerView recyclerView, int id) {
-        ShadowViewGroup shadowViewGroup = Shadows.shadowOf(recyclerView);
-        android.app.Fragment calendarFragment = (CalendarFragment) shadowViewGroup.getOnCreateContextMenuListener();
-        final RoboMenuItem contextMenuItem = new RoboMenuItem(id);
-
         // TODO Check that the context menu contains this id and that this id is is visible (not yet easily supported by Roboletric)
 
         // Select the context menu item
+        ShadowViewGroup shadowViewGroup = Shadows.shadowOf(recyclerView);
+        android.app.Fragment calendarFragment = (CalendarFragment) shadowViewGroup.getOnCreateContextMenuListener();
+        final RoboMenuItem contextMenuItem = new RoboMenuItem(id);
         calendarFragment.onContextItemSelected(contextMenuItem);
     }
 
