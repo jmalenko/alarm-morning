@@ -637,7 +637,7 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
 
         assertThat("The number of items", recyclerView.getChildCount(), is(HORIZON_DAYS + 2));
         assertCalendarItem(0, "2/1", "Mon", "Off", "", null, ""); // Today
-        assertCalendarItem(1, "", "", "4:31 AM", "Ringing", "", "–10s"); // The one-time alarm
+        assertCalendarItem(1, "", "", "4:31 AM", "Ringing", "", "-10s"); // The one-time alarm
         assertCalendarItem(2, "", "", "4:32 AM", "", "", ""); // The one-time alarm
         assertCalendarItem(3, "2/2", "Tue", "Off", "", null, ""); // Tomorrow
 
@@ -706,7 +706,7 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
         assertThat("The number of items", recyclerView.getChildCount(), is(HORIZON_DAYS + 2));
         assertCalendarItem(0, "2/1", "Mon", "Off", "", null, ""); // Today
         assertCalendarItem(1, "", "", "4:31 AM", "Passed", "", ""); // The one-time alarm
-        assertCalendarItem(2, "", "", "4:32 AM", "Ringing", "", "–10s"); // The one-time alarm
+        assertCalendarItem(2, "", "", "4:32 AM", "Ringing", "", "-10s"); // The one-time alarm
         assertCalendarItem(3, "2/2", "Tue", "Off", "", null, ""); // Tomorrow
 
         // Check system alarm
