@@ -164,9 +164,13 @@ public class SystemNotification {
         intent.setAction(NotificationReceiver.ACTION_CLICK_NOTIFICATION);
         intent.putExtra(NotificationReceiver.EXTRA_ACTIVITY, NotificationReceiver.EXTRA_ACTIVITY__RING);
         intent.putExtra(RingActivity.ALARM_TIME, appAlarm.getDateTime()); // We must pass this to the activity as it might have been destroyed // TODO review this
-        AppAlarm alarmOfRingingAlarm = globalManager.getNextAction().appAlarm;
-        String name = alarmOfRingingAlarm instanceof OneTimeAlarm ? ((OneTimeAlarm) alarmOfRingingAlarm).getName() : null;
-        intent.putExtra(RingActivity.ALARM_NAME, name); // We must pass this to the activity as it might have been destroyed
+        try {
+            AppAlarm alarmOfRingingAlarm = globalManager.getNextAction().appAlarm;
+            String name = alarmOfRingingAlarm instanceof OneTimeAlarm ? ((OneTimeAlarm) alarmOfRingingAlarm).getName() : null;
+            intent.putExtra(RingActivity.ALARM_NAME, name); // We must pass this to the activity as it might have been destroyed
+        } catch (IllegalArgumentException e) {
+            Log.d(TAG, "Cannot get nextAction", e);
+        }
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.setContentIntent(pendingIntent);
 

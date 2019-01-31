@@ -221,8 +221,12 @@ public class GlobalManager {
     }
 
     private boolean afterNearFuture() {
-        NextAction nextAction = getNextAction();
-        return nextAction.appAlarm != null && afterNearFuture(nextAction.appAlarm.getDateTime());
+        try {
+            NextAction nextAction = getNextAction();
+            return nextAction.appAlarm != null && afterNearFuture(nextAction.appAlarm.getDateTime());
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
     }
 
     public boolean afterNearFuture(Calendar alarmTime) {
@@ -262,7 +266,7 @@ public class GlobalManager {
     /*
      * Contains info about the dismissed alarms.
      */
-    private static final String PERSIST_DISMISSED = "persist_dismissed";
+    private static final String PERSIST_DISMISSED = "persist_dismissed_2"; // There vas a change in format in versionCode = 15, and we dont want to use one key with different formats. Therefore we use the suffix number.
 
     private static final String STRING_UNDEFINED = "";
     private static final long LONG_UNDEFINED = -1;
@@ -398,7 +402,7 @@ public class GlobalManager {
             }
 
             return dismissedAlarms;
-        } catch (JSONException | ClassCastException e) {
+        } catch (JSONException e) {
             Log.w(TAG, "Error getting dismissed alarms", e);
             return new HashSet<>();
         }
@@ -471,7 +475,7 @@ public class GlobalManager {
         }
     }
 
-    private void addDismissedAlarm(AppAlarm appAlarm) {
+    public void addDismissedAlarm(AppAlarm appAlarm) {
         Log.v(TAG, "addDismissedAlarm(appAlarm=" + appAlarm + ")");
 
         modifyDismissedAlarm(dismissedAlarms ->
@@ -581,9 +585,14 @@ public class GlobalManager {
 
         if (systemAlarm.nextActionShouldChange()) {
             NextAction nextAction = systemAlarm.calcNextAction();
-            NextAction nextActionPersisted = getNextAction();
+            NextAction nextActionPersisted;
+            try {
+                nextActionPersisted = getNextAction();
+            } catch (IllegalArgumentException e) {
+                nextActionPersisted = null;
+            }
 
-            if (!nextActionPersisted.action.equals(STRING_UNDEFINED)) {
+            if (nextActionPersisted != null) {
                 Log.w(TAG, "The next system alarm changed while the app was not running.\n" +
                         "   Persisted is action=" + nextActionPersisted.action +
                         ", time=" + nextActionPersisted.time.getTime() +
@@ -886,7 +895,11 @@ public class GlobalManager {
     }
 
     public void onDismissBeforeRinging(Analytics analytics) { // TODO Consider removing (there should be arguments everywhere). This is here only because pushing it to NotificatinReceiver would cause making NextAction public
-        onDismissBeforeRinging(getNextAction().appAlarm, analytics);
+        try {
+            onDismissBeforeRinging(getNextAction().appAlarm, analytics);
+        } catch (IllegalArgumentException e) {
+            Log.w(TAG, "Cannot get nextAction", e);
+        }
     }
 
     public void onDismissBeforeRinging(AppAlarm appAlarm, Analytics analytics) {
@@ -926,7 +939,11 @@ public class GlobalManager {
     }
 
     public void onAlarmTimeOfEarlyDismissedAlarm() { // TODO Consider removing (there should be arguments everywhere)
-        onAlarmTimeOfEarlyDismissedAlarm(getNextAction().appAlarm);
+        try {
+            onAlarmTimeOfEarlyDismissedAlarm(getNextAction().appAlarm);
+        } catch (IllegalArgumentException e) {
+            Log.w(TAG, "Cannot get nextAction", e);
+        }
     }
 
     public void onAlarmTimeOfEarlyDismissedAlarm(AppAlarm appAlarm) {
@@ -949,7 +966,11 @@ public class GlobalManager {
     }
 
     public void onRing() {
-        onRing(getNextAction().appAlarm); // TODO Consider removing (there should be arguments everywhere)
+        try {
+            onRing(getNextAction().appAlarm); // TODO Consider removing (there should be arguments everywhere)
+        } catch (IllegalArgumentException e) {
+            Log.w(TAG, "Cannot get nextAction", e);
+        }
     }
 
     public void onRing(AppAlarm appAlarm) {
@@ -957,8 +978,14 @@ public class GlobalManager {
 
         Context context = AlarmMorningApplication.getAppContext();
 
-        NextAction nextAction = getNextAction();
-        boolean isNew = !nextAction.time.after(nextAction.appAlarm.getDateTime()); // This is the first time (at the alarm time) the alarm rings, otherwise the alarm is resumed after snoozing
+        boolean isNew; // This is the first time (at the alarm time) the alarm rings, otherwise the alarm is resumed after snoozing
+        try {
+            NextAction nextAction = getNextAction();
+            isNew = !nextAction.time.after(nextAction.appAlarm.getDateTime());
+        } catch (IllegalArgumentException e) {
+            Log.d(TAG, "Cannot get nextAction", e);
+            isNew = true;
+        }
 
         if (isRingingOrSnoozed() && isNew) { // Another alarm is still ringing
             Log.i(TAG, "The previous alarm is still ringing. Cancelling it.");
@@ -1325,9 +1352,13 @@ public class GlobalManager {
 //        ringIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         ringIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         ringIntent.putExtra(RingActivity.ALARM_TIME, getRingingAlarm().getDateTime());
-        AppAlarm alarmOfRingingAlarm = getNextAction().appAlarm;
-        String oneTimeAlarmName = alarmOfRingingAlarm instanceof OneTimeAlarm ? ((OneTimeAlarm) alarmOfRingingAlarm).getName() : null;
-        ringIntent.putExtra(RingActivity.ALARM_NAME, oneTimeAlarmName);
+        try {
+            AppAlarm alarmOfRingingAlarm = getNextAction().appAlarm;
+            String oneTimeAlarmName = alarmOfRingingAlarm instanceof OneTimeAlarm ? ((OneTimeAlarm) alarmOfRingingAlarm).getName() : null;
+            ringIntent.putExtra(RingActivity.ALARM_NAME, oneTimeAlarmName);
+        } catch (IllegalArgumentException e) {
+            Log.d(TAG, "Cannot get nextAction", e);
+        }
         context.startActivity(ringIntent);
     }
 
