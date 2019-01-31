@@ -122,7 +122,6 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
 
         String timeText;
         if (!(appAlarm instanceof Day) || day.isEnabled()) {
-            // FIXME Use 24 hour time format on my phone
             timeText = Localization.timeToString(appAlarm.getHour(), appAlarm.getMinute(), fragment.getActivity());
         } else {
             timeText = res.getString(R.string.alarm_unset);
