@@ -35,6 +35,8 @@ import cz.jaro.alarmmorning.calendar.CalendarEvent;
 import cz.jaro.alarmmorning.calendar.CalendarHelper;
 import cz.jaro.alarmmorning.graphics.Blink;
 import cz.jaro.alarmmorning.graphics.SlideButton;
+import cz.jaro.alarmmorning.model.AppAlarm;
+import cz.jaro.alarmmorning.model.OneTimeAlarm;
 import cz.jaro.alarmmorning.receivers.AlarmReceiver;
 import cz.jaro.alarmmorning.sensor.Flip;
 import cz.jaro.alarmmorning.sensor.Move;
@@ -42,6 +44,8 @@ import cz.jaro.alarmmorning.sensor.Proximity;
 import cz.jaro.alarmmorning.sensor.SensorEventDetector;
 import cz.jaro.alarmmorning.sensor.Shake;
 
+import static cz.jaro.alarmmorning.GlobalManager.PERSIST_ALARM_ID;
+import static cz.jaro.alarmmorning.GlobalManager.PERSIST_ALARM_TYPE;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.endOfToday;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.onTheSameDate;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.onTheSameMinute;
@@ -50,8 +54,7 @@ import static cz.jaro.alarmmorning.calendar.CalendarUtils.onTheSameMinute;
 /**
  * Activity that is displayed while the alarm fires.
  * <p>
- * Activity must be started with extra {@link #ALARM_TIME} that contains the Calendar instance of the alarm time. The extra{@link #ALARM_NAME} may contain the
- * name of the alarm.
+ * Activity must be started with {@link GlobalManager#PERSIST_ALARM_TYPE} and {@link GlobalManager#PERSIST_ALARM_ID} extras that define the alarm.
  */
 public class RingActivity extends Activity implements RingInterface {
 
@@ -59,11 +62,7 @@ public class RingActivity extends Activity implements RingInterface {
 
     public static final String ACTION_HIDE_ACTIVITY = "cz.jaro.alarmmorning.intent.action.HIDE_ACTIVITY";
 
-    public static final String ALARM_TIME = "ALARM_TIME";
-    public static final String ALARM_NAME = "ALARM_NAME";
-
-    private Calendar mAlarmTime;
-    private String mAlarmName;
+    private AppAlarm appAlarm;
 
     private Ringtone ringtone;
     private MediaPlayer mediaPlayer;
@@ -150,15 +149,21 @@ public class RingActivity extends Activity implements RingInterface {
             });
         }
 
-        if (savedInstanceState != null) {
-            mAlarmTime = (Calendar) savedInstanceState.getSerializable(ALARM_TIME);
-            mAlarmName = savedInstanceState.getString(ALARM_NAME);
-        } else {
-            mAlarmTime = (Calendar) getIntent().getSerializableExtra(ALARM_TIME);
-            mAlarmName = getIntent().getStringExtra(ALARM_NAME);
-        }
+        String alarmType;
+        String alarmId;
 
-        if (mAlarmTime == null) {
+        if (savedInstanceState != null) {
+            alarmType = savedInstanceState.getString(PERSIST_ALARM_TYPE);
+            alarmId = savedInstanceState.getString(PERSIST_ALARM_ID);
+        } else {
+            Intent intent = getIntent();
+            alarmType = intent.getStringExtra(PERSIST_ALARM_TYPE);
+            alarmId = intent.getStringExtra(PERSIST_ALARM_ID);
+        }
+        GlobalManager globalManager = GlobalManager.getInstance();
+        appAlarm = globalManager.load(alarmType, alarmId);
+
+        if (appAlarm == null) {
             // TODO This should not happen, but it does sometimes (see crash reporting). Therefore we log everything. Possible explanation is that the users
             // Activity manually started without specifying the extra.
             StringBuilder str = new StringBuilder();
@@ -180,10 +185,10 @@ public class RingActivity extends Activity implements RingInterface {
             str.append("\n");
             str.append("\n");
             str.append("Database dump:\n");
-            GlobalManager globalManager = GlobalManager.getInstance();
             str.append(globalManager.dumpDB());
 
             Crashlytics.log(str.toString());
+            throw new NullPointerException("Cannot get the alarm object");
         }
 
         SlideButton dismissButton = (SlideButton) findViewById(R.id.dismissButton);
@@ -212,8 +217,8 @@ public class RingActivity extends Activity implements RingInterface {
         Log.v(TAG, "onSaveInstanceState()");
         super.onSaveInstanceState(savedInstanceState);
 
-        savedInstanceState.putSerializable(ALARM_TIME, mAlarmTime);
-        savedInstanceState.putString(ALARM_NAME, mAlarmName);
+        savedInstanceState.putString(PERSIST_ALARM_TYPE, appAlarm.getClass().getSimpleName());
+        savedInstanceState.putString(PERSIST_ALARM_ID, appAlarm.getPersistenceId());
     }
 
     @Override
@@ -249,7 +254,7 @@ public class RingActivity extends Activity implements RingInterface {
         blink = new Blink(this);
 
         GlobalManager globalManager = GlobalManager.getInstance();
-        globalManager.onDismiss(analytics);
+        globalManager.onDismiss(appAlarm, analytics);
 
         blink.setMessageText(R.string.blink_dismiss);
         blink.initiateFinish();
@@ -265,7 +270,7 @@ public class RingActivity extends Activity implements RingInterface {
         blink = new Blink(this);
 
         GlobalManager globalManager = GlobalManager.getInstance();
-        Calendar ringAfterSnoozeTime = globalManager.onSnooze(analytics);
+        Calendar ringAfterSnoozeTime = globalManager.onSnooze(appAlarm, analytics);
 
         blink.setMessageText(R.string.blink_snooze);
         String timeStr = Localization.timeToString(ringAfterSnoozeTime.getTime(), getBaseContext());
@@ -425,28 +430,26 @@ public class RingActivity extends Activity implements RingInterface {
         timeView.setText(currentTimeString);
 
         TextView alarmTimeView = (TextView) findViewById(R.id.alarmTime);
-        if (mAlarmTime != null) {
-            if (onTheSameMinute(mAlarmTime, now)) {
-                alarmTimeView.setVisibility(View.INVISIBLE);
-            } else {
-                String alarmTimeText;
-                String timeStr = Localization.timeToString(mAlarmTime.getTime(), getBaseContext());
-                if (onTheSameDate(mAlarmTime, now)) {
-                    alarmTimeText = res.getString(R.string.alarm_was_set_to_today, timeStr);
-                } else {
-                    String dateStr = Localization.dateToStringFull(res, mAlarmTime.getTime());
-                    alarmTimeText = res.getString(R.string.alarm_was_set_to_nontoday, timeStr, dateStr);
-                }
-                alarmTimeView.setText(alarmTimeText);
-                alarmTimeView.setVisibility(View.VISIBLE);
-            }
-        } else {
+        Calendar alarmTime = appAlarm.getDateTime();
+        if (onTheSameMinute(alarmTime, now)) {
             alarmTimeView.setVisibility(View.INVISIBLE);
+        } else {
+            String alarmTimeText;
+            String timeStr = Localization.timeToString(alarmTime.getTime(), getBaseContext());
+            if (onTheSameDate(alarmTime, now)) {
+                alarmTimeText = res.getString(R.string.alarm_was_set_to_today, timeStr);
+            } else {
+                String dateStr = Localization.dateToStringFull(res, alarmTime.getTime());
+                alarmTimeText = res.getString(R.string.alarm_was_set_to_nontoday, timeStr, dateStr);
+            }
+            alarmTimeView.setText(alarmTimeText);
+            alarmTimeView.setVisibility(View.VISIBLE);
         }
 
         TextView nameView = (TextView) findViewById(R.id.oneTimeAlarmName);
-        if (mAlarmName != null) {
-            nameView.setText(mAlarmName);
+        if (appAlarm instanceof OneTimeAlarm && ((OneTimeAlarm) appAlarm).getName() != null) {
+            OneTimeAlarm oneTimeAlarm = (OneTimeAlarm) appAlarm;
+            nameView.setText(oneTimeAlarm.getName());
             nameView.setVisibility(View.VISIBLE);
         } else {
             nameView.setVisibility(View.GONE);

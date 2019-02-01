@@ -14,9 +14,12 @@ import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowActivity;
 
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import cz.jaro.alarmmorning.Analytics;
+import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.RingActivity;
 import cz.jaro.alarmmorning.SystemAlarm;
@@ -599,8 +602,13 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
         shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE + 1)));
 
         // Call the receiver
+        List<OneTimeAlarm> oneTimeAlarms = globalManager.loadOneTimeAlarms();
+        Collections.sort(oneTimeAlarms);
+
         Intent intent = new Intent();
         intent.setAction(SystemAlarm.ACTION_RING);
+        intent.putExtra(GlobalManager.PERSIST_ALARM_TYPE, oneTimeAlarms.get(0).getClass().getSimpleName());
+        intent.putExtra(GlobalManager.PERSIST_ALARM_ID, oneTimeAlarms.get(0).getPersistenceId());
         AlarmReceiver alarmReceiver = new AlarmReceiver();
         alarmReceiver.onReceive(context, intent);
 
@@ -620,7 +628,7 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
 
         // Check ring activity
         Calendar alarmTime = new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE + 1);
-        startActivityRing(alarmTime);
+        startActivityRing(globalManager.loadOneTimeAlarms().get(0));
 
         assertThat("Date visibility", textDate.getVisibility(), is(View.VISIBLE));
         assertThat("Time visibility", textTime.getVisibility(), is(View.VISIBLE));
@@ -661,7 +669,7 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
         // ----------------------------------------------------
 
         // Start the second alarm
-        // Note: the currenty ringing alarm is intentionally NOT dismissed by the user when the 2nd alarm starts.
+        // Note: the currently ringing alarm is intentionally NOT dismissed by the user when the 2nd alarm starts.
 
         // Shift clock
         shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE + 2)));
@@ -669,6 +677,8 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
         // Call the receiver
         Intent intent2 = new Intent();
         intent2.setAction(SystemAlarm.ACTION_RING);
+        intent2.putExtra(GlobalManager.PERSIST_ALARM_TYPE, oneTimeAlarms.get(1).getClass().getSimpleName());
+        intent2.putExtra(GlobalManager.PERSIST_ALARM_ID, oneTimeAlarms.get(1).getPersistenceId());
         AlarmReceiver alarmReceiver2 = new AlarmReceiver();
         alarmReceiver2.onReceive(context, intent2);
 
@@ -688,7 +698,7 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
 
         // Check ring activity
         Calendar alarmTime2 = new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE + 2);
-        startActivityRing(alarmTime2);
+        startActivityRing(globalManager.loadOneTimeAlarms().get(1));
 
         assertThat("Date visibility", textDate.getVisibility(), is(View.VISIBLE));
         assertThat("Time visibility", textTime.getVisibility(), is(View.VISIBLE));
@@ -779,8 +789,13 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
         shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE)));
 
         // Call the receiver
+        List<OneTimeAlarm> oneTimeAlarms = globalManager.loadOneTimeAlarms();
+        Collections.sort(oneTimeAlarms);
+
         Intent intent = new Intent();
         intent.setAction(SystemAlarm.ACTION_RING);
+        intent.putExtra(GlobalManager.PERSIST_ALARM_TYPE, oneTimeAlarms.get(0).getClass().getSimpleName());
+        intent.putExtra(GlobalManager.PERSIST_ALARM_ID, oneTimeAlarms.get(0).getPersistenceId());
         AlarmReceiver alarmReceiver = new AlarmReceiver();
         alarmReceiver.onReceive(context, intent);
 
@@ -803,13 +818,13 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
 
         assertThat("The number of items", recyclerView.getChildCount(), is(HORIZON_DAYS + 2));
         assertCalendarItem(0, "2/1", "Mon", "Off", "", null, ""); // Today
-        assertCalendarItem(1, "", "", "4:30 AM", "Ringing", "One", "–10s"); // The one-time alarm
+        assertCalendarItem(1, "", "", "4:30 AM", "Ringing", "One", "-10s"); // The one-time alarm
         assertCalendarItem(2, "", "", "4:30 AM", "Passed", "Two", ""); // The one-time alarm
         assertCalendarItem(3, "2/2", "Tue", "Off", "", null, ""); // Tomorrow
 
         // Check ring activity
         Calendar alarmTime = new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE);
-        startActivityRing(alarmTime, "One");
+        startActivityRing(globalManager.loadOneTimeAlarms().get(0));
 
         assertThat("Date visibility", textDate.getVisibility(), is(View.VISIBLE));
         assertThat("Time visibility", textTime.getVisibility(), is(View.VISIBLE));

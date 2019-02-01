@@ -9,6 +9,10 @@ import cz.jaro.alarmmorning.AlarmMorningActivity;
 import cz.jaro.alarmmorning.Analytics;
 import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.RingActivity;
+import cz.jaro.alarmmorning.model.AppAlarm;
+
+import static cz.jaro.alarmmorning.GlobalManager.PERSIST_ALARM_ID;
+import static cz.jaro.alarmmorning.GlobalManager.PERSIST_ALARM_TYPE;
 
 /**
  * This receiver handles the actions with the notification.
@@ -33,7 +37,12 @@ public class NotificationReceiver extends BroadcastReceiver {
 
         Log.v(TAG, "onReceive() action=" + action);
 
+        AppAlarm appAlarm = null;
         GlobalManager globalManager = GlobalManager.getInstance();
+        String alarmType = intent.getStringExtra(PERSIST_ALARM_TYPE);
+        String alarmId = intent.getStringExtra(PERSIST_ALARM_ID);
+        if (alarmType != null && alarmId != null)
+            appAlarm = globalManager.load(alarmType, alarmId);
 
         switch (action) {
             case ACTION_CLICK_NOTIFICATION: {
@@ -49,8 +58,8 @@ public class NotificationReceiver extends BroadcastReceiver {
                 } else if (activity.equals(NotificationReceiver.EXTRA_ACTIVITY__RING)) {
                     Intent ringIntent = new Intent(context, RingActivity.class);
                     ringIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    intent.putExtra(RingActivity.ALARM_TIME, intent.getSerializableExtra(RingActivity.ALARM_TIME));
-                    intent.putExtra(RingActivity.ALARM_NAME, intent.getSerializableExtra(RingActivity.ALARM_NAME));
+                    intent.putExtra(PERSIST_ALARM_TYPE, appAlarm.getClass().getSimpleName());
+                    intent.putExtra(PERSIST_ALARM_ID, appAlarm.getPersistenceId());
                     context.startActivity(ringIntent);
                 } else {
                     throw new IllegalArgumentException("Unexpected argument " + activity);
@@ -70,7 +79,7 @@ public class NotificationReceiver extends BroadcastReceiver {
 
                 Analytics analytics = new Analytics(Analytics.Channel.Notification, Analytics.ChannelName.Alarm);
 
-                globalManager.onDismissBeforeRinging(analytics);
+                globalManager.onDismissBeforeRinging(appAlarm, analytics);
                 break;
             }
             case ACTION_DISMISS: {
@@ -78,7 +87,7 @@ public class NotificationReceiver extends BroadcastReceiver {
 
                 Analytics analytics = new Analytics(Analytics.Channel.Notification, Analytics.ChannelName.Alarm);
 
-                globalManager.onDismiss(analytics);
+                globalManager.onDismiss(appAlarm, analytics);
                 break;
             }
             case ACTION_SNOOZE: {
@@ -86,7 +95,7 @@ public class NotificationReceiver extends BroadcastReceiver {
 
                 Analytics analytics = new Analytics(Analytics.Channel.Notification, Analytics.ChannelName.Alarm);
 
-                globalManager.onSnooze(analytics);
+                globalManager.onSnooze(appAlarm, analytics);
                 break;
             }
         }

@@ -34,8 +34,6 @@ import cz.jaro.alarmmorning.model.Day;
 import cz.jaro.alarmmorning.model.Defaults;
 import cz.jaro.alarmmorning.model.OneTimeAlarm;
 
-import static cz.jaro.alarmmorning.AlarmMorningActivity.EXTRA_ALARM_ID;
-import static cz.jaro.alarmmorning.AlarmMorningActivity.EXTRA_ALARM_TYPE;
 import static cz.jaro.alarmmorning.SystemAlarm.ACTION_ALARM_TIME_OF_EARLY_DISMISSED_ALARM;
 import static cz.jaro.alarmmorning.SystemAlarm.ACTION_RING_IN_NEAR_FUTURE;
 import static cz.jaro.alarmmorning.SystemAlarm.ACTION_SET_SYSTEM_ALARM;
@@ -253,8 +251,8 @@ public class GlobalManager {
      */
     private static final String PERSIST_ACTION = "persist_system_alarm_action";
     private static final String PERSIST_TIME = "persist_system_alarm_time";
-    private static final String PERSIST_ALARM_TYPE = "persist_alarm_type";
-    private static final String PERSIST_ALARM_ID = "persist_alarm_id";
+    public static final String PERSIST_ALARM_TYPE = "persist_alarm_type";
+    public static final String PERSIST_ALARM_ID = "persist_alarm_id";
 
     /*
      * Contains info about the last alarm. Last alarm is the one that runs, possibly is snoozed and was dismissed or cancelled.
@@ -660,6 +658,15 @@ public class GlobalManager {
         onAlarmSetNew(systemAlarm);
     }
 
+    public void onDateChange() {
+        Log.d(TAG, "onDateChanged()");
+
+        Context context = AlarmMorningApplication.getAppContext();
+
+        SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
+        systemAlarm.onDateChange();
+    }
+
     /**
      * Formats skipped alarm list to a string which can be used in the Analytics.
      *
@@ -796,7 +803,7 @@ public class GlobalManager {
         CheckAlarmTime checkAlarmTime = CheckAlarmTime.getInstance(context);
         checkAlarmTime.onAlarmSet();
 
-        updateCalendarActivity(context, AlarmMorningActivity.ACTION_ALARM_SET);
+        updateCalendarActivity(context, AlarmMorningActivity.ACTION_ALARM_SET, null);
     }
 
     private void onAlarmSetNew(SystemAlarm systemAlarm) {
@@ -821,7 +828,7 @@ public class GlobalManager {
                 break;
             case SystemAlarm.ACTION_RING:
                 if (systemAlarm.useNearFutureTime()) {
-                    onNearFuture(false, true);
+                    onNearFuture(nextAction.appAlarm, false, true);
                 }
                 break;
             default:
@@ -829,10 +836,10 @@ public class GlobalManager {
         }
     }
 
-    public void onNearFuture() {
-        Log.d(TAG, "onNearFuture()");
+    public void onNearFuture(AppAlarm appAlarm) {
+        Log.d(TAG, "onNearFuture(appAlarm=" + appAlarm + ")");
 
-        onNearFuture(true, false);
+        onNearFuture(appAlarm, true, false);
     }
 
     /**
@@ -841,12 +848,10 @@ public class GlobalManager {
      * @param callSystemAlarm If true then call {@link SystemAlarm#onNearFuture(AppAlarm)}, otherwise ship the call.
      * @param force           If false then considers a ringing or snoozed alarm: if there is a ringing or snoozed alarm then do nothing.
      */
-    private void onNearFuture(boolean callSystemAlarm, boolean force) {
+    private void onNearFuture(AppAlarm appAlarm, boolean callSystemAlarm, boolean force) {
         Log.d(TAG, "onNearFuture(callSystemAlarm=" + callSystemAlarm + ")");
 
         Context context = AlarmMorningApplication.getAppContext();
-
-        AppAlarm appAlarm = getNextAlarmToRing();
 
         Analytics analytics = new Analytics(context, Analytics.Event.Show, Analytics.Channel.Notification, Analytics.ChannelName.Alarm);
         analytics.setAppAlarm(appAlarm);
@@ -894,14 +899,6 @@ public class GlobalManager {
         }
     }
 
-    public void onDismissBeforeRinging(Analytics analytics) { // TODO Consider removing (there should be arguments everywhere). This is here only because pushing it to NotificatinReceiver would cause making NextAction public
-        try {
-            onDismissBeforeRinging(getNextAction().appAlarm, analytics);
-        } catch (IllegalArgumentException e) {
-            Log.w(TAG, "Cannot get nextAction", e);
-        }
-    }
-
     public void onDismissBeforeRinging(AppAlarm appAlarm, Analytics analytics) {
         Log.d(TAG, "onDismissBeforeRinging(appAlarm=" + appAlarm + ")");
 
@@ -934,15 +931,7 @@ public class GlobalManager {
         if (nextAlarmToRing != null && afterNearFuture(nextAlarmToRing.getDateTime())) {
             Log.i(TAG, "Immediately starting \"alarm in near future\" period.");
 
-            onNearFuture(false, false);
-        }
-    }
-
-    public void onAlarmTimeOfEarlyDismissedAlarm() { // TODO Consider removing (there should be arguments everywhere)
-        try {
-            onAlarmTimeOfEarlyDismissedAlarm(getNextAction().appAlarm);
-        } catch (IllegalArgumentException e) {
-            Log.w(TAG, "Cannot get nextAction", e);
+            onNearFuture(nextAlarmToRing, false, false);
         }
     }
 
@@ -954,22 +943,14 @@ public class GlobalManager {
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
         systemAlarm.onAlarmTimeOfEarlyDismissedAlarm();
 
-        updateCalendarActivity(context, AlarmMorningActivity.ACTION_ALARM_TIME_OF_EARLY_DISMISSED_ALARM);
+        updateCalendarActivity(context, AlarmMorningActivity.ACTION_ALARM_TIME_OF_EARLY_DISMISSED_ALARM, appAlarm);
 
         // translate to STATE_FUTURE if in the near future
         AppAlarm nextAlarmToRing = getNextAlarmToRing();
         if (nextAlarmToRing != null && afterNearFuture(nextAlarmToRing.getDateTime())) {
             Log.i(TAG, "Immediately starting \"alarm in near future\" period.");
 
-            onNearFuture(false, false);
-        }
-    }
-
-    public void onRing() {
-        try {
-            onRing(getNextAction().appAlarm); // TODO Consider removing (there should be arguments everywhere)
-        } catch (IllegalArgumentException e) {
-            Log.w(TAG, "Cannot get nextAction", e);
+            onNearFuture(nextAlarmToRing, false, false);
         }
     }
 
@@ -1030,14 +1011,7 @@ public class GlobalManager {
 
         startRingingActivity(context);
 
-        updateCalendarActivity(context, AlarmMorningActivity.ACTION_RING);
-    }
-
-    public void onDismiss(Analytics analytics) {
-        Log.d(TAG, "onDismiss()");
-
-        AppAlarm nextAlarmToRing = getNextAlarmToRing();
-        onDismiss(nextAlarmToRing, analytics);
+        updateCalendarActivity(context, AlarmMorningActivity.ACTION_RING, appAlarm);
     }
 
     public void onDismiss(AppAlarm appAlarm, Analytics analytics) {
@@ -1064,15 +1038,16 @@ public class GlobalManager {
 
         updateWidget(context);
 
-        updateRingingActivity(context, RingActivity.ACTION_HIDE_ACTIVITY);
+        updateRingingActivity(context, RingActivity.ACTION_HIDE_ACTIVITY, appAlarm);
 
-        updateCalendarActivity(context, AlarmMorningActivity.ACTION_DISMISS);
+        updateCalendarActivity(context, AlarmMorningActivity.ACTION_DISMISS, appAlarm);
 
         // translate to STATE_FUTURE if in the near future
         if (afterNearFuture()) {
             Log.i(TAG, "Immediately starting \"alarm in near future\" period.");
 
-            onNearFuture(false, false);
+            NextAction nextAction = getNextAction();
+            onNearFuture(nextAction.appAlarm, false, false);
         }
     }
 
@@ -1080,7 +1055,7 @@ public class GlobalManager {
      * @param analytics Analytics with filled {@link Analytics.Channel} and {@link Analytics.ChannelName} fields. Other fields will be filled by this method.
      * @return Time when the alarm will ring again
      */
-    public Calendar onSnooze(Analytics analytics) {
+    public Calendar onSnooze(AppAlarm appAlarm, Analytics analytics) {
         Log.d(TAG, "onSnooze()");
 
         Context context = AlarmMorningApplication.getAppContext();
@@ -1103,9 +1078,9 @@ public class GlobalManager {
         SystemNotification systemNotification = SystemNotification.getInstance(context);
         systemNotification.onSnooze(nextAlarmToRing, ringAfterSnoozeTime);
 
-        updateRingingActivity(context, RingActivity.ACTION_HIDE_ACTIVITY);
+        updateRingingActivity(context, RingActivity.ACTION_HIDE_ACTIVITY, appAlarm);
 
-        updateCalendarActivity(context, AlarmMorningActivity.ACTION_SNOOZE);
+        updateCalendarActivity(context, AlarmMorningActivity.ACTION_SNOOZE, appAlarm);
 
         return ringAfterSnoozeTime;
     }
@@ -1136,9 +1111,9 @@ public class GlobalManager {
         SystemAlarmClock systemAlarmClock = SystemAlarmClock.getInstance(context);
         systemAlarmClock.onAlarmCancel();
 
-        updateRingingActivity(context, RingActivity.ACTION_HIDE_ACTIVITY);
+        updateRingingActivity(context, RingActivity.ACTION_HIDE_ACTIVITY, appAlarm);
 
-        updateCalendarActivity(context, AlarmMorningActivity.ACTION_CANCEL);
+        updateCalendarActivity(context, AlarmMorningActivity.ACTION_CANCEL, appAlarm);
     }
 
     /*
@@ -1349,45 +1324,33 @@ public class GlobalManager {
         Log.d(TAG, "startRingingActivity()");
 
         Intent ringIntent = new Intent(context, RingActivity.class);
-//        ringIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         ringIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        ringIntent.putExtra(RingActivity.ALARM_TIME, getRingingAlarm().getDateTime());
-        try {
-            AppAlarm alarmOfRingingAlarm = getNextAction().appAlarm;
-            String oneTimeAlarmName = alarmOfRingingAlarm instanceof OneTimeAlarm ? ((OneTimeAlarm) alarmOfRingingAlarm).getName() : null;
-            ringIntent.putExtra(RingActivity.ALARM_NAME, oneTimeAlarmName);
-        } catch (IllegalArgumentException e) {
-            Log.d(TAG, "Cannot get nextAction", e);
-        }
+        AppAlarm ringingAlarm = getRingingAlarm();
+        ringIntent.putExtra(PERSIST_ALARM_TYPE, ringingAlarm.getClass().getSimpleName());
+        ringIntent.putExtra(PERSIST_ALARM_ID, ringingAlarm.getPersistenceId());
         context.startActivity(ringIntent);
     }
 
-    private void updateRingingActivity(Context context, String action) {
+    private void updateRingingActivity(Context context, String action, AppAlarm appAlarm) {
         Log.d(TAG, "updateRingingActivity(action=" + action + ")");
 
         Intent intent = new Intent(context, RingActivity.class);
         intent.setAction(action);
+        if (appAlarm != null) {
+            intent.putExtra(PERSIST_ALARM_TYPE, appAlarm.getClass().getSimpleName());
+            intent.putExtra(PERSIST_ALARM_ID, appAlarm.getPersistenceId());
+        }
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 
-    private void updateCalendarActivity(Context context, String action) {
-        Log.d(TAG, "updateCalendarActivity(action=" + action + ")");
-        updateCalendarActivity(context, action, getNextAlarmToRing());
-    }
-
-    /**
-     * @param context
-     * @param action
-     * @param appAlarm Alarm
-     */
     private void updateCalendarActivity(Context context, String action, AppAlarm appAlarm) {
         Log.d(TAG, "updateCalendarActivity(action=" + action + ", appAlarm = " + appAlarm + ")");
 
         Intent intent = new Intent(context, AlarmMorningActivity.class);
         intent.setAction(action);
         if (appAlarm != null) {
-            intent.putExtra(EXTRA_ALARM_TYPE, appAlarm.getClass().getSimpleName());
-            intent.putExtra(EXTRA_ALARM_ID, appAlarm.getPersistenceId());
+            intent.putExtra(PERSIST_ALARM_TYPE, appAlarm.getClass().getSimpleName());
+            intent.putExtra(PERSIST_ALARM_ID, appAlarm.getPersistenceId());
         }
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
@@ -1585,7 +1548,7 @@ public class GlobalManager {
         return alarmTimes;
     }
 
-    AppAlarm load(String alarmType, String alarmId) throws IllegalArgumentException {
+    public AppAlarm load(String alarmType, String alarmId) throws IllegalArgumentException {
         if (alarmType.equals(STRING_UNDEFINED))
             throw new IllegalArgumentException("Invalid alarm type: " + alarmType);
 

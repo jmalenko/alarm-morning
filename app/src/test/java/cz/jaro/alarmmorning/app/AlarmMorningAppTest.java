@@ -54,12 +54,14 @@ import cz.jaro.alarmmorning.AlarmMorningActivityTest;
 import cz.jaro.alarmmorning.CalendarFragment;
 import cz.jaro.alarmmorning.DatePickerFragment;
 import cz.jaro.alarmmorning.FixedTimeTest;
+import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.RingActivity;
 import cz.jaro.alarmmorning.SettingsActivity;
 import cz.jaro.alarmmorning.TimePickerFragment;
 import cz.jaro.alarmmorning.WidgetProvider;
 import cz.jaro.alarmmorning.graphics.SlideButton;
+import cz.jaro.alarmmorning.model.AppAlarm;
 import cz.jaro.alarmmorning.receivers.AlarmReceiver;
 import cz.jaro.alarmmorning.receivers.NotificationReceiver;
 import cz.jaro.alarmmorning.receivers.VoidReceiver;
@@ -184,15 +186,10 @@ public class AlarmMorningAppTest extends FixedTimeTest {
         return itemCount;
     }
 
-    void startActivityRing(Calendar alarmTime) {
-        startActivityRing(alarmTime, null);
-    }
-
-    void startActivityRing(Calendar alarmTime, String alarmName) {
+    void startActivityRing(AppAlarm appAlarm) {
         Intent ringIntent = new Intent(context, RingActivity.class);
-        ringIntent.putExtra(RingActivity.ALARM_TIME, alarmTime);
-        if (alarmName != null)
-            ringIntent.putExtra(RingActivity.ALARM_NAME, alarmName);
+        ringIntent.putExtra(GlobalManager.PERSIST_ALARM_TYPE, appAlarm.getClass().getSimpleName());
+        ringIntent.putExtra(GlobalManager.PERSIST_ALARM_ID, appAlarm.getPersistenceId());
 
         activity = buildActivity(RingActivity.class, ringIntent).setup().get();
         shadowActivity = Shadows.shadowOf(activity);

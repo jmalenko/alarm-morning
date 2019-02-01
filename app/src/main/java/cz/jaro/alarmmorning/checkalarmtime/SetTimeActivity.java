@@ -18,7 +18,6 @@ import cz.jaro.alarmmorning.graphics.TimePickerDialogWithDisable;
 import cz.jaro.alarmmorning.model.Day;
 
 import static cz.jaro.alarmmorning.Analytics.CHECK_ALARM_TIME_METHOD__DIALOG;
-import static cz.jaro.alarmmorning.RingActivity.ALARM_TIME;
 import static cz.jaro.alarmmorning.checkalarmtime.CheckAlarmTimeNotificationReceiver.EXTRA_NEW_ALARM_TIME;
 import static cz.jaro.alarmmorning.model.Day.VALUE_UNSET;
 
@@ -30,6 +29,8 @@ import static cz.jaro.alarmmorning.model.Day.VALUE_UNSET;
 public class SetTimeActivity extends AppCompatActivity implements TimePickerDialogWithDisable.OnTimeSetWithDisableListener {
 
     private static final String TAG = SetTimeActivity.class.getSimpleName();
+
+    public static final String ALARM_TIME = "ALARM_TIME";
 
     Calendar newAlarmTime;
 

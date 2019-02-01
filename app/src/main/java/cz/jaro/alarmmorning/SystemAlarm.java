@@ -17,6 +17,8 @@ import cz.jaro.alarmmorning.model.AppAlarm;
 import cz.jaro.alarmmorning.model.AppAlarmFilter;
 import cz.jaro.alarmmorning.receivers.AlarmReceiver;
 
+import static cz.jaro.alarmmorning.GlobalManager.PERSIST_ALARM_ID;
+import static cz.jaro.alarmmorning.GlobalManager.PERSIST_ALARM_TYPE;
 import static cz.jaro.alarmmorning.GlobalManager.STATE_DISMISSED;
 import static cz.jaro.alarmmorning.GlobalManager.STATE_DISMISSED_BEFORE_RINGING;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.beginningOfTomorrow;
@@ -74,6 +76,10 @@ public class SystemAlarm {
 
         Intent intent = new Intent(context, AlarmReceiver.class);
         intent.setAction(nextAction.action);
+        if (nextAction.appAlarm != null) {
+            intent.putExtra(PERSIST_ALARM_TYPE, nextAction.appAlarm.getClass().getSimpleName());
+            intent.putExtra(PERSIST_ALARM_ID, nextAction.appAlarm.getPersistenceId());
+        }
 
         operation = PendingIntent.getBroadcast(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -286,20 +292,26 @@ public class SystemAlarm {
 
         Log.i(TAG, "Acting on system alarm. action=" + action);
 
+        AppAlarm appAlarm = null;
         GlobalManager globalManager = GlobalManager.getInstance();
+        String alarmType = intent.getStringExtra(PERSIST_ALARM_TYPE);
+        String alarmId = intent.getStringExtra(PERSIST_ALARM_ID);
+        if (alarmType != null && alarmId != null)
+            appAlarm = globalManager.load(alarmType, alarmId);
 
         switch (action) {
             case ACTION_SET_SYSTEM_ALARM:
-                globalManager.onAlarmTimeOfEarlyDismissedAlarm();
+                globalManager.onDateChange();
+                ;
                 break;
             case ACTION_RING_IN_NEAR_FUTURE:
-                globalManager.onNearFuture();
+                globalManager.onNearFuture(appAlarm);
                 break;
             case ACTION_ALARM_TIME_OF_EARLY_DISMISSED_ALARM:
-                globalManager.onAlarmTimeOfEarlyDismissedAlarm();
+                globalManager.onAlarmTimeOfEarlyDismissedAlarm(appAlarm);
                 break;
             case ACTION_RING:
-                globalManager.onRing();
+                globalManager.onRing(appAlarm);
                 break;
             default:
                 throw new IllegalArgumentException("Unexpected argument " + action);
@@ -350,6 +362,12 @@ public class SystemAlarm {
         AppAlarm ringingAlarm = globalManager.getRingingAlarm();
 
         registerSystemAlarm(ACTION_RING, ringAfterSnoozeTime, ringingAlarm);
+    }
+
+    public void onDateChange() {
+        Log.d(TAG, "onDateChanged()");
+
+        register();
     }
 
 }

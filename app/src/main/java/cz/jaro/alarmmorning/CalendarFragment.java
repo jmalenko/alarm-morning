@@ -1,10 +1,8 @@
 package cz.jaro.alarmmorning;
 
 import android.app.Activity;
-import android.app.ActivityManager;
 import android.app.DatePickerDialog;
 import android.app.Fragment;
-import android.content.ComponentName;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -41,7 +39,6 @@ import cz.jaro.alarmmorning.model.Day;
 import cz.jaro.alarmmorning.model.Defaults;
 import cz.jaro.alarmmorning.model.OneTimeAlarm;
 
-import static android.content.Context.ACTIVITY_SERVICE;
 import static cz.jaro.alarmmorning.GlobalManager.HORIZON_DAYS;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.addDaysClone;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.beginningOfToday;
@@ -151,14 +148,6 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         handler.stop();
     }
 
-    public boolean isForeground(String className) {
-        ActivityManager manager = (ActivityManager) getActivity().getSystemService(ACTIVITY_SERVICE);
-        List<ActivityManager.RunningTaskInfo> task = manager.getRunningTasks(1);
-        if (task.isEmpty()) return true; // The true value is needed for Robolectric tests
-        ComponentName componentInfo = task.get(0).topActivity;
-        return componentInfo.getClassName().equals(className);
-    }
-
     /*
      * Events relevant to next alarm
      * =============================
@@ -168,13 +157,6 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         Log.d(TAG, "onAlarmSet(appAparm = " + appAlarm + ")");
 
         updatePositionOfNextAlarm();
-
-        boolean isCalendarInForeground = isForeground(getActivity().getClass().getName()); // Needed to detect when the wizard is running.
-        if (isCalendarInForeground && positionAction != POSITION_UNSET) { // otherwise the alarm is set because a default alarm time was set. (The DefaultsActivity is running and I don't know why CalendarFragment gets the broadcast message...)
-            AppAlarm appAlarmAtPosition = loadPosition(positionAction);
-            String toastText = formatToastText(appAlarmAtPosition);
-            Toast.makeText(getActivity(), toastText, Toast.LENGTH_LONG).show();
-        }
     }
 
     public void onDismissBeforeRinging(AppAlarm appAlarm) {
@@ -224,6 +206,10 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
         // Update position of next alarms
         positionNextAlarm = calcPositionNextAlarm();
+
+        // Show toast
+        String toastText = formatToastText(day);
+        Toast.makeText(getActivity(), toastText, Toast.LENGTH_LONG).show();
     }
 
     public void onCreateOneTimeAlarm(OneTimeAlarm oneTimeAlarm) {
@@ -249,6 +235,10 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         // Update position of next action
         if (positionAction < pos) { /* nothing */ } else
             positionAction++;
+
+        // Show toast
+        String toastText = formatToastText(oneTimeAlarm);
+        Toast.makeText(getActivity(), toastText, Toast.LENGTH_LONG).show();
 
         // FUTURE Blink the item
     }
@@ -1031,7 +1021,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
                 Analytics analytics2 = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
 
                 GlobalManager globalManager2 = GlobalManager.getInstance();
-                globalManager2.onSnooze(analytics2);
+                globalManager2.onSnooze(appAlarmAtPosition, analytics2);
                 break;
         }
         return super.onContextItemSelected(item);

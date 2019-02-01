@@ -18,6 +18,8 @@ import cz.jaro.alarmmorning.model.Day;
 import cz.jaro.alarmmorning.model.OneTimeAlarm;
 import cz.jaro.alarmmorning.receivers.NotificationReceiver;
 
+import static cz.jaro.alarmmorning.GlobalManager.PERSIST_ALARM_ID;
+import static cz.jaro.alarmmorning.GlobalManager.PERSIST_ALARM_TYPE;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.onTheSameDate;
 
 /**
@@ -163,14 +165,8 @@ public class SystemNotification {
         Intent intent = new Intent(context, NotificationReceiver.class);
         intent.setAction(NotificationReceiver.ACTION_CLICK_NOTIFICATION);
         intent.putExtra(NotificationReceiver.EXTRA_ACTIVITY, NotificationReceiver.EXTRA_ACTIVITY__RING);
-        intent.putExtra(RingActivity.ALARM_TIME, appAlarm.getDateTime()); // We must pass this to the activity as it might have been destroyed // TODO review this
-        try {
-            AppAlarm alarmOfRingingAlarm = globalManager.getNextAction().appAlarm;
-            String name = alarmOfRingingAlarm instanceof OneTimeAlarm ? ((OneTimeAlarm) alarmOfRingingAlarm).getName() : null;
-            intent.putExtra(RingActivity.ALARM_NAME, name); // We must pass this to the activity as it might have been destroyed
-        } catch (IllegalArgumentException e) {
-            Log.d(TAG, "Cannot get nextAction", e);
-        }
+        intent.putExtra(PERSIST_ALARM_TYPE, appAlarm.getClass().getSimpleName());
+        intent.putExtra(PERSIST_ALARM_ID, appAlarm.getPersistenceId());
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.setContentIntent(pendingIntent);
 

@@ -19,10 +19,12 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import cz.jaro.alarmmorning.Analytics;
+import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.RingActivity;
 import cz.jaro.alarmmorning.SystemAlarm;
 import cz.jaro.alarmmorning.clock.FixedClock;
+import cz.jaro.alarmmorning.model.AppAlarm;
 import cz.jaro.alarmmorning.model.Day;
 import cz.jaro.alarmmorning.model.Defaults;
 import cz.jaro.alarmmorning.receivers.AlarmReceiver;
@@ -338,7 +340,8 @@ public class CalendarWithDayAlarmTest extends AlarmMorningAppTest {
 
         // Start ring activity
         Calendar alarmTime = new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DEFAULT, MINUTE_DEFAULT);
-        startActivityRing(alarmTime);
+        Day day = globalManager.loadDay(alarmTime);
+        startActivityRing(day);
 
         // Check appearance
         assertThat("Date visibility", textDate.getVisibility(), is(View.VISIBLE));
@@ -416,7 +419,8 @@ public class CalendarWithDayAlarmTest extends AlarmMorningAppTest {
 
         // Start ring activity
         Calendar alarmTime = new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DEFAULT, MINUTE_DEFAULT, 10);
-        startActivityRing(alarmTime);
+        Day day = globalManager.loadDay(alarmTime);
+        startActivityRing(day);
 
         dismissButton.performClick();
 
@@ -455,6 +459,9 @@ public class CalendarWithDayAlarmTest extends AlarmMorningAppTest {
         // Call the receiver
         Intent intent = new Intent();
         intent.setAction(SystemAlarm.ACTION_RING_IN_NEAR_FUTURE);
+        AppAlarm appAlarm = globalManager.loadDay(new GregorianCalendar(YEAR, MONTH, DAY));
+        intent.putExtra(GlobalManager.PERSIST_ALARM_TYPE, appAlarm.getClass().getSimpleName());
+        intent.putExtra(GlobalManager.PERSIST_ALARM_ID, appAlarm.getPersistenceId());
         AlarmReceiver alarmReceiver = new AlarmReceiver();
         alarmReceiver.onReceive(context, intent);
 
@@ -471,6 +478,8 @@ public class CalendarWithDayAlarmTest extends AlarmMorningAppTest {
         // Call the receiver
         Intent intent2 = new Intent();
         intent2.setAction(SystemAlarm.ACTION_RING);
+        intent2.putExtra(GlobalManager.PERSIST_ALARM_TYPE, appAlarm.getClass().getSimpleName());
+        intent2.putExtra(GlobalManager.PERSIST_ALARM_ID, appAlarm.getPersistenceId());
         AlarmReceiver alarmReceiver2 = new AlarmReceiver();
         alarmReceiver2.onReceive(context, intent2);
 
@@ -480,7 +489,8 @@ public class CalendarWithDayAlarmTest extends AlarmMorningAppTest {
 
         // Start ring activity
         Calendar alarmTime = new GregorianCalendar(YEAR, MONTH, DAY, 23, 30, 10);
-        startActivityRing(alarmTime);
+        Day day = globalManager.loadDay(alarmTime);
+        startActivityRing(day);
 
         dismissButton.performClick();
 
@@ -510,7 +520,8 @@ public class CalendarWithDayAlarmTest extends AlarmMorningAppTest {
 
         // Start ring activity
         Calendar alarmTime = new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DEFAULT, MINUTE_DEFAULT, 10);
-        startActivityRing(alarmTime);
+        Day day = globalManager.loadDay(alarmTime);
+        startActivityRing(day);
 
         snoozeButton.performClick();
 
@@ -674,6 +685,9 @@ public class CalendarWithDayAlarmTest extends AlarmMorningAppTest {
         // Call the receiver
         Intent intent = new Intent();
         intent.setAction(SystemAlarm.ACTION_RING_IN_NEAR_FUTURE);
+        AppAlarm appAlarm = globalManager.loadDay(new GregorianCalendar(YEAR, MONTH, DAY));
+        intent.putExtra(GlobalManager.PERSIST_ALARM_TYPE, appAlarm.getClass().getSimpleName());
+        intent.putExtra(GlobalManager.PERSIST_ALARM_ID, appAlarm.getPersistenceId());
         AlarmReceiver alarmReceiver = new AlarmReceiver();
         alarmReceiver.onReceive(context, intent);
 
@@ -692,6 +706,9 @@ public class CalendarWithDayAlarmTest extends AlarmMorningAppTest {
         // Call the receiver
         Intent intent = new Intent();
         intent.setAction(SystemAlarm.ACTION_RING);
+        AppAlarm appAlarm = globalManager.loadDay(new GregorianCalendar(YEAR, MONTH, DAY));
+        intent.putExtra(GlobalManager.PERSIST_ALARM_TYPE, appAlarm.getClass().getSimpleName());
+        intent.putExtra(GlobalManager.PERSIST_ALARM_ID, appAlarm.getPersistenceId());
         AlarmReceiver alarmReceiver = new AlarmReceiver();
         alarmReceiver.onReceive(context, intent);
 
@@ -706,7 +723,8 @@ public class CalendarWithDayAlarmTest extends AlarmMorningAppTest {
 
         // Start ring activity
         Calendar alarmTime = new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DEFAULT, MINUTE_DEFAULT);
-        startActivityRing(alarmTime);
+        Day day = globalManager.loadDay(alarmTime);
+        startActivityRing(day);
 
         snoozeButton.performClick();
 

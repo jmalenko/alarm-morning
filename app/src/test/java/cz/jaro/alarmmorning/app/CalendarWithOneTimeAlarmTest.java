@@ -17,13 +17,17 @@ import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowActivity;
 
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import cz.jaro.alarmmorning.Analytics;
+import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.RingActivity;
 import cz.jaro.alarmmorning.SystemAlarm;
 import cz.jaro.alarmmorning.clock.FixedClock;
+import cz.jaro.alarmmorning.model.AppAlarm;
 import cz.jaro.alarmmorning.model.OneTimeAlarm;
 import cz.jaro.alarmmorning.receivers.AlarmReceiver;
 import cz.jaro.alarmmorning.receivers.NotificationReceiver;
@@ -538,6 +542,9 @@ public class CalendarWithOneTimeAlarmTest extends AlarmMorningAppTest {
         // Call the receiver
         Intent intent = new Intent();
         intent.setAction(SystemAlarm.ACTION_RING_IN_NEAR_FUTURE);
+        AppAlarm appAlarm = globalManager.loadOneTimeAlarms().get(0);
+        intent.putExtra(GlobalManager.PERSIST_ALARM_TYPE, appAlarm.getClass().getSimpleName());
+        intent.putExtra(GlobalManager.PERSIST_ALARM_ID, appAlarm.getPersistenceId());
         AlarmReceiver alarmReceiver = new AlarmReceiver();
         alarmReceiver.onReceive(context, intent);
 
@@ -873,7 +880,7 @@ public class CalendarWithOneTimeAlarmTest extends AlarmMorningAppTest {
 
         // Check ring activity
         Calendar alarmTime = new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE);
-        startActivityRing(alarmTime);
+        startActivityRing(globalManager.loadOneTimeAlarms().get(0));
 
         assertThat("Date visibility", textDate.getVisibility(), is(View.VISIBLE));
         assertThat("Time visibility", textTime.getVisibility(), is(View.VISIBLE));
@@ -892,7 +899,7 @@ public class CalendarWithOneTimeAlarmTest extends AlarmMorningAppTest {
         assertThat("The number of items", count, is(HORIZON_DAYS + 1));
 
         assertCalendarItem(0, "2/1", "Mon", "Off", "", null, ""); // Today
-        assertCalendarItem(1, "", "", "4:30 AM", "Ringing", "", "–10s"); // The one-time alarm
+        assertCalendarItem(1, "", "", "4:30 AM", "Ringing", "", "-10s"); // The one-time alarm
         assertCalendarItem(2, "2/2", "Tue", "Off", "", null, ""); // Tomorrow
     }
 
@@ -954,7 +961,7 @@ public class CalendarWithOneTimeAlarmTest extends AlarmMorningAppTest {
 
         // Start ring activity
         Calendar alarmTime = new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE, 10);
-        startActivityRing(alarmTime);
+        startActivityRing(globalManager.loadOneTimeAlarms().get(0));
 
         dismissButton.performClick();
 
@@ -1053,7 +1060,7 @@ public class CalendarWithOneTimeAlarmTest extends AlarmMorningAppTest {
 
         // Start ring activity
         Calendar alarmTime = new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE, 10);
-        startActivityRing(alarmTime);
+        startActivityRing(globalManager.loadOneTimeAlarms().get(0));
 
         snoozeButton.performClick();
 
@@ -1061,7 +1068,7 @@ public class CalendarWithOneTimeAlarmTest extends AlarmMorningAppTest {
         startActivityCalendar();
 
         assertCalendarItem(0, "2/1", "Mon", "Off", "", null, ""); // Today
-        assertCalendarItem(1, "", "", "4:30 AM", "Snoozed", "", "–10s"); // The one-time alarm
+        assertCalendarItem(1, "", "", "4:30 AM", "Snoozed", "", "-10s"); // The one-time alarm
         assertCalendarItem(2, "2/2", "Tue", "Off", "", null, ""); // Tomorrow
 
         // Check system alarm
@@ -1106,7 +1113,7 @@ public class CalendarWithOneTimeAlarmTest extends AlarmMorningAppTest {
         assertThat("The change of number of items", newCount - oldCount, is(0));
 
         assertCalendarItem(0, "2/1", "Mon", "Off", "", null, ""); // Today
-        assertCalendarItem(1, "", "", "4:30 AM", "Snoozed", "", "–10s"); // The one-time alarm
+        assertCalendarItem(1, "", "", "4:30 AM", "Snoozed", "", "-10s"); // The one-time alarm
         assertCalendarItem(2, "2/2", "Tue", "Off", "", null, ""); // Tomorrow
 
         // Check system alarm
@@ -1302,7 +1309,7 @@ public class CalendarWithOneTimeAlarmTest extends AlarmMorningAppTest {
         assertThat("The number of items did not change", newCount - oldCount, is(0));
 
         assertCalendarItem(0, "2/1", "Mon", "Off", "", null, ""); // Today
-        assertCalendarItem(1, "", "", "4:30 AM", "Ringing", "Flowers", "–10s"); // The one-time alarm
+        assertCalendarItem(1, "", "", "4:30 AM", "Ringing", "Flowers", "-10s"); // The one-time alarm
         assertCalendarItem(2, "2/2", "Tue", "Off", "", null, ""); // Tomorrow
 
         // Check system alarm
@@ -1578,7 +1585,7 @@ public class CalendarWithOneTimeAlarmTest extends AlarmMorningAppTest {
         assertThat("The number of items did not change", newCount - oldCount, is(0));
 
         assertCalendarItem(0, "2/1", "Mon", "Off", "", null, ""); // Today
-        assertCalendarItem(1, "", "", "4:30 AM", "Snoozed", "Flowers", "–20s"); // The one-time alarm
+        assertCalendarItem(1, "", "", "4:30 AM", "Snoozed", "Flowers", "-20s"); // The one-time alarm
         assertCalendarItem(2, "2/2", "Tue", "Off", "", null, ""); // Tomorrow
 
         // Check system alarm
@@ -1619,6 +1626,9 @@ public class CalendarWithOneTimeAlarmTest extends AlarmMorningAppTest {
         // Call the receiver
         Intent intent = new Intent();
         intent.setAction(SystemAlarm.ACTION_RING_IN_NEAR_FUTURE);
+        AppAlarm appAlarm = globalManager.loadOneTimeAlarms().get(0);
+        intent.putExtra(GlobalManager.PERSIST_ALARM_TYPE, appAlarm.getClass().getSimpleName());
+        intent.putExtra(GlobalManager.PERSIST_ALARM_ID, appAlarm.getPersistenceId());
         AlarmReceiver alarmReceiver = new AlarmReceiver();
         alarmReceiver.onReceive(context, intent);
 
@@ -1636,10 +1646,16 @@ public class CalendarWithOneTimeAlarmTest extends AlarmMorningAppTest {
         shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE)));
 
         // Call the receiver
+        List<OneTimeAlarm> oneTimeAlarms = globalManager.loadOneTimeAlarms();
+        Collections.sort(oneTimeAlarms);
+
         Intent intent = new Intent();
         intent.setAction(SystemAlarm.ACTION_RING);
-        AlarmReceiver alarmReceiver2 = new AlarmReceiver();
-        alarmReceiver2.onReceive(context, intent);
+        AppAlarm appAlarm = oneTimeAlarms.get(0);
+        intent.putExtra(GlobalManager.PERSIST_ALARM_TYPE, appAlarm.getClass().getSimpleName());
+        intent.putExtra(GlobalManager.PERSIST_ALARM_ID, appAlarm.getPersistenceId());
+        AlarmReceiver alarmReceiver = new AlarmReceiver();
+        alarmReceiver.onReceive(context, intent);
 
         // Shift clock
         shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE, 10)));
@@ -1653,7 +1669,7 @@ public class CalendarWithOneTimeAlarmTest extends AlarmMorningAppTest {
 
         // Start ring activity
         Calendar alarmTime = new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE);
-        startActivityRing(alarmTime);
+        startActivityRing(globalManager.loadOneTimeAlarms().get(0));
 
         snoozeButton.performClick();
 

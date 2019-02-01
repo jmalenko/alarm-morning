@@ -55,6 +55,9 @@ import cz.jaro.alarmmorning.model.OneTimeAlarm;
 import cz.jaro.alarmmorning.nighttimebell.CustomAlarmTone;
 import cz.jaro.alarmmorning.wizard.Wizard;
 
+import static cz.jaro.alarmmorning.GlobalManager.PERSIST_ALARM_ID;
+import static cz.jaro.alarmmorning.GlobalManager.PERSIST_ALARM_TYPE;
+
 public class AlarmMorningActivity extends AppCompatActivity {
 
     private static final String TAG = AlarmMorningActivity.class.getSimpleName();
@@ -72,9 +75,6 @@ public class AlarmMorningActivity extends AppCompatActivity {
     public static final String EVENT_DELETE_ONE_TIME_ALARM = "EVENT_DELETE_ONE_TIME_ALARM";
     public static final String EVENT_MODIFY_ONE_TIME_ALARM_DATETIME = "EVENT_MODIFY_ONE_TIME_ALARM_DATETIME";
     public static final String EVENT_MODIFY_ONE_TIME_ALARM_NAME = "EVENT_MODIFY_ONE_TIME_ALARM_NAME";
-
-    public static final String EXTRA_ALARM_TYPE = "EXTRA_ALARM_TYPE";
-    public static final String EXTRA_ALARM_ID = "EXTRA_ALARM_ID";
 
     public static final String URL_WEBSITE = "https://github.com/jmalenko/alarm-morning/wiki";
     public static final String URL_USER_GUIDE = "https://github.com/jmalenko/alarm-morning/wiki/User-Guide";
@@ -174,8 +174,8 @@ public class AlarmMorningActivity extends AppCompatActivity {
                 AppAlarm appAlarm = null;
 
                 GlobalManager globalManager = GlobalManager.getInstance();
-                String alarmType = intent.getStringExtra(EXTRA_ALARM_TYPE);
-                String alarmId = intent.getStringExtra(EXTRA_ALARM_ID);
+                String alarmType = intent.getStringExtra(PERSIST_ALARM_TYPE);
+                String alarmId = intent.getStringExtra(PERSIST_ALARM_ID);
                 if (alarmType != null && alarmId != null)
                     appAlarm = globalManager.load(alarmType, alarmId);
 
