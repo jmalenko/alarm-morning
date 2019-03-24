@@ -71,9 +71,11 @@ import static cz.jaro.alarmmorning.calendar.CalendarUtils.roundDown;
  * <p>
  * 3. Notification
  * <p>
- * 4. Ring activity (when alarm is ringing)
+ * 4. Widget
  * <p>
- * 5. App activity
+ * 5. Ring activity (when alarm is ringing)
+ * <p>
+ * 6. Calendar activity
  */
 public class GlobalManager {
 
