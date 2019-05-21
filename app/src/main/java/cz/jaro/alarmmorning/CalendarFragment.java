@@ -930,7 +930,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
         switch (state) {
             case GlobalManager.STATE_FUTURE:
-                boolean nextAndAfterNear = positionNextAlarm.contains(positionAction) && globalManager.afterNearFuture(appAlarm.getDateTime());
+                boolean nextAndAfterNear = positionNextAlarm.contains(positionAction) && globalManager.afterBeginningOfNearFuturePeriod(appAlarm.getDateTime());
                 if (nextAndAfterNear) {
                     disable.setVisible(false);
                     revert.setVisible(false);

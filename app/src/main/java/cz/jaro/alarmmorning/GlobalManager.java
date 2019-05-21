@@ -220,21 +220,29 @@ public class GlobalManager {
         return state == STATE_DISMISSED || state == STATE_DISMISSED_BEFORE_RINGING;
     }
 
-    private boolean afterNearFuture() {
+    private boolean afterBeginningOfNearFuturePeriod() {
         try {
             NextAction nextAction = getNextAction();
-            return nextAction.appAlarm != null && afterNearFuture(nextAction.appAlarm.getDateTime());
+            return nextAction.appAlarm != null && afterBeginningOfNearFuturePeriod(nextAction.appAlarm.getDateTime());
         } catch (IllegalArgumentException e) {
             return false;
         }
     }
 
-    public boolean afterNearFuture(Calendar alarmTime) {
+    public boolean afterBeginningOfNearFuturePeriod(Calendar alarmTime) {
         Context context = AlarmMorningApplication.getAppContext();
         Calendar now = clock().now();
 
         Calendar nearFutureTime = SystemAlarm.getNearFutureTime(context, alarmTime);
         return now.after(nearFutureTime);
+    }
+
+    public boolean inNearFuturePeriod(Calendar alarmTime) {
+        Context context = AlarmMorningApplication.getAppContext();
+        Calendar now = clock().now();
+
+        Calendar nearFutureTime = SystemAlarm.getNearFutureTime(context, alarmTime);
+        return now.after(nearFutureTime) && now.before(alarmTime);
     }
 
     /*
@@ -930,7 +938,7 @@ public class GlobalManager {
 
         // Translate to STATE_FUTURE if in the near future
         AppAlarm nextAlarmToRing = getNextAlarmToRing();
-        if (nextAlarmToRing != null && afterNearFuture(nextAlarmToRing.getDateTime())) {
+        if (nextAlarmToRing != null && afterBeginningOfNearFuturePeriod(nextAlarmToRing.getDateTime())) {
             Log.i(TAG, "Immediately starting \"alarm in near future\" period.");
 
             onNearFuture(nextAlarmToRing, false, false);
@@ -949,7 +957,7 @@ public class GlobalManager {
 
         // translate to STATE_FUTURE if in the near future
         AppAlarm nextAlarmToRing = getNextAlarmToRing();
-        if (nextAlarmToRing != null && afterNearFuture(nextAlarmToRing.getDateTime())) {
+        if (nextAlarmToRing != null && afterBeginningOfNearFuturePeriod(nextAlarmToRing.getDateTime())) {
             Log.i(TAG, "Immediately starting \"alarm in near future\" period.");
 
             onNearFuture(nextAlarmToRing, false, false);
@@ -1045,7 +1053,7 @@ public class GlobalManager {
         updateCalendarActivity(context, AlarmMorningActivity.ACTION_DISMISS, appAlarm);
 
         // translate to STATE_FUTURE if in the near future
-        if (afterNearFuture()) {
+        if (afterBeginningOfNearFuturePeriod()) {
             Log.i(TAG, "Immediately starting \"alarm in near future\" period.");
 
             NextAction nextAction = getNextAction();

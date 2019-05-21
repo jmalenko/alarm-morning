@@ -160,8 +160,6 @@ public class SystemNotification {
         String contentText = res.getString(R.string.notification_text_ringing);
         mBuilder.setContentText(contentText);
 
-        GlobalManager globalManager = GlobalManager.getInstance();
-
         Intent intent = new Intent(context, NotificationReceiver.class);
         intent.setAction(NotificationReceiver.ACTION_CLICK_NOTIFICATION);
         intent.putExtra(NotificationReceiver.EXTRA_ACTIVITY, NotificationReceiver.EXTRA_ACTIVITY__RING);
@@ -255,11 +253,12 @@ public class SystemNotification {
     public void onModifyOneTimeAlarmDateTime(OneTimeAlarm oneTimeAlarm) {
         Log.d(TAG, "onModifyOneTimeAlarmDateTime(oneTimeAlarm = " + oneTimeAlarm + ")");
 
-        GlobalManager globalManager = GlobalManager.getInstance();
+        if (currentlyDisplayedNotificationIsAbout(oneTimeAlarm)) {
+            GlobalManager globalManager = GlobalManager.getInstance();
 
-        Calendar now = globalManager.clock().now();
-        if (oneTimeAlarm.getDateTime().before(now)) {
-            hideNotification();
+            if (!globalManager.inNearFuturePeriod(oneTimeAlarm.getDateTime())) {
+                hideNotification();
+            }
         }
     }
 

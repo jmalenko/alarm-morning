@@ -128,15 +128,15 @@ public class SystemAlarm {
 
             try {
                 GlobalManager globalManager = GlobalManager.getInstance();
-                NextAction nextAction2 = globalManager.getNextAction();
+                NextAction nextAction = globalManager.getNextAction();
 
                 Intent intent2 = new Intent(context, AlarmReceiver.class);
-                intent2.setAction(nextAction2.action);
+                intent2.setAction(nextAction.action);
 
-                PendingIntent operation2 = PendingIntent.getBroadcast(context, 1, intent2, PendingIntent.FLAG_NO_CREATE);
+                PendingIntent operation = PendingIntent.getBroadcast(context, 1, intent2, PendingIntent.FLAG_NO_CREATE);
 
-                if (operation2 != null) {
-                    operation2.cancel();
+                if (operation != null) {
+                    operation.cancel();
                 }
             } catch (IllegalArgumentException e) {
                 Log.d(TAG, "Unable to get the action for cancelling", e);
@@ -181,7 +181,7 @@ public class SystemAlarm {
      *
      * @return the next action and system alarm
      */
-    protected NextAction calcNextAction(Clock clock) {
+    private NextAction calcNextAction(Clock clock) {
         Log.d(TAG, "calcNextAction(clock=" + clock.now().getTime().toString() + ")");
 
         Calendar now = clock.now();
