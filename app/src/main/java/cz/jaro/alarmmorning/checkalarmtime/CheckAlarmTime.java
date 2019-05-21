@@ -44,7 +44,7 @@ import static cz.jaro.alarmmorning.calendar.CalendarUtils.roundDown;
  */
 public class CheckAlarmTime {
 
-    private static final String TAG = SystemAlarm.class.getSimpleName();
+    private static final String TAG = CheckAlarmTime.class.getSimpleName();
 
     private static final int NOTIFICATION_ID = 1;
     private static final int REQUEST_CODE = 1;
@@ -193,7 +193,10 @@ public class CheckAlarmTime {
                 onAutoHideNotification();
                 break;
             case Intent.ACTION_PROVIDER_CHANGED:
+                // TODO May not work in Oreo and later. Solution is at https://stackoverflow.com/questions/49616809/oreo-calendar-changes
+                // TODO Intent is received even when calendar is not changed.
                 onCalendarUpdated();
+                Log.v(TAG, "data = " + intent.getData());
                 break;
             default:
                 throw new IllegalArgumentException("Unexpected argument " + action);
@@ -277,7 +280,7 @@ public class CheckAlarmTime {
         Calendar date = now.before(checkAlarmTimeAtToday) ? CalendarUtils.beginningOfToday(now) : CalendarUtils.beginningOfTomorrow(now);
         Day day = globalManager.loadDay(date);
 
-        Log.v(TAG, !day.isEnabled() ? "Alarm is disabled on " + day.getDate().getTime() : "Is now in period between" + checkAlarmTimeAt.getTime() + " and " + day.getDateTime().getTime());
+        Log.v(TAG, !day.isEnabled() ? "Alarm is disabled on " + day.getDate().getTime() : "Now " + now.getTime() + " is in period between " + checkAlarmTimeAt.getTime() + " and " + day.getDateTime().getTime());
         boolean res = !day.isEnabled() || (now.after(checkAlarmTimeAt) && now.before(day.getDateTime()));
         Log.d(TAG, "isBetweenCheckAlarmTimeAndAlarmTime() returns " + res);
         return res;
