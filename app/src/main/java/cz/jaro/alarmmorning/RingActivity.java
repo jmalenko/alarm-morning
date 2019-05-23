@@ -27,6 +27,7 @@ import android.widget.TextView;
 import com.crashlytics.android.Crashlytics;
 
 import java.io.IOException;
+import java.security.InvalidParameterException;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Set;
@@ -34,6 +35,7 @@ import java.util.Set;
 import cz.jaro.alarmmorning.calendar.CalendarEvent;
 import cz.jaro.alarmmorning.calendar.CalendarHelper;
 import cz.jaro.alarmmorning.graphics.Blink;
+import cz.jaro.alarmmorning.graphics.JoyButton;
 import cz.jaro.alarmmorning.graphics.SlideButton;
 import cz.jaro.alarmmorning.model.AppAlarm;
 import cz.jaro.alarmmorning.model.OneTimeAlarm;
@@ -88,6 +90,8 @@ public class RingActivity extends Activity implements RingInterface {
     private boolean mutedInPast;
     private int mutedSecondsLeft;
     public static final int MUTE_SECONDS = 10;
+
+    private TextView snoozeTimeTextView;
 
     private Set<SensorEventDetector> sensorEventDetectors;
 
@@ -194,13 +198,111 @@ public class RingActivity extends Activity implements RingInterface {
         SlideButton dismissButton = (SlideButton) findViewById(R.id.dismissButton);
         dismissButton.setOnClickListener(this::onDismiss);
 
+        snoozeTimeTextView = (TextView) findViewById(R.id.snoozeTimeTextView);
+
+        JoyButton snoozeButton = (JoyButton) findViewById(R.id.snoozeButton);
+        snoozeButton.setOnJoyClickListener(new JoyButton.OnJoyClickListener() {
+            @Override
+            public void onDown(View v) {
+                snoozeTimeTextView.setVisibility(View.VISIBLE);
+
+                int minutes = calcSnoozeMinutes(0, 0, true);
+                snoozeTimeTextView.setText(getResources().getString(R.string.snooze_time_text, minutes));
+            }
+
+            @Override
+            public void onMove(View v, float dx, float dy, boolean click) {
+                int minutes = calcSnoozeMinutes(dx, dy, click);
+                snoozeTimeTextView.setText(getResources().getString(R.string.snooze_time_text, minutes));
+            }
+
+            @Override
+            public void onUp(View v, float dx, float dy, boolean click) {
+                snoozeTimeTextView.setVisibility(View.INVISIBLE);
+
+                int minutes = calcSnoozeMinutes(dx, dy, click);
+                doSnooze(minutes);
+            }
+
+            @Override
+            public void onCancel(View v) {
+                snoozeTimeTextView.setVisibility(View.INVISIBLE);
+            }
+        });
+
         startAll();
+    }
+
+    private int calcSnoozeMinutes(float dx, float dy, boolean click) {
+        int minutes;
+
+        if (click) {
+            // Use default snooze time
+            Context context = AlarmMorningApplication.getAppContext();
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+            minutes = preferences.getInt(SettingsActivity.PREF_SNOOZE_TIME, SettingsActivity.PREF_SNOOZE_TIME_DEFAULT);
+        } else {
+            // Calculate the snooze time from the button position
+            Double minutesD = positionDeltaToMinutes(dx, dy);
+            minutes = (int) Math.round(minutesD);
+            if (minutes < 1)
+                minutes = 1;
+            if (minutes > 15) {
+                minutes -= minutes % 5;
+            }
+        }
+
+        return minutes;
+    }
+
+    /**
+     * Convert from cartesian coordinates to angle in polar coordinates.
+     * <br>
+     * Restriction: both dx and dy cannot be zero at the same time.
+     *
+     * @param dx Delta along the x axis.
+     * @param dy Delta along the y axis.
+     * @return Angle in radians, in mathematical sense (0 = x-axis, counterclockwise). In interval 0 .. 2*Pi.
+     */
+    static double positionDeltaToAngle(float dx, float dy) {
+        double angle;
+        if (dx == 0) {
+            if (0 < dy) angle = Math.PI * 3 / 2;
+            else if (0 > dy) angle = Math.PI / 2;
+            else throw new InvalidParameterException("Cannot calculate angle when there was no move");
+        } else {
+            if (0 <= dx) {
+                if (0 < dy)
+                    angle = 2 * Math.PI - Math.atan(dy / dx);
+                else if (0 > dy)
+                    angle = Math.atan(-dy / dx);
+                else
+                    angle = 0;
+            } else {
+                if (0 < dy)
+                    angle = Math.PI + Math.atan(dy / -dx);
+                else
+                    angle = Math.PI - Math.atan(dy / dx);
+            }
+        }
+        return angle;
+    }
+
+    static double positionDeltaToMinutes(float dx, float dy) {
+        if (dx == 0 && dy == 0) throw new InvalidParameterException("Cannot calculate minutes when the was no move");
+
+        double angle = positionDeltaToAngle(dx, dy);
+
+        double minutes = Math.toDegrees(-angle + Math.PI / 2);
+        if (minutes < 0) minutes += 360;
+        minutes /= 6;
+        return minutes;
     }
 
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        // The seetings must be reset after the user interacts with UI
+        // The settings must be reset after the user interacts with UI
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && hasFocus) {
             final int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
                     | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
@@ -239,11 +341,6 @@ public class RingActivity extends Activity implements RingInterface {
         doDismiss();
     }
 
-    public void onSnooze(View view) {
-        Log.i(TAG, "Snooze");
-        doSnooze();
-    }
-
     private void doDismiss() {
         Log.d(TAG, "doDismiss()");
 
@@ -263,6 +360,16 @@ public class RingActivity extends Activity implements RingInterface {
     private void doSnooze() {
         Log.d(TAG, "doSnooze()");
 
+        Context context = AlarmMorningApplication.getAppContext();
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        int minutes = preferences.getInt(SettingsActivity.PREF_SNOOZE_TIME, SettingsActivity.PREF_SNOOZE_TIME_DEFAULT);
+
+        doSnooze(minutes);
+    }
+
+    private void doSnooze(int minutes) {
+        Log.i(TAG, "Snooze for " + minutes + " minutes");
+
         stopAll();
 
         Analytics analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Ring);
@@ -270,7 +377,7 @@ public class RingActivity extends Activity implements RingInterface {
         blink = new Blink(this);
 
         GlobalManager globalManager = GlobalManager.getInstance();
-        Calendar ringAfterSnoozeTime = globalManager.onSnooze(appAlarm, analytics);
+        Calendar ringAfterSnoozeTime = globalManager.onSnooze(appAlarm, minutes, analytics);
 
         blink.setMessageText(R.string.blink_snooze);
         String timeStr = Localization.timeToString(ringAfterSnoozeTime.getTime(), getBaseContext());

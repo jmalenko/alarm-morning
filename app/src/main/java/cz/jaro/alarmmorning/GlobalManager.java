@@ -495,9 +495,9 @@ public class GlobalManager {
         Log.v(TAG, "removeDismissedAlarm(appAlarm=" + appAlarm + ")");
 
         modifyDismissedAlarm(dismissedAlarms -> {
-            if (dismissedAlarms.contains(appAlarm)) {
-                Log.d(TAG, "Removing a dismissed alarm from the set of dismissed alarms: " + appAlarm);
-                dismissedAlarms.remove(appAlarm);
+                    if (dismissedAlarms.contains(appAlarm)) {
+                        Log.d(TAG, "Removing a dismissed alarm from the set of dismissed alarms: " + appAlarm);
+                        dismissedAlarms.remove(appAlarm);
                     }
                 }
         );
@@ -532,7 +532,7 @@ public class GlobalManager {
         if (ringingAlarm != null &&
                 (appAlarm instanceof Day && ringingAlarm instanceof Day && (((Day) ringingAlarm).getDate()).equals(((Day) appAlarm).getDate())) ||
                 (appAlarm instanceof OneTimeAlarm && ringingAlarm instanceof OneTimeAlarm && (((OneTimeAlarm) ringingAlarm).getId() == ((OneTimeAlarm) appAlarm).getId()))
-                ) {
+        ) {
             if (isDismissedAlarm(appAlarm)) {
                 if (appAlarm.getDateTime().before(clock().now())) {
                     Log.v(TAG, "   is ringing & is among dismissed & is in past => DISMISSED");
@@ -1062,6 +1062,7 @@ public class GlobalManager {
     }
 
     /**
+     * @param appAlarm  Alarm to be snoozed.
      * @param analytics Analytics with filled {@link Analytics.Channel} and {@link Analytics.ChannelName} fields. Other fields will be filled by this method.
      * @return Time when the alarm will ring again
      */
@@ -1093,6 +1094,16 @@ public class GlobalManager {
         updateCalendarActivity(context, AlarmMorningActivity.ACTION_SNOOZE, appAlarm);
 
         return ringAfterSnoozeTime;
+    }
+
+    /**
+     * @param appAlarm  Alarm to be snoozed.
+     * @param minutes   For how many minutes will the alarm be snoozed.
+     * @param analytics Analytics with filled {@link Analytics.Channel} and {@link Analytics.ChannelName} fields. Other fields will be filled by this method.
+     * @return Time when the alarm will ring again
+     */
+    public Calendar onSnooze(AppAlarm appAlarm, int minutes, Analytics analytics) {
+        return onSnooze(appAlarm, analytics); // TODO Implement
     }
 
     /**

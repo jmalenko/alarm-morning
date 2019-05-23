@@ -10,10 +10,22 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true">
 
-        <ImageButton
+        <TextView
+            android:id="@+id/snoozeTimeTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="@dimen/margin_medium"
+            android:layout_marginTop="@dimen/margin_tiny"
+            android:text="Snooze for 20 minutes"
+            android:textSize="24sp"
+            android:visibility="invisible" />
+
+        <cz.jaro.alarmmorning.graphics.JoyButton
             android:id="@+id/snoozeButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@id/snoozeTimeTextView"
             android:layout_centerHorizontal="true"
             android:background="@drawable/snooze_button"
             android:contentDescription="@string/action_snooze"

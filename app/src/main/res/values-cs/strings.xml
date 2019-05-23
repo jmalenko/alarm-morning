@@ -35,6 +35,8 @@
     <string name="next_calendar_with_location">Příští schůzka: <xliff:g example="07:00" id="time">%1$s</xliff:g> <xliff:g example="Dentist" id="title">%2$s</xliff:g> (<xliff:g example="Main St" id="location">%3$s</xliff:g>)</string>
     <string name="next_calendar_without_location">Příští schůzka: <xliff:g example="07:00" id="time">%1$s</xliff:g> <xliff:g example="Dentist" id="title">%2$s</xliff:g></string>
 
+    <string name="snooze_time_text">Odložit o <xliff:g example="20" id="minutes">%1$d</xliff:g> minut</string>
+
     <!-- Wizard activity -->
     <string name="title_activity_wizard">Průvodce nastavením</string>
 
