@@ -746,7 +746,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
                         oneTimeAlarm.setMinute(minute);
 
                         // If in the past then shift to tomorrow
-                        // Note: we do this event if the "set one time alarm" action started from the context menu on today AND the time is in the past
+                        // Note: we do this even if the "set one time alarm" action started from the context menu on today AND the time is in the past
                         Calendar now = clock().now();
                         if (oneTimeAlarm.getDateTime().before(now)) {
                             Calendar date = oneTimeAlarm.getDate();
