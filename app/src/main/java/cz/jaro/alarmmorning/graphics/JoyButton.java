@@ -20,10 +20,11 @@ import android.view.View;
  */
 public class JoyButton extends AppCompatImageButton {
 
+    // TODO Provide visual feedback with the actions
+
     private static final String TAG = JoyButton.class.getSimpleName();
 
     int distanceMin = 20;
-    int distanceCancel = 164;
 
     private OnJoyClickListener listener = null;
 
@@ -64,7 +65,9 @@ public class JoyButton extends AppCompatImageButton {
                         double distance = Math.sqrt(delta_x * delta_x + delta_y * delta_y);
                         boolean click = distance <= distanceMin;
 
-                        Log.d(TAG, "delta=[" + delta_x + ", " + delta_y + "], current=[" + current_x + ", " + current_y + "], motionEvent_original=[" + motionEvent_original_x + ", " + motionEvent_original_y + "], distance=" + distance + ", click=" + click);
+                        int distanceCancel = (view.getHeight() + view.getWidth()) / 2;
+
+                        Log.d(TAG, "delta=[" + delta_x + ", " + delta_y + "], current=[" + current_x + ", " + current_y + "], motionEvent_original=[" + motionEvent_original_x + ", " + motionEvent_original_y + "], distance=" + distance + ", distanceCancel=" + distanceCancel + ", click=" + click);
 
                         if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
                             if (distance <= distanceCancel) {
