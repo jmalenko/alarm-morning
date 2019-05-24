@@ -681,7 +681,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
                 // recurrent alarm))
                 int hour = now.get(Calendar.HOUR_OF_DAY);
                 if (onTheSameDate(appAlarmAtPosition.getDate(), today)) {
-                    if (hour + 1 < 24) hour++;
+                    hour = (hour + 1) % 24;
                 }
                 bundle.putInt(TimePickerFragment.HOURS, hour);
                 bundle.putInt(TimePickerFragment.MINUTES, 0);
