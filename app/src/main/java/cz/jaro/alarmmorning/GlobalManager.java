@@ -1070,6 +1070,22 @@ public class GlobalManager {
         Log.d(TAG, "onSnooze()");
 
         Context context = AlarmMorningApplication.getAppContext();
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        int snoozeTime = preferences.getInt(SettingsActivity.PREF_SNOOZE_TIME, SettingsActivity.PREF_SNOOZE_TIME_DEFAULT);
+
+        return onSnooze(appAlarm, snoozeTime, analytics);
+    }
+
+    /**
+     * @param appAlarm  Alarm to be snoozed.
+     * @param minutes   For how many minutes will the alarm be snoozed.
+     * @param analytics Analytics with filled {@link Analytics.Channel} and {@link Analytics.ChannelName} fields. Other fields will be filled by this method.
+     * @return Time when the alarm will ring again
+     */
+    public Calendar onSnooze(AppAlarm appAlarm, int minutes, Analytics analytics) {
+        Log.d(TAG, "onSnooze(appAlam=" + appAlarm.getPersistenceId() + ", minutes=" + minutes + ")");
+
+        Context context = AlarmMorningApplication.getAppContext();
 
         AppAlarm nextAlarmToRing = getNextAlarmToRing();
 
@@ -1081,7 +1097,7 @@ public class GlobalManager {
 
         setState(STATE_SNOOZED, getRingingAlarm());
 
-        Calendar ringAfterSnoozeTime = getRingAfterSnoozeTime(clock());
+        Calendar ringAfterSnoozeTime = getRingAfterSnoozeTime(clock(), minutes);
 
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
         systemAlarm.onSnooze(ringAfterSnoozeTime);
@@ -1094,16 +1110,6 @@ public class GlobalManager {
         updateCalendarActivity(context, AlarmMorningActivity.ACTION_SNOOZE, appAlarm);
 
         return ringAfterSnoozeTime;
-    }
-
-    /**
-     * @param appAlarm  Alarm to be snoozed.
-     * @param minutes   For how many minutes will the alarm be snoozed.
-     * @param analytics Analytics with filled {@link Analytics.Channel} and {@link Analytics.ChannelName} fields. Other fields will be filled by this method.
-     * @return Time when the alarm will ring again
-     */
-    public Calendar onSnooze(AppAlarm appAlarm, int minutes, Analytics analytics) {
-        return onSnooze(appAlarm, analytics); // TODO Implement
     }
 
     /**
@@ -1326,7 +1332,13 @@ public class GlobalManager {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         int snoozeTime = preferences.getInt(SettingsActivity.PREF_SNOOZE_TIME, SettingsActivity.PREF_SNOOZE_TIME_DEFAULT);
 
-        Calendar ringAfterSnoozeTime = addMinutesClone(clock.now(), snoozeTime);
+        return getRingAfterSnoozeTime(clock, snoozeTime);
+    }
+
+    public Calendar getRingAfterSnoozeTime(Clock clock, int minutes) {
+        Log.d(TAG, "getRingAfterSnoozeTime(minutes=" + minutes + ")");
+
+        Calendar ringAfterSnoozeTime = addMinutesClone(clock.now(), minutes);
         roundDown(ringAfterSnoozeTime, Calendar.SECOND);
 
         return ringAfterSnoozeTime;
