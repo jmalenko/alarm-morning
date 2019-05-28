@@ -1068,7 +1068,7 @@ public class CalendarWithOneTimeAlarmTest extends AlarmMorningAppTest {
         startActivityCalendar();
 
         assertCalendarItem(0, "2/1", "Mon", "Off", "", null, ""); // Today
-        assertCalendarItem(1, "", "", "4:30 AM", "Snoozed", "", "-10s"); // The one-time alarm
+        assertCalendarItem(1, "", "", "4:30 AM", "Snoozed until 4:40 AM", "", "-10s"); // The one-time alarm
         assertCalendarItem(2, "2/2", "Tue", "Off", "", null, ""); // Tomorrow
 
         // Check system alarm
@@ -1080,7 +1080,7 @@ public class CalendarWithOneTimeAlarmTest extends AlarmMorningAppTest {
         assertNotificationCount(1);
 
         Notification notification = shadowNotificationManager.getAllNotifications().get(0);
-        assertNotification(notification, "Alarm at 4:30 AM", "Snoozed till 4:40 AM");
+        assertNotification(notification, "Alarm at 4:30 AM", "Snoozed until 4:40 AM");
         assertNotificationActionCount(notification, 1);
         assertNotificationAction(notification, 0, "Dismiss", NotificationReceiver.ACTION_DISMISS);
 
@@ -1113,7 +1113,7 @@ public class CalendarWithOneTimeAlarmTest extends AlarmMorningAppTest {
         assertThat("The change of number of items", newCount - oldCount, is(0));
 
         assertCalendarItem(0, "2/1", "Mon", "Off", "", null, ""); // Today
-        assertCalendarItem(1, "", "", "4:30 AM", "Snoozed", "", "-10s"); // The one-time alarm
+        assertCalendarItem(1, "", "", "4:30 AM", "Snoozed until 4:40 AM", "", "-10s"); // The one-time alarm
         assertCalendarItem(2, "2/2", "Tue", "Off", "", null, ""); // Tomorrow
 
         // Check system alarm
@@ -1125,7 +1125,7 @@ public class CalendarWithOneTimeAlarmTest extends AlarmMorningAppTest {
         assertNotificationCount(1);
 
         Notification notification = shadowNotificationManager.getAllNotifications().get(0);
-        assertNotification(notification, "Alarm at 4:30 AM", "Snoozed till 4:40 AM");
+        assertNotification(notification, "Alarm at 4:30 AM", "Snoozed until 4:40 AM");
         assertNotificationActionCount(notification, 1);
         assertNotificationAction(notification, 0, "Dismiss", NotificationReceiver.ACTION_DISMISS);
 
@@ -1585,7 +1585,7 @@ public class CalendarWithOneTimeAlarmTest extends AlarmMorningAppTest {
         assertThat("The number of items did not change", newCount - oldCount, is(0));
 
         assertCalendarItem(0, "2/1", "Mon", "Off", "", null, ""); // Today
-        assertCalendarItem(1, "", "", "4:30 AM", "Snoozed", "Flowers", "-20s"); // The one-time alarm
+        assertCalendarItem(1, "", "", "4:30 AM", "Snoozed until 4:40 AM", "Flowers", "-20s"); // The one-time alarm
         assertCalendarItem(2, "2/2", "Tue", "Off", "", null, ""); // Tomorrow
 
         // Check system alarm
@@ -1596,7 +1596,7 @@ public class CalendarWithOneTimeAlarmTest extends AlarmMorningAppTest {
         assertNotificationCount(1);
 
         Notification notification = shadowNotificationManager.getAllNotifications().get(0);
-        assertNotification(notification, "Alarm at 4:30 AM – Flowers", "Snoozed till 4:40 AM");
+        assertNotification(notification, "Alarm at 4:30 AM – Flowers", "Snoozed until 4:40 AM");
         assertNotificationActionCount(notification, 1);
         assertNotificationAction(notification, 0, "Dismiss", NotificationReceiver.ACTION_DISMISS);
 

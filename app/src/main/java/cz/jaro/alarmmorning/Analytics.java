@@ -57,7 +57,7 @@ public class Analytics {
     private static final String PREF_USER_ID_UNSET = "";
     private static final int USER_ID_LENGTH = 12;
 
-    private static final String DATE_FORMAT_UTC = "yyyy-MM-dd HH:mm:ss.SSS";
+    private static final String DATETIME_FORMAT_UTC = "yyyy-MM-dd HH:mm:ss.SSS";
     private static final String DATE_FORMAT = "yyyy-MM-dd";
     private static final String TIME_FORMAT = "HH:mm";
 
@@ -229,7 +229,7 @@ public class Analytics {
         mPayload.putInt(Param.Version.name(), versionCode);
 
         Calendar now = now();
-        String utcTime = calendarToStringUTC(now);
+        String utcTime = calendarToDatetimeStringUTC(now);
         mPayload.putString(Param.Datetime_UTC.name(), utcTime);
 
         mPayload.putString(Param.Datetime.name(), now.getTime().toString());
@@ -770,9 +770,13 @@ public class Analytics {
         return new String(result);
     }
 
-    public static String calendarToStringUTC(Calendar calendar) {
-        SimpleDateFormat sdfTime = new SimpleDateFormat(DATE_FORMAT_UTC, Locale.US);
+    public static String calendarToDatetimeStringUTC(Calendar calendar) {
+        SimpleDateFormat sdfTime = new SimpleDateFormat(DATETIME_FORMAT_UTC, Locale.US);
         return sdfTime.format(calendar.getTime());
+    }
+
+    public static Calendar datetimeUTCStringToCalendar(String dateString) {
+        return stringToCalendar(dateString, DATETIME_FORMAT_UTC);
     }
 
     public static String calendarToStringDate(Calendar calendar) {
@@ -781,7 +785,11 @@ public class Analytics {
     }
 
     public static Calendar dateStringToCalendar(String dateString) {
-        SimpleDateFormat sdfTime = new SimpleDateFormat(DATE_FORMAT, Locale.US);
+        return stringToCalendar(dateString, DATE_FORMAT);
+    }
+
+    private static Calendar stringToCalendar(String dateString, String format) {
+        SimpleDateFormat sdfTime = new SimpleDateFormat(format, Locale.US);
         try {
             Date date = sdfTime.parse(dateString);
 

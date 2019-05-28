@@ -270,6 +270,7 @@ public class GlobalManager {
     private static final String PERSIST_LAST_STATE = "persist_last_state";
     private static final String PERSIST_LAST_ALARM_TYPE = "persist_last_alarm_type";
     private static final String PERSIST_LAST_ALARM_ID = "persist_last_alarm_id";
+    private static final String PERSIST_LAST_RING_AFTER_SNOOZE_TIME = "persist_last_ring_after_snooze_time";
 
     /*
      * Contains info about the dismissed alarms.
@@ -382,6 +383,33 @@ public class GlobalManager {
         }
 
         editor.commit();
+    }
+
+    private void saveRingAfterSnoozeTime(Calendar ringAfterSnoozeTime) {
+        Log.v(TAG, "saveRingAfterSnoozeTime(ringAfterSnoozeTime=" + ringAfterSnoozeTime + ")");
+
+        Context context = AlarmMorningApplication.getAppContext();
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = preferences.edit();
+
+        String ringAfterSnoozeTimeStr = Analytics.calendarToDatetimeStringUTC(ringAfterSnoozeTime);
+
+        editor.putString(PERSIST_LAST_RING_AFTER_SNOOZE_TIME, ringAfterSnoozeTimeStr);
+
+        editor.commit();
+    }
+
+    public Calendar loadRingAfterSnoozeTime() {
+        Log.v(TAG, "loadRingAfterSnoozeTime()");
+
+        Context context = AlarmMorningApplication.getAppContext();
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+
+        String ringAfterSnoozeTimeStr = preferences.getString(PERSIST_LAST_RING_AFTER_SNOOZE_TIME, STRING_UNDEFINED);
+
+        Calendar ringAfterSnoozeTime = Analytics.datetimeUTCStringToCalendar(ringAfterSnoozeTimeStr);
+
+        return ringAfterSnoozeTime;
     }
 
     /**
@@ -1098,6 +1126,7 @@ public class GlobalManager {
         setState(STATE_SNOOZED, getRingingAlarm());
 
         Calendar ringAfterSnoozeTime = getRingAfterSnoozeTime(clock(), minutes);
+        saveRingAfterSnoozeTime(ringAfterSnoozeTime);
 
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
         systemAlarm.onSnooze(ringAfterSnoozeTime);

@@ -341,6 +341,11 @@ public class RingActivity extends Activity implements RingInterface {
         doDismiss();
     }
 
+    public void onSnooze(View view) {
+        Log.i(TAG, "Snooze");
+        doSnooze();
+    }
+
     private void doDismiss() {
         Log.d(TAG, "doDismiss()");
 

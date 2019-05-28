@@ -90,7 +90,7 @@
     <string name="notification_title_with_name">Alarm at <xliff:g example="07:00" id="time">%1$s</xliff:g> – <xliff:g example="Take the pill" id="name">%2$s</xliff:g></string>
     <string name="notification_text_future">Touch to view all alarms</string>
     <string name="notification_text_ringing">Ringing</string>
-    <string name="notification_text_snoozed">Snoozed till <xliff:g example="07:00" id="time">%1$s</xliff:g></string>
+    <string name="notification_text_snoozed">Snoozed until <xliff:g example="07:00" id="time">%1$s</xliff:g></string>
 
     <string name="notification_title_long">Alarm at <xliff:g example="07:00" id="time">%1$s</xliff:g> on <xliff:g example="23/12" id="date">%2$s</xliff:g></string>
     <string name="notification_text_cancelled">Alarm cancelled</string>
@@ -118,7 +118,7 @@
     <string name="alarm_state_changed">Changed</string>
     <string name="alarm_state_passed">Passed</string>
     <string name="alarm_state_ringing">Ringing</string>
-    <string name="alarm_state_snoozed">Snoozed</string>
+    <string name="alarm_state_snoozed">Snoozed until <xliff:g example="07:00" id="time">%1$s</xliff:g></string>
     <string name="alarm_state_dismissed_before_ringing">Dismissed before ringing</string>
 
     <string name="action_dismiss">Dismiss</string>

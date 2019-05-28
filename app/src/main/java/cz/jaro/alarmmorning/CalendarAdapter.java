@@ -154,7 +154,9 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
             } else if (state == GlobalManager.STATE_RINGING) {
                 stateText = res.getString(R.string.alarm_state_ringing);
             } else if (state == GlobalManager.STATE_SNOOZED) {
-                stateText = res.getString(R.string.alarm_state_snoozed);
+                Calendar ringAfterSnoozeTime = globalManager.loadRingAfterSnoozeTime();
+                String ringAfterSnoozeTimeText = Localization.timeToString(ringAfterSnoozeTime.get(Calendar.HOUR_OF_DAY), ringAfterSnoozeTime.get(Calendar.MINUTE), fragment.getActivity());
+                stateText = res.getString(R.string.alarm_state_snoozed, ringAfterSnoozeTimeText);
             } else if (state == GlobalManager.STATE_DISMISSED) {
                 stateText = res.getString(R.string.alarm_state_passed);
             } else {

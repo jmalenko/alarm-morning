@@ -529,7 +529,7 @@ public class CalendarWithDayAlarmTest extends AlarmMorningAppTest {
         startActivityCalendar();
 
         // Check calendar
-        assertCalendarItem(0, "2/1", "Mon", "7:00 AM", "Snoozed", "-10s"); // Today
+        assertCalendarItem(0, "2/1", "Mon", "7:00 AM", "Snoozed until 7:10 AM", "-10s"); // Today
         assertCalendarItem(1, "2/2", "Tue", "Off", "", ""); // Tomorrow
 
         // Check system alarm
@@ -541,7 +541,7 @@ public class CalendarWithDayAlarmTest extends AlarmMorningAppTest {
         assertNotificationCount(1);
 
         Notification notification = shadowNotificationManager.getAllNotifications().get(0);
-        assertNotification(notification, "Alarm at 7:00 AM", "Snoozed till 7:10 AM");
+        assertNotification(notification, "Alarm at 7:00 AM", "Snoozed until 7:10 AM");
         assertNotificationActionCount(notification, 1);
         assertNotificationAction(notification, 0, "Dismiss", NotificationReceiver.ACTION_DISMISS);
 
