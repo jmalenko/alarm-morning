@@ -86,6 +86,9 @@
     <string name="blink_invalid">Neplatný příkaz</string>
 
     <!-- Notification -->
+    <string name="channel_name">Hlavní kanál</string>
+    <string name="channel_description">Kanál obsahující všechna upozornění</string>
+
     <string name="notification_title">Budík v <xliff:g example="07:00" id="time">%1$s</xliff:g></string>
     <string name="notification_title_with_name">Budík v <xliff:g example="07:00" id="time">%1$s</xliff:g> – <xliff:g example="Take the pill" id="name">%2$s</xliff:g></string>
     <string name="notification_text_future">Zobraz všechny budíky</string>

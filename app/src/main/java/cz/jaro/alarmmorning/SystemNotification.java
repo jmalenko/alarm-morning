@@ -1,11 +1,13 @@
 package cz.jaro.alarmmorning;
 
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -32,6 +34,7 @@ public class SystemNotification {
     private static SystemNotification instance;
     private Context context;
 
+    private static final String CHANNEL_ID = "MAIN_NOTIFICATION";
     private static final int NOTIFICATION_ID = 0;
     private static int NOTIFICATION_ERROR_ID = NOTIFICATION_ID;
 
@@ -51,26 +54,44 @@ public class SystemNotification {
     }
 
     private NotificationCompat.Builder buildNotification(AppAlarm appAlarm) {
+        createNotificationChannel();
+
         Resources res = context.getResources();
         String timeText = Localization.timeToString(appAlarm.getHour(), appAlarm.getMinute(), context);
 
-        String contentTitle;
-        if (appAlarm instanceof OneTimeAlarm && ((OneTimeAlarm) appAlarm).getName() != null && !((OneTimeAlarm) appAlarm).getName().isEmpty()) {
-            contentTitle = res.getString(R.string.notification_title_with_name, timeText, ((OneTimeAlarm) appAlarm).getName());
-        } else {
-            contentTitle = res.getString(R.string.notification_title, timeText);
-        }
+        String contentTitle = appAlarm instanceof OneTimeAlarm && ((OneTimeAlarm) appAlarm).getName() != null && !((OneTimeAlarm) appAlarm).getName().isEmpty()
+                ? res.getString(R.string.notification_title_with_name, timeText, ((OneTimeAlarm) appAlarm).getName())
+                : res.getString(R.string.notification_title, timeText);
 
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_alarm_white)
-                .setContentTitle(contentTitle);
+                .setContentTitle(contentTitle)
+                .setPriority(NotificationCompat.PRIORITY_MAX)
+                .setCategory(NotificationCompat.CATEGORY_SERVICE);
 
         Intent deleteIntent = new Intent(context, NotificationReceiver.class);
         deleteIntent.setAction(NotificationReceiver.ACTION_DELETE_NOTIFICATION);
+        deleteIntent.putExtra(PERSIST_ALARM_TYPE, appAlarm.getClass().getSimpleName());
+        deleteIntent.putExtra(PERSIST_ALARM_ID, appAlarm.getPersistenceId());
         PendingIntent deletePendingIntent = PendingIntent.getBroadcast(context, 1, deleteIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.setDeleteIntent(deletePendingIntent);
 
         return mBuilder;
+    }
+
+    private void createNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            String name = context.getString(R.string.channel_name);
+            String descriptionText = context.getString(R.string.channel_description);
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+            channel.setDescription(descriptionText);
+
+            // Register the channel with the system
+            NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.createNotificationChannel(channel);
+        }
     }
 
     private void showNotification(NotificationCompat.Builder mBuilder, AppAlarm appAlarm) {
@@ -105,12 +126,16 @@ public class SystemNotification {
 
         Intent intent = new Intent(context, NotificationReceiver.class);
         intent.setAction(NotificationReceiver.ACTION_CLICK_NOTIFICATION);
+        intent.putExtra(PERSIST_ALARM_TYPE, appAlarm.getClass().getSimpleName());
+        intent.putExtra(PERSIST_ALARM_ID, appAlarm.getPersistenceId());
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.setContentIntent(pendingIntent);
 
         String dismissText = res.getString(R.string.action_dismiss);
         Intent dismissIntent = new Intent(context, NotificationReceiver.class);
         dismissIntent.setAction(NotificationReceiver.ACTION_DISMISS_BEFORE_RINGING);
+        dismissIntent.putExtra(PERSIST_ALARM_TYPE, appAlarm.getClass().getSimpleName());
+        dismissIntent.putExtra(PERSIST_ALARM_ID, appAlarm.getPersistenceId());
         PendingIntent dismissPendingIntent = PendingIntent.getBroadcast(context, 1, dismissIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.addAction(R.drawable.ic_alarm_off_white, dismissText, dismissPendingIntent);
 
@@ -171,12 +196,16 @@ public class SystemNotification {
         String dismissText = res.getString(R.string.action_dismiss);
         Intent dismissIntent = new Intent(context, NotificationReceiver.class);
         dismissIntent.setAction(NotificationReceiver.ACTION_DISMISS);
+        dismissIntent.putExtra(PERSIST_ALARM_TYPE, appAlarm.getClass().getSimpleName());
+        dismissIntent.putExtra(PERSIST_ALARM_ID, appAlarm.getPersistenceId());
         PendingIntent dismissPendingIntent = PendingIntent.getBroadcast(context, 1, dismissIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.addAction(R.drawable.ic_alarm_off_white, dismissText, dismissPendingIntent);
 
         String snoozeText = res.getString(R.string.action_snooze);
         Intent snoozeIntent = new Intent(context, NotificationReceiver.class);
         snoozeIntent.setAction(NotificationReceiver.ACTION_SNOOZE);
+        snoozeIntent.putExtra(PERSIST_ALARM_TYPE, appAlarm.getClass().getSimpleName());
+        snoozeIntent.putExtra(PERSIST_ALARM_ID, appAlarm.getPersistenceId());
         PendingIntent snoozePendingIntent = PendingIntent.getBroadcast(context, 1, snoozeIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.addAction(R.drawable.ic_snooze_white, snoozeText, snoozePendingIntent);
 
@@ -201,12 +230,16 @@ public class SystemNotification {
 
         Intent intent = new Intent(context, NotificationReceiver.class);
         intent.setAction(NotificationReceiver.ACTION_CLICK_NOTIFICATION);
+        intent.putExtra(PERSIST_ALARM_TYPE, appAlarm.getClass().getSimpleName());
+        intent.putExtra(PERSIST_ALARM_ID, appAlarm.getPersistenceId());
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.setContentIntent(pendingIntent);
 
         String dismissText = res.getString(R.string.action_dismiss);
         Intent dismissIntent = new Intent(context, NotificationReceiver.class);
         dismissIntent.setAction(NotificationReceiver.ACTION_DISMISS);
+        dismissIntent.putExtra(PERSIST_ALARM_TYPE, appAlarm.getClass().getSimpleName());
+        dismissIntent.putExtra(PERSIST_ALARM_ID, appAlarm.getPersistenceId());
         PendingIntent dismissPendingIntent = PendingIntent.getBroadcast(context, 1, dismissIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.addAction(R.drawable.ic_alarm_off_white, dismissText, dismissPendingIntent);
 
@@ -318,6 +351,8 @@ public class SystemNotification {
 
         Intent intent = new Intent(context, NotificationReceiver.class);
         intent.setAction(NotificationReceiver.ACTION_CLICK_NOTIFICATION);
+        intent.putExtra(PERSIST_ALARM_TYPE, appAlarm.getClass().getSimpleName());
+        intent.putExtra(PERSIST_ALARM_ID, appAlarm.getPersistenceId());
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.setContentIntent(pendingIntent);
 

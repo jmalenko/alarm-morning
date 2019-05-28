@@ -68,7 +68,7 @@ public class NotificationReceiver extends BroadcastReceiver {
             }
             case ACTION_DELETE_NOTIFICATION: {
                 Analytics analytics = new Analytics(context, Analytics.Event.Hide, Analytics.Channel.Notification, Analytics.ChannelName.Alarm);
-                analytics.setAppAlarm(globalManager.getNextAlarmToRing());
+                analytics.setAppAlarm(appAlarm);
                 analytics.save();
 
                 deleteNotification();
