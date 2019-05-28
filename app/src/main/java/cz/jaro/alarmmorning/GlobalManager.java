@@ -1111,7 +1111,7 @@ public class GlobalManager {
      * @return Time when the alarm will ring again
      */
     public Calendar onSnooze(AppAlarm appAlarm, int minutes, Analytics analytics) {
-        Log.d(TAG, "onSnooze(appAlam=" + appAlarm.getPersistenceId() + ", minutes=" + minutes + ")");
+        Log.d(TAG, "onSnooze(appAlarm=" + appAlarm.getPersistenceId() + ", minutes=" + minutes + ")");
 
         Context context = AlarmMorningApplication.getAppContext();
 
