@@ -102,9 +102,9 @@
   <string name="time_to_ring_toast_off">Alarma este dezactivată</string>
   <string name="time_to_ring_toast_passed">Această alarmă este setată la timpul trecut; nu va suna</string>
   <string name="time_to_ring_toast_removed">The alarm was removed</string>
-  <string name="time_to_ring_message_days"><xliff:g example="1" id="days">%1$d</xliff:g>z <xliff:g example="2" id="hours">%2$d</xliff:g></string>
-  <string name="time_to_ring_message_hours"><xliff:g example="2" id="hours">%1$d</xliff:g>o <xliff:g example="3" id="minutes">%2$d</xliff:g>m</string>
-  <string name="time_to_ring_message_minutes"><xliff:g example="3" id="minutes">%1$d</xliff:g>m <xliff:g example="4" id="seconds">%2$d</xliff:g>s</string>
+  <string name="time_to_ring_message_days_and_hours"><xliff:g example="1" id="days">%1$d</xliff:g>z <xliff:g example="2" id="hours">%2$d</xliff:g></string>
+  <string name="time_to_ring_message_hours_and_minutes"><xliff:g example="2" id="hours">%1$d</xliff:g>o <xliff:g example="3" id="minutes">%2$d</xliff:g>m</string>
+  <string name="time_to_ring_message_minutes_and_seconds"><xliff:g example="3" id="minutes">%1$d</xliff:g>m <xliff:g example="4" id="seconds">%2$d</xliff:g>s</string>
   <string name="tomorrow">Mâine</string>
   <string name="holiday">Sărbătoare</string>
   <!-- Descriptions for accessibility -->

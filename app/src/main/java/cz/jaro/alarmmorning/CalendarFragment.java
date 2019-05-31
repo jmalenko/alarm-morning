@@ -395,7 +395,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
                 RelativeLayout itemView = (RelativeLayout) recyclerView.getChildAt(childAt);
                 TextView textComment = (TextView) itemView.findViewById(R.id.textComment);
 
-                String messageText = adapter.getTimeToAlarm(appAlarmAtPosition);
+                String messageText = adapter.getDurationToAlarm(appAlarmAtPosition);
                 textComment.setText(messageText);
             }
         }

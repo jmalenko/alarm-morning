@@ -115,7 +115,7 @@ public class SetAlarmByVoiceActivity extends Activity {
 
             if (name == null) {
                 long diff = alarmTime.getTimeInMillis() - now.getTimeInMillis();
-                name = CalendarAdapter.formatTimeDifference(diff, getResources());
+                name = CalendarAdapter.formatTimeDifference(diff, true, getResources());
             }
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (!isVoiceInteraction()) {

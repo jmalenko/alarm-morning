@@ -219,7 +219,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         } else {
             if (fragment.isPositionWithNextAlarm(position) &&
                     !(appAlarm instanceof OneTimeAlarm && (state == GlobalManager.STATE_DISMISSED_BEFORE_RINGING || state == GlobalManager.STATE_DISMISSED))) {
-                commentText = getTimeToAlarm(appAlarm);
+                commentText = getDurationToAlarm(appAlarm);
             } else {
                 commentText = "";
             }
@@ -228,28 +228,37 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
     }
 
     @NonNull
-    String getTimeToAlarm(AppAlarm appAlarm) {
+    String getDurationToAlarm(AppAlarm appAlarm) {
         long diff = appAlarm.getTimeToRing(fragment.clock());
 
-        String messageText = formatTimeDifference(diff, fragment.getResources());
+        String messageText = formatTimeDifference(diff, false, fragment.getResources());
         return messageText;
     }
 
     @NonNull
-    public static String formatTimeDifference(long diff, Resources res) {
+    public static String formatTimeDifference(long diff, boolean trimZeroSubunits, Resources res) {
         String messageText;
 
         TimeDifference timeDifference = new TimeDifference(diff);
         String sign = timeDifference.isNegative() ? res.getString(R.string.negative_sign) : "";
 
         if (timeDifference.days > 0) {
-            messageText = sign + res.getString(R.string.time_to_ring_message_days, timeDifference.days, timeDifference.hours);
+            if (timeDifference.hours != 0 || !trimZeroSubunits)
+                messageText = sign + res.getString(R.string.time_to_ring_message_days_and_hours, timeDifference.days, timeDifference.hours);
+            else
+                messageText = sign + res.getString(R.string.time_to_ring_message_days, timeDifference.days);
         } else if (timeDifference.hours > 0) {
-            messageText = sign + res.getString(R.string.time_to_ring_message_hours, timeDifference.hours, timeDifference.minutes);
+            if (timeDifference.minutes != 0 || !trimZeroSubunits)
+                messageText = sign + res.getString(R.string.time_to_ring_message_hours_and_minutes, timeDifference.hours, timeDifference.minutes);
+            else
+                messageText = sign + res.getString(R.string.time_to_ring_message_hours, timeDifference.hours);
         } else if (timeDifference.minutes > 0) {
-            messageText = sign + res.getString(R.string.time_to_ring_message_minutes, timeDifference.minutes, timeDifference.seconds);
+            if (timeDifference.seconds != 0 || !trimZeroSubunits)
+                messageText = sign + res.getString(R.string.time_to_ring_message_minutes_and_seconds, timeDifference.minutes, timeDifference.seconds);
+            else
+                messageText = sign + res.getString(R.string.time_to_ring_message_minutes, timeDifference.minutes);
         } else {
-            messageText = sign + res.getString(R.string.time_to_ring_message_seconds, timeDifference.seconds, sign);
+            messageText = sign + res.getString(R.string.time_to_ring_message_seconds, timeDifference.seconds);
         }
 
         return messageText;

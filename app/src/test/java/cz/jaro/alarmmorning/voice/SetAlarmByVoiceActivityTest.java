@@ -143,7 +143,7 @@ public class SetAlarmByVoiceActivityTest extends FixedTimeTest {
         assertThat("Minute", cal.get(Calendar.MINUTE), is(DayTest.MINUTE + 10));
         assertThat("Second", cal.get(Calendar.SECOND), is(0));
 
-        assertThat("Name", oneTimeAlarm.getName(), is("10m 0s"));
+        assertThat("Name", oneTimeAlarm.getName(), is("10m"));
     }
 
     @Test
