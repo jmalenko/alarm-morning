@@ -27,6 +27,39 @@ import static cz.jaro.alarmmorning.model.OneTimeAlarm.UTC;
 
 /**
  * Set alarm time. The alarm time is passed as an argument in intent. The activity interacts with the user via voice; visual is static.
+ * <p>
+ * Examples of the voice commands explicitly supported by this app:
+ * <ul>
+ * <li>Set an alarm for [time, e.g. 6 a.m.]</li>
+ * <li>Set an alarm for [time] (with) labeled [name, e.g. dentist]</li>
+ * <li>Set an alarm for [amount of time, e.g. 20 minutes] from now</li>
+ * <li>Set an alarm in [amount of time]</li>
+ * <li>Set an alarm in [amount of time] labeled [name]</li>
+ * <li>Set a timer for [amount of time]</li>
+ * <li>Set a timer for [amount of time] labeled [name]</li>
+ * <li>Wake me up in [time]</li>
+ * <li>Wake me up at [amount of time] [days]</li>
+ * </ul>
+ * <p>
+ * Examples of the voice commands supported by Google Voice. Note that Google Voice says "You can do that in the app" and starts the app (into the calendar):*
+ * <ul>
+ * <li>Show me my alarms</li>
+ * <li>Show me my timers</li>
+ * <li>My alarms</li>
+ * <li>When is my next alarm?</li>
+ * <li>Snooze the alarm</li>
+ * <li>Dismiss the alarm</li>
+ * <li>Turn off all alarms</li>
+ * <li>Turn off all timers</li>
+ * <li>Stop the alarm</li>
+ * <li>Cancel the alarm</li>
+ * </ul>
+ * <p>
+ * Examples of the unsupported voice commands:
+ * <ul>
+ * <li>Set a repeating alarm for [time] on [days, e.g. Monday and Friday, everyday]</li>
+ * <li>Set a repeating alarm at [time] for [days]</li>
+ * </ul>
  */
 public class SetAlarmByVoiceActivity extends Activity {
 
@@ -39,8 +72,6 @@ public class SetAlarmByVoiceActivity extends Activity {
     private Calendar now;
 
     private static int ROUND_IF_LESS_THAN__SECONDS = 120;
-
-    // TODO Google Now allows cancelling the timer (that was just set).
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
