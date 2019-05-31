@@ -1,23 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
-    package="cz.jaro.alarmmorning"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="cz.jaro.alarmmorning">
 
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-    <uses-permission android:name="android.permission.WAKE_LOCK"/>
-    <uses-permission android:name="android.permission.VIBRATE"/>
-    <uses-permission android:name="android.permission.READ_CALENDAR"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <uses-feature
         android:name="android.hardware.location.gps"
-        android:required="false"/>
+        android:required="false" />
     <uses-feature
         android:name="android.hardware.location.network"
-        android:required="false"/>
+        android:required="false" />
 
     <application
         android:name=".AlarmMorningApplication"
@@ -28,95 +27,85 @@
 
         <activity
             android:name=".AlarmMorningActivity"
-            android:launchMode="singleTask"
-            android:label="@string/app_name"> <!-- Use application name in the main activity -->
+            android:label="@string/app_name"
+            android:launchMode="singleTask"> <!-- Use application name in the main activity -->
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <intent-filter>
-                <action android:name="android.intent.action.SHOW_ALARMS"/>
-                <category android:name="android.intent.category.DEFAULT"/>
+                <action android:name="android.intent.action.SHOW_ALARMS" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         <!-- The RingActivity is not included in the Recent Apps but keeps the main activity included. -->
         <activity
             android:name=".RingActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
+            android:excludeFromRecents="true"
             android:label="@string/title_activity_ring"
             android:launchMode="singleInstance"
-            android:theme="@style/FullscreenTheme"
             android:noHistory="true"
             android:taskAffinity=""
-            android:excludeFromRecents="true">
-        </activity>
+            android:theme="@style/FullscreenTheme"></activity>
         <activity
             android:name=".DefaultsActivity"
             android:label="@string/title_activity_defaults"
-            android:parentActivityName=".AlarmMorningActivity">
-        </activity>
+            android:parentActivityName=".AlarmMorningActivity"></activity>
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".AlarmMorningActivity">
-        </activity>
+            android:parentActivityName=".AlarmMorningActivity"></activity>
         <activity
             android:name=".wizard.Wizard"
-            android:label="@string/title_activity_wizard">
-        </activity>
+            android:label="@string/title_activity_wizard"></activity>
         <activity
             android:name=".checkalarmtime.SetTimeActivity"
-            android:theme="@style/TransparentTheme">
-        </activity>
+            android:theme="@style/TransparentTheme"></activity>
         <activity
             android:name=".voice.SetAlarmByVoiceActivity"
             android:label="@string/title_activity_set_alarm_by_voice">
             <intent-filter>
-                <action android:name="android.intent.action.SET_ALARM"/>
-                <category android:name="android.intent.category.DEFAULT"/>
+                <action android:name="android.intent.action.SET_ALARM" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
             <intent-filter>
-                <action android:name="android.intent.action.SET_TIMER"/>
-                <category android:name="android.intent.category.DEFAULT"/>
+                <action android:name="android.intent.action.SET_TIMER" />
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
 
         <receiver android:name=".WidgetProvider">
             <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/widget_info"/>
+                android:resource="@xml/widget_info" />
         </receiver>
 
-        <receiver android:name=".receivers.AlarmReceiver">
-        </receiver>
+        <receiver android:name=".receivers.AlarmReceiver"></receiver>
         <receiver android:name=".receivers.BootReceiver">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
         <receiver android:name=".receivers.UpgradeReceiver">
             <intent-filter>
-                <action android:name="android.intent.action.PACKAGE_REPLACED"/>
-                <data android:scheme="package"/>
+                <action android:name="android.intent.action.PACKAGE_REPLACED" />
+                <data android:scheme="package" />
             </intent-filter>
         </receiver>
         <receiver android:name=".receivers.TimeChangedReceiver">
             <intent-filter>
-                <action android:name="android.intent.action.TIME_SET"/>
-                <action android:name="android.intent.action.TIMEZONE_CHANGED"/>
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".receivers.NotificationReceiver">
-        </receiver>
-        <receiver android:name=".receivers.WidgetReceiver">
-        </receiver>
-        <receiver android:name=".checkalarmtime.CheckAlarmTimeAlarmReceiver">
-        </receiver>
-        <receiver android:name=".checkalarmtime.CheckAlarmTimeNotificationReceiver">
-        </receiver>
+        <receiver android:name=".receivers.NotificationReceiver"></receiver>
+        <receiver android:name=".receivers.WidgetReceiver"></receiver>
+        <receiver android:name=".checkalarmtime.CheckAlarmTimeAlarmReceiver"></receiver>
+        <receiver android:name=".checkalarmtime.CheckAlarmTimeNotificationReceiver"></receiver>
         <receiver android:name=".checkalarmtime.CalendarEventChangeReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.PROVIDER_CHANGED" />
@@ -125,7 +114,6 @@
                 <data android:host="com.android.calendar" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".nighttimebell.NighttimeBellAlarmReceiver">
-        </receiver>
+        <receiver android:name=".nighttimebell.NighttimeBellAlarmReceiver"></receiver>
     </application>
 </manifest>
