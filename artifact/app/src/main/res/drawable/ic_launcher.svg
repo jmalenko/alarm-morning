@@ -1,26 +1,24 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
-<svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:xlink="http://www.w3.org/1999/xlink"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="48"
-   height="48"
-   viewBox="0 0 48 48.000001"
-   id="svg4176"
-   version="1.1"
-   inkscape:version="0.91 r13725"
-   sodipodi:docname="android-icon-template.svg"
-   inkscape:export-filename="Z:\android-icon-template48.png"
-   inkscape:export-xdpi="90"
-   inkscape:export-ydpi="90"
-   enable-background="new">
+<svg xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:cc="http://creativecommons.org/ns#"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+    width="48"
+    height="48"
+    viewBox="0 0 48 48.000001"
+    id="svg4176"
+    version="1.1"
+    inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
+    sodipodi:docname="ic_launcher.svg"
+    inkscape:export-filename="Z:\android-icon-template48.png"
+    inkscape:export-xdpi="90"
+    inkscape:export-ydpi="90"
+    enable-background="new">
   <defs
      id="defs4178">
     <linearGradient
@@ -90,16 +88,16 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="18.520833"
-     inkscape:cx="16.035995"
+      inkscape:zoom="17.916667"
+      inkscape:cx="24"
      inkscape:cy="24"
      inkscape:document-units="px"
-     inkscape:current-layer="layer7"
+      inkscape:current-layer="layer5"
      showgrid="true"
      units="px"
-     inkscape:window-width="1857"
-     inkscape:window-height="1058"
-     inkscape:window-x="55"
+      inkscape:window-width="1856"
+      inkscape:window-height="1057"
+      inkscape:window-x="56"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
      showguides="true"
@@ -238,7 +236,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
         <cc:license
            rdf:resource="http://creativecommons.org/licenses/by-sa/3.0/" />
       </cc:Work>
@@ -367,7 +365,7 @@
      id="layer3"
      inkscape:label="Foreground"
      style="display:inline">
-    <circle
+    <ellipse
        style="display:inline;fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:3;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:0;stroke-dasharray:none;stroke-opacity:1"
        id="circle4259"
        cx="23.999998"
@@ -498,8 +496,7 @@
        style="font-style:normal;font-weight:normal;font-size:40px;line-height:125%;font-family:Sans;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        x="19"
        y="37"
-       id="text6454"
-       sodipodi:linespacing="125%"><tspan
+        id="text6454"><tspan
          sodipodi:role="line"
          id="tspan6456"
          x="19"
@@ -523,7 +520,6 @@
        inkscape:groupmode="layer"
        style="display:inline">
       <text
-         sodipodi:linespacing="125%"
          id="text7052"
          y="42.597954"
          x="35.030273"
@@ -545,8 +541,7 @@
          style="font-style:normal;font-weight:normal;font-size:17.5px;line-height:125%;font-family:Sans;letter-spacing:0px;word-spacing:0px;display:inline;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
          x="34.10376"
          y="42.911064"
-         id="text6391"
-         sodipodi:linespacing="125%"><tspan
+          id="text6391"><tspan
            sodipodi:role="line"
            id="tspan6393"
            x="34.10376"
