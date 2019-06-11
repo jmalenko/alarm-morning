@@ -64,7 +64,7 @@ public class CalendarHelper {
      * @return calendar event
      */
     public CalendarEvent find(Calendar from, Calendar to, CalendarEventFilter filter) {
-        Log.d(TAG, "Find the first calendar that starts between " + from.getTime() + " and " + to.getTime());
+        Log.d(TAG, "Find the first calendar item that starts between " + from.getTime() + " and " + to.getTime());
 
         int permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission.READ_CALENDAR);
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
