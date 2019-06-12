@@ -63,11 +63,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     public static final String PREF_SNOOZE_TIME = "pref_snooze_time";
 
     /**
-     * Value is in minutes.
-     */
-    public static final String PREF_NEAR_FUTURE_TIME = "pref_near_future_time";
-
-    /**
      * Value is boolean.
      */
     public static final String PREF_AUTO_SNOOZE = "pref_auto_snooze";
@@ -86,6 +81,11 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
      * Value is in minutes.
      */
     public static final String PREF_AUTO_DISMISS_TIME = "pref_auto_dismiss_time";
+
+    /**
+     * Value is in minutes.
+     */
+    public static final String PREF_NEAR_FUTURE_TIME = "pref_near_future_time";
 
     /**
      * Value is in minutes.
@@ -124,8 +124,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     public static final int PREF_AUTO_SNOOZE_TIME_DEFAULT = 5;
     public static final boolean PREF_AUTO_DISMISS_DEFAULT = true;
     public static final int PREF_AUTO_DISMISS_TIME_DEFAULT = 120;
-    public static final int PREF_NEAR_FUTURE_TIME_DEFAULT = 120;
     public static final String PREF_ACTION_DEFAULT = PREF_ACTION_NOTHING;
+    public static final int PREF_NEAR_FUTURE_TIME_DEFAULT = 120;
     public static final int PREF_NAP_TIME_DEFAULT = 30;
     public static final boolean PREF_CHECK_ALARM_TIME_DEFAULT = true;
     public static final String PREF_CHECK_ALARM_TIME_AT_DEFAULT = "22:00";
@@ -164,7 +164,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         bindPreferenceSummaryToValue(findPreference(PREF_SNOOZE_TIME));
         bindPreferenceSummaryToValue(findPreference(PREF_AUTO_SNOOZE_TIME));
         bindPreferenceSummaryToValue(findPreference(PREF_AUTO_DISMISS_TIME));
-        bindPreferenceSummaryToValue(findPreference(PREF_NEAR_FUTURE_TIME));
         bindPreferenceSummaryToValue(findPreference(PREF_ACTION_ON_BUTTON));
         bindPreferenceSummaryToValue(findPreference(PREF_ACTION_ON_MOVE));
         bindPreferenceSummaryToValue(findPreference(PREF_ACTION_ON_FLIP));
@@ -174,6 +173,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         bindPreferenceSummaryToValue(findPreference(PREF_CHECK_ALARM_TIME_GAP));
         bindPreferenceSummaryToValue(findPreference(PREF_NIGHTTIME_BELL_AT));
         bindPreferenceSummaryToValue(findPreference(PREF_NIGHTTIME_BELL_RINGTONE));
+        bindPreferenceSummaryToValue(findPreference(PREF_NEAR_FUTURE_TIME));
         bindPreferenceSummaryToValue(findPreference(PREF_NAP_TIME));
         bindPreferenceSummaryToValue(findPreference(PREF_HOLIDAY));
 
@@ -475,9 +475,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             case PREF_AUTO_DISMISS_TIME:
                 newValue = defaultSharedPreferences.getInt(preference.getKey(), PREF_AUTO_DISMISS_TIME_DEFAULT);
                 break;
-            case PREF_NEAR_FUTURE_TIME:
-                newValue = defaultSharedPreferences.getInt(preference.getKey(), PREF_NEAR_FUTURE_TIME_DEFAULT);
-                break;
             case PREF_ACTION_ON_BUTTON:
             case PREF_ACTION_ON_MOVE:
             case PREF_ACTION_ON_FLIP:
@@ -496,6 +493,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 break;
             case PREF_NIGHTTIME_BELL_RINGTONE:
                 newValue = defaultSharedPreferences.getString(preference.getKey(), PREF_NIGHTTIME_BELL_RINGTONE_DEFAULT);
+                break;
+            case PREF_NEAR_FUTURE_TIME:
+                newValue = defaultSharedPreferences.getInt(preference.getKey(), PREF_NEAR_FUTURE_TIME_DEFAULT);
                 break;
             case PREF_NAP_TIME:
                 newValue = defaultSharedPreferences.getInt(preference.getKey(), PREF_NAP_TIME_DEFAULT);

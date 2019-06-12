@@ -31,8 +31,6 @@
 
     <string name="pref_title_auto_dismiss_time">Auto dismiss alarm after … from the original alarm time</string>
 
-    <string name="pref_title_near_future_time">Show notification before alarm</string>
-
 
     <string name="pref_category_ring_actions_title">Actions while ringing</string>
 
@@ -66,6 +64,8 @@
 
 
     <string name="pref_category_other_title">Other</string>
+
+    <string name="pref_title_near_future_time">Show notification before alarm</string>
 
     <string name="pref_title_nap_time">Nap time</string>
 

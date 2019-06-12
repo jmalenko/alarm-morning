@@ -31,8 +31,6 @@
 
     <string name="pref_title_auto_dismiss_time">Automaticky ukončit budík po … od původního času</string>
 
-    <string name="pref_title_near_future_time">Oznámení před budíkem</string>
-
 
     <string name="pref_category_ring_actions_title">Akce během zvonění</string>
 
@@ -66,6 +64,8 @@
 
 
     <string name="pref_category_other_title">Ostatní</string>
+
+    <string name="pref_title_near_future_time">Oznámení před budíkem</string>
 
     <string name="pref_title_nap_time">Délka zdřímnutí</string>
 

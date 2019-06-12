@@ -67,12 +67,6 @@
             android:title="@string/pref_title_auto_snooze_time"
             custom:maxHour="12" />
 
-        <cz.jaro.alarmmorning.graphics.RelativeTimePreference
-            android:key="pref_near_future_time"
-            android:title="@string/pref_title_near_future_time"
-            android:defaultValue="120"
-            custom:maxHour="12"/>
-
     </PreferenceCategory>
 
     <PreferenceCategory
@@ -171,6 +165,12 @@
     <PreferenceCategory
         android:key="pref_category_other"
         android:title="@string/pref_category_other_title">
+
+        <cz.jaro.alarmmorning.graphics.RelativeTimePreference
+            android:key="pref_near_future_time"
+            android:title="@string/pref_title_near_future_time"
+            android:defaultValue="120"
+            custom:maxHour="12"/>
 
         <cz.jaro.alarmmorning.graphics.RelativeTimePreference
             android:key="pref_nap_time"
