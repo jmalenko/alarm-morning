@@ -19,6 +19,18 @@
     <string name="pref_title_snooze_time">Délka odložení</string>
     <string name="pref_summary_snooze_time"><xliff:g example="3" id="minutes">%1$d</xliff:g> minut</string>
 
+    <string name="pref_title_auto_snooze">Automaticky odložit budík</string>
+    <string name="pref_summaryoff_auto_snooze">Neodkládat automaticky</string>
+    <string name="pref_summaryon_auto_snooze">Neodkládat automaticky</string>
+
+    <string name="pref_title_auto_snooze_time">Automaticky odložit budík po … od začátku probíhajícího zvonění</string>
+
+    <string name="pref_title_auto_dismiss">Automaticky ukončit budík</string>
+    <string name="pref_summaryoff_auto_dismiss">Neukončovat automaticky</string>
+    <string name="pref_summaryon_auto_dismiss">Ukončovat automaticky</string>
+
+    <string name="pref_title_auto_dismiss_time">Automaticky ukončit budík po … od původního času</string>
+
     <string name="pref_title_near_future_time">Oznámení před budíkem</string>
 
 

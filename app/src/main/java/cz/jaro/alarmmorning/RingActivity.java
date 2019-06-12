@@ -34,6 +34,7 @@ import java.util.Set;
 
 import cz.jaro.alarmmorning.calendar.CalendarEvent;
 import cz.jaro.alarmmorning.calendar.CalendarHelper;
+import cz.jaro.alarmmorning.calendar.CalendarUtils;
 import cz.jaro.alarmmorning.graphics.Blink;
 import cz.jaro.alarmmorning.graphics.JoyButton;
 import cz.jaro.alarmmorning.graphics.SlideButton;
@@ -65,6 +66,9 @@ public class RingActivity extends Activity implements RingInterface {
     public static final String ACTION_HIDE_ACTIVITY = "cz.jaro.alarmmorning.intent.action.HIDE_ACTIVITY";
 
     private AppAlarm appAlarm;
+
+    public static final String LAST_RINGING_START_TIME = "last_ringing_start_time";
+    private Calendar lastRingingStartTime;
 
     private Ringtone ringtone;
     private MediaPlayer mediaPlayer;
@@ -155,16 +159,21 @@ public class RingActivity extends Activity implements RingInterface {
 
         String alarmType;
         String alarmId;
+        GlobalManager globalManager = GlobalManager.getInstance();
 
         if (savedInstanceState != null) {
             alarmType = savedInstanceState.getString(PERSIST_ALARM_TYPE);
             alarmId = savedInstanceState.getString(PERSIST_ALARM_ID);
+
+            long lastRingingStartTimeMS = savedInstanceState.getLong(LAST_RINGING_START_TIME);
+            lastRingingStartTime = CalendarUtils.newGregorianCalendar(lastRingingStartTimeMS);
         } else {
             Intent intent = getIntent();
             alarmType = intent.getStringExtra(PERSIST_ALARM_TYPE);
             alarmId = intent.getStringExtra(PERSIST_ALARM_ID);
+
+            lastRingingStartTime = globalManager.clock().now();
         }
-        GlobalManager globalManager = GlobalManager.getInstance();
         appAlarm = globalManager.load(alarmType, alarmId);
 
         if (appAlarm == null) {
@@ -221,7 +230,7 @@ public class RingActivity extends Activity implements RingInterface {
                 snoozeTimeTextView.setVisibility(View.INVISIBLE);
 
                 int minutes = calcSnoozeMinutes(dx, dy, click);
-                doSnooze(minutes);
+                doSnooze(minutes, false);
             }
 
             @Override
@@ -321,6 +330,7 @@ public class RingActivity extends Activity implements RingInterface {
 
         savedInstanceState.putString(PERSIST_ALARM_TYPE, appAlarm.getClass().getSimpleName());
         savedInstanceState.putString(PERSIST_ALARM_ID, appAlarm.getPersistenceId());
+        savedInstanceState.putLong(LAST_RINGING_START_TIME, lastRingingStartTime.getTimeInMillis());
     }
 
     @Override
@@ -338,20 +348,22 @@ public class RingActivity extends Activity implements RingInterface {
 
     public void onDismiss(View view) {
         Log.i(TAG, "Dismiss");
-        doDismiss();
+        doDismiss(false);
     }
 
     public void onSnooze(View view) {
         Log.i(TAG, "Snooze");
-        doSnooze();
+        doSnooze(false);
     }
 
-    private void doDismiss() {
-        Log.d(TAG, "doDismiss()");
+    private void doDismiss(boolean autoDismiss) {
+        Log.d(TAG, "doDismiss(autoDismiss=" + autoDismiss + ")");
 
         stopAll();
 
-        Analytics analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Ring);
+        Analytics analytics = autoDismiss ?
+                new Analytics(Analytics.Channel.Time, Analytics.ChannelName.Ring) :
+                new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Ring);
 
         blink = new Blink(this);
 
@@ -362,22 +374,24 @@ public class RingActivity extends Activity implements RingInterface {
         blink.initiateFinish();
     }
 
-    private void doSnooze() {
-        Log.d(TAG, "doSnooze()");
+    private void doSnooze(boolean autoSnooze) {
+        Log.d(TAG, "doSnooze(autoSnooze=" + autoSnooze + ")");
 
         Context context = AlarmMorningApplication.getAppContext();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         int minutes = preferences.getInt(SettingsActivity.PREF_SNOOZE_TIME, SettingsActivity.PREF_SNOOZE_TIME_DEFAULT);
 
-        doSnooze(minutes);
+        doSnooze(minutes, autoSnooze);
     }
 
-    private void doSnooze(int minutes) {
+    private void doSnooze(int minutes, boolean autoSnooze) {
         Log.i(TAG, "Snooze for " + minutes + " minutes");
 
         stopAll();
 
-        Analytics analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Ring);
+        Analytics analytics = autoSnooze ?
+                new Analytics(Analytics.Channel.Time, Analytics.ChannelName.Ring) :
+                new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Ring);
 
         blink = new Blink(this);
 
@@ -529,6 +543,9 @@ public class RingActivity extends Activity implements RingInterface {
     private void updateContent() {
         Log.d(TAG, "updateContent()");
 
+        if (checkAutoActions())
+            return;
+
         GlobalManager globalManager = GlobalManager.getInstance();
         Calendar now = globalManager.clock().now();
 
@@ -594,6 +611,59 @@ public class RingActivity extends Activity implements RingInterface {
         } else {
             nextCalendarView.setVisibility(View.GONE);
         }
+    }
+
+    /**
+     *
+     * @return True when an auto action is triggered.
+     */
+    private boolean checkAutoActions() {
+        Context context = this;
+        GlobalManager globalManager = GlobalManager.getInstance();
+        Calendar now = globalManager.clock().now();
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+
+        // Note: Do auto-dismiss before auto-snooze
+
+        // Check auto dismiss
+        boolean autoDismiss = preferences.getBoolean(SettingsActivity.PREF_AUTO_DISMISS, SettingsActivity.PREF_AUTO_DISMISS_DEFAULT);
+        if (autoDismiss) {
+            long autoDismissTime = preferences.getInt(SettingsActivity.PREF_AUTO_DISMISS_TIME, SettingsActivity.PREF_AUTO_DISMISS_TIME_DEFAULT);
+
+            Calendar alarmTime = appAlarm.getDateTime();
+            long diffFromAlarmTime = (now.getTimeInMillis() - alarmTime.getTimeInMillis()) / 1000 / 60; // in minutes
+
+            boolean doAutoDismiss = autoDismissTime <= diffFromAlarmTime;
+
+            Log.v(TAG, "Auto-dismiss check " + doAutoDismiss + ": auto-dismiss time (" + autoDismissTime + " min) <= time since the alarm time (" + diffFromAlarmTime + " min)");
+
+            if (doAutoDismiss) {
+                Log.i(TAG, "Auto-dismiss");
+                doDismiss(true);
+                return true;
+            }
+        }
+
+        // Check auto snooze
+        boolean autoSnooze = preferences.getBoolean(SettingsActivity.PREF_AUTO_SNOOZE, SettingsActivity.PREF_AUTO_SNOOZE_DEFAULT);
+        if (autoSnooze) {
+            long autoSnoozeTime = preferences.getInt(SettingsActivity.PREF_AUTO_SNOOZE_TIME, SettingsActivity.PREF_AUTO_SNOOZE_TIME_DEFAULT);
+
+            long diffFromLastRingingStartTime = (now.getTimeInMillis() - lastRingingStartTime.getTimeInMillis()) / 1000 / 60; // in minutes
+
+            boolean doAutoSnooze = autoSnoozeTime <= diffFromLastRingingStartTime;
+
+            Log.v(TAG, "Auto-snooze check " + doAutoSnooze + ": auto-snooze time (" + autoSnoozeTime + " min) <= time since the start of this ringing (" + diffFromLastRingingStartTime + " min)");
+
+            if (doAutoSnooze) {
+                Log.i(TAG, "Auto-snooze");
+                doSnooze(true);
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private Uri getRingtoneUri() {
@@ -955,12 +1025,12 @@ public class RingActivity extends Activity implements RingInterface {
 
             case SettingsActivity.PREF_ACTION_SNOOZE:
                 Log.i(TAG, "Snooze");
-                doSnooze();
+                doSnooze(false);
                 return;
 
             case SettingsActivity.PREF_ACTION_DISMISS:
                 Log.i(TAG, "Dismiss");
-                doDismiss();
+                doDismiss(false);
                 return;
 
             default:

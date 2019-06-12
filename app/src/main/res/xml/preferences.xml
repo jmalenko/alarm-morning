@@ -39,6 +39,34 @@
             custom:maxValue="60"
             custom:minValue="1"/>
 
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="pref_auto_snooze"
+            android:summaryOff="@string/pref_summaryoff_auto_snooze"
+            android:summaryOn="@string/pref_summaryon_auto_snooze"
+            android:title="@string/pref_title_auto_snooze" />
+
+        <cz.jaro.alarmmorning.graphics.RelativeTimePreference
+            android:defaultValue="5"
+            android:dependency="pref_auto_snooze"
+            android:key="pref_auto_snooze_time"
+            android:title="@string/pref_title_auto_snooze_time"
+            custom:maxHour="12" />
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="pref_auto_dismiss"
+            android:summaryOff="@string/pref_summaryoff_auto_dismiss"
+            android:summaryOn="@string/pref_summaryon_auto_dismiss"
+            android:title="@string/pref_title_auto_dismiss" />
+
+        <cz.jaro.alarmmorning.graphics.RelativeTimePreference
+            android:defaultValue="120"
+            android:dependency="pref_auto_dismiss"
+            android:key="pref_auto_dismiss_time"
+            android:title="@string/pref_title_auto_snooze_time"
+            custom:maxHour="12" />
+
         <cz.jaro.alarmmorning.graphics.RelativeTimePreference
             android:key="pref_near_future_time"
             android:title="@string/pref_title_near_future_time"

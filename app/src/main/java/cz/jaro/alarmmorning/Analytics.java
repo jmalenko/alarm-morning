@@ -489,6 +489,18 @@ public class Analytics {
             int snoozeTime = preferences.getInt(SettingsActivity.PREF_SNOOZE_TIME, SettingsActivity.PREF_SNOOZE_TIME_DEFAULT);
             confPreferences.put(SettingsActivity.PREF_SNOOZE_TIME, snoozeTime);
 
+            boolean autoSnoozePreference = preferences.getBoolean(SettingsActivity.PREF_AUTO_SNOOZE, SettingsActivity.PREF_AUTO_SNOOZE_DEFAULT);
+            confPreferences.put(SettingsActivity.PREF_AUTO_SNOOZE, autoSnoozePreference);
+
+            int autoSnoozeMinutes = preferences.getInt(SettingsActivity.PREF_AUTO_SNOOZE_TIME, SettingsActivity.PREF_AUTO_SNOOZE_TIME_DEFAULT);
+            confPreferences.put(SettingsActivity.PREF_AUTO_SNOOZE_TIME, autoSnoozeMinutes);
+
+            boolean autoDismissPreference = preferences.getBoolean(SettingsActivity.PREF_AUTO_DISMISS, SettingsActivity.PREF_AUTO_DISMISS_DEFAULT);
+            confPreferences.put(SettingsActivity.PREF_AUTO_DISMISS, autoDismissPreference);
+
+            int autoDismissMinutes = preferences.getInt(SettingsActivity.PREF_AUTO_DISMISS_TIME, SettingsActivity.PREF_AUTO_DISMISS_TIME_DEFAULT);
+            confPreferences.put(SettingsActivity.PREF_AUTO_DISMISS_TIME, autoDismissMinutes);
+
             int nearFutureMinutes = preferences.getInt(SettingsActivity.PREF_NEAR_FUTURE_TIME, SettingsActivity.PREF_NEAR_FUTURE_TIME_DEFAULT);
             confPreferences.put(SettingsActivity.PREF_NEAR_FUTURE_TIME, nearFutureMinutes);
 

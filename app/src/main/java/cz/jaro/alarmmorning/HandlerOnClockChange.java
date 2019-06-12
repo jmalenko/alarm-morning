@@ -33,9 +33,9 @@ public class HandlerOnClockChange extends Handler {
     private final Runnable runnableOnClockChange = () -> {
         Log.d(TAG, "Clock (and time unit) changed");
 
-        runRunnable();
-
         registerNextClockChange();
+
+        runRunnable();
     };
 
     private boolean isRunning;
