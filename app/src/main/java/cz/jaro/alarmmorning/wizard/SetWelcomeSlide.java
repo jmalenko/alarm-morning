@@ -20,7 +20,7 @@ public class SetWelcomeSlide extends BaseFragment {
 
         // Set color of bottom description
         if (Wizard.loadWizardFinished(getContext())) {
-            TextView description2View = (TextView) view.findViewById(R.id.description2);
+            TextView description2View = view.findViewById(R.id.description2);
             description2View.setTextColor(getResources().getColor(R.color.Deep_Orange_200));
         }
 

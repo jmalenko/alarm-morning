@@ -254,7 +254,7 @@ public class AlarmMorningActivity extends AppCompatActivity {
         setContentView(R.layout.activity_calendar);
 
         // Set a Toolbar to replace the ActionBar.
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         ActionBar ab = getSupportActionBar();
@@ -262,10 +262,10 @@ public class AlarmMorningActivity extends AppCompatActivity {
         ab.setDisplayShowHomeEnabled(false);
         ab.setHomeButtonEnabled(true);
 
-        mNavigationView = (NavigationView) findViewById(R.id.left_drawer);
+        mNavigationView = findViewById(R.id.left_drawer);
         setupDrawerContent(mNavigationView);
 
-        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerLayout = findViewById(R.id.drawer_layout);
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.drawer_open, R.string.drawer_close) {
             @Override
             public void onDrawerClosed(View view) {

@@ -25,17 +25,17 @@ public class SetActionsSlide extends BaseFragment {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
         SharedPreferences.Editor editor = preferences.edit();
 
-        CheckBox onMoveCheckBox = (CheckBox) getView().findViewById(R.id.onMoveCheckBox);
+        CheckBox onMoveCheckBox = getView().findViewById(R.id.onMoveCheckBox);
         if (onMoveCheckBox.isChecked()) {
             saveActionPreference(editor, SettingsActivity.PREF_ACTION_ON_MOVE, SettingsActivity.PREF_ACTION_MUTE);
         }
 
-        CheckBox onFlipCheckBox = (CheckBox) getView().findViewById(R.id.onFlipCheckBox);
+        CheckBox onFlipCheckBox = getView().findViewById(R.id.onFlipCheckBox);
         if (onFlipCheckBox.isChecked()) {
             saveActionPreference(editor, SettingsActivity.PREF_ACTION_ON_FLIP, SettingsActivity.PREF_ACTION_SNOOZE);
         }
 
-        CheckBox onShakeCheckBox = (CheckBox) getView().findViewById(R.id.onShakeCheckBox);
+        CheckBox onShakeCheckBox = getView().findViewById(R.id.onShakeCheckBox);
         if (onShakeCheckBox.isChecked()) {
             saveActionPreference(editor, SettingsActivity.PREF_ACTION_ON_SHAKE, SettingsActivity.PREF_ACTION_DISMISS);
         }

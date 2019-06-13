@@ -91,8 +91,8 @@ public class DefaultsAdapter extends RecyclerView.Adapter<DefaultsAdapter.Defaul
         public DefaultViewHolder(View view) {
             super(view);
 
-            textDayOfWeek = (TextView) view.findViewById(R.id.textDayOfWeek);
-            textTime = (TextView) view.findViewById(R.id.textTime);
+            textDayOfWeek = view.findViewById(R.id.textDayOfWeek);
+            textTime = view.findViewById(R.id.textTime);
 
             view.setOnLongClickListener(this);
         }

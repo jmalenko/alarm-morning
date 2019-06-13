@@ -196,22 +196,22 @@ public class AlarmMorningAppTest extends FixedTimeTest {
 
         AlarmMorningActivityTest.setLocale(activity, "en", "US");
 
-        textDate = (TextView) activity.findViewById(R.id.date);
-        textTime = (TextView) activity.findViewById(R.id.time);
-        textAlarmTime = (TextView) activity.findViewById(R.id.alarmTime);
-        textOneTimeAlarmName = (TextView) activity.findViewById(R.id.oneTimeAlarmName);
-        textNextCalendar = (TextView) activity.findViewById(R.id.nextCalendar);
-        textMuted = (TextView) activity.findViewById(R.id.muted);
+        textDate = activity.findViewById(R.id.date);
+        textTime = activity.findViewById(R.id.time);
+        textAlarmTime = activity.findViewById(R.id.alarmTime);
+        textOneTimeAlarmName = activity.findViewById(R.id.oneTimeAlarmName);
+        textNextCalendar = activity.findViewById(R.id.nextCalendar);
+        textMuted = activity.findViewById(R.id.muted);
 
-        snoozeButton = (ImageButton) activity.findViewById(R.id.snoozeButton);
-        dismissButton = (SlideButton) activity.findViewById(R.id.dismissButton);
+        snoozeButton = activity.findViewById(R.id.snoozeButton);
+        dismissButton = activity.findViewById(R.id.dismissButton);
     }
 
     void startActivityCalendar() {
         activity = Robolectric.setupActivity(AlarmMorningActivity.class);
         shadowActivity = Shadows.shadowOf(activity);
 
-        recyclerView = (RecyclerView) activity.findViewById(R.id.calendar_recycler_view);
+        recyclerView = activity.findViewById(R.id.calendar_recycler_view);
 
         refreshRecyclerView();
     }
@@ -230,13 +230,13 @@ public class AlarmMorningAppTest extends FixedTimeTest {
     void loadItemAtPosition(int position) {
         item = recyclerView.getChildAt(position);
 
-        textDate = (TextView) item.findViewById(R.id.textDate);
-        textDoW = (TextView) item.findViewById(R.id.textDayOfWeekCal);
-        textTime = (TextView) item.findViewById(R.id.textTimeCal);
-        textState = (TextView) item.findViewById(R.id.textState);
-        textName = (EditText) item.findViewById(R.id.textName);
-        textComment = (TextView) item.findViewById(R.id.textComment);
-        headerDate = (LinearLayout) item.findViewById(R.id.headerDate);
+        textDate = item.findViewById(R.id.textDate);
+        textDoW = item.findViewById(R.id.textDayOfWeekCal);
+        textTime = item.findViewById(R.id.textTimeCal);
+        textState = item.findViewById(R.id.textState);
+        textName = item.findViewById(R.id.textName);
+        textComment = item.findViewById(R.id.textComment);
+        headerDate = item.findViewById(R.id.headerDate);
     }
 
     void clickContextMenu(int id) {
@@ -440,10 +440,10 @@ public class AlarmMorningAppTest extends FixedTimeTest {
         int widgetId = shadowAppWidgetManager.createWidget(WidgetProvider.class, R.layout.widget_layout);
         View view = shadowAppWidgetManager.getViewFor(widgetId);
 
-        ImageView widgetIcon = (ImageView) view.findViewById(R.id.icon);
+        ImageView widgetIcon = view.findViewById(R.id.icon);
         ShadowDrawable shadowWidgetIconDrawable = Shadows.shadowOf(widgetIcon.getDrawable());
-        TextView widgetTime = (TextView) view.findViewById(R.id.alarm_time);
-        TextView widgetDate = (TextView) view.findViewById(R.id.alarm_date);
+        TextView widgetTime = view.findViewById(R.id.alarm_time);
+        TextView widgetDate = view.findViewById(R.id.alarm_date);
 
         assertThat("Widget icon", shadowWidgetIconDrawable.getCreatedFromResId(), is(iconResId));
         assertThat("Time text", widgetTime.getText().toString(), is(time));

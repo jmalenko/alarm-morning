@@ -70,7 +70,7 @@ public class TimePreference extends DialogPreference {
             int hour = mTimePicker.getCurrentHour();
             int minute = mTimePicker.getCurrentMinute();
 
-            String time = String.valueOf(hour) + ":" + String.valueOf(minute);
+            String time = hour + ":" + minute;
 
             if (callChangeListener(time)) {
                 mHour = hour;

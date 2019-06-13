@@ -558,7 +558,7 @@ public class GlobalManager {
         Log.v(TAG, "   saved alarm time is " + ringingAlarm);
 
         if (ringingAlarm != null &&
-                (appAlarm instanceof Day && ringingAlarm instanceof Day && (((Day) ringingAlarm).getDate()).equals(((Day) appAlarm).getDate())) ||
+                (appAlarm instanceof Day && ringingAlarm instanceof Day && (ringingAlarm.getDate()).equals(appAlarm.getDate())) ||
                 (appAlarm instanceof OneTimeAlarm && ringingAlarm instanceof OneTimeAlarm && (((OneTimeAlarm) ringingAlarm).getId() == ((OneTimeAlarm) appAlarm).getId()))
         ) {
             if (isDismissedAlarm(appAlarm)) {

@@ -42,11 +42,11 @@ public abstract class BaseFragment extends Fragment implements ISlideSelectionLi
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_wizard_base, container, false);
 
-        mainLayout = (LinearLayout) view.findViewById(R.id.main);
+        mainLayout = view.findViewById(R.id.main);
         int backgroundColor = getDefaultBackgroundColor();
         mainLayout.setBackgroundColor(backgroundColor);
 
-        TextView titleView = (TextView) view.findViewById(R.id.title);
+        TextView titleView = view.findViewById(R.id.title);
         String title = getTitle();
         titleView.setText(title);
         int titleColor = getTitleColor();
@@ -56,7 +56,7 @@ public abstract class BaseFragment extends Fragment implements ISlideSelectionLi
 
         int descriptionColor = getDescriptionColor();
 
-        TextView description1View = (TextView) view.findViewById(R.id.description1);
+        TextView description1View = view.findViewById(R.id.description1);
         String descriptionTop = getDescriptionTop();
         if (descriptionTop != null) {
             description1View.setText(descriptionTop);
@@ -67,7 +67,7 @@ public abstract class BaseFragment extends Fragment implements ISlideSelectionLi
             description1View.setVisibility(View.GONE);
         }
 
-        TextView description2View = (TextView) view.findViewById(R.id.description2);
+        TextView description2View = view.findViewById(R.id.description2);
         String descriptionBottom = getDescriptionBottom();
         if (descriptionBottom != null) {
             description2View.setText(descriptionBottom);
@@ -88,7 +88,7 @@ public abstract class BaseFragment extends Fragment implements ISlideSelectionLi
 
         // add content
         if (getContentLayoutId() != 0) {
-            ScrollView scrollView = (ScrollView) view.findViewById(R.id.content_frame2);
+            ScrollView scrollView = view.findViewById(R.id.content_frame2);
 
             LayoutInflater layoutInflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             View newLayout = layoutInflater.inflate(getContentLayoutId(), null, false);
@@ -96,7 +96,7 @@ public abstract class BaseFragment extends Fragment implements ISlideSelectionLi
             scrollView.addView(newLayout);
         } else {
             // Ignore content's layout_weight (useful on small displaye when the descriptions are long)
-            ScrollView scrollView = (ScrollView) view.findViewById(R.id.content_frame2);
+            ScrollView scrollView = view.findViewById(R.id.content_frame2);
             LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
             scrollView.setLayoutParams(params1);
         }

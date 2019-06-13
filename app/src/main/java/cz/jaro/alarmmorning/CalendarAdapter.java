@@ -287,13 +287,13 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         public CalendarViewHolder(View view) {
             super(view);
 
-            textDayOfWeek = (TextView) view.findViewById(R.id.textDayOfWeekCal);
-            textDate = (TextView) view.findViewById(R.id.textDate);
-            textTime = (TextView) view.findViewById(R.id.textTimeCal);
-            textState = (TextView) view.findViewById(R.id.textState);
-            textName = (EditText) view.findViewById(R.id.textName);
-            textComment = (TextView) view.findViewById(R.id.textComment);
-            headerDate = (LinearLayout) view.findViewById(R.id.headerDate);
+            textDayOfWeek = view.findViewById(R.id.textDayOfWeekCal);
+            textDate = view.findViewById(R.id.textDate);
+            textTime = view.findViewById(R.id.textTimeCal);
+            textState = view.findViewById(R.id.textState);
+            textName = view.findViewById(R.id.textName);
+            textComment = view.findViewById(R.id.textComment);
+            headerDate = view.findViewById(R.id.headerDate);
 
             view.setOnLongClickListener(this);
         }

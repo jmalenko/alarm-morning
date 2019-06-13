@@ -24,8 +24,6 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
 
-import com.crashlytics.android.Crashlytics;
-
 import java.io.IOException;
 import java.security.InvalidParameterException;
 import java.util.Calendar;
@@ -207,9 +205,9 @@ public class RingActivity extends Activity implements RingInterface {
         SlideButton dismissButton = (SlideButton) findViewById(R.id.dismissButton);
         dismissButton.setOnClickListener(this::onDismiss);
 
-        snoozeTimeTextView = (TextView) findViewById(R.id.snoozeTimeTextView);
+        snoozeTimeTextView = findViewById(R.id.snoozeTimeTextView);
 
-        JoyButton snoozeButton = (JoyButton) findViewById(R.id.snoozeButton);
+        JoyButton snoozeButton = findViewById(R.id.snoozeButton);
         snoozeButton.setOnJoyClickListener(new JoyButton.OnJoyClickListener() {
             @Override
             public void onDown(View v) {
@@ -416,7 +414,7 @@ public class RingActivity extends Activity implements RingInterface {
     }
 
     private void initMute() {
-        mutedTextView = (TextView) findViewById(R.id.muted);
+        mutedTextView = findViewById(R.id.muted);
 
         mutedInPast = false;
     }
@@ -551,14 +549,14 @@ public class RingActivity extends Activity implements RingInterface {
 
         Resources res = getResources();
         String currentDateString = Localization.dateToStringFull(res, now.getTime());
-        TextView dateView = (TextView) findViewById(R.id.date);
+        TextView dateView = findViewById(R.id.date);
         dateView.setText(currentDateString);
 
         String currentTimeString = Localization.timeToString(now.getTime(), this);
-        TextView timeView = (TextView) findViewById(R.id.time);
+        TextView timeView = findViewById(R.id.time);
         timeView.setText(currentTimeString);
 
-        TextView alarmTimeView = (TextView) findViewById(R.id.alarmTime);
+        TextView alarmTimeView = findViewById(R.id.alarmTime);
         Calendar alarmTime = appAlarm.getDateTime();
         if (onTheSameMinute(alarmTime, now)) {
             alarmTimeView.setVisibility(View.INVISIBLE);
@@ -575,7 +573,7 @@ public class RingActivity extends Activity implements RingInterface {
             alarmTimeView.setVisibility(View.VISIBLE);
         }
 
-        TextView nameView = (TextView) findViewById(R.id.oneTimeAlarmName);
+        TextView nameView = findViewById(R.id.oneTimeAlarmName);
         if (appAlarm instanceof OneTimeAlarm && ((OneTimeAlarm) appAlarm).getName() != null) {
             OneTimeAlarm oneTimeAlarm = (OneTimeAlarm) appAlarm;
             nameView.setText(oneTimeAlarm.getName());
@@ -592,7 +590,7 @@ public class RingActivity extends Activity implements RingInterface {
         As there alarm may ring (or be snoozed) for a longer period, consider also the following rule:
           4. Show the entry that occurs now
         */
-        TextView nextCalendarView = (TextView) findViewById(R.id.nextCalendar);
+        TextView nextCalendarView = findViewById(R.id.nextCalendar);
 
         Calendar endOfToday = endOfToday(now); // last milisecond in today
 

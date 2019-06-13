@@ -28,14 +28,14 @@ public class SetFeaturesSlide extends BaseFragment {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
         SharedPreferences.Editor editor = preferences.edit();
 
-        CheckBox onCheckAlarmTime = (CheckBox) getView().findViewById(R.id.onCheckAlarmTime);
+        CheckBox onCheckAlarmTime = getView().findViewById(R.id.onCheckAlarmTime);
         editor.putBoolean(SettingsActivity.PREF_CHECK_ALARM_TIME, onCheckAlarmTime.isChecked());
         if (onCheckAlarmTime.isChecked()) {
             savePreference(getContext(), editor, SettingsActivity.PREF_CHECK_ALARM_TIME_AT, SettingsActivity.PREF_CHECK_ALARM_TIME_AT_DEFAULT);
             savePreference(getContext(), editor, SettingsActivity.PREF_CHECK_ALARM_TIME_GAP, SettingsActivity.PREF_CHECK_ALARM_TIME_GAP_DEFAULT);
         }
 
-        CheckBox onPlayNighttimeBell = (CheckBox) getView().findViewById(R.id.onPlayNighttimeBell);
+        CheckBox onPlayNighttimeBell = getView().findViewById(R.id.onPlayNighttimeBell);
         editor.putBoolean(SettingsActivity.PREF_NIGHTTIME_BELL, onPlayNighttimeBell.isChecked());
         if (onPlayNighttimeBell.isChecked()) {
             savePreference(getContext(), editor, SettingsActivity.PREF_NIGHTTIME_BELL_AT, SettingsActivity.PREF_NIGHTTIME_BELL_AT_DEFAULT);

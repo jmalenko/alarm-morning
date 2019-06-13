@@ -156,17 +156,13 @@ public class SystemNotification {
             Day day = (Day) appAlarm;
             if (retrieveAlarmType.equals("Day")) {
                 Calendar retrieveDayAlarmDate = retrieveDayAlarmDate();
-                if (onTheSameDate(day.getDate(), retrieveDayAlarmDate)) {
-                    return true;
-                }
+                return onTheSameDate(day.getDate(), retrieveDayAlarmDate);
             }
         } else if (appAlarm instanceof OneTimeAlarm) {
             OneTimeAlarm oneTimeAlarm = (OneTimeAlarm) appAlarm;
             if (retrieveAlarmType.equals("OneTimeAlarm")) {
                 Long retrieveOneTimeAlarmId = retrieveOneTimeAlarmId();
-                if (oneTimeAlarm.getId() == retrieveOneTimeAlarmId) {
-                    return true;
-                }
+                return oneTimeAlarm.getId() == retrieveOneTimeAlarmId;
             }
         } else {
             throw new IllegalArgumentException("Unexpected class " + appAlarm.getClass());

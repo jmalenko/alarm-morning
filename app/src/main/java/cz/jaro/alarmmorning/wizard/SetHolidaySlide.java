@@ -31,10 +31,10 @@ public class SetHolidaySlide extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
 
-        holidaySelector = (HolidaySelector) view.findViewById(R.id.holidaySelector);
+        holidaySelector = view.findViewById(R.id.holidaySelector);
         holidaySelector.setListVisibility(View.GONE);
 
-        recommendationContainer = (LinearLayout) view.findViewById(R.id.recommendationContainer);
+        recommendationContainer = view.findViewById(R.id.recommendationContainer);
 
         // Preset
         String holidayPreference;

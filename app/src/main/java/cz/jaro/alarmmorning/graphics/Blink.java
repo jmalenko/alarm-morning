@@ -26,8 +26,8 @@ public class Blink {
     private void init() {
         activity.setContentView(R.layout.activity_blink);
 
-        messageText = (TextView) activity.findViewById(R.id.message);
-        timeText = (TextView) activity.findViewById(R.id.time);
+        messageText = activity.findViewById(R.id.message);
+        timeText = activity.findViewById(R.id.time);
     }
 
     /**

@@ -302,7 +302,6 @@ public class SystemAlarm {
         switch (action) {
             case ACTION_SET_SYSTEM_ALARM:
                 globalManager.onDateChange();
-                ;
                 break;
             case ACTION_RING_IN_NEAR_FUTURE:
                 globalManager.onNearFuture(appAlarm);

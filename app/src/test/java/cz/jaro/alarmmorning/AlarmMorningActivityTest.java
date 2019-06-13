@@ -174,7 +174,7 @@ public class AlarmMorningActivityTest extends FixedTimeTest {
 
         AlarmMorningActivity activity = Robolectric.setupActivity(AlarmMorningActivity.class);
 
-        NavigationView mNavigationView = (NavigationView) activity.findViewById(R.id.left_drawer);
+        NavigationView mNavigationView = activity.findViewById(R.id.left_drawer);
         MenuItem menuItem = mNavigationView.getMenu().findItem(R.id.navigation_translate);
 
         assertThat(menuItem.isVisible()).isEqualTo(false);
@@ -189,7 +189,7 @@ public class AlarmMorningActivityTest extends FixedTimeTest {
 
         AlarmMorningActivity activity = Robolectric.setupActivity(AlarmMorningActivity.class);
 
-        NavigationView mNavigationView = (NavigationView) activity.findViewById(R.id.left_drawer);
+        NavigationView mNavigationView = activity.findViewById(R.id.left_drawer);
         MenuItem menuItem = mNavigationView.getMenu().findItem(R.id.navigation_translate);
 
         assertThat(menuItem.isVisible()).isEqualTo(true);
@@ -208,7 +208,7 @@ public class AlarmMorningActivityTest extends FixedTimeTest {
 
         AlarmMorningActivity activity = Robolectric.setupActivity(AlarmMorningActivity.class);
 
-        NavigationView mNavigationView = (NavigationView) activity.findViewById(R.id.left_drawer);
+        NavigationView mNavigationView = activity.findViewById(R.id.left_drawer);
         MenuItem menuItem = mNavigationView.getMenu().findItem(R.id.navigation_translate);
 
         assertThat(menuItem.isVisible()).isEqualTo(true);
@@ -326,7 +326,7 @@ public class AlarmMorningActivityTest extends FixedTimeTest {
 
         Resources res = activity.getResources();
 
-        RecyclerView recyclerView = (RecyclerView) activity.findViewById(R.id.defaults_recycler_view);
+        RecyclerView recyclerView = activity.findViewById(R.id.defaults_recycler_view);
 
         // XXX Workaround Robolectric - RecyclerView needs to be measured and laid out manually in Robolectric.
         // Source: http://stackoverflow.com/questions/27052866/android-robolectric-click-recyclerview-item
@@ -337,7 +337,7 @@ public class AlarmMorningActivityTest extends FixedTimeTest {
 
         for (int position = 0; position < recyclerView.getChildCount(); position++) {
             View item = recyclerView.getChildAt(position);
-            TextView textDayOfWeek = (TextView) item.findViewById(R.id.textDayOfWeek);
+            TextView textDayOfWeek = item.findViewById(R.id.textDayOfWeek);
 
             if (position == 0)
                 assertThat(textDayOfWeek.getText()).isEqualTo("Sun");
@@ -357,7 +357,7 @@ public class AlarmMorningActivityTest extends FixedTimeTest {
 
         Resources res = activity.getResources();
 
-        RecyclerView recyclerView = (RecyclerView) activity.findViewById(R.id.defaults_recycler_view);
+        RecyclerView recyclerView = activity.findViewById(R.id.defaults_recycler_view);
 
         // XXX Workaround Robolectric - RecyclerView needs to be measured and laid out manually in Robolectric.
         // Source: http://stackoverflow.com/questions/27052866/android-robolectric-click-recyclerview-item
@@ -368,14 +368,14 @@ public class AlarmMorningActivityTest extends FixedTimeTest {
 
         for (int position = 0; position < recyclerView.getChildCount(); position++) {
             View item = recyclerView.getChildAt(position);
-            TextView textDayOfWeek = (TextView) item.findViewById(R.id.textDayOfWeek);
+            TextView textDayOfWeek = item.findViewById(R.id.textDayOfWeek);
 
             if (position == 0)
                 assertThat(textDayOfWeek.getText()).isEqualTo("Po");
 
             String dayOfWeekText = Localization.dayOfWeekToStringShort(res, AlarmDataSource.allDaysOfWeek[(position + 1) % AlarmDataSource.allDaysOfWeek.length]); // week starts with Monday
 
-            assertThat(Integer.toString(position) + textDayOfWeek.getText()).isEqualTo(Integer.toString(position) + dayOfWeekText);
+            assertThat(Integer.toString(position) + textDayOfWeek.getText()).isEqualTo(position + dayOfWeekText);
         }
     }
 

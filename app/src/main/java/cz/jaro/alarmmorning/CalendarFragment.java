@@ -77,7 +77,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_calendar, container, false);
 
-        recyclerView = (RecyclerView) rootView.findViewById(R.id.calendar_recycler_view);
+        recyclerView = rootView.findViewById(R.id.calendar_recycler_view);
 
         // use a linear layout manager
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
@@ -364,7 +364,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
         // To prevent updating of the whole item, we update only the name
         RelativeLayout itemView = (RelativeLayout) recyclerView.getChildAt(pos);
-        TextView textName = (TextView) itemView.findViewById(R.id.textName);
+        TextView textName = itemView.findViewById(R.id.textName);
         textName.setText(oneTimeAlarm.getName());
     }
 
@@ -393,7 +393,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
             int childAt = pos - linearLayoutManager.findFirstVisibleItemPosition();
             if (0 <= childAt && childAt < recyclerView.getChildCount()) {
                 RelativeLayout itemView = (RelativeLayout) recyclerView.getChildAt(childAt);
-                TextView textComment = (TextView) itemView.findViewById(R.id.textComment);
+                TextView textComment = itemView.findViewById(R.id.textComment);
 
                 String messageText = adapter.getDurationToAlarm(appAlarmAtPosition);
                 textComment.setText(messageText);
@@ -492,7 +492,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
             AppAlarm appAlarm2 = items.get(i);
             if (appAlarm2 instanceof Day
                     && appAlarm instanceof Day
-                    && onTheSameDate(((Day) appAlarm2).getDateTime(), ((Day) appAlarm).getDateTime()))
+                    && onTheSameDate(appAlarm2.getDateTime(), appAlarm.getDateTime()))
                 return i;
             if (appAlarm2 instanceof OneTimeAlarm
                     && appAlarm instanceof OneTimeAlarm

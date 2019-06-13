@@ -21,7 +21,7 @@ public class SetPermissionSlide extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
 
-        TextView explanationTextView = (TextView) view.findViewById(R.id.explanation);
+        TextView explanationTextView = view.findViewById(R.id.explanation);
         explanationTextView.setText(Html.fromHtml(getString(R.string.wizard_set_permissions_explanation)));
 
         return view;

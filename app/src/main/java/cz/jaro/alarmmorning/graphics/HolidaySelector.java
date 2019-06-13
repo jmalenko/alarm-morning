@@ -72,12 +72,12 @@ public class HolidaySelector extends LinearLayout implements AdapterView.OnItemS
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.holiday_selector, this, true);
 
-        spinner1 = (Spinner) findViewById(R.id.holidaySpinner1);
-        spinner2 = (Spinner) findViewById(R.id.holidaySpinner2);
-        spinner3 = (Spinner) findViewById(R.id.holidaySpinner3);
+        spinner1 = findViewById(R.id.holidaySpinner1);
+        spinner2 = findViewById(R.id.holidaySpinner2);
+        spinner3 = findViewById(R.id.holidaySpinner3);
 
-        listOfHolidays = (LinearLayout) findViewById(R.id.listOfHolidays);
-        listOfHolidaysDetails = (TextView) findViewById(R.id.listOfHolidaysDetails);
+        listOfHolidays = findViewById(R.id.listOfHolidays);
+        listOfHolidaysDetails = findViewById(R.id.listOfHolidaysDetails);
 
         // Setup
         adapter1 = new HolidayAdapter(getContext(), R.layout.simple_spinner_item);
@@ -96,8 +96,8 @@ public class HolidaySelector extends LinearLayout implements AdapterView.OnItemS
         spinner3.setOnItemSelectedListener(this);
 
         // Recommendations
-        recommendation = (LinearLayout) findViewById(R.id.recommendation);
-        recommendationContainer = (LinearLayout) findViewById(R.id.recommendationContainer);
+        recommendation = findViewById(R.id.recommendation);
+        recommendationContainer = findViewById(R.id.recommendationContainer);
 
         startRegionDetectors();
     }

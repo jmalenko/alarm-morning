@@ -67,7 +67,7 @@ public class SetTimeSlide extends BaseFragment implements TimePicker.OnTimeChang
 
         presetTime();
 
-        TimePicker picker = (TimePicker) view.findViewById(R.id.timePicker2);
+        TimePicker picker = view.findViewById(R.id.timePicker2);
         picker.setCurrentHour(hourOfDay);
         picker.setCurrentMinute(minute);
         picker.setIs24HourView(DateFormat.is24HourFormat(getActivity()));
@@ -76,7 +76,7 @@ public class SetTimeSlide extends BaseFragment implements TimePicker.OnTimeChang
         // Make the whole TimePicker visible
         int screenSize = getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK;
         if (screenSize == Configuration.SCREENLAYOUT_SIZE_NORMAL) {
-            ScrollView scrollView = (ScrollView) view.findViewById(R.id.content_frame2);
+            ScrollView scrollView = view.findViewById(R.id.content_frame2);
             LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, 1f);
             scrollView.setLayoutParams(params1);
         }
