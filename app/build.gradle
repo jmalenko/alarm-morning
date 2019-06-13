@@ -9,17 +9,32 @@ android {
         applicationId "cz.jaro.alarmmorning"
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 11
-        versionName "0.91"
+        versionCode 12
+        versionName "0.92"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         android.compileOptions.sourceCompatibility 1.8
         android.compileOptions.targetCompatibility 1.8
+    }
+
+    signingConfigs {
+        myconfig {
+            storeFile file('key-store.jks')
+            storePassword 'd236514bc6684ee7ab63d9eedb13dcf4ae034f935952797889fa2cb10c8f72f9'
+            keyAlias 'myconfig'
+            keyPassword 'hoGg4iLOliIvCV0j91MD'
+        }
     }
 
     buildTypes {
         release {
             // minifyEnabled true // XXX Workaround - minimization does not work reliably with Jack. https://code.google.com/p/android/issues/detail?id=218917&sort=-opened&colspec=ID%20Status%20Priority%20Owner%20Summary%20Stars%20Reporter%20Opened
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.myconfig
+        }
+        debug {
+//            applicationIdSuffix ".test"
+            versionNameSuffix "-test"
+            signingConfig signingConfigs.myconfig
         }
     }
 
@@ -45,8 +60,8 @@ dependencies {
 
     implementation 'com.github.paolorotolo:appintro:4.0.0'
 
-    implementation 'com.crashlytics.sdk.android:crashlytics:2.9.8'
-    implementation 'com.google.firebase:firebase-core:16.0.6'
+    implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
+    implementation 'com.google.firebase:firebase-core:16.0.9'
 
     // Required -- JUnit 4 framework
     testImplementation 'junit:junit:4.12'
