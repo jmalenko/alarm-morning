@@ -490,13 +490,13 @@ public class RingActivity extends Activity implements RingInterface {
 
             isRinging = true;
 
-            startContent();
-
             startSound();
             startVibrate();
 
             initMute();
             startSensors();
+
+            startContent();
         }
     }
 
@@ -511,13 +511,13 @@ public class RingActivity extends Activity implements RingInterface {
 
             isRinging = false;
 
+            stopContent();
+
             stopSensors();
             stopMute();
 
             stopVibrate();
             stopSound();
-
-            stopContent();
 
             // allow device sleep
             WakeLocker.release();
