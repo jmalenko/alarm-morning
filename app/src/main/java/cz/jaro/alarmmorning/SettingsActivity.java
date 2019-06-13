@@ -356,22 +356,16 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 String summaryText = res.getString(R.string.pref_summary_volume, volume);
 
                 preference.setSummary(summaryText);
-            } else if (key.equals(PREF_SNOOZE_TIME)) {
-                int intValue = (int) value;
-
-                Context context = preference.getContext();
-                Resources res = context.getResources();
-                String summaryText = res.getString(R.string.pref_summary_snooze_time, intValue);
-
-                preference.setSummary(summaryText);
-            } else if (preference instanceof RelativeTimePreference) {
+            } else if (preference instanceof RelativeTimePreference || key.equals(PREF_SNOOZE_TIME)) {
                 int intValue = (int) value;
                 int hours = RelativeTimePreference.valueToHour(intValue);
                 int minutes = RelativeTimePreference.valueToMinute(intValue);
 
                 Context context = preference.getContext();
                 Resources res = context.getResources();
-                String summaryText = res.getString(R.string.pref_summary_relative_time, hours, minutes);
+                String summaryText = hours == 0 ?
+                        res.getString(R.string.pref_summary_snooze_time, intValue) :
+                        res.getString(R.string.pref_summary_relative_time, hours, minutes);
 
                 preference.setSummary(summaryText);
             } else if (preference instanceof TimePreference) {
