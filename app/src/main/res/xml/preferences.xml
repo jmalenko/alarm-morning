@@ -64,7 +64,7 @@
             android:defaultValue="120"
             android:dependency="pref_auto_dismiss"
             android:key="pref_auto_dismiss_time"
-            android:title="@string/pref_title_auto_snooze_time"
+            android:title="@string/pref_title_auto_dismiss_time"
             custom:maxHour="12" />
 
     </PreferenceCategory>
