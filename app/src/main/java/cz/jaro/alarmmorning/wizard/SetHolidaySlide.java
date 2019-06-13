@@ -15,7 +15,7 @@ import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.SettingsActivity;
 import cz.jaro.alarmmorning.graphics.HolidaySelector;
 import cz.jaro.alarmmorning.holiday.HolidayHelper;
-import de.jollyday.Holiday;
+import de.galgtonold.jollydayandroid.Holiday;
 
 public class SetHolidaySlide extends BaseFragment {
 

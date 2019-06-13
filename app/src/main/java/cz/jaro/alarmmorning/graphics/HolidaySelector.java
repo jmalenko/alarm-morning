@@ -30,7 +30,7 @@ import cz.jaro.alarmmorning.holiday.regiondetector.NetworkLocationProviderRegion
 import cz.jaro.alarmmorning.holiday.regiondetector.RegionDetector;
 import cz.jaro.alarmmorning.holiday.regiondetector.TelephonyRegionDetector;
 import cz.jaro.alarmmorning.wizard.Wizard;
-import de.jollyday.Holiday;
+import de.galgtonold.jollydayandroid.Holiday;
 
 /**
  * The View that allows to select a HolidayCalendar path, eg. a hierarchically organized regions.

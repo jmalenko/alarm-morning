@@ -6,3 +6,7 @@
 
 -printmapping build/outputs/proguard/release/mapping.txt
 -keepattributes EnclosingMethod
+
+# Requred by Jollyday library to prevent warnings
+-keepattributes EnclosingMethod
+-keepattributes InnerClasses

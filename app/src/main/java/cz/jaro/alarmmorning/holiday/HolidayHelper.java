@@ -22,11 +22,11 @@ import java.util.Set;
 import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.SettingsActivity;
-import de.jollyday.CalendarHierarchy;
-import de.jollyday.Holiday;
-import de.jollyday.HolidayCalendar;
-import de.jollyday.HolidayManager;
-import de.jollyday.util.ResourceUtil;
+import de.galgtonold.jollydayandroid.CalendarHierarchy;
+import de.galgtonold.jollydayandroid.Holiday;
+import de.galgtonold.jollydayandroid.HolidayCalendar;
+import de.galgtonold.jollydayandroid.HolidayManager;
+import de.galgtonold.jollydayandroid.util.ResourceUtil;
 
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.beginningOfToday;
 import static cz.jaro.alarmmorning.holiday.HolidayHelper.PATH_TOP;

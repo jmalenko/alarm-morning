@@ -7,7 +7,7 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import cz.jaro.alarmmorning.SettingsActivity;
-import de.jollyday.HolidayCalendar;
+import de.galgtonold.jollydayandroid.HolidayCalendar;
 
 /**
  * The Preference representing a {@link HolidayCalendar}.

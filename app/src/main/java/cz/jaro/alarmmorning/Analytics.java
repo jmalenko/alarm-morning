@@ -41,7 +41,7 @@ import cz.jaro.alarmmorning.model.Day;
 import cz.jaro.alarmmorning.model.Defaults;
 import cz.jaro.alarmmorning.model.OneTimeAlarm;
 import cz.jaro.alarmmorning.wizard.Wizard;
-import de.jollyday.Holiday;
+import de.galgtonold.jollydayandroid.Holiday;
 
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.dayOfWeekToString;
 

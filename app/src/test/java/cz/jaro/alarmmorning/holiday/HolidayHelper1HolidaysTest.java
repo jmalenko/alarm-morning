@@ -10,7 +10,7 @@ import java.util.List;
 
 import cz.jaro.alarmmorning.FixedTimeTest;
 import cz.jaro.alarmmorning.clock.Clock;
-import de.jollyday.Holiday;
+import de.galgtonold.jollydayandroid.Holiday;
 
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.beginningOfToday;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.roundDown;
