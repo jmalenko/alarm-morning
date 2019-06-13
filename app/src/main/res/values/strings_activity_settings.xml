@@ -68,8 +68,8 @@
     <string name="pref_title_near_future_time">Show notification before alarm</string>
 
     <string name="pref_title_nap_enabled">Default time of new alarm is relative</string>
-    <string name="pref_summaryoff_nap_enabled">… minutes from now</string>
-    <string name="pref_summaryon_nap_enabled">Round to next hour</string>
+    <string name="pref_summaryoff_nap_enabled">Round to next hour</string>
+    <string name="pref_summaryon_nap_enabled">… minutes from now</string>
 
     <string name="pref_title_nap_time">How far from now</string>
 
