@@ -489,20 +489,23 @@ public class Analytics {
             int snoozeTime = preferences.getInt(SettingsActivity.PREF_SNOOZE_TIME, SettingsActivity.PREF_SNOOZE_TIME_DEFAULT);
             confPreferences.put(SettingsActivity.PREF_SNOOZE_TIME, snoozeTime);
 
-            boolean autoSnoozePreference = preferences.getBoolean(SettingsActivity.PREF_AUTO_SNOOZE, SettingsActivity.PREF_AUTO_SNOOZE_DEFAULT);
-            confPreferences.put(SettingsActivity.PREF_AUTO_SNOOZE, autoSnoozePreference);
+            boolean autoSnooze = preferences.getBoolean(SettingsActivity.PREF_AUTO_SNOOZE, SettingsActivity.PREF_AUTO_SNOOZE_DEFAULT);
+            confPreferences.put(SettingsActivity.PREF_AUTO_SNOOZE, autoSnooze);
 
             int autoSnoozeMinutes = preferences.getInt(SettingsActivity.PREF_AUTO_SNOOZE_TIME, SettingsActivity.PREF_AUTO_SNOOZE_TIME_DEFAULT);
             confPreferences.put(SettingsActivity.PREF_AUTO_SNOOZE_TIME, autoSnoozeMinutes);
 
-            boolean autoDismissPreference = preferences.getBoolean(SettingsActivity.PREF_AUTO_DISMISS, SettingsActivity.PREF_AUTO_DISMISS_DEFAULT);
-            confPreferences.put(SettingsActivity.PREF_AUTO_DISMISS, autoDismissPreference);
+            boolean autoDismiss = preferences.getBoolean(SettingsActivity.PREF_AUTO_DISMISS, SettingsActivity.PREF_AUTO_DISMISS_DEFAULT);
+            confPreferences.put(SettingsActivity.PREF_AUTO_DISMISS, autoDismiss);
 
             int autoDismissMinutes = preferences.getInt(SettingsActivity.PREF_AUTO_DISMISS_TIME, SettingsActivity.PREF_AUTO_DISMISS_TIME_DEFAULT);
             confPreferences.put(SettingsActivity.PREF_AUTO_DISMISS_TIME, autoDismissMinutes);
 
             int nearFutureMinutes = preferences.getInt(SettingsActivity.PREF_NEAR_FUTURE_TIME, SettingsActivity.PREF_NEAR_FUTURE_TIME_DEFAULT);
             confPreferences.put(SettingsActivity.PREF_NEAR_FUTURE_TIME, nearFutureMinutes);
+
+            boolean napTimeEnabled = preferences.getBoolean(SettingsActivity.PREF_NAP_ENABLED, SettingsActivity.PREF_NAP_ENABLED_DEFAULT);
+            confPreferences.put(SettingsActivity.PREF_NAP_ENABLED, napTimeEnabled);
 
             int napTime = preferences.getInt(SettingsActivity.PREF_NAP_TIME, SettingsActivity.PREF_NAP_TIME_DEFAULT);
             confPreferences.put(SettingsActivity.PREF_NAP_TIME, napTime);

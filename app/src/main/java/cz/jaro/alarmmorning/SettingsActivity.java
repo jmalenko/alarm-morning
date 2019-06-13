@@ -90,6 +90,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     /**
      * Value is in minutes.
      */
+    public static final String PREF_NAP_ENABLED = "pref_nap_enabled";
     public static final String PREF_NAP_TIME = "pref_nap_time";
 
     public static final String PREF_ACTION_ON_BUTTON = "pref_action_on_button";
@@ -126,6 +127,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     public static final int PREF_AUTO_DISMISS_TIME_DEFAULT = 120;
     public static final String PREF_ACTION_DEFAULT = PREF_ACTION_NOTHING;
     public static final int PREF_NEAR_FUTURE_TIME_DEFAULT = 120;
+    public static final boolean PREF_NAP_ENABLED_DEFAULT = false;
     public static final int PREF_NAP_TIME_DEFAULT = 30;
     public static final boolean PREF_CHECK_ALARM_TIME_DEFAULT = true;
     public static final String PREF_CHECK_ALARM_TIME_AT_DEFAULT = "22:00";

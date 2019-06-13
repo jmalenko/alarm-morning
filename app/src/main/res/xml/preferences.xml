@@ -172,9 +172,17 @@
             android:defaultValue="120"
             custom:maxHour="12"/>
 
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="pref_nap_enabled"
+            android:summaryOff="@string/pref_summaryoff_nap_enabled"
+            android:summaryOn="@string/pref_summaryon_nap_enabled"
+            android:title="@string/pref_title_nap_enabled" />
+
         <cz.jaro.alarmmorning.graphics.RelativeTimePreference
             android:key="pref_nap_time"
             android:title="@string/pref_title_nap_time"
+            android:dependency="pref_nap_enabled"
             android:defaultValue="30"
             custom:maxHour="6"/>
 

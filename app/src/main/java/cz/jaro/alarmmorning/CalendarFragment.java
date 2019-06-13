@@ -655,18 +655,10 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         // Preset time
         Calendar now = clock().now();
 
-        GlobalManager globalManager = GlobalManager.getInstance();
-        AppAlarm appAlarmAtPosition = loadPosition(positionAction);
-        int state = globalManager.getState(appAlarmAtPosition);
-        boolean presetNap = appAlarmAtPosition instanceof Day && menuAction == R.id.action_day_set_time && (
-                positionAction == 0 && (((Day) appAlarmAtPosition).isEnabled()
-                        ? (state == GlobalManager.STATE_SNOOZED || state == GlobalManager.STATE_DISMISSED || state == GlobalManager.STATE_DISMISSED_BEFORE_RINGING)
-                        : now.after(appAlarmAtPosition.getDateTime()))
-        );
-
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        boolean presetNap = preferences.getBoolean(SettingsActivity.PREF_NAP_ENABLED, SettingsActivity.PREF_NAP_ENABLED_DEFAULT);
         Bundle bundle = new Bundle();
         if (presetNap) {
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
             int napTime = preferences.getInt(SettingsActivity.PREF_NAP_TIME, SettingsActivity.PREF_NAP_TIME_DEFAULT);
 
             now.add(Calendar.MINUTE, napTime);
@@ -674,6 +666,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
             bundle.putInt(TimePickerFragment.HOURS, now.get(Calendar.HOUR_OF_DAY));
             bundle.putInt(TimePickerFragment.MINUTES, now.get(Calendar.MINUTE));
         } else {
+            AppAlarm appAlarmAtPosition = loadPosition(positionAction);
             if (menuAction == R.id.action_day_add_alarm) {
                 // If today, then preset to the next hour (so the alarm rings in next hour).
                 // If tomorrow or later, set to the current hour and zero minutes (so it coincides with the possible appointment that is currently in progress).

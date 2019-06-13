@@ -67,7 +67,11 @@
 
     <string name="pref_title_near_future_time">Oznámení před budíkem</string>
 
-    <string name="pref_title_nap_time">Délka zdřímnutí</string>
+    <string name="pref_title_nap_enabled">Přednastavený čas nového budíku je relativní</string>
+    <string name="pref_summaryoff_nap_enabled">… minut od současnosti</string>
+    <string name="pref_summaryon_nap_enabled">V nejbližší celou hodinu</string>
+
+    <string name="pref_title_nap_time">Jak dlouho od současnosti</string>
 
     <string name="pref_title_holiday">Svátky</string>
 
