@@ -79,10 +79,8 @@ public class SystemNotification {
     }
 
     public static void createNotificationChannel(Context context) {
-        Log.w(TAG, "createNotificationChannel()");
         // Create the NotificationChannel, but only on API 26+ because the NotificationChannel class is new and not in the support library
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            Log.w(TAG, "creating channel");
             String name = context.getString(R.string.channel_name);
             String descriptionText = context.getString(R.string.channel_description);
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
