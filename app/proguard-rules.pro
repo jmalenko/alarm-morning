@@ -4,9 +4,6 @@
 # You can edit the include path and order by changing the proguardFiles
 # directive in build.gradle.
 
--printmapping build/outputs/proguard/release/mapping.txt
--keepattributes EnclosingMethod
-
 # Requred by Jollyday library to prevent warnings
 -keepattributes EnclosingMethod
 -keepattributes InnerClasses
