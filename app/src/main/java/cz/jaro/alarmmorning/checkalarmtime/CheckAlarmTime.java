@@ -20,6 +20,7 @@ import cz.jaro.alarmmorning.Localization;
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.SettingsActivity;
 import cz.jaro.alarmmorning.SystemAlarm;
+import cz.jaro.alarmmorning.SystemNotification;
 import cz.jaro.alarmmorning.calendar.CalendarEvent;
 import cz.jaro.alarmmorning.calendar.CalendarEventFilter;
 import cz.jaro.alarmmorning.calendar.CalendarHelper;
@@ -304,7 +305,8 @@ public class CheckAlarmTime {
             contentTitle = res.getString(R.string.notification_check_title_currently_unset);
         }
 
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
+        SystemNotification.createNotificationChannel(context);
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context, SystemNotification.CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_alarm_white)
                 .setContentTitle(contentTitle)
                 .setPriority(NotificationCompat.PRIORITY_MAX);

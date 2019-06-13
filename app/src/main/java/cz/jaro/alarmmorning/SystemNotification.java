@@ -34,7 +34,7 @@ public class SystemNotification {
     private static SystemNotification instance;
     private Context context;
 
-    private static final String CHANNEL_ID = "MAIN_NOTIFICATION";
+    public static final String CHANNEL_ID = "MAIN_NOTIFICATION";
     private static final int NOTIFICATION_ID = 0;
     private static int NOTIFICATION_ERROR_ID = NOTIFICATION_ID;
 
@@ -54,8 +54,6 @@ public class SystemNotification {
     }
 
     private NotificationCompat.Builder buildNotification(AppAlarm appAlarm) {
-        createNotificationChannel();
-
         Resources res = context.getResources();
         String timeText = Localization.timeToString(appAlarm.getHour(), appAlarm.getMinute(), context);
 
@@ -63,6 +61,7 @@ public class SystemNotification {
                 ? res.getString(R.string.notification_title_with_name, timeText, ((OneTimeAlarm) appAlarm).getName())
                 : res.getString(R.string.notification_title, timeText);
 
+        createNotificationChannel(context);
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_alarm_white)
                 .setContentTitle(contentTitle)
@@ -79,9 +78,11 @@ public class SystemNotification {
         return mBuilder;
     }
 
-    private void createNotificationChannel() {
+    public static void createNotificationChannel(Context context) {
+        Log.w(TAG, "createNotificationChannel()");
         // Create the NotificationChannel, but only on API 26+ because the NotificationChannel class is new and not in the support library
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Log.w(TAG, "creating channel");
             String name = context.getString(R.string.channel_name);
             String descriptionText = context.getString(R.string.channel_description);
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
@@ -372,7 +373,8 @@ public class SystemNotification {
         String contentTitle = res.getString(R.string.app_name);
         String contentText = res.getString(R.string.notification_text_skipped, skippedAlarms);
 
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context)
+        createNotificationChannel(context);
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_alarm_white)
                 .setContentTitle(contentTitle)
                 .setContentText(contentText);
