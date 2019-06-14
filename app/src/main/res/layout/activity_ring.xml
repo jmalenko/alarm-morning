@@ -59,7 +59,8 @@
             android:paddingRight="34dp"
             android:paddingTop="2dp"
             android:progressDrawable="@android:color/transparent"
-            android:thumb="@drawable/slidebutton_thumb" />
+            android:thumb="@drawable/slidebutton_thumb"
+            android:thumbOffset="16dp" />
 
     </RelativeLayout>
 
