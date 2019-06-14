@@ -1,5 +1,5 @@
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:orientation="horizontal">
@@ -17,8 +17,8 @@
             android:background="@color/primary_dark"
             android:gravity="center"
             android:paddingTop="@dimen/margin_tiny"
-            android:text="Mon"
-            android:textSize="@dimen/text_size_day_of_week" />
+            android:textSize="@dimen/text_size_day_of_week"
+            tools:text="Mon" />
 
         <TextView
             android:id="@+id/textDate"
@@ -27,20 +27,20 @@
             android:background="@color/primary_dark"
             android:gravity="center"
             android:paddingBottom="@dimen/margin_tiny"
-            android:text="1/2"
-            android:textSize="@dimen/text_size_date" />
+            android:textSize="@dimen/text_size_date"
+            tools:text="1/2" />
     </LinearLayout>
 
     <TextView
         android:id="@+id/textTimeCal"
         android:layout_width="wrap_content"
         android:layout_height="72dp"
-        android:layout_marginStart="@dimen/margin_medium"
         android:layout_marginEnd="@dimen/margin_tiny"
+        android:layout_marginStart="@dimen/margin_medium"
         android:layout_toEndOf="@id/headerDate"
         android:gravity="center_vertical"
-        android:text="07:00"
-        android:textSize="@dimen/text_size_time" />
+        android:textSize="@dimen/text_size_time"
+        tools:text="07:00" />
 
     <TextView
         android:id="@+id/textState"
@@ -53,8 +53,8 @@
         android:gravity="end"
         android:maxLines="1"
         android:paddingTop="@dimen/margin_small"
-        android:text="Snoozed until 07:10"
-        android:textAlignment="textEnd" />
+        android:textAlignment="textEnd"
+        tools:text="Snoozed until 07:10" />
 
     <cz.jaro.alarmmorning.graphics.EditTextWithoutSuggestion
         android:id="@+id/textName"
@@ -71,9 +71,9 @@
         android:imeOptions="actionDone"
         android:inputType="text|textCapSentences"
         android:maxLines="1"
-        android:text="Take the pill"
         android:textAlignment="textEnd"
-        android:textColor="@null" />
+        android:textColor="@null"
+        tools:text="Take the pill" />
 
     <TextView
         android:id="@+id/textComment"
@@ -87,7 +87,7 @@
         android:gravity="end"
         android:maxLines="1"
         android:paddingBottom="@dimen/margin_small"
-        android:text="12m 34s"
-        android:textAlignment="textEnd" />
+        android:textAlignment="textEnd"
+        tools:text="12m 34s" />
 
 </RelativeLayout>

@@ -1,5 +1,5 @@
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical"
@@ -16,7 +16,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/holidays_recommendations"/>
+            android:text="@string/holidays_recommendations" />
 
         <HorizontalScrollView
             android:layout_width="match_parent"
@@ -36,7 +36,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/holidays_setting"/>
+            android:text="@string/holidays_setting" />
 
     </LinearLayout>
 
@@ -49,7 +49,7 @@
         android:layout_marginRight="@dimen/margin_medium"
         android:layout_marginTop="@dimen/margin_large"
         android:spinnerMode="dialog"
-        android:text="Germany"/>
+        tools:text="Germany" />
 
     <Spinner
         android:id="@+id/holidaySpinner2"
@@ -59,7 +59,7 @@
         android:layout_marginLeft="@dimen/margin_medium"
         android:layout_marginRight="@dimen/margin_medium"
         android:spinnerMode="dialog"
-        android:text="Bavaria"/>
+        tools:text="Bavaria" />
 
     <Spinner
         android:id="@+id/holidaySpinner3"
@@ -69,7 +69,7 @@
         android:layout_marginLeft="@dimen/margin_medium"
         android:layout_marginRight="@dimen/margin_medium"
         android:spinnerMode="dialog"
-        android:text="Munich"/>
+        tools:text="Munich" />
 
     <LinearLayout
         android:id="@+id/listOfHolidays"
@@ -82,7 +82,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/margin_small"
-            android:text="@string/holidays_list_title"/>
+            android:text="@string/holidays_list_title" />
 
         <ScrollView
             android:layout_width="match_parent"
@@ -92,7 +92,7 @@
                 android:id="@+id/listOfHolidaysDetails"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Date Name"/>
+                tools:text="Date Name" />
 
         </ScrollView>
 

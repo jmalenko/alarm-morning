@@ -1,6 +1,6 @@
-<LinearLayout
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/widget_layout"
-    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/widget_background"
@@ -12,7 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:contentDescription="Alarm icon"
+        android:contentDescription="@string/alarm_icon_content_description"
         android:src="@drawable/ic_alarm_on_white" />
 
     <TextView
@@ -26,10 +26,10 @@
         android:shadowDx="0"
         android:shadowDy="2"
         android:shadowRadius="2"
-        android:text="08:00"
+        android:singleLine="true"
         android:textAlignment="center"
         android:textColor="@android:color/white"
-        android:singleLine="true" />
+        tools:text="08:00" />
 
     <TextView
         android:id="@+id/alarm_date"
@@ -42,8 +42,8 @@
         android:shadowDx="0"
         android:shadowDy="2"
         android:shadowRadius="2"
-        android:text="Mon"
+        android:singleLine="true"
         android:textAlignment="center"
         android:textColor="@android:color/white"
-        android:singleLine="true" />
+        tools:text="Mon" />
 </LinearLayout>

@@ -357,7 +357,7 @@ public class Localization {
      * @param resId     resource id
      * @return the value from current locale if the value in the current locale is different from the value in in the default locale; otherwise returns null.
      */
-    private static String getValue(Resources resources, int resId) {
+    public static String getValue(Resources resources, int resId) {
         AssetManager assets = resources.getAssets();
         DisplayMetrics metrics = resources.getDisplayMetrics();
         Configuration config = new Configuration(resources.getConfiguration());

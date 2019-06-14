@@ -1,5 +1,5 @@
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:keepScreenOn="true">
@@ -17,9 +17,9 @@
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="@dimen/margin_medium"
             android:layout_marginTop="@dimen/margin_tiny"
-            android:text="Snooze for 20 minutes"
             android:textSize="24sp"
-            android:visibility="invisible" />
+            android:visibility="invisible"
+            tools:text="Snooze for 20 minutes" />
 
         <cz.jaro.alarmmorning.graphics.JoyButton
             android:id="@+id/snoozeButton"
@@ -39,8 +39,8 @@
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="@dimen/margin_tiny"
             android:layout_marginTop="@dimen/margin_tiny"
-            android:text="Muted for 9 seconds"
-            android:visibility="invisible" />
+            android:visibility="invisible"
+            tools:text="Muted for 9 seconds" />
 
         <cz.jaro.alarmmorning.graphics.SlideButton
             android:id="@+id/dismissButton"
@@ -86,17 +86,17 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:gravity="center"
-                android:text="Monday, February 15" />
+                tools:text="Monday, February 15" />
 
             <TextView
                 android:id="@+id/time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:text="12:34"
                 android:textColor="@color/accent"
                 android:textSize="70sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                tools:text="12:34" />
 
             <Space
                 android:layout_width="match_parent"
@@ -109,7 +109,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:gravity="center"
-                android:text="Alarm was set to 7:15" />
+                tools:text="Alarm was set to 7:15" />
 
             <Space
                 android:layout_width="match_parent"
@@ -124,8 +124,8 @@
                 android:layout_marginLeft="@dimen/margin_medium"
                 android:layout_marginRight="@dimen/margin_medium"
                 android:gravity="center"
-                android:text="Take the pill"
-                android:textColor="@color/accent" />
+                android:textColor="@color/accent"
+                tools:text="Take the pill" />
 
             <Space
                 android:layout_width="match_parent"
@@ -140,7 +140,7 @@
                 android:layout_marginLeft="@dimen/margin_medium"
                 android:layout_marginRight="@dimen/margin_medium"
                 android:gravity="center"
-                android:text="Next appointment: 8:00 Dentist" />
+                tools:text="Next appointment: 8:00 Dentist" />
 
             <Space
                 android:layout_width="match_parent"

@@ -26,4 +26,5 @@
     <string name="date_format_very_short"></string>
     <string name="date_format_full"></string>
     <string name="time_format"></string>
+    <string name="hour_minute_separator"></string>
 </resources>

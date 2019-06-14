@@ -156,6 +156,7 @@
     <!-- Descriptions for accessibility -->
     <string name="drawer_open">Otevřít navigační menu</string>
     <string name="drawer_close">Zavřít navigační menu</string>
+    <string name="alarm_icon_content_description">Ikona budíku</string>
 
     <!-- Localization -->
     <string name="list_separator">", "</string>

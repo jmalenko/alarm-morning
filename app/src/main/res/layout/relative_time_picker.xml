@@ -1,6 +1,6 @@
-<LinearLayout
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/relative_time_wrap_layout"
-    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:gravity="center">
@@ -17,18 +17,18 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="@string/relative_time_picker_label_hour"/>
+                android:text="@string/relative_time_picker_label_hour" />
 
             <Space
                 android:layout_width="0dip"
-                android:layout_height="0dip"/>
+                android:layout_height="0dip" />
 
             <TextView
                 android:id="@+id/minute_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="@string/relative_time_picker_label_minute"/>
+                android:text="@string/relative_time_picker_label_minute" />
 
         </TableRow>
 
@@ -39,7 +39,7 @@
                 android:layout_width="70dp"
                 android:layout_height="wrap_content"
                 android:focusable="true"
-                android:focusableInTouchMode="true"/>
+                android:focusableInTouchMode="true" />
 
             <TextView
                 android:id="@+id/separator"
@@ -48,14 +48,14 @@
                 android:layout_gravity="center"
                 android:layout_marginLeft="@dimen/margin_tiny"
                 android:layout_marginRight="@dimen/margin_tiny"
-                android:text=":"/>
+                tools:text=":" />
 
             <NumberPicker
                 android:id="@+id/minute"
                 android:layout_width="70dp"
                 android:layout_height="wrap_content"
                 android:focusable="true"
-                android:focusableInTouchMode="true"/>
+                android:focusableInTouchMode="true" />
 
         </TableRow>
     </TableLayout>

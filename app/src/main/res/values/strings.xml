@@ -157,6 +157,7 @@
     <!-- Descriptions for accessibility -->
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
+    <string name="alarm_icon_content_description">Alarm icon</string>
 
     <!-- Localization -->
     <string name="list_separator">", "</string>
