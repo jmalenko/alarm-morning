@@ -60,7 +60,7 @@
             android:paddingTop="2dp"
             android:progressDrawable="@android:color/transparent"
             android:thumb="@drawable/slidebutton_thumb"
-            android:thumbOffset="16dp" />
+            android:thumbOffset="14dp" />
 
     </RelativeLayout>
 
