@@ -699,7 +699,6 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
                     Day day = (Day) appAlarmAtPosition;
                     day.setState(Day.STATE_DISABLED);
                     modifyDayAlarm(day);
-                    return;
                 } else {
                     switch (menuAction) {
                         case R.id.action_day_set_time:
@@ -710,7 +709,6 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
                         case R.id.action_day_add_alarm:
                             // do nothing (setting time of a (to be) newly created alarm)
                     }
-                    return;
                 }
             } else {
                 switch (menuAction) {
@@ -748,7 +746,6 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
                         }
 
                         createOneTimeAlarm(oneTimeAlarm);
-                        return;
                 }
             }
         }

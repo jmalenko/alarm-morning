@@ -15,14 +15,14 @@ public class JSONSharedPreferences {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(c);
         SharedPreferences.Editor editor = settings.edit();
         editor.putString(JSONSharedPreferences.PREFIX + key, object.toString());
-        editor.commit();
+        editor.apply();
     }
 
     public static void saveJSONArray(Context c, String key, JSONArray array) {
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(c);
         SharedPreferences.Editor editor = settings.edit();
         editor.putString(JSONSharedPreferences.PREFIX + key, array.toString());
-        editor.commit();
+        editor.apply();
     }
 
     public static JSONObject loadJSONObject(Context c, String key) throws JSONException {
@@ -40,7 +40,7 @@ public class JSONSharedPreferences {
         if (settings.contains(JSONSharedPreferences.PREFIX + key)) {
             SharedPreferences.Editor editor = settings.edit();
             editor.remove(JSONSharedPreferences.PREFIX + key);
-            editor.commit();
+            editor.apply();
         }
     }
 }

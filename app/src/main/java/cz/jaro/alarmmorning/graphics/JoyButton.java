@@ -24,7 +24,7 @@ public class JoyButton extends AppCompatImageButton {
 
     private static final String TAG = JoyButton.class.getSimpleName();
 
-    int distanceMin = 20;
+    final int distanceMin = 20;
 
     private OnJoyClickListener listener = null;
 

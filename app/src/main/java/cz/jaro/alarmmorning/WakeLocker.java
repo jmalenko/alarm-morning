@@ -10,7 +10,7 @@ import android.os.PowerManager;
  * standard behavior.
  */
 public abstract class WakeLocker {
-    private static final String APP_TAG = "alarm-morning";
+    private static final String APP_TAG = "alarm-morning:mywakelogtag";
 
     private static PowerManager.WakeLock wakeLock;
 

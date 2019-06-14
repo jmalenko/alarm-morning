@@ -19,7 +19,7 @@ public class URLHelper {
      *
      * @param URLString URL
      * @return true if the URL exists (and has content)
-     * @throws IOException
+     * @throws IOException On Input/Output exception
      */
     public static boolean exists(String URLString) throws IOException {
         URL url = new URL(URLString);

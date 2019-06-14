@@ -116,7 +116,7 @@ public class Defaults implements Cloneable {
 
     @Override
     public String toString() {
-        StringBuffer str = new StringBuffer();
+        StringBuilder str = new StringBuilder();
 
         str.append(dayOfWeekToString(dayOfWeek));
         str.append(" ");

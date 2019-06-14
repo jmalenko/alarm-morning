@@ -41,7 +41,7 @@ public class SetFeaturesSlide extends BaseFragment {
             savePreference(getContext(), editor, SettingsActivity.PREF_NIGHTTIME_BELL_AT, SettingsActivity.PREF_NIGHTTIME_BELL_AT_DEFAULT);
         }
 
-        editor.commit();
+        editor.apply();
     }
 
     protected static void savePreference(Context context, SharedPreferences.Editor editor, String pref, String value) {

@@ -303,7 +303,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     /**
      * A preference value change listener that updates the preference's summary to reflect its new value.
      */
-    private static OnPreferenceChangeListenerWithAnalytics sBindPreferenceSummaryToValueListener = new OnPreferenceChangeListenerWithAnalytics() {
+    private static final OnPreferenceChangeListenerWithAnalytics sBindPreferenceSummaryToValueListener = new OnPreferenceChangeListenerWithAnalytics() {
         @Override
         public boolean onPreferenceChange(Preference preference, Object value) {
             analytics(preference, value);

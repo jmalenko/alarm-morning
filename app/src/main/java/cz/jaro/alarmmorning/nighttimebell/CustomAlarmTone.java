@@ -70,7 +70,7 @@ public class CustomAlarmTone {
                     // Remember that files were installed
                     SharedPreferences.Editor editor = preferences.edit();
                     editor.putBoolean(PREF_FILES_INSTALLED, true);
-                    editor.commit();
+                    editor.apply();
                 }
             } else {
                 Log.d(TAG, "Already installed");
@@ -158,7 +158,7 @@ public class CustomAlarmTone {
                         || ringtonePreference.equals(SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE_DEFAULT)) {
                     SharedPreferences.Editor editor = preferences.edit();
                     editor.putString(SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE, newUri.toString());
-                    editor.commit();
+                    editor.apply();
                 }
             }
 

@@ -25,7 +25,7 @@
   <string name="pref_summaryoff_check_alarm_time">Não vê a hora do alarme</string>
   <string name="pref_summaryon_check_alarm_time">Verifique a hora do alarme</string>
   <string name="pref_title_check_alarm_time_at">Verifique em</string>
-  <string name="pref_title_check_alarm_time_gap">Alarme deve tocar pelo menos... antes da primeira nomeação</string>
+  <string name="pref_title_check_alarm_time_gap">Alarme deve tocar pelo menos… antes da primeira nomeação</string>
   <string name="pref_category_nighttime_bell_title">@string/pref_title_nighttime_bell</string>
   <string name="pref_title_nighttime_bell">Sino noturno (torneiras corneta)</string>
   <string name="pref_summaryoff_nighttime_bell">Não toque</string>

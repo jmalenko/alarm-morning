@@ -31,13 +31,13 @@ public class Move extends SensorEventDetector {
         float y = event.values[1];
         float z = event.values[2];
 
+        mAccelCurrent = Math.sqrt(x * x + y * y + z * z);
+
         if (!mInitialized) {
             mInitialized = true;
-            mAccelCurrent = Math.sqrt(x * x + y * y + z * z);
             return false;
         } else {
             double mAccelLast = mAccelCurrent;
-            mAccelCurrent = Math.sqrt(x * x + y * y + z * z);
             double delta = mAccelCurrent - mAccelLast;
             mAccel = mAccel * 0.9f + delta;
 

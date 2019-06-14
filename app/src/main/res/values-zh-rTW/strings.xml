@@ -40,7 +40,7 @@
   <string name="snooze_alarm_on_device_flip">設備翻轉時延遲響鬧</string>
   <string name="dismiss_alarm_on_device_shake">抖動設備關閉響鬧</string>
   <string name="wizard_set_features_title">設置鬧鐘進階的功能</string>
-  <string name="wizard_set_features_description">每天晚上在 <xliff:g example="22:00" id="time">%1$s </xliff:g>...</string>
+  <string name="wizard_set_features_description">每天晚上在 <xliff:g example="22:00" id="time">%1$s </xliff:g>…</string>
   <string name="check_alarm_time">檢查鬧鐘設置為第一次預約前的至少1小時</string>
   <string name="play_nighttime_bell">播放夜間響鈴 (敲打號角)</string>
   <string name="wizard_set_permissions_title">允許許可權</string>
@@ -77,7 +77,7 @@
   <string name="notification_check_text_with_location">第一次約會: <xliff:g example="07:00" id="time">%1$s </xliff:g> <xliff:g example="Dentist" id="title">%2$s </xliff:g> (<xliff:g example="Main St" id="location">%3$s </xliff:g>)</string>
   <string name="notification_check_text_without_location">第一次約會: <xliff:g example="07:00" id="time">%1$s </xliff:g> <xliff:g example="Dentist" id="title">%2$s </xliff:g></string>
   <string name="notification_check_text_set_at">設置為 <xliff:g example="07:00" id="time">%1$s </xliff:g></string>
-  <string name="notification_check_text_set_dialog">設置...</string>
+  <string name="notification_check_text_set_dialog">設置…</string>
   <!-- Nighttime bell -->
   <string name="nighttime_bell_toast">晚安。</string>
   <!-- Common -->
@@ -89,8 +89,7 @@
   <string name="alarm_state_dismissed_before_ringing">在響鈴之前被取消</string>
   <string name="action_dismiss">取消</string>
   <string name="action_snooze">延遲響鬧</string>
-  <string name="action_change">已更改</string>
-  <string name="action_nothing">沒動作</string>
+    <string name="action_nothing">沒動作</string>
   <string name="action_mute_for_10_seconds">靜音10秒</string>
   <string name="action_set">Set</string>
   <string name="action_set_time">Set time</string>
@@ -102,8 +101,7 @@
   <string name="time_to_ring_toast_minutes">此鬧鐘設置為 <xliff:g example="3" id="minutes">%1$d</xliff:g> 小時、和 <xliff:g example="4" id="seconds">%2$d</xliff:g> 分鐘 (從現在開始計)</string>
   <string name="time_to_ring_toast_off">此鬧鐘已關閉</string>
   <string name="time_to_ring_toast_passed">此鬧鐘設置為過去時間; 它不會響鬧</string>
-  <string name="time_to_ring_toast_removed">The alarm was removed</string>
-  <string name="time_to_ring_message_days_and_hours"><xliff:g example="1" id="days">%1$d</xliff:g>d <xliff:g example="2" id="hours">%2$d</xliff:g>h</string>
+    <string name="time_to_ring_message_days_and_hours"><xliff:g example="1" id="days">%1$d</xliff:g>d <xliff:g example="2" id="hours">%2$d</xliff:g>h</string>
   <string name="time_to_ring_message_hours_and_minutes"><xliff:g example="2" id="hours">%1$d </xliff:g> h <xliff:g example="3" id="minutes">%2$d </xliff:g> m</string>
   <string name="time_to_ring_message_minutes_and_seconds"><xliff:g example="3" id="minutes">%1$d </xliff:g> m <xliff:g example="4" id="seconds">%2$d </xliff:g> s</string>
   <string name="tomorrow">明天</string>

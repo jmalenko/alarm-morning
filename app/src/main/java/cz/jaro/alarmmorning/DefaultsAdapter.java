@@ -7,6 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.ibm.icu.util.Calendar;
+
 import cz.jaro.alarmmorning.model.AlarmDataSource;
 import cz.jaro.alarmmorning.model.Defaults;
 
@@ -52,13 +54,10 @@ public class DefaultsAdapter extends RecyclerView.Adapter<DefaultsAdapter.Defaul
         int backgroundColor;
         com.ibm.icu.util.Calendar c = com.ibm.icu.util.Calendar.getInstance();
         int dayOfWeekType = c.getDayOfWeekType(((activity.firstDayOfWeek + position) % AlarmDataSource.allDaysOfWeek.length) + 1); // ICU4J library encodes days as 1 = Sunday, ... , 7 = Saturday
-        switch (dayOfWeekType) {
-            case com.ibm.icu.util.Calendar.WEEKEND:
-                backgroundColor = res.getColor(R.color.weekend);
-                break;
-
-            default:
-                backgroundColor = res.getColor(R.color.primary_dark);
+        if (dayOfWeekType == Calendar.WEEKEND) {
+            backgroundColor = res.getColor(R.color.weekend);
+        } else {
+            backgroundColor = res.getColor(R.color.primary_dark);
         }
         viewHolder.getTextDayOfWeek().setBackgroundColor(backgroundColor);
 

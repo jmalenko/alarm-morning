@@ -243,7 +243,6 @@ public class CheckAlarmTime {
                     if (targetAlarmTimeChanged) {
                         showNotification(morningInfo.day, morningInfo.targetAlarmTime, morningInfo.checkAlarmTimeGap, morningInfo.event);
                     }
-
                 } else {
                     // TODO Show notification but ignore if the user already dismissed the notification about this event (maybe only duration changed)
                     boolean dismissedNotification = false;

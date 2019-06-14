@@ -430,7 +430,7 @@ public class SystemNotification {
             throw new IllegalArgumentException("Unexpected class " + appAlarm.getClass());
         }
 
-        editor.commit();
+        editor.apply();
     }
 
     public void persistRemove() {
@@ -443,7 +443,7 @@ public class SystemNotification {
         editor.remove(PERSIST_NOTIFICATION_DAY_ALARM_DATE);
         editor.remove(PERSIST_NOTIFICATION_ONE_TIME_ALARM_ID);
 
-        editor.commit();
+        editor.apply();
     }
 
 }

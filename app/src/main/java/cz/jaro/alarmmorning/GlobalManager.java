@@ -150,7 +150,7 @@ public class GlobalManager {
     public AppAlarm getNextAlarmToRing() {
         Log.v(TAG, "getNextAlarmToRing()");
 
-        AppAlarm appAlarm = null;
+        AppAlarm appAlarm;
         if (isRingingOrSnoozed()) {
             Log.v(TAG, "   loading the ringing or snoozed alarm");
 
@@ -324,7 +324,7 @@ public class GlobalManager {
             editor.putString(PERSIST_ALARM_ID, nextAction.appAlarm.getPersistenceId());
         }
 
-        editor.commit();
+        editor.apply();
     }
 
     // Persisted state
@@ -382,7 +382,7 @@ public class GlobalManager {
             throw new IllegalArgumentException("Unexpected class " + appAlarm.getClass());
         }
 
-        editor.commit();
+        editor.apply();
     }
 
     private void saveRingAfterSnoozeTime(Calendar ringAfterSnoozeTime) {
@@ -396,7 +396,7 @@ public class GlobalManager {
 
         editor.putString(PERSIST_LAST_RING_AFTER_SNOOZE_TIME, ringAfterSnoozeTimeStr);
 
-        editor.commit();
+        editor.apply();
     }
 
     public Calendar loadRingAfterSnoozeTime() {
@@ -462,7 +462,7 @@ public class GlobalManager {
     }
 
     public static <T extends Comparable<? super T>> List<T> asSortedList(Collection<T> c) {
-        List<T> list = new ArrayList<T>(c);
+        List<T> list = new ArrayList<>(c);
         java.util.Collections.sort(list);
         return list;
     }
@@ -1451,7 +1451,7 @@ public class GlobalManager {
 
         editor.putString(SettingsActivity.PREF_HOLIDAY, holidayPreference);
 
-        editor.commit();
+        editor.apply();
 
         // Reset alarm
         onAlarmSet();
@@ -1686,7 +1686,7 @@ public class GlobalManager {
 
         editor.clear();
 
-        editor.commit();
+        editor.apply();
 
         // Set defaults
         // XXX Workaround - Robolectric hasn't implemented setDefaultValues() yet, we have to set each setting individually (as the need for testing arises)

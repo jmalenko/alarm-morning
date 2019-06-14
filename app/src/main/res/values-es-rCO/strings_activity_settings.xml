@@ -25,7 +25,7 @@
   <string name="pref_summaryoff_check_alarm_time">No compruebe la hora de la alarma</string>
   <string name="pref_summaryon_check_alarm_time">Comprobar la hora de la alarma</string>
   <string name="pref_title_check_alarm_time_at">Verifique en</string>
-  <string name="pref_title_check_alarm_time_gap">La alarma debe sonar al menos ... antes de la primera cita</string>
+  <string name="pref_title_check_alarm_time_gap">La alarma debe sonar al menos … antes de la primera cita</string>
   <string name="pref_category_nighttime_bell_title">@string/pref_title_nighttime_bell</string>
   <string name="pref_title_nighttime_bell">Campana nocturna (Toca el botón de llamada)</string>
   <string name="pref_summaryoff_nighttime_bell">No reproducir</string>

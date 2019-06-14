@@ -89,8 +89,7 @@
   <string name="alarm_state_dismissed_before_ringing">Отфрлен пред да ѕвони</string>
   <string name="action_dismiss">Отфрли</string>
   <string name="action_snooze">Одложете</string>
-  <string name="action_change">Промени</string>
-  <string name="action_nothing">Ништо</string>
+    <string name="action_nothing">Ништо</string>
   <string name="action_mute_for_10_seconds">Исклучи за 10 секунди</string>
   <string name="action_set">Set</string>
   <string name="action_set_time">Set time</string>
@@ -102,8 +101,7 @@
   <string name="time_to_ring_toast_minutes">Овој аларм е поставен на<xliff:g example="3" id="minutes">%1$d</xliff:g> минуути и <xliff:g example="4" id="seconds">%2$d</xliff:g> секунди од сега</string>
   <string name="time_to_ring_toast_off">Алармот е исклучен</string>
   <string name="time_to_ring_toast_passed">Овој аларм е поставен на поминато време; нема да ѕвони</string>
-  <string name="time_to_ring_toast_removed">The alarm was removed</string>
-  <string name="time_to_ring_message_days_and_hours"><xliff:g example="1" id="days">%1$d</xliff:g>д <xliff:g example="2" id="hours">%2$d</xliff:g>с</string>
+    <string name="time_to_ring_message_days_and_hours"><xliff:g example="1" id="days">%1$d</xliff:g>д <xliff:g example="2" id="hours">%2$d</xliff:g>с</string>
   <string name="time_to_ring_message_hours_and_minutes"><xliff:g example="2" id="hours">%1$d</xliff:g>с <xliff:g example="3" id="minutes">%2$d</xliff:g>м</string>
   <string name="time_to_ring_message_minutes_and_seconds"><xliff:g example="3" id="minutes">%1$d</xliff:g>м <xliff:g example="4" id="seconds">%2$d</xliff:g>с</string>
   <string name="tomorrow">Утре</string>

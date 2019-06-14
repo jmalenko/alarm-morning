@@ -22,21 +22,23 @@ public class BootReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         WakeLocker.acquire(context);
 
-        Log.v(TAG, "onReceive()");
+        if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
+            Log.v(TAG, "onReceive()");
 
-        new Analytics(context, Analytics.Event.Start, Analytics.Channel.External, Analytics.ChannelName.Boot).setConfigurationInfo().save();
+            new Analytics(context, Analytics.Event.Start, Analytics.Channel.External, Analytics.ChannelName.Boot).setConfigurationInfo().save();
 
-        Log.i(TAG, "Setting alarm on boot");
-        GlobalManager globalManager = GlobalManager.getInstance();
-        globalManager.forceSetAlarm();
+            Log.i(TAG, "Setting alarm on boot");
+            GlobalManager globalManager = GlobalManager.getInstance();
+            globalManager.forceSetAlarm();
 
-        Log.i(TAG, "Starting CheckAlarmTime on boot");
-        CheckAlarmTime checkAlarmTime = CheckAlarmTime.getInstance(context);
-        checkAlarmTime.checkAndRegister();
+            Log.i(TAG, "Starting CheckAlarmTime on boot");
+            CheckAlarmTime checkAlarmTime = CheckAlarmTime.getInstance(context);
+            checkAlarmTime.checkAndRegister();
 
-        Log.i(TAG, "Starting NighttimeBell on boot");
-        NighttimeBell nighttimeBell = NighttimeBell.getInstance(context);
-        nighttimeBell.checkAndRegister();
+            Log.i(TAG, "Starting NighttimeBell on boot");
+            NighttimeBell nighttimeBell = NighttimeBell.getInstance(context);
+            nighttimeBell.checkAndRegister();
+        }
 
         WakeLocker.release();
     }

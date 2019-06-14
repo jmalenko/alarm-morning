@@ -137,28 +137,26 @@ public class Localization {
      * @return string with the names of days. The can be simply inserted into a sentence.
      */
     public static String daysOfWeekToString(List<Integer> daysOfWeek, Resources res) {
-        String title;
+        StringBuilder title;
 
         int index = daysOfWeek.size();
 
         if (index == 0) {
-            title = "";
+            title = new StringBuilder();
         } else {
-            title = Localization.dayOfWeekToString(res, daysOfWeek.get(--index));
+            title = new StringBuilder(Localization.dayOfWeekToString(res, daysOfWeek.get(--index)));
 
             if (0 < index) {
-                title = Localization.dayOfWeekToString(res, daysOfWeek.get(--index))
-                        + res.getString(R.string.list_separator_last)
-                        + title;
+                title.insert(0, Localization.dayOfWeekToString(res, daysOfWeek.get(--index))
+                        + res.getString(R.string.list_separator_last));
             }
 
             while (0 < index) {
-                title = Localization.dayOfWeekToString(res, daysOfWeek.get(--index))
-                        + res.getString(R.string.list_separator)
-                        + title;
+                title.insert(0, Localization.dayOfWeekToString(res, daysOfWeek.get(--index))
+                        + res.getString(R.string.list_separator));
             }
         }
-        return title;
+        return title.toString();
     }
 
     /**
@@ -337,20 +335,19 @@ public class Localization {
     public static String dateTimesToString(List<Calendar> dateTimes, Context context) {
         Resources resources = context.getResources();
 
-        String dateTimesText = "";
+        StringBuilder dateTimesText = new StringBuilder();
 
         for (int index = 0; index < dateTimes.size(); index++) {
             if (0 < index) {
-                if (index < dateTimes.size())
-                    dateTimesText = dateTimesText + resources.getString(R.string.list_separator);
-                else
-                    dateTimesText = dateTimesText + resources.getString(R.string.list_separator_last);
+                dateTimesText.append(index < dateTimes.size() - 1 ?
+                        resources.getString(R.string.list_separator) :
+                        resources.getString(R.string.list_separator_last));
             }
             Calendar dateTime = dateTimes.get(index);
-            dateTimesText = dateTimesText + Localization.dateTimeToString(dateTime, context);
+            dateTimesText.append(Localization.dateTimeToString(dateTime, context));
         }
 
-        return dateTimesText;
+        return dateTimesText.toString();
     }
 
     /**

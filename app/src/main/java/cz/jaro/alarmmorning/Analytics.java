@@ -14,7 +14,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
-import com.crashlytics.android.Crashlytics;
+import com.google.android.gms.ads.identifier.AdvertisingIdClient;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import org.json.JSONException;
@@ -583,6 +583,13 @@ public class Analytics {
 
             confSystem.put("settingsSystem_time_12_24", Settings.System.getString(mContext.getContentResolver(), Settings.System.TIME_12_24));
 
+            try {
+                AdvertisingIdClient.Info idInfo = AdvertisingIdClient.getAdvertisingIdInfo(getContext());
+                confSystem.put("google_advertising_id", idInfo.getId());
+            } catch (Exception e) {
+                Log.v(TAG, "Cannot get advertising id", e);
+            }
+
             conf.put("system", confSystem);
 
             // Locale
@@ -768,7 +775,7 @@ public class Analytics {
 
             SharedPreferences.Editor editor = preferences.edit();
             editor.putString(PREF_USER_ID, userId);
-            editor.commit();
+            editor.apply();
         }
 
         return userId;

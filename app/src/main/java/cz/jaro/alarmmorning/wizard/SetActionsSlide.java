@@ -40,7 +40,7 @@ public class SetActionsSlide extends BaseFragment {
             saveActionPreference(editor, SettingsActivity.PREF_ACTION_ON_SHAKE, SettingsActivity.PREF_ACTION_DISMISS);
         }
 
-        editor.commit();
+        editor.apply();
     }
 
     private void saveActionPreference(SharedPreferences.Editor editor, String pref, String value) {

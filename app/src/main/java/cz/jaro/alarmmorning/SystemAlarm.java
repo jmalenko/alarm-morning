@@ -10,6 +10,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import java.util.Calendar;
+import java.util.Objects;
 import java.util.Set;
 
 import cz.jaro.alarmmorning.clock.Clock;
@@ -372,9 +373,9 @@ public class SystemAlarm {
 }
 
 class NextAction {
-    String action;
-    Calendar time;
-    AppAlarm appAlarm;
+    final String action;
+    final Calendar time;
+    final AppAlarm appAlarm;
 
     public NextAction(String action, Calendar time, AppAlarm appAlarm) {
         this.action = action;
@@ -389,9 +390,9 @@ class NextAction {
 
         NextAction that = (NextAction) o;
 
-        if (action != null ? !action.equals(that.action) : that.action != null) return false;
-        if (time != null ? !time.equals(that.time) : that.time != null) return false;
-        return appAlarm != null ? appAlarm.equals(that.appAlarm) : that.appAlarm == null;
+        if (!Objects.equals(action, that.action)) return false;
+        if (!Objects.equals(time, that.time)) return false;
+        return Objects.equals(appAlarm, that.appAlarm);
     }
 
     @Override

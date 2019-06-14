@@ -89,8 +89,7 @@
   <string name="alarm_state_dismissed_before_ringing">Afgewezen voor het rinkelen</string>
   <string name="action_dismiss">Afwijzen</string>
   <string name="action_snooze">Snooze</string>
-  <string name="action_change">Wijzigen</string>
-  <string name="action_nothing">Niets</string>
+    <string name="action_nothing">Niets</string>
   <string name="action_mute_for_10_seconds">Dempen gedurende 10 seconden</string>
   <string name="action_set">Set</string>
   <string name="action_set_time">Set time</string>
@@ -102,8 +101,7 @@
   <string name="time_to_ring_toast_minutes">Dit alarm is ingesteld over <xliff:g example="3" id="minutes">%1$d</xliff:g> minuten en <xliff:g example="4" id="seconds">%2$d</xliff:g> seconden vanaf nu</string>
   <string name="time_to_ring_toast_off">Dit alarm is uitgeschakeld</string>
   <string name="time_to_ring_toast_passed">Dit alarm werd vastgesteld in de verleden tijd; het zal niet overgaan</string>
-  <string name="time_to_ring_toast_removed">The alarm was removed</string>
-  <string name="time_to_ring_message_days_and_hours"><xliff:g example="1" id="days">%1$d</xliff:g>d <xliff:g example="2" id="hours">%2$d</xliff:g>h</string>
+    <string name="time_to_ring_message_days_and_hours"><xliff:g example="1" id="days">%1$d</xliff:g>d <xliff:g example="2" id="hours">%2$d</xliff:g>h</string>
   <string name="time_to_ring_message_hours_and_minutes"><xliff:g example="2" id="hours">%1$d</xliff:g>h <xliff:g example="3" id="minutes">%2$d</xliff:g>m</string>
   <string name="time_to_ring_message_minutes_and_seconds"><xliff:g example="3" id="minutes">%1$d</xliff:g>m <xliff:g example="4" id="seconds">%2$d</xliff:g>s</string>
   <string name="tomorrow">Morgen</string>

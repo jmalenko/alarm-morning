@@ -47,14 +47,12 @@ public class HolidayAdapter extends ArrayAdapter<String> {
     public String positionToPreferenceString(int position) {
         Log.v(TAG, "positionToPreferenceString(position=" + position + ")");
         String preferenceString;
-        switch (position) {
-            case 0:
-                preferenceString = parentPath;
-                break;
-            default:
-                List<Region> regions = HolidayHelper.getInstance().list(parentPath);
-                Region region = regions.get(position - 1);
-                preferenceString = region.getFullPath();
+        if (position == 0) {
+            preferenceString = parentPath;
+        } else {
+            List<Region> regions = HolidayHelper.getInstance().list(parentPath);
+            Region region = regions.get(position - 1);
+            preferenceString = region.getFullPath();
         }
         Log.v(TAG, "positionToPreferenceString=" + preferenceString);
         return preferenceString;

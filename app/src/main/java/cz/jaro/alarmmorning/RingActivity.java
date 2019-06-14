@@ -98,7 +98,7 @@ public class RingActivity extends Activity implements RingInterface {
     private Set<SensorEventDetector> sensorEventDetectors;
 
     LocalBroadcastManager bManager;
-    private static IntentFilter b_intentFilter;
+    private static final IntentFilter b_intentFilter;
 
     private Blink blink;
 
@@ -107,7 +107,7 @@ public class RingActivity extends Activity implements RingInterface {
         b_intentFilter.addAction(ACTION_HIDE_ACTIVITY);
     }
 
-    private BroadcastReceiver bReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver bReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
@@ -250,7 +250,7 @@ public class RingActivity extends Activity implements RingInterface {
             minutes = preferences.getInt(SettingsActivity.PREF_SNOOZE_TIME, SettingsActivity.PREF_SNOOZE_TIME_DEFAULT);
         } else {
             // Calculate the snooze time from the button position
-            Double minutesD = positionDeltaToMinutes(dx, dy);
+            double minutesD = positionDeltaToMinutes(dx, dy);
             minutes = (int) Math.round(minutesD);
             if (minutes < 1)
                 minutes = 1;
@@ -440,8 +440,8 @@ public class RingActivity extends Activity implements RingInterface {
         runnableMute.run();
     }
 
-    private Handler handlerMute = new Handler();
-    private Runnable runnableMute = new Runnable() {
+    private final Handler handlerMute = new Handler();
+    private final Runnable runnableMute = new Runnable() {
         @Override
         public void run() {
             Log.d(TAG, "run()");
@@ -530,7 +530,7 @@ public class RingActivity extends Activity implements RingInterface {
         handlerContent.start();
     }
 
-    private HandlerOnClockChange handlerContent = new HandlerOnClockChange(this::updateContent, Calendar.MINUTE);
+    private final HandlerOnClockChange handlerContent = new HandlerOnClockChange(this::updateContent, Calendar.MINUTE);
 
     private void stopContent() {
         Log.d(TAG, "stopContent()");
@@ -872,8 +872,8 @@ public class RingActivity extends Activity implements RingInterface {
         }
     }
 
-    private Handler handlerVolume = new Handler();
-    private Runnable runnableVolume = new Runnable() {
+    private final Handler handlerVolume = new Handler();
+    private final Runnable runnableVolume = new Runnable() {
         @Override
         public void run() {
             boolean end = updateIncreasingVolume();
@@ -919,7 +919,7 @@ public class RingActivity extends Activity implements RingInterface {
         }
     }
 
-    public BroadcastReceiver vibrateReceiver = new BroadcastReceiver() {
+    public final BroadcastReceiver vibrateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {
@@ -967,19 +967,17 @@ public class RingActivity extends Activity implements RingInterface {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
         String buttonActionPreference = preferences.getString(SettingsActivity.PREF_ACTION_ON_BUTTON, SettingsActivity.PREF_ACTION_DEFAULT);
 
-        switch (buttonActionPreference) {
-            case SettingsActivity.PREF_ACTION_DEFAULT:
-                if (keycode == KeyEvent.KEYCODE_BACK) {
-                    Log.d(TAG, "Doing nothing on back key.");
-                    return true;
-                } else {
-                    Log.d(TAG, "Doing nothing. Let the operating system handles tke key.");
-                    return super.onKeyDown(keycode, e);
-                }
-
-            default:
-                actOnEvent(buttonActionPreference);
+        if (SettingsActivity.PREF_ACTION_DEFAULT.equals(buttonActionPreference)) {
+            if (keycode == KeyEvent.KEYCODE_BACK) {
+                Log.d(TAG, "Doing nothing on back key.");
                 return true;
+            } else {
+                Log.d(TAG, "Doing nothing. Let the operating system handles tke key.");
+                return super.onKeyDown(keycode, e);
+            }
+        } else {
+            actOnEvent(buttonActionPreference);
+            return true;
         }
     }
 

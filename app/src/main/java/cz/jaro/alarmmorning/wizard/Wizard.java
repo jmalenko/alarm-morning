@@ -99,7 +99,7 @@ public class Wizard extends AppIntro {
 
         editor.putBoolean(PREF_WIZARD, true);
 
-        editor.commit();
+        editor.apply();
 
         // Set return intent
         Intent returnIntent = new Intent();

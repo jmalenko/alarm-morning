@@ -19,7 +19,7 @@ import static cz.jaro.alarmmorning.calendar.CalendarUtils.roundDown;
  * We use "alarm rings at 7:30", while English uses "alarm goes off at 7:30".
  * We use "ring the alarm", while English uses "raised the alarm".
  * <p/>
- * The alarm time is a combination of {@link #getDate()}, {@link #getHour()} and {@link#getMinute()}. For convenience, the method {@link #getDateTime()}
+ * The alarm time is a combination of {@link #getDate()}, {@link #getHour()} and {@link #getMinute()}. For convenience, the method {@link #getDateTime()}
  * combines all three items together and returns the alarm time..
  */
 public class Day extends AppAlarm {
@@ -254,7 +254,7 @@ public class Day extends AppAlarm {
 
     @Override
     public String toString() {
-        StringBuffer str = new StringBuffer();
+        StringBuilder str = new StringBuilder();
 
         str.append(Analytics.calendarToStringDate(date));
         str.append(" ");

@@ -25,7 +25,7 @@
   <string name="pref_summaryoff_check_alarm_time">不检查闹钟时间</string>
   <string name="pref_summaryon_check_alarm_time">检查闹钟时间</string>
   <string name="pref_title_check_alarm_time_at">查看</string>
-  <string name="pref_title_check_alarm_time_gap">在第一次约会之前, 闹钟必须至少响...</string>
+  <string name="pref_title_check_alarm_time_gap">在第一次约会之前, 闹钟必须至少响…</string>
   <string name="pref_category_nighttime_bell_title">@string/pref_title_nighttime_bell</string>
   <string name="pref_title_nighttime_bell">夜间响铃 (敲打号角)</string>
   <string name="pref_summaryoff_nighttime_bell">不播放音乐</string>
@@ -35,5 +35,5 @@
   <string name="pref_category_other_title">其它</string>
   <string name="pref_title_nap_time">午睡时间</string>
   <string name="pref_title_holiday">假期</string>
-  <string name="pref_title_start_wizard">启动向导...</string>
+  <string name="pref_title_start_wizard">启动向导…</string>
 </resources>

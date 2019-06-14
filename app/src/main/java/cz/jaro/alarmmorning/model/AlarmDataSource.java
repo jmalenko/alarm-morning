@@ -95,11 +95,12 @@ public class AlarmDataSource {
     }
 
     /**
-     * Retrieve a {@code Day} object from the database, together with the {@link Day#defaults} referenced object..
+     * Retrieve a {@code Day} object from the database, together with the {@link Day#defaults} referenced object.
      *
      * @param date identifier of the object
      * @return The retrieved object
      */
+    @SuppressWarnings("JavadocReference")
     public Day loadDay(Calendar date) {
         Day day = loadDayShallow(date);
 
@@ -148,6 +149,7 @@ public class AlarmDataSource {
      *
      * @param day object to be stored
      */
+    @SuppressWarnings("JavadocReference")
     public void saveDay(Day day) {
         String dateText = dateToText(day.getDate());
 
@@ -190,7 +192,7 @@ public class AlarmDataSource {
      * @return The list of retrieved objects
      */
     public List<OneTimeAlarm> loadOneTimeAlarms(Calendar from) {
-        List<OneTimeAlarm> oneTimeAlarms = new ArrayList<OneTimeAlarm>();
+        List<OneTimeAlarm> oneTimeAlarms = new ArrayList<>();
 
         String selection;
         String[] selectionArgs;
@@ -232,6 +234,7 @@ public class AlarmDataSource {
      *
      * @param oneTimeAlarm object to be stored
      */
+    @SuppressWarnings("JavadocReference")
     public void saveOneTimeAlarm(OneTimeAlarm oneTimeAlarm) {
         ContentValues values = new ContentValues();
         values.put(AlarmDbHelper.COLUMN_ONETIMEALARM_ALARM_TIME, oneTimeAlarm.getAlarmTime());

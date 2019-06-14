@@ -344,7 +344,7 @@ public class AlarmMorningActivityTest extends FixedTimeTest {
 
             String dayOfWeekText = Localization.dayOfWeekToStringShort(res, AlarmDataSource.allDaysOfWeek[position]); // week starts with Sunday
 
-            assertThat(new Integer(position).toString() + textDayOfWeek.getText()).isEqualTo(new Integer(position).toString() + dayOfWeekText);
+            assertThat(Integer.toString(position) + textDayOfWeek.getText()).isEqualTo(Integer.toString(position) + dayOfWeekText);
         }
     }
 

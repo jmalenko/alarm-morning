@@ -89,8 +89,7 @@
   <string name="alarm_state_dismissed_before_ringing">Hentikan sebelum dering</string>
   <string name="action_dismiss">Abaikan</string>
   <string name="action_snooze">Tunda</string>
-  <string name="action_change">Ubah</string>
-  <string name="action_nothing">Tidak ada</string>
+    <string name="action_nothing">Tidak ada</string>
   <string name="action_mute_for_10_seconds">Diam untuk 10 detik</string>
   <string name="action_set">Set</string>
   <string name="action_set_time">Set time</string>
@@ -102,8 +101,7 @@
   <string name="time_to_ring_toast_minutes">Alarm ini diatur untuk <xliff:g example="3" id="minutes">%1$d</xliff:g> menit dan <xliff:g example="4" id="seconds">%2$d</xliff:g> detik dari sekarang</string>
   <string name="time_to_ring_toast_off">Alarm ini tidak aktif</string>
   <string name="time_to_ring_toast_passed">Jam alarm ini diatur ke waktu di masa lalu; tidak akan berdering</string>
-  <string name="time_to_ring_toast_removed">The alarm was removed</string>
-  <string name="time_to_ring_message_days_and_hours"><xliff:g example="1" id="days">%1$d</xliff:g>d <xliff:g example="2" id="hours">%2$d</xliff:g>h</string>
+    <string name="time_to_ring_message_days_and_hours"><xliff:g example="1" id="days">%1$d</xliff:g>d <xliff:g example="2" id="hours">%2$d</xliff:g>h</string>
   <string name="time_to_ring_message_hours_and_minutes"><xliff:g example="2" id="hours">%1$d</xliff:g>h <xliff:g example="3" id="minutes">%2$d</xliff:g>m</string>
   <string name="time_to_ring_message_minutes_and_seconds"><xliff:g example="3" id="minutes">%1$d</xliff:g>m <xliff:g example="4" id="seconds">%2$d</xliff:g>s</string>
   <string name="tomorrow">Besok</string>

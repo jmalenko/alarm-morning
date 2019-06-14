@@ -25,7 +25,7 @@
   <string name="pref_summaryoff_check_alarm_time">Alarmtijd niet controleren</string>
   <string name="pref_summaryon_check_alarm_time">Controleer alarmtijd</string>
   <string name="pref_title_check_alarm_time_at">Controleren op</string>
-  <string name="pref_title_check_alarm_time_gap">Het alarm moet minstens afgaan ... vóór de eerste afspraak</string>
+  <string name="pref_title_check_alarm_time_gap">Het alarm moet minstens afgaan … vóór de eerste afspraak</string>
   <string name="pref_category_nighttime_bell_title">@string/pref_title_nighttime_bell</string>
   <string name="pref_title_nighttime_bell">Nachtelijke bell (raak de bugel aan)</string>
   <string name="pref_summaryoff_nighttime_bell">Niet afspelen</string>

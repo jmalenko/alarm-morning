@@ -257,7 +257,7 @@ public class DefaultsActivity extends AppCompatActivity implements View.OnCreate
         }
     }
 
-    View.OnClickListener snackbarClickListener = new View.OnClickListener() {
+    final View.OnClickListener snackbarClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             for (int dayOfWeek : otherWeekdaysWithTheSameAlarmTime) {

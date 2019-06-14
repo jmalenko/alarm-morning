@@ -88,7 +88,6 @@
   <string name="alarm_state_dismissed_before_ringing">Detener antes de sonar</string>
   <string name="action_dismiss">Descartar</string>
   <string name="action_snooze">Posponer</string>
-  <string name="action_change">Cambiar</string>
   <string name="action_nothing">Nada</string>
   <string name="action_mute_for_10_seconds">Silenciar durante 10 segundos</string>
   <string name="action_set">Set</string>
@@ -101,8 +100,7 @@
   <string name="time_to_ring_toast_minutes">Esta alarma esta configurada para <xliff:g ejemplo="3" id="minutes">%1$d</xliff:g> minutos y <xliff:g ejemplo="4" id="segundos">%2$d</xliff:g> segundos desde ahora</string>
   <string name="time_to_ring_toast_off">Esta alarma está apagada</string>
   <string name="time_to_ring_toast_passed">Esta alarma está configurada en tiempo pasado; no sonará</string>
-  <string name="time_to_ring_toast_removed">The alarm was removed</string>
-  <string name="time_to_ring_message_days_and_hours"><xliff:g ejemplo="1" id="days">%1$d</xliff:g>d<xliff:g ejemplo="2" id="hours">%2$d</xliff:g>h</string>
+    <string name="time_to_ring_message_days_and_hours"><xliff:g ejemplo="1" id="days">%1$d</xliff:g>d<xliff:g ejemplo="2" id="hours">%2$d</xliff:g>h</string>
   <string name="time_to_ring_message_hours_and_minutes"><xliff:g ejemplo="2" id="hours">%1$d</xliff:g>h <xliff:g ejemplo="3" id="minutes">%2$d</xliff:g>m</string>
   <string name="time_to_ring_message_minutes_and_seconds"><xliff:g ejemplo="3" id="minutes">%1$d</xliff:g>m <xliff:g ejemplo="4" id="seconds">%2$d</xliff:g>s</string>
   <string name="tomorrow">Mañana</string>

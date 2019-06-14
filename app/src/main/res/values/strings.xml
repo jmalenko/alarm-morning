@@ -126,7 +126,6 @@
 
     <string name="action_dismiss">Dismiss</string>
     <string name="action_snooze">Snooze</string>
-    <string name="action_change">Change</string>
     <string name="action_nothing">Nothing</string>
     <string name="action_mute_for_10_seconds">Mute for 10 seconds</string>
 
@@ -142,7 +141,6 @@
     <string name="time_to_ring_toast_seconds">This alarm is set for <xliff:g example="4" id="seconds">%1$d</xliff:g> seconds from now</string>
     <string name="time_to_ring_toast_off">This alarm is off</string>
     <string name="time_to_ring_toast_passed">This alarm is set to passed time; it will not ring</string>
-    <string name="time_to_ring_toast_removed">The alarm was removed</string>
 
     <string name="time_to_ring_message_days_and_hours"><xliff:g example="1" id="days">%1$d</xliff:g>d <xliff:g example="2" id="hours">%2$d</xliff:g>h</string>
     <string name="time_to_ring_message_hours_and_minutes"><xliff:g example="2" id="hours">%1$d</xliff:g>h <xliff:g example="3" id="minutes">%2$d</xliff:g>m</string>

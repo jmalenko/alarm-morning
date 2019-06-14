@@ -41,31 +41,33 @@ public class UpgradeReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         WakeLocker.acquire(context);
 
-        Log.v(TAG, "onReceive()");
+        if (intent.getAction().equals(Intent.ACTION_PACKAGE_REPLACED)) {
+            Log.v(TAG, "onReceive()");
 
-        new Analytics(context, Analytics.Event.Start, Analytics.Channel.External, Analytics.ChannelName.Upgrade).setConfigurationInfo().save();
+            new Analytics(context, Analytics.Event.Start, Analytics.Channel.External, Analytics.ChannelName.Upgrade).setConfigurationInfo().save();
 
-        // Update default values of preferences
-        PreferenceManager.setDefaultValues(context, R.xml.preferences, false);
+            // Update default values of preferences
+            PreferenceManager.setDefaultValues(context, R.xml.preferences, false);
 
-        Log.i(TAG, "Update preferences");
-        updateData(context);
+            Log.i(TAG, "Update preferences");
+            updateData(context);
 
-        Log.i(TAG, "Setting alarm on update");
-        GlobalManager globalManager = GlobalManager.getInstance();
-        globalManager.forceSetAlarm();
+            Log.i(TAG, "Setting alarm on update");
+            GlobalManager globalManager = GlobalManager.getInstance();
+            globalManager.forceSetAlarm();
 
-        Log.i(TAG, "Starting CheckAlarmTime on update");
-        CheckAlarmTime checkAlarmTime = CheckAlarmTime.getInstance(context);
-        checkAlarmTime.checkAndRegister();
+            Log.i(TAG, "Starting CheckAlarmTime on update");
+            CheckAlarmTime checkAlarmTime = CheckAlarmTime.getInstance(context);
+            checkAlarmTime.checkAndRegister();
 
-        Log.i(TAG, "Starting NighttimeBell on update");
-        NighttimeBell nighttimeBell = NighttimeBell.getInstance(context);
-        nighttimeBell.checkAndRegister();
+            Log.i(TAG, "Starting NighttimeBell on update");
+            NighttimeBell nighttimeBell = NighttimeBell.getInstance(context);
+            nighttimeBell.checkAndRegister();
 
-        Log.i(TAG, "Installing files");
-        CustomAlarmTone customAlarmTone = new CustomAlarmTone(context);
-        customAlarmTone.install();
+            Log.i(TAG, "Installing files");
+            CustomAlarmTone customAlarmTone = new CustomAlarmTone(context);
+            customAlarmTone.install();
+        }
 
         WakeLocker.release();
     }
@@ -115,7 +117,7 @@ public class UpgradeReceiver extends BroadcastReceiver {
             }
         }
 
-        editor.commit();
+        editor.apply();
     }
 
     private static final String PERSIST_DISMISSED_1 = "persist_dismissed";

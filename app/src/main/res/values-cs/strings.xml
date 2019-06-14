@@ -126,7 +126,6 @@
 
     <string name="action_dismiss">Ukončit</string>
     <string name="action_snooze">Odložit</string>
-    <string name="action_change">Změnit</string>
     <string name="action_nothing">Nic</string>
     <string name="action_mute_for_10_seconds">Ztišit na 10 sekund</string>
 
@@ -142,7 +141,6 @@
     <string name="time_to_ring_toast_seconds">Budík zazvoní za <xliff:g example="4" id="seconds">%1$d</xliff:g> sekund</string>
     <string name="time_to_ring_toast_off">Budík je vypnutý</string>
     <string name="time_to_ring_toast_passed">Budík je nastaven na čas v minulosti, nezazvoní</string>
-    <string name="time_to_ring_toast_removed">Budík byl odstraněn</string>
 
     <string name="time_to_ring_message_days_and_hours"><xliff:g example="1" id="days">%1$d</xliff:g>d <xliff:g example="2" id="hours">%2$d</xliff:g>h</string>
     <string name="time_to_ring_message_hours_and_minutes"><xliff:g example="2" id="hours">%1$d</xliff:g>h <xliff:g example="3" id="minutes">%2$d</xliff:g>m</string>

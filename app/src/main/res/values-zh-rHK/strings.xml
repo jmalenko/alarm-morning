@@ -76,7 +76,7 @@
   <string name="notification_check_text_with_location">下一次約會: <xliff:g example="07:00" id="time">%1$s </xliff:g> <xliff:g example="Dentist" id="title">%2$s </xliff:g> (<xliff:g example="Main St" id="location">%3$s</xliff:g>)</string>
   <string name="notification_check_text_without_location">第一次約會: <xliff:g example="07:00" id="time">%1$s </xliff:g> <xliff:g example="Dentist" id="title">%2$s</xliff:g></string>
   <string name="notification_check_text_set_at">設置為<xliff:g example="07:00" id="time">%1$s</xliff:g></string>
-  <string name="notification_check_text_set_dialog">設置...</string>
+  <string name="notification_check_text_set_dialog">設置…</string>
   <!-- Nighttime bell -->
   <string name="nighttime_bell_toast">晚安</string>
   <!-- Common -->
@@ -88,8 +88,7 @@
   <string name="alarm_state_dismissed_before_ringing">解雇前響</string>
   <string name="action_dismiss">辭退</string>
   <string name="action_snooze">打盹</string>
-  <string name="action_change">改變</string>
-  <string name="action_nothing">沒有什麼</string>
+    <string name="action_nothing">沒有什麼</string>
   <string name="action_mute_for_10_seconds">靜音10秒</string>
   <string name="action_set">Set</string>
   <string name="action_set_time">Set time</string>
@@ -101,8 +100,7 @@
   <string name="time_to_ring_toast_minutes">此警報是為 <xliff:g example="3" id="minutes">%1$d</xliff:g>分鐘和<xliff:g example="4" id="seconds">%2$d</xliff:g>秒設置的, 從現在開始</string>
   <string name="time_to_ring_toast_off">此警報關閉</string>
   <string name="time_to_ring_toast_passed">這個鬧鐘設定為通過時間，它不會響。</string>
-  <string name="time_to_ring_toast_removed">The alarm was removed</string>
-  <string name="time_to_ring_message_days_and_hours"><xliff:g example="1" id="days">%1$d</xliff:g>d <xliff:g example="2" id="hours">%2$d</xliff:g>h</string>
+    <string name="time_to_ring_message_days_and_hours"><xliff:g example="1" id="days">%1$d</xliff:g>d <xliff:g example="2" id="hours">%2$d</xliff:g>h</string>
   <string name="time_to_ring_message_hours_and_minutes"><xliff:g example="2" id="hours">%1$d</xliff:g>h<xliff:g example="3" id="minutes">%2$d</xliff:g>m</string>
   <string name="time_to_ring_message_minutes_and_seconds"><xliff:g example="3" id="minutes">%1$d</xliff:g>m <xliff:g example="4" id="seconds">%2$d</xliff:g>s</string>
   <string name="tomorrow">明天</string>

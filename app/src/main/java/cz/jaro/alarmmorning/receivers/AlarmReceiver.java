@@ -22,6 +22,7 @@ public class AlarmReceiver extends BroadcastReceiver {
      * @param context Context
      * @param intent  Intent
      */
+    @SuppressWarnings("JavadocReference")
     @Override
     public void onReceive(Context context, Intent intent) {
         // Prevent device sleep

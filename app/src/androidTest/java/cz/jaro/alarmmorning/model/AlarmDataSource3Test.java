@@ -20,6 +20,7 @@ import static cz.jaro.alarmmorning.model.AlarmDataSource1Test.MONTH;
 import static cz.jaro.alarmmorning.model.AlarmDataSource1Test.YEAR;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests with a database preset to particular scenario: there are several Days and defaults are off.
@@ -60,7 +61,7 @@ public class AlarmDataSource3Test {
         Calendar to = new GregorianCalendar(YEAR, MONTH - 1, DAY + 10);
         List<Calendar> alarmTimes = globalManager.getAlarmsInPeriod(from, to);
 
-        assertEquals(alarmTimes.isEmpty(), true);
+        assertTrue(alarmTimes.isEmpty());
     }
 
     @Test
@@ -69,7 +70,7 @@ public class AlarmDataSource3Test {
         Calendar to = new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DAY - 1, MINUTE_DAY);
         List<Calendar> alarmTimes = globalManager.getAlarmsInPeriod(from, to);
 
-        assertEquals(alarmTimes.isEmpty(), true);
+        assertTrue(alarmTimes.isEmpty());
     }
 
     @Test
@@ -78,7 +79,7 @@ public class AlarmDataSource3Test {
         Calendar to = new GregorianCalendar(YEAR, MONTH, DAY, 0, 0);
         List<Calendar> alarmTimes = globalManager.getAlarmsInPeriod(from, to);
 
-        assertEquals(alarmTimes.isEmpty(), true);
+        assertTrue(alarmTimes.isEmpty());
     }
 
     @Test

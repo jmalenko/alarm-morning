@@ -25,7 +25,7 @@
   <string name="pref_summaryoff_check_alarm_time">Не проверувај времето на алармот</string>
   <string name="pref_summaryon_check_alarm_time">Провери времето на алармот</string>
   <string name="pref_title_check_alarm_time_at">Провери сите</string>
-  <string name="pref_title_check_alarm_time_gap">Алармот мора да звони барем ... пред првиот состанок</string>
+  <string name="pref_title_check_alarm_time_gap">Алармот мора да звони барем … пред првиот состанок</string>
   <string name="pref_category_nighttime_bell_title">@string/pref_title_nighttime_bell</string>
   <string name="pref_title_nighttime_bell">Ноќно ѕвонче</string>
   <string name="pref_summaryoff_nighttime_bell">Не играј</string>
