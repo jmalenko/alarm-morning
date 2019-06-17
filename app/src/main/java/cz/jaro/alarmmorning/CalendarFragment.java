@@ -220,27 +220,23 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         int pos = getPosition(oneTimeAlarm);
         adapter.notifyItemInserted(pos);
 
+        // Note: Blink the item - intentionally omitted as the RecyclerView show an animation of the added item
+
         // Update position of next alarms
         List<Integer> positionNextAlarmNew = new ArrayList<>();
         for (int i = 0; i < positionNextAlarm.size(); i++) {
             positionNextAlarmNew.add(positionNextAlarm.get(i) + 1);
             Integer p = positionNextAlarm.get(i);
-            if (p < pos)
-                positionNextAlarmNew.add(i, p);
-            else
-                positionNextAlarmNew.add(i, p + 1);
+            positionNextAlarmNew.add(i, p < pos ? p : p + 1);
         }
         positionNextAlarm = positionNextAlarmNew;
 
         // Update position of next action
-        if (positionAction < pos) { /* nothing */ } else
-            positionAction++;
+        if (pos <= positionAction) positionAction++;
 
         // Show toast
         String toastText = formatToastText(oneTimeAlarm);
         Toast.makeText(getActivity(), toastText, Toast.LENGTH_LONG).show();
-
-        // FUTURE Blink the item
     }
 
     public void onDeleteOneTimeAlarm(long oneTimeAlarmId) {
