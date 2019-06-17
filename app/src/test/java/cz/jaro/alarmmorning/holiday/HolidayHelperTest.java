@@ -39,7 +39,7 @@ public class HolidayHelperTest {
         holidayHelper = HolidayHelper.getInstance();
     }
 
-    // TODO The tests must be run obe-by-one (via "Rerun Failed Tests")
+    // TODO The tests must be run one-by-one (via "Rerun Failed Tests")
 
     @Test
     public void list() {
