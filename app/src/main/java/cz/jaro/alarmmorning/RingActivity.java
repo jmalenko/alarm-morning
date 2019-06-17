@@ -612,7 +612,6 @@ public class RingActivity extends Activity implements RingInterface {
     }
 
     /**
-     *
      * @return True when an auto action is triggered.
      */
     private boolean checkAutoActions() {
@@ -630,7 +629,8 @@ public class RingActivity extends Activity implements RingInterface {
             long autoDismissTime = preferences.getInt(SettingsActivity.PREF_AUTO_DISMISS_TIME, SettingsActivity.PREF_AUTO_DISMISS_TIME_DEFAULT);
 
             Calendar alarmTime = appAlarm.getDateTime();
-            long diffFromAlarmTime = (now.getTimeInMillis() - alarmTime.getTimeInMillis()) / 1000 / 60; // in minutes
+            // The following a little hack to account for the fact that when the code is scheduled at particular time, the code that saves the current time is executed few milliseconds later. This applies to both now and lastRingingStartTime bellow variables. We just trim the milliseconds (assumes that the execution happens within one second).
+            long diffFromAlarmTime = (now.getTimeInMillis() / 1000 - alarmTime.getTimeInMillis() / 1000) / 60; // in minutes
 
             boolean doAutoDismiss = autoDismissTime <= diffFromAlarmTime;
 
@@ -648,7 +648,7 @@ public class RingActivity extends Activity implements RingInterface {
         if (autoSnooze) {
             long autoSnoozeTime = preferences.getInt(SettingsActivity.PREF_AUTO_SNOOZE_TIME, SettingsActivity.PREF_AUTO_SNOOZE_TIME_DEFAULT);
 
-            long diffFromLastRingingStartTime = (now.getTimeInMillis() - lastRingingStartTime.getTimeInMillis()) / 1000 / 60; // in minutes
+            long diffFromLastRingingStartTime = (now.getTimeInMillis() / 1000 - lastRingingStartTime.getTimeInMillis() / 1000) / 60; // in minutes
 
             boolean doAutoSnooze = autoSnoozeTime <= diffFromLastRingingStartTime;
 
