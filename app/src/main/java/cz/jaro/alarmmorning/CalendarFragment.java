@@ -215,12 +215,14 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     public void onCreateOneTimeAlarm(OneTimeAlarm oneTimeAlarm) {
         Log.d(TAG, "onCreateOneTimeAlarm(oneTimeAlarm = " + oneTimeAlarm + ")");
 
-        loadItems(); // TODO Don't load everything again, use findPosition()
+        // Get the target position
+        int pos = findPosition(oneTimeAlarm);
 
-        int pos = getPosition(oneTimeAlarm);
+        // Add the alarm and animate the list (RecyclerView)
+        items.add(pos, oneTimeAlarm);
         adapter.notifyItemInserted(pos);
 
-        // Note: Blink the item - intentionally omitted as the RecyclerView show an animation of the added item
+        // Note: Blink the item - intentionally omitted as the RecyclerView shows an animation of the added item
 
         // Update position of next alarms
         List<Integer> positionNextAlarmNew = new ArrayList<>();
@@ -543,7 +545,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         if (c.before(beginningOfToday))
             return pos;
 
-        // Find the Day on the dame date
+        // Find the Day on the same date
         while (true) {
             if (pos == items.size())
                 break;
@@ -556,9 +558,9 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
             pos++;
         }
         // Assert: pos is the index of the respective Day
-        // Increase positionAction
+        // Increase position
         pos++;
-        // Use natural order. If there are several alarms at the same same, put it at the end o such alarms.
+        // Use natural order. If there are several alarms at the same time, put it at the end of such alarms.
         while (true) {
             if (pos == items.size())
                 break;
