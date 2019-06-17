@@ -463,12 +463,13 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
             List<Integer> oldPositionNextAlarm = positionNextAlarm;
             positionNextAlarm = newPositionNextAlarm;
 
-            // TODO Optimization: if an item is both in oldPositionNextAlarm and newPositionNextAlarm then call this item notifyItemChanged() only once
             for (int pos : oldPositionNextAlarm) {
                 adapter.notifyItemChanged(pos);
             }
             for (int pos : newPositionNextAlarm) {
-                adapter.notifyItemChanged(pos);
+                if (!oldPositionNextAlarm.contains(pos)) { // Optimization: if an item is both in oldPositionNextAlarm and newPositionNextAlarm then call this item's notifyItemChanged() only once
+                    adapter.notifyItemChanged(pos);
+                }
             }
         }
     }
