@@ -28,7 +28,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.GregorianCalendar;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.graphics.RecyclerViewWithContextMenu;
@@ -63,7 +65,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     private int positionAction; // position of the item with which the action is performed (via context menu or via click)
     private static final int POSITION_UNSET = -1; // constant representing "positionAction of the next alarm" when no next alarm exists
 
-    private List<Integer> positionNextAlarm; // position of the next alarm
+    private Set<Integer> positionNextAlarm; // position of the next alarm
 
     private final HandlerOnClockChange handler = new HandlerOnClockChange();
 
@@ -155,14 +157,14 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
     public void onAlarmSet(AppAlarm appAlarm) {
         Log.d(TAG, "onAlarmSet(appAparm = " + appAlarm + ")");
-
         updatePositionOfNextAlarm();
     }
 
     public void onDismissBeforeRinging(AppAlarm appAlarm) {
         Log.d(TAG, "onDismissBeforeRinging(appAparm = " + appAlarm + ")");
 
-        int pos = getPosition(appAlarm); // TODO Maybe this needs to happen in every similar method
+        // Note: the dismissed alarm may not be the next alarm to ring (but may be)
+        int pos = getPosition(appAlarm);
         adapter.notifyItemChanged(pos);
 
         updatePositionOfNextAlarm();
@@ -170,12 +172,14 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
     public void onAlarmTimeOfEarlyDismissedAlarm(AppAlarm appAlarm) {
         Log.d(TAG, "onAlarmTimeOfEarlyDismissedAlarm(appAparm = " + appAlarm + ")");
-        invalidateItemsWithNextAlarm();
+
+        int pos = getPosition(appAlarm);
+        adapter.notifyItemChanged(pos);
     }
 
     public void onRing(AppAlarm appAlarm) {
         Log.d(TAG, "onRing(appAparm = " + appAlarm + ")");
-        invalidateItemsWithNextAlarm();
+        // Nothing
     }
 
     public void onDismiss(AppAlarm appAlarm) {
@@ -185,7 +189,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
     public void onSnooze(AppAlarm appAlarm) {
         Log.d(TAG, "onSnooze(appAparm = " + appAlarm + ")");
-        invalidateItemsWithNextAlarm();
+        updatePositionOfNextAlarm();
     }
 
     public void onCancel(AppAlarm appAlarm) {
@@ -201,11 +205,12 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     public void onModifyDayAlarm(Day day) {
         Log.d(TAG, "modifyDayAlarm(day = " + day + ")");
 
+        // Update this alarm
         int pos = getPosition(day);
         adapter.notifyItemChanged(pos);
 
-        // Update position of next alarms
-        positionNextAlarm = calcPositionNextAlarm();
+        // Update position of next alarm
+        updatePositionOfNextAlarm();
 
         // Show toast
         String toastText = formatToastText(day);
@@ -225,11 +230,9 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         // Note: Blink the item - intentionally omitted as the RecyclerView shows an animation of the added item
 
         // Update position of next alarms
-        List<Integer> positionNextAlarmNew = new ArrayList<>();
-        for (int i = 0; i < positionNextAlarm.size(); i++) {
-            positionNextAlarmNew.add(positionNextAlarm.get(i) + 1);
-            Integer p = positionNextAlarm.get(i);
-            positionNextAlarmNew.add(i, p < pos ? p : p + 1);
+        Set<Integer> positionNextAlarmNew = new HashSet<>();
+        for (int p : positionNextAlarm) {
+            positionNextAlarmNew.add(p < pos ? p : p + 1);
         }
         positionNextAlarm = positionNextAlarmNew;
 
@@ -280,26 +283,20 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     }
 
     private void changePosition(OneTimeAlarm oneTimeAlarm) {
-        int pos1 = getPosition(oneTimeAlarm);
+        int pos1 = getPosition(oneTimeAlarm); // Move from
         loadItems();
-        int pos2 = getPosition(oneTimeAlarm);
+        int pos2 = getPosition(oneTimeAlarm); // Move to
 
         // If the item does not exist (e.g. because its date was changed to past)
         if (pos2 == -1) {
             adapter.notifyItemRemoved(pos1);
             adapter.notifyDataSetChanged();
 
-            List<Integer> positionNextAlarmNew = new ArrayList<>();
-            for (int i = 0; i < positionNextAlarm.size(); i++) {
-                int pos = positionNextAlarm.get(i);
-                int posNew;
+            Set<Integer> positionNextAlarmNew = new HashSet<>();
+            for (int pos : positionNextAlarm) {
+                int posNew = pos < pos1 ? pos : pos - 1;
 
-                if (pos < pos1)
-                    posNew = pos;
-                else
-                    posNew = pos - 1;
-
-                positionNextAlarmNew.add(i, posNew);
+                positionNextAlarmNew.add(posNew);
             }
             positionNextAlarm = positionNextAlarmNew;
 
@@ -312,9 +309,8 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         adapter.notifyItemChanged(pos1);
         adapter.notifyItemMoved(pos1, pos2);
 
-        List<Integer> positionNextAlarmNew = new ArrayList<>();
-        for (int i = 0; i < positionNextAlarm.size(); i++) {
-            int pos = positionNextAlarm.get(i);
+        Set<Integer> positionNextAlarmNew = new HashSet<>();
+        for (int pos : positionNextAlarm) {
             int posNew;
 
             if (pos1 == pos)
@@ -322,14 +318,13 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
             else if (pos2 == pos)
                 posNew = pos1;
             else if (pos1 < pos && pos < pos2) {
-                if (pos1 < pos2)
-                    posNew = pos - 1;
-                else
-                    posNew = pos + 1;
+                posNew = pos - 1;
+            } else if (pos2 < pos && pos < pos1) {
+                posNew = pos + 1;
             } else
                 posNew = pos;
 
-            positionNextAlarmNew.add(i, posNew);
+            positionNextAlarmNew.add(posNew);
         }
         positionNextAlarm = positionNextAlarmNew;
 
@@ -337,12 +332,10 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
             positionAction = pos2;
         else if (pos2 == positionAction)
             positionAction = pos1;
-        else if (pos1 < positionAction && positionAction < pos2) {
-            if (pos1 < pos2)
-                positionAction--;
-            else
+        else if (pos1 < positionAction && positionAction < pos2)
+            positionAction--;
+        else if (pos2 < positionAction && positionAction < pos1)
                 positionAction++;
-        }
     }
 
     public void onModifyOneTimeAlarmName(OneTimeAlarm oneTimeAlarm) {
@@ -435,15 +428,15 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         return globalManager.clock();
     }
 
-    private List<Integer> calcPositionNextAlarm() {
+    private Set<Integer> calcPositionNextAlarm() {
         GlobalManager globalManager = GlobalManager.getInstance();
         AppAlarm nextAlarmToRing = globalManager.getNextAlarmToRing();
 
-        return nextAlarmToRing == null ? new ArrayList<>() : alarmTimeToPosition(nextAlarmToRing);
+        return nextAlarmToRing == null ? new HashSet<>() : alarmTimeToPosition(nextAlarmToRing);
     }
 
-    private List<Integer> alarmTimeToPosition(AppAlarm appAlarm) {
-        List<Integer> positions = new ArrayList<>();
+    private Set<Integer> alarmTimeToPosition(AppAlarm appAlarm) {
+        Set<Integer> positions = new HashSet<>();
 
         for (int pos = 0; pos < items.size(); pos++) {
             AppAlarm appAlarm2 = loadPosition(pos);
@@ -456,30 +449,23 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     }
 
     private void updatePositionOfNextAlarm() {
-        List<Integer> newPositionNextAlarm = calcPositionNextAlarm();
-
-        boolean same = positionNextAlarm.containsAll(newPositionNextAlarm) && newPositionNextAlarm.containsAll(positionNextAlarm);
-        if (!same) {
-            Log.d(TAG, "Next alarm is at positionAction " + newPositionNextAlarm);
-
-            List<Integer> oldPositionNextAlarm = positionNextAlarm;
-            positionNextAlarm = newPositionNextAlarm;
-
-            for (int pos : oldPositionNextAlarm) {
-                adapter.notifyItemChanged(pos);
-            }
-            for (int pos : newPositionNextAlarm) {
-                if (!oldPositionNextAlarm.contains(pos)) { // Optimization: if an item is both in oldPositionNextAlarm and newPositionNextAlarm then call this item's notifyItemChanged() only once
-                    adapter.notifyItemChanged(pos);
-                }
-            }
-        }
-    }
-
-    private void invalidateItemsWithNextAlarm() {
+        // Update current items
         for (int pos : positionNextAlarm) {
             adapter.notifyItemChanged(pos);
         }
+
+        // Get and update new items
+        Set<Integer> newPositionNextAlarm = calcPositionNextAlarm();
+        Log.d(TAG, "Next alarm is at positionAction " + newPositionNextAlarm);
+
+        for (int pos : newPositionNextAlarm) {
+            if (!positionNextAlarm.contains(pos)) { // Optimization: if an item is both in positionNextAlarm and newPositionNextAlarm then call this item's notifyItemChanged() only once
+                adapter.notifyItemChanged(pos);
+            }
+        }
+
+        // Replace
+        positionNextAlarm = newPositionNextAlarm;
     }
 
     public boolean isPositionWithNextAlarm(int position) {

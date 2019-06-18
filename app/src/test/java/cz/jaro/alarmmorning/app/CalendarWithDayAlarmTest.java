@@ -616,22 +616,23 @@ public class CalendarWithDayAlarmTest extends AlarmMorningAppTest {
         prepareUntilSnooze();
 
         // Set day alarm
-        calendar_setDayAlarm(0, DEFAULT_ALARM_HOUR, DEFAULT_ALARM_MINUTE + 30, DEFAULT_ALARM_HOUR + 6, DEFAULT_ALARM_MINUTE);
+        calendar_setDayAlarm(0, DEFAULT_ALARM_HOUR, DEFAULT_ALARM_MINUTE, DEFAULT_ALARM_HOUR + 3, DEFAULT_ALARM_MINUTE + 11);
 
         // Check calendar
-        assertCalendarItem(0, "2/1", "Mon", "1:00 PM", "Changed", "5h 59m"); // Today
+        assertCalendarItem(0, "2/1", "Mon", "10:11 AM", "Changed", "3h 10m"); // Today
         assertCalendarItem(1, "2/2", "Tue", "Off", "", ""); // Tomorrow
 
         // Check system alarm
         assertSystemAlarmCount(2);
-        assertSystemAlarm(YEAR, MONTH, DAY, DEFAULT_ALARM_HOUR + 4, DEFAULT_ALARM_MINUTE, SystemAlarm.ACTION_RING_IN_NEAR_FUTURE);
-        assertSystemAlarmClock(YEAR, MONTH, DAY, DEFAULT_ALARM_HOUR + 6, DEFAULT_ALARM_MINUTE);
+        assertSystemAlarm(YEAR, MONTH, DAY, DEFAULT_ALARM_HOUR + 1, DEFAULT_ALARM_MINUTE + 11, SystemAlarm.ACTION_RING_IN_NEAR_FUTURE);
+        assertSystemAlarmClock(YEAR, MONTH, DAY, DEFAULT_ALARM_HOUR + 3, DEFAULT_ALARM_MINUTE + 11);
+
 
         // Check notification
         assertNotificationCount(0);
 
         // Check widget
-        assertWidget(R.drawable.ic_alarm_white, "1:00 PM", null);
+        assertWidget(R.drawable.ic_alarm_white, "10:11 AM", null);
     }
 
     /**
