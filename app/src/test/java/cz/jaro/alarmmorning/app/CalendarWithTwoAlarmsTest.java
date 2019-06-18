@@ -115,7 +115,7 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
 
         // Check calendar
         int newCount = recyclerView.getChildCount();
-        assertThat("The number of items increased by one", newCount - oldCount, is(2));
+        assertThat("The number of items increased by two", newCount - oldCount, is(2));
 
         shared_t101_addTwoAlarms_BothInNearPeriod();
     }
@@ -131,7 +131,7 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
 
         // Check calendar
         int newCount = recyclerView.getChildCount();
-        assertThat("The number of items increased by one", newCount - oldCount, is(2));
+        assertThat("The number of items increased by two", newCount - oldCount, is(2));
 
         shared_t101_addTwoAlarms_BothInNearPeriod();
     }
@@ -166,7 +166,7 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
 
         // Check calendar
         int newCount = recyclerView.getChildCount();
-        assertThat("The number of items increased by one", newCount - oldCount, is(2));
+        assertThat("The number of items increased by two", newCount - oldCount, is(2));
 
         shared_t102_addTwoAlarms_afterNearPeriod();
     }
@@ -182,7 +182,7 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
 
         // Check calendar
         int newCount = recyclerView.getChildCount();
-        assertThat("The number of items increased by one", newCount - oldCount, is(2));
+        assertThat("The number of items increased by two", newCount - oldCount, is(2));
 
         shared_t102_addTwoAlarms_afterNearPeriod();
     }
@@ -198,7 +198,7 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
 
         // Check calendar
         int newCount = recyclerView.getChildCount();
-        assertThat("The number of items increased by one", newCount - oldCount, is(2));
+        assertThat("The number of items increased by two", newCount - oldCount, is(2));
 
         assertCalendarItem(0, "2/1", "Mon", "Off", "", null, ""); // Today
         assertCalendarItem(1, "", "", "4:30 AM", "", "", "3h 30m"); // The 1st one-time alarm
@@ -229,7 +229,7 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
         refreshRecyclerView();
 
         // Check calendar
-        assertThat("The number of items increased by one", recyclerView.getChildCount(), is(HORIZON_DAYS + 2));
+        assertThat("The number of items increased by two", recyclerView.getChildCount(), is(HORIZON_DAYS + 2));
 
         assertCalendarItem(0, "2/1", "Mon", "Off", "", null, ""); // Today
         assertCalendarItem(1, "", "", "4:30 AM", "", "One", "3h 30m"); // The 1st one-time alarm
