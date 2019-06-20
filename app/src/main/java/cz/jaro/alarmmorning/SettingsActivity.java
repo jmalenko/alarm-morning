@@ -35,7 +35,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     private static final String TAG = AppCompatPreferenceActivity.class.getSimpleName();
 
     // TODO Reregister system alarm if the preference for future time changes
-    // TODO Reregister system alarm if the alarm is snoozed and the preference for snooze time changes
 
     /**
      * Value is ringtone URI.
