@@ -24,6 +24,7 @@ import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.RingActivity;
 import cz.jaro.alarmmorning.SystemAlarm;
 import cz.jaro.alarmmorning.clock.FixedClock;
+import cz.jaro.alarmmorning.graphics.JoyButton;
 import cz.jaro.alarmmorning.model.AppAlarm;
 import cz.jaro.alarmmorning.model.Day;
 import cz.jaro.alarmmorning.model.Defaults;
@@ -542,6 +543,45 @@ public class CalendarWithDayAlarmTest extends AlarmMorningAppTest {
 
         Notification notification = shadowNotificationManager.getAllNotifications().get(0);
         assertNotification(notification, "Alarm at 7:00 AM", "Snoozed until 7:10 AM");
+        assertNotificationActionCount(notification, 1);
+        assertNotificationAction(notification, 0, "Dismiss", NotificationReceiver.ACTION_DISMISS);
+
+        // Check widget
+        assertWidget(R.drawable.ic_alarm_white, "7:00 AM", null);
+    }
+
+    @Test
+    public void t431_snoozeWhileRinging_for1minute() {
+        prepareUntilRing();
+
+        // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
+        consumeNextScheduledAlarm();
+
+        // Start ring activity
+        Calendar alarmTime = new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DEFAULT, MINUTE_DEFAULT, 10);
+        Day day = globalManager.loadDay(alarmTime);
+        startActivityRing(day);
+
+        // Snooze for 1 minutes
+        ((JoyButton) snoozeButton).performJoyClick(5, -100, false);
+
+        // Start Calendar
+        startActivityCalendar();
+
+        // Check calendar
+        assertCalendarItem(0, "2/1", "Mon", "7:00 AM", "Snoozed until 7:01 AM", "-10s"); // Today
+        assertCalendarItem(1, "2/2", "Tue", "Off", "", ""); // Tomorrow
+
+        // Check system alarm
+        assertSystemAlarmCount(1);
+        assertSystemAlarm(YEAR, MONTH, DAY, DEFAULT_ALARM_HOUR, DEFAULT_ALARM_MINUTE + 1, SystemAlarm.ACTION_RING);
+        assertSystemAlarmClockNone();
+
+        // Check notification
+        assertNotificationCount(1);
+
+        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
+        assertNotification(notification, "Alarm at 7:00 AM", "Snoozed until 7:01 AM");
         assertNotificationActionCount(notification, 1);
         assertNotificationAction(notification, 0, "Dismiss", NotificationReceiver.ACTION_DISMISS);
 

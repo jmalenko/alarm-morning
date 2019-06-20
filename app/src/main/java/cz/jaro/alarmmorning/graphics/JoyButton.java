@@ -8,7 +8,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 /**
- * JoyStickButton is a button. Moreover, while holding the button the user can move the button. In the Alarm Morning app, the posistion of where the button was
+ * JoyStickButton is a button. Moreover, while holding the button the user can move the button. In the Alarm Morning app, the position of where the button was
  * released denotes the snooze minutes.
  * <p>
  * Definition:
@@ -24,7 +24,7 @@ public class JoyButton extends AppCompatImageButton {
 
     private static final String TAG = JoyButton.class.getSimpleName();
 
-    final int distanceMin = 20;
+    private final int distanceMin = 20;
 
     private OnJoyClickListener listener = null;
 
@@ -80,14 +80,24 @@ public class JoyButton extends AppCompatImageButton {
                                     listener.onCancel(view);
                             }
                         } else {
-                            if (listener != null)
-                                listener.onUp(view, delta_x, delta_y, click);
+                            if (click)
+                                performClick();
+                            performJoyClick(delta_x, delta_y, click);
                         }
                         return true;
                 }
                 return false;
             }
         });
+    }
+
+    public boolean performJoyClick(float deltaX, float deltaY, boolean click) {
+        if (listener != null) {
+            listener.onUp(this, deltaX, deltaY, click);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
