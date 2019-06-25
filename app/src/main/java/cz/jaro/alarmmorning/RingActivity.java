@@ -332,6 +332,12 @@ public class RingActivity extends Activity implements RingInterface {
     }
 
     @Override
+    protected void onPause() {
+        super.onPause();
+        doSnooze(false);
+    }
+
+    @Override
     protected void onDestroy() {
         Log.v(TAG, "onDestroy()");
         super.onDestroy();
