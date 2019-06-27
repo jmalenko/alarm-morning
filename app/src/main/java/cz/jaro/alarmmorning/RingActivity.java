@@ -97,6 +97,8 @@ public class RingActivity extends Activity implements RingInterface {
 
     private Set<SensorEventDetector> sensorEventDetectors;
 
+    private boolean actionPerformed = false; // User performed and action (snooze or dismiss) in the activity. That includes auto-snooze and auto-actions.
+
     LocalBroadcastManager bManager;
     private static final IntentFilter b_intentFilter;
 
@@ -334,7 +336,9 @@ public class RingActivity extends Activity implements RingInterface {
     @Override
     protected void onPause() {
         super.onPause();
-        doSnooze(false);
+        if (!actionPerformed) {
+            doSnooze(false);
+        }
     }
 
     @Override
@@ -365,6 +369,8 @@ public class RingActivity extends Activity implements RingInterface {
 
         stopAll();
 
+        actionPerformed = true;
+
         Analytics analytics = autoDismiss ?
                 new Analytics(Analytics.Channel.Time, Analytics.ChannelName.Ring) :
                 new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Ring);
@@ -392,6 +398,8 @@ public class RingActivity extends Activity implements RingInterface {
         Log.i(TAG, "Snooze for " + minutes + " minutes");
 
         stopAll();
+
+        actionPerformed = true;
 
         Analytics analytics = autoSnooze ?
                 new Analytics(Analytics.Channel.Time, Analytics.ChannelName.Ring) :
