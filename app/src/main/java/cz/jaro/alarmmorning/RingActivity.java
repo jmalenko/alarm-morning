@@ -59,7 +59,7 @@ import static cz.jaro.alarmmorning.calendar.CalendarUtils.onTheSameMinute;
  */
 public class RingActivity extends Activity implements RingInterface {
 
-    private static final String TAG = RingActivity.class.getSimpleName();
+    private static final String TAG = GlobalManager.createLogTag(RingActivity.class);
 
     public static final String ACTION_HIDE_ACTIVITY = "cz.jaro.alarmmorning.intent.action.HIDE_ACTIVITY";
 

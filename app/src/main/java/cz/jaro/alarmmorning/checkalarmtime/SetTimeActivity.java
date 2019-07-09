@@ -28,7 +28,7 @@ import static cz.jaro.alarmmorning.model.Day.VALUE_UNSET;
  */
 public class SetTimeActivity extends AppCompatActivity implements TimePickerDialogWithDisable.OnTimeSetWithDisableListener {
 
-    private static final String TAG = SetTimeActivity.class.getSimpleName();
+    private static final String TAG = GlobalManager.createLogTag(SetTimeActivity.class);
 
     public static final String ALARM_TIME = "ALARM_TIME";
 

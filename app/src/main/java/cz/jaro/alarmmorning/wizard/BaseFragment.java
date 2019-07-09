@@ -19,6 +19,7 @@ import android.widget.TextView;
 import com.github.paolorotolo.appintro.ISlideBackgroundColorHolder;
 import com.github.paolorotolo.appintro.ISlideSelectionListener;
 
+import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.R;
 
 /**
@@ -26,7 +27,7 @@ import cz.jaro.alarmmorning.R;
  */
 public abstract class BaseFragment extends Fragment implements ISlideSelectionListener, ISlideBackgroundColorHolder {
 
-    private static final String TAG = BaseFragment.class.getSimpleName();
+    private static final String TAG = GlobalManager.createLogTag(BaseFragment.class);
 
     private LinearLayout mainLayout;
 

@@ -36,7 +36,7 @@ import static cz.jaro.alarmmorning.holiday.HolidayHelper.PATH_TOP;
  */
 public class HolidayHelper {
 
-    private static final String TAG = HolidayHelper.class.getSimpleName();
+    private static final String TAG = GlobalManager.createLogTag(HolidayHelper.class);
 
     public static final String PATH_TOP = "";
     public static final String PATH_SEPARATOR = ".";

@@ -16,7 +16,7 @@ import cz.jaro.alarmmorning.nighttimebell.NighttimeBell;
  */
 public class TimeChangedReceiver extends BroadcastReceiver {
 
-    private static final String TAG = TimeChangedReceiver.class.getSimpleName();
+    private static final String TAG = GlobalManager.createLogTag(TimeChangedReceiver.class);
 
     @Override
     public void onReceive(Context context, Intent intent) {

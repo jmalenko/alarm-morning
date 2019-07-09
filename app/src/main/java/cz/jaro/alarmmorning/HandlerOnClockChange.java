@@ -24,7 +24,7 @@ import static cz.jaro.alarmmorning.calendar.CalendarUtils.subField;
  */
 public class HandlerOnClockChange extends Handler {
 
-    private static final String TAG = HandlerOnClockChange.class.getSimpleName();
+    private static final String TAG = GlobalManager.createLogTag(HandlerOnClockChange.class);
 
     private Integer unit;
 

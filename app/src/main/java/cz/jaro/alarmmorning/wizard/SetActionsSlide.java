@@ -5,6 +5,7 @@ import android.preference.PreferenceManager;
 import android.widget.CheckBox;
 
 import cz.jaro.alarmmorning.Analytics;
+import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.SettingsActivity;
 
@@ -13,7 +14,7 @@ import cz.jaro.alarmmorning.SettingsActivity;
  */
 public class SetActionsSlide extends BaseFragment {
 
-    private static final String TAG = SetActionsSlide.class.getSimpleName();
+    private static final String TAG = GlobalManager.createLogTag(SetActionsSlide.class);
 
     @Override
     protected int getContentLayoutId() {

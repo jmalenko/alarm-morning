@@ -51,7 +51,7 @@ import static cz.jaro.alarmmorning.calendar.CalendarUtils.onTheSameDate;
  */
 public class CalendarFragment extends Fragment implements View.OnClickListener, TimePickerDialogWithDisable.OnTimeSetWithDisableListener, DatePickerDialog.OnDateSetListener {
 
-    private static final String TAG = CalendarFragment.class.getSimpleName();
+    private static final String TAG = GlobalManager.createLogTag(CalendarFragment.class);
 
     private CalendarAdapter adapter;
 

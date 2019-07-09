@@ -6,6 +6,7 @@ import android.util.Log;
 
 import java.util.Arrays;
 
+import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.RingInterface;
 import cz.jaro.alarmmorning.SettingsActivity;
 
@@ -14,7 +15,7 @@ import cz.jaro.alarmmorning.SettingsActivity;
  */
 public class Flip extends SensorEventDetector {
 
-    private static final String TAG = Flip.class.getSimpleName();
+    private static final String TAG = GlobalManager.createLogTag(Flip.class);
 
     private final static float THRESHOLD = 5; // when the device is still facing up and flips, the value goes from 9.81 do -9.81
 

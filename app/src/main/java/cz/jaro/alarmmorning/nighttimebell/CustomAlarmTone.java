@@ -21,6 +21,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.JSONSharedPreferences;
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.SettingsActivity;
@@ -30,7 +31,7 @@ import cz.jaro.alarmmorning.SettingsActivity;
  */
 public class CustomAlarmTone {
 
-    private static final String TAG = CustomAlarmTone.class.getSimpleName();
+    private static final String TAG = GlobalManager.createLogTag(CustomAlarmTone.class);
 
     /**
      * Value true = the files were copied into the system.

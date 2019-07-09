@@ -16,13 +16,14 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.calendar.CalendarUtils;
 
 /**
  * Store objects to a database.
  */
 public class AlarmDataSource {
-    private static final String TAG = AlarmDataSource.class.getSimpleName();
+    private static final String TAG = GlobalManager.createLogTag(AlarmDataSource.class);
 
     private final SimpleDateFormat iso8601Format = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
 

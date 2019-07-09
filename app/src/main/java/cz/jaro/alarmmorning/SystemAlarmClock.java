@@ -19,7 +19,7 @@ import cz.jaro.alarmmorning.receivers.VoidReceiver;
  */
 public class SystemAlarmClock {
 
-    private static final String TAG = SystemAlarmClock.class.getSimpleName();
+    private static final String TAG = GlobalManager.createLogTag(SystemAlarmClock.class);
 
     private static final int REQUEST_CODE_INTENT_ACTION = 1;
     private static final int REQUEST_CODE_INTENT_SHOW = 2;

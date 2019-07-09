@@ -18,6 +18,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
+import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.Localization;
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.holiday.HolidayAdapter;
@@ -39,7 +40,7 @@ import de.galgtonold.jollydayandroid.Holiday;
  */
 public class HolidaySelector extends LinearLayout implements AdapterView.OnItemSelectedListener, RegionDetector.OnRegionChangeListener {
 
-    private static final String TAG = HolidaySelector.class.getSimpleName();
+    private static final String TAG = GlobalManager.createLogTag(HolidaySelector.class);
 
     private final LinearLayout recommendation;
     private final LinearLayout recommendationContainer;

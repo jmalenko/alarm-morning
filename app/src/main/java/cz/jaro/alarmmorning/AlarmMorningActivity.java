@@ -60,7 +60,7 @@ import static cz.jaro.alarmmorning.GlobalManager.PERSIST_ALARM_TYPE;
 
 public class AlarmMorningActivity extends AppCompatActivity {
 
-    private static final String TAG = AlarmMorningActivity.class.getSimpleName();
+    private static final String TAG = GlobalManager.createLogTag(AlarmMorningActivity.class);
 
     public static final String ACTION_ALARM_SET = "ALARM_SET";
     public static final String ACTION_DISMISS_BEFORE_RINGING = "DISMISS_BEFORE_RINGING";

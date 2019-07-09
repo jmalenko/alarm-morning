@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.WakeLocker;
 
 /**
@@ -12,7 +13,7 @@ import cz.jaro.alarmmorning.WakeLocker;
  */
 public class NighttimeBellAlarmReceiver extends BroadcastReceiver {
 
-    private static final String TAG = NighttimeBellAlarmReceiver.class.getSimpleName();
+    private static final String TAG = GlobalManager.createLogTag(NighttimeBellAlarmReceiver.class);
 
     /**
      * Delegate to NighttimeBell class.

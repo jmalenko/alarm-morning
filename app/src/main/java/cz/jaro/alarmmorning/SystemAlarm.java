@@ -15,7 +15,6 @@ import java.util.Set;
 
 import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.model.AppAlarm;
-import cz.jaro.alarmmorning.model.AppAlarmFilter;
 import cz.jaro.alarmmorning.receivers.AlarmReceiver;
 
 import static cz.jaro.alarmmorning.GlobalManager.PERSIST_ALARM_ID;
@@ -29,7 +28,7 @@ import static cz.jaro.alarmmorning.calendar.CalendarUtils.beginningOfTomorrow;
  */
 public class SystemAlarm {
 
-    private static final String TAG = SystemAlarm.class.getSimpleName();
+    private static final String TAG = GlobalManager.createLogTag(SystemAlarm.class);
 
     private static SystemAlarm instance;
 

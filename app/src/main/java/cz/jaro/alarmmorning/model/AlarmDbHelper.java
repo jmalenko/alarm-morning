@@ -6,6 +6,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import cz.jaro.alarmmorning.GlobalManager;
+
 /**
  * Represent changes of the database model.
  * <p/>
@@ -14,7 +16,7 @@ import android.util.Log;
  */
 public class AlarmDbHelper extends SQLiteOpenHelper {
 
-    private static final String TAG = AlarmDbHelper.class.getSimpleName();
+    private static final String TAG = GlobalManager.createLogTag(AlarmDbHelper.class);
 
     private static final String DATABASE_NAME = "alarms.db";
 

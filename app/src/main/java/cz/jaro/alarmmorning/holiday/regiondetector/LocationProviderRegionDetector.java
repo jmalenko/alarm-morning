@@ -12,12 +12,14 @@ import android.util.Log;
 import java.util.List;
 import java.util.Locale;
 
+import cz.jaro.alarmmorning.GlobalManager;
+
 /**
  * Detects the region from Location Provider.
  */
 public class LocationProviderRegionDetector extends RegionDetector {
 
-    private static final String TAG = LocationProviderRegionDetector.class.getSimpleName();
+    private static final String TAG = GlobalManager.createLogTag(LocationProviderRegionDetector.class);
 
     private String provider;
 

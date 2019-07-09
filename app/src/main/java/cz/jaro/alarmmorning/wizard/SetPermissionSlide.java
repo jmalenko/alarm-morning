@@ -9,12 +9,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.nighttimebell.CustomAlarmTone;
 
 public class SetPermissionSlide extends BaseFragment {
 
-    private static final String TAG = SetPermissionSlide.class.getSimpleName();
+    private static final String TAG = GlobalManager.createLogTag(SetPermissionSlide.class);
 
     @Nullable
     @Override

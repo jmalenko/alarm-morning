@@ -63,7 +63,7 @@ import static cz.jaro.alarmmorning.model.OneTimeAlarm.UTC;
  */
 public class SetAlarmByVoiceActivity extends Activity {
 
-    private static final String TAG = SetAlarmByVoiceActivity.class.getSimpleName();
+    private static final String TAG = GlobalManager.createLogTag(SetAlarmByVoiceActivity.class);
 
     private Calendar alarmTime;
 

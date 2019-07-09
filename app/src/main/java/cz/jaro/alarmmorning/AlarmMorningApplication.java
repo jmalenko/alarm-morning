@@ -20,7 +20,7 @@ import io.fabric.sdk.android.Fabric;
  */
 public class AlarmMorningApplication extends Application {
 
-    private static final String TAG = Application.class.getSimpleName();
+    private static final String TAG = GlobalManager.createLogTag(Application.class);
 
     private static Context appContext;
 

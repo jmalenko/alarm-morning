@@ -35,7 +35,7 @@ import static cz.jaro.alarmmorning.calendar.CalendarUtils.addDay;
  */
 public class UpgradeReceiver extends BroadcastReceiver {
 
-    private static final String TAG = UpgradeReceiver.class.getSimpleName();
+    private static final String TAG = GlobalManager.createLogTag(UpgradeReceiver.class);
 
     @Override
     public void onReceive(Context context, Intent intent) {

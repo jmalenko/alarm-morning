@@ -7,6 +7,8 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
+import cz.jaro.alarmmorning.GlobalManager;
+
 /**
  * JoyStickButton is a button. Moreover, while holding the button the user can move the button. In the Alarm Morning app, the position of where the button was
  * released denotes the snooze minutes.
@@ -22,7 +24,7 @@ public class JoyButton extends AppCompatImageButton {
 
     // TODO Provide visual feedback with the actions
 
-    private static final String TAG = JoyButton.class.getSimpleName();
+    private static final String TAG = GlobalManager.createLogTag(JoyButton.class);
 
     private final int distanceMin = 20;
 

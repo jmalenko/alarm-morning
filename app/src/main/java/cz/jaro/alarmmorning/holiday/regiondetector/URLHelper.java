@@ -8,11 +8,14 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import cz.jaro.alarmmorning.GlobalManager;
+
 /**
  * Helper class for URLs.
  */
 public class URLHelper {
-    private static final String TAG = URLHelper.class.getSimpleName();
+
+    private static final String TAG = GlobalManager.createLogTag(URLHelper.class);
 
     /**
      * Tests whether an URL exists.

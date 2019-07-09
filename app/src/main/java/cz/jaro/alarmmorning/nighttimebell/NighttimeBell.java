@@ -16,6 +16,7 @@ import android.widget.Toast;
 import java.util.Calendar;
 
 import cz.jaro.alarmmorning.Analytics;
+import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.SettingsActivity;
 import cz.jaro.alarmmorning.SystemAlarm;
@@ -27,7 +28,7 @@ import cz.jaro.alarmmorning.checkalarmtime.CheckAlarmTime;
  */
 public class NighttimeBell {
 
-    private static final String TAG = NighttimeBell.class.getSimpleName();
+    private static final String TAG = GlobalManager.createLogTag(NighttimeBell.class);
 
     private static NighttimeBell instance;
 

@@ -11,6 +11,7 @@ import android.util.Log;
 
 import java.util.Arrays;
 
+import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.RingInterface;
 import cz.jaro.alarmmorning.SettingsActivity;
 
@@ -19,7 +20,7 @@ import cz.jaro.alarmmorning.SettingsActivity;
  */
 public abstract class SensorEventDetector implements SensorEventListener {
 
-    private static final String TAG = SensorEventDetector.class.getSimpleName();
+    private static final String TAG = GlobalManager.createLogTag(SensorEventDetector.class);
 
     protected final RingInterface ringInterface;
     private final String name;

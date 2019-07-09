@@ -7,6 +7,7 @@ import android.widget.ArrayAdapter;
 
 import java.util.List;
 
+import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.R;
 
 
@@ -15,7 +16,7 @@ import cz.jaro.alarmmorning.R;
  */
 public class HolidayAdapter extends ArrayAdapter<String> {
 
-    private static final String TAG = HolidayAdapter.class.getSimpleName();
+    private static final String TAG = GlobalManager.createLogTag(HolidayAdapter.class);
 
     private String parentPath;
 

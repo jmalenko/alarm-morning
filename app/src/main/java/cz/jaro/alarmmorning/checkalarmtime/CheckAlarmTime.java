@@ -45,7 +45,7 @@ import static cz.jaro.alarmmorning.calendar.CalendarUtils.roundDown;
  */
 public class CheckAlarmTime {
 
-    private static final String TAG = CheckAlarmTime.class.getSimpleName();
+    private static final String TAG = GlobalManager.createLogTag(CheckAlarmTime.class);
 
     private static final int NOTIFICATION_ID = 1;
     private static final int REQUEST_CODE = 1;
@@ -451,7 +451,7 @@ public class CheckAlarmTime {
 }
 
 class MorningInfo {
-    private static final String TAG = SystemAlarm.class.getSimpleName();
+    private static final String TAG = GlobalManager.createLogTag(MorningInfo.class);
 
     private final Context context;
 

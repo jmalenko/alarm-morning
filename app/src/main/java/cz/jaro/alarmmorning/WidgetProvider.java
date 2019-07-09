@@ -25,7 +25,7 @@ import static cz.jaro.alarmmorning.calendar.CalendarUtils.onTheSameDate;
  */
 public class WidgetProvider extends AppWidgetProvider {
 
-    private static final String TAG = WidgetProvider.class.getSimpleName();
+    private static final String TAG = GlobalManager.createLogTag(WidgetProvider.class);
 
     /**
      * Hide the tomorrow's alarm time until it is nearer than this number of hours.

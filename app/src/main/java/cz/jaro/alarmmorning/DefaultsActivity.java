@@ -30,7 +30,7 @@ import cz.jaro.alarmmorning.model.Defaults;
 
 public class DefaultsActivity extends AppCompatActivity implements View.OnCreateContextMenuListener, TimePickerDialogWithDisable.OnTimeSetWithDisableListener, View.OnClickListener {
 
-    private static final String TAG = DefaultsActivity.class.getSimpleName();
+    private static final String TAG = GlobalManager.createLogTag(DefaultsActivity.class);
 
     private DefaultsAdapter adapter;
     private RecyclerView recyclerView;

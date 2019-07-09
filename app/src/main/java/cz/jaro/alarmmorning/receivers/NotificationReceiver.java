@@ -19,7 +19,7 @@ import static cz.jaro.alarmmorning.GlobalManager.PERSIST_ALARM_TYPE;
  */
 public class NotificationReceiver extends BroadcastReceiver {
 
-    private static final String TAG = NotificationReceiver.class.getSimpleName();
+    private static final String TAG = GlobalManager.createLogTag(NotificationReceiver.class);
 
     public static final String ACTION_CLICK_NOTIFICATION = "cz.jaro.alarmmorning.intent.action.CLICK_NOTIFICATION";
     public static final String ACTION_DELETE_NOTIFICATION = "cz.jaro.alarmmorning.intent.action.DELETE_NOTIFICATION";

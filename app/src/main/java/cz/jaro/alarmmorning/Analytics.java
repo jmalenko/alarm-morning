@@ -51,7 +51,7 @@ import static cz.jaro.alarmmorning.calendar.CalendarUtils.dayOfWeekToString;
  * For efficiency, everything is implemented as static.
  */
 public class Analytics {
-    private static final String TAG = Analytics.class.getSimpleName();
+    private static final String TAG = GlobalManager.createLogTag(Analytics.class);
 
     private static final String PREF_USER_ID = "user_id";
     private static final String PREF_USER_ID_UNSET = "";

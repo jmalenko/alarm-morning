@@ -28,7 +28,7 @@ import cz.jaro.alarmmorning.model.OneTimeAlarm;
  */
 public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.CalendarViewHolder> {
 
-    private static final String TAG = CalendarAdapter.class.getSimpleName();
+    private static final String TAG = GlobalManager.createLogTag(CalendarAdapter.class);
 
     private final CalendarFragment fragment;
 

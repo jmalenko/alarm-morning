@@ -100,7 +100,7 @@ public class GlobalManager {
      * Singleton and Context managements was inspired by https://nfrolov.wordpress.com/2014/08/16/android-sqlitedatabase-locking-and-multi-threading/
      */
 
-    private static final String TAG = GlobalManager.class.getSimpleName();
+    private static final String TAG = createLogTag(GlobalManager.class);
 
     private static final int STATE_UNDEFINED = 0;
     public static final int STATE_FUTURE = 1;
@@ -1703,6 +1703,10 @@ public class GlobalManager {
      */
     public String dumpDB() {
         return dataSource.dumpDB();
+    }
+
+    public static String createLogTag(Class c) {
+        return c.getSimpleName() + "_AlarmMorning";
     }
 
 }

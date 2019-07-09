@@ -55,7 +55,7 @@ import static cz.jaro.alarmmorning.calendar.CalendarUtils.endOfToday;
  */
 public class SetTimeSlide extends BaseFragment implements TimePicker.OnTimeChangedListener {
 
-    private static final String TAG = SetTimeSlide.class.getSimpleName();
+    private static final String TAG = GlobalManager.createLogTag(SetTimeSlide.class);
 
     int hourOfDay;
     int minute;

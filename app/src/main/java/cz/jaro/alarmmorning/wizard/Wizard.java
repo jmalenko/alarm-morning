@@ -16,12 +16,14 @@ import com.github.paolorotolo.appintro.AppIntro;
 
 import java.util.ArrayList;
 
+import cz.jaro.alarmmorning.GlobalManager;
+
 /**
  * Wizard contains several fragments that allow the user to quickly configure the app.
  */
 public class Wizard extends AppIntro {
 
-    private static final String TAG = Wizard.class.getSimpleName();
+    private static final String TAG = GlobalManager.createLogTag(Wizard.class);
 
     /**
      * Value true = the wizard finished. Otherwise it should be presented to the user.

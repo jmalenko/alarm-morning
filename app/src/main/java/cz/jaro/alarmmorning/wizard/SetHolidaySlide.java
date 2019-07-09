@@ -19,7 +19,7 @@ import de.galgtonold.jollydayandroid.Holiday;
 
 public class SetHolidaySlide extends BaseFragment {
 
-    private static final String TAG = SetHolidaySlide.class.getSimpleName();
+    private static final String TAG = GlobalManager.createLogTag(SetHolidaySlide.class);
 
     private HolidaySelector holidaySelector;
     private LinearLayout recommendationContainer;

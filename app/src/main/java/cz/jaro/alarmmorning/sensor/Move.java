@@ -6,6 +6,7 @@ import android.util.Log;
 
 import java.util.Arrays;
 
+import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.RingInterface;
 import cz.jaro.alarmmorning.SettingsActivity;
 
@@ -14,7 +15,7 @@ import cz.jaro.alarmmorning.SettingsActivity;
  */
 public class Move extends SensorEventDetector {
 
-    private static final String TAG = Move.class.getSimpleName();
+    private static final String TAG = GlobalManager.createLogTag(Move.class);
 
     private boolean mInitialized;
     private double mAccelCurrent;

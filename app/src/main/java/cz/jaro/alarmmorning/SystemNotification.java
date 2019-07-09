@@ -29,7 +29,7 @@ import static cz.jaro.alarmmorning.calendar.CalendarUtils.onTheSameDate;
  */
 public class SystemNotification {
 
-    private static final String TAG = SystemNotification.class.getSimpleName();
+    private static final String TAG = GlobalManager.createLogTag(SystemNotification.class);
 
     private static SystemNotification instance;
     private Context context;

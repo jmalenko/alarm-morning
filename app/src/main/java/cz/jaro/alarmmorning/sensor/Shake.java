@@ -6,6 +6,7 @@ import android.util.Log;
 
 import java.util.Arrays;
 
+import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.RingInterface;
 import cz.jaro.alarmmorning.SettingsActivity;
 
@@ -14,7 +15,7 @@ import cz.jaro.alarmmorning.SettingsActivity;
  */
 public class Shake extends SensorEventDetector {
 
-    private static final String TAG = Shake.class.getSimpleName();
+    private static final String TAG = GlobalManager.createLogTag(Shake.class);
 
     private static final int FORCE_THRESHOLD = 50;
     private static final long SHAKE_DURATION = 500 * 1000000; // in nanoseconds

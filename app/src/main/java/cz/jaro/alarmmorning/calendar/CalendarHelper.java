@@ -13,6 +13,7 @@ import android.util.Log;
 
 import java.util.Calendar;
 
+import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.Localization;
 
 /**
@@ -20,7 +21,7 @@ import cz.jaro.alarmmorning.Localization;
  */
 public class CalendarHelper {
 
-    private static final String TAG = CalendarHelper.class.getSimpleName();
+    private static final String TAG = GlobalManager.createLogTag(CalendarHelper.class);
 
     // Projection for calendar instances
     public static final String[] INSTANCE_PROJECTION = new String[]{

@@ -7,13 +7,14 @@ import android.util.Log;
 
 import cz.jaro.alarmmorning.AlarmMorningActivity;
 import cz.jaro.alarmmorning.Analytics;
+import cz.jaro.alarmmorning.GlobalManager;
 
 /**
  * The widget receiver.
  */
 public class WidgetReceiver extends AppWidgetProvider {
 
-    private static final String TAG = WidgetReceiver.class.getSimpleName();
+    private static final String TAG = GlobalManager.createLogTag(WidgetReceiver.class);
 
     public static final String ACTION_WIDGET_CLICK = "cz.jaro.alarmmorning.intent.action.WIDGET_CLICK";
 

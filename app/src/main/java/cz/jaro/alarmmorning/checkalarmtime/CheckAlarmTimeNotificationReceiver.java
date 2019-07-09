@@ -9,6 +9,7 @@ import java.util.Calendar;
 
 import cz.jaro.alarmmorning.AlarmMorningActivity;
 import cz.jaro.alarmmorning.Analytics;
+import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.calendar.CalendarUtils;
 
 import static cz.jaro.alarmmorning.Analytics.CHECK_ALARM_TIME_METHOD__QUICK;
@@ -21,7 +22,7 @@ import static cz.jaro.alarmmorning.model.Day.VALUE_UNSET;
  */
 public class CheckAlarmTimeNotificationReceiver extends BroadcastReceiver {
 
-    private static final String TAG = CheckAlarmTimeNotificationReceiver.class.getSimpleName();
+    private static final String TAG = GlobalManager.createLogTag(CheckAlarmTimeNotificationReceiver.class);
 
     public static final String ACTION_CHECK_ALARM_TIME_CLICK = "cz.jaro.alarmmorning.intent.action.CLICK";
     public static final String ACTION_CHECK_ALARM_TIME_DELETE = "cz.jaro.alarmmorning.intent.action.DELETE";
