@@ -213,6 +213,7 @@ public class RingActivity extends Activity implements RingInterface {
         snoozeButton.setOnJoyClickListener(new JoyButton.OnJoyClickListener() {
             @Override
             public void onDown(View v) {
+                Log.v(TAG, "onDown()");
                 snoozeTimeTextView.setVisibility(View.VISIBLE);
 
                 int minutes = calcSnoozeMinutes(0, 0, true);
@@ -221,12 +222,14 @@ public class RingActivity extends Activity implements RingInterface {
 
             @Override
             public void onMove(View v, float dx, float dy, boolean click) {
+                Log.v(TAG, "onMove(dx=" + dx + ", dy=" + dy + ", click=" + click + ")");
                 int minutes = calcSnoozeMinutes(dx, dy, click);
                 snoozeTimeTextView.setText(getResources().getString(R.string.snooze_time_text, minutes));
             }
 
             @Override
             public void onUp(View v, float dx, float dy, boolean click) {
+                Log.v(TAG, "onUp(dx=" + dx + ", dy=" + dy + ", click=" + click + ")");
                 snoozeTimeTextView.setVisibility(View.INVISIBLE);
 
                 int minutes = calcSnoozeMinutes(dx, dy, click);
@@ -235,6 +238,7 @@ public class RingActivity extends Activity implements RingInterface {
 
             @Override
             public void onCancel(View v) {
+                Log.v(TAG, "onCancel()");
                 snoozeTimeTextView.setVisibility(View.INVISIBLE);
             }
         });
@@ -334,8 +338,10 @@ public class RingActivity extends Activity implements RingInterface {
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
+    protected void onStop() {
+        Log.v(TAG, "onStop()");
+
+        super.onStop();
         if (!actionPerformed) {
             doSnooze(false);
         }
@@ -355,17 +361,16 @@ public class RingActivity extends Activity implements RingInterface {
     }
 
     public void onDismiss(View view) {
-        Log.i(TAG, "Dismiss");
         doDismiss(false);
     }
 
     public void onSnooze(View view) {
-        Log.i(TAG, "Snooze");
         doSnooze(false);
     }
 
     private void doDismiss(boolean autoDismiss) {
         Log.d(TAG, "doDismiss(autoDismiss=" + autoDismiss + ")");
+        Log.i(TAG, "Dismiss");
 
         stopAll();
 
@@ -385,7 +390,7 @@ public class RingActivity extends Activity implements RingInterface {
     }
 
     private void doSnooze(boolean autoSnooze) {
-        Log.d(TAG, "doSnooze(autoSnooze=" + autoSnooze + ")");
+        Log.v(TAG, "doSnooze(autoSnooze=" + autoSnooze + ")");
 
         Context context = AlarmMorningApplication.getAppContext();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -395,6 +400,7 @@ public class RingActivity extends Activity implements RingInterface {
     }
 
     private void doSnooze(int minutes, boolean autoSnooze) {
+        Log.v(TAG, "doSnooze(minutes=" + minutes + ", autoSnooze=" + autoSnooze + ")");
         Log.i(TAG, "Snooze for " + minutes + " minutes");
 
         stopAll();
@@ -423,7 +429,7 @@ public class RingActivity extends Activity implements RingInterface {
             Log.i(TAG, "Mute");
             startMute();
         } else {
-            Log.d(TAG, "Not muting because it had been mutedTextView");
+            Log.d(TAG, "Not muting because it had been not muted");
         }
     }
 
@@ -629,6 +635,7 @@ public class RingActivity extends Activity implements RingInterface {
      * @return True when an auto action is triggered.
      */
     private boolean checkAutoActions() {
+        Log.v(TAG, "checkAutoActions()");
         Context context = this;
         GlobalManager globalManager = GlobalManager.getInstance();
         Calendar now = globalManager.clock().now();
@@ -651,7 +658,7 @@ public class RingActivity extends Activity implements RingInterface {
             Log.v(TAG, "Auto-dismiss check " + doAutoDismiss + ": auto-dismiss time (" + autoDismissTime + " min) <= time since the alarm time (" + diffFromAlarmTime + " min)");
 
             if (doAutoDismiss) {
-                Log.i(TAG, "Auto-dismiss");
+                Log.d(TAG, "Auto-dismiss");
                 doDismiss(true);
                 return true;
             }
@@ -669,7 +676,7 @@ public class RingActivity extends Activity implements RingInterface {
             Log.v(TAG, "Auto-snooze check " + doAutoSnooze + ": auto-snooze time (" + autoSnoozeTime + " min) <= time since the start of this ringing (" + diffFromLastRingingStartTime + " min)");
 
             if (doAutoSnooze) {
-                Log.i(TAG, "Auto-snooze");
+                Log.d(TAG, "Auto-snooze");
                 doSnooze(true);
                 return true;
             }
@@ -1024,6 +1031,7 @@ public class RingActivity extends Activity implements RingInterface {
 
     @Override
     public void actOnEvent(String action) {
+        Log.v(TAG, "actOnEvent(action=" + action + ")");
         switch (action) {
             case SettingsActivity.PREF_ACTION_DEFAULT:
                 Log.d(TAG, "Doing nothing");
@@ -1034,12 +1042,10 @@ public class RingActivity extends Activity implements RingInterface {
                 return;
 
             case SettingsActivity.PREF_ACTION_SNOOZE:
-                Log.i(TAG, "Snooze");
                 doSnooze(false);
                 return;
 
             case SettingsActivity.PREF_ACTION_DISMISS:
-                Log.i(TAG, "Dismiss");
                 doDismiss(false);
                 return;
 
