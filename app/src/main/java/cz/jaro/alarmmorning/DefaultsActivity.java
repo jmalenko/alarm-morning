@@ -250,7 +250,7 @@ public class DefaultsActivity extends AppCompatActivity implements View.OnCreate
             }
             String title = getResources().getString(R.string.change_others_title, timeText, days);
 
-            snackbar = Snackbar.make(getCurrentFocus(), title, Snackbar.LENGTH_INDEFINITE);
+            snackbar = Snackbar.make(recyclerView, title, Snackbar.LENGTH_INDEFINITE);
             snackbar.setAction(getString(R.string.action_set), snackbarClickListener);
             snackbar.getView().setBackgroundColor(ContextCompat.getColor(this, R.color.primary_dark));
             snackbar.show();
