@@ -363,7 +363,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 Context context = preference.getContext();
                 Resources res = context.getResources();
                 String summaryText = hours == 0 ?
-                        res.getString(R.string.pref_summary_snooze_time, intValue) :
+                        res.getQuantityString(R.plurals.pref_summary_snooze_time, minutes, minutes) :
                         res.getString(R.string.pref_summary_relative_time, hours, minutes);
 
                 preference.setSummary(summaryText);

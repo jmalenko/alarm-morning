@@ -12,7 +12,10 @@
   <string name="pref_summaryoff_vibrate">No vibrar cuando está repicando</string>
   <string name="pref_summaryon_vibrate">Vibrar cuando repica</string>
   <string name="pref_title_snooze_time">Tiempo de pausa</string>
-  <string name="pref_summary_snooze_time"><xliff:g ejemplo="3" id="minutes">%1$d</xliff:g>minutos</string>
+  <plurals name="pref_summary_snooze_time">
+    <item quantity="one"><xliff:g example="3" id="minutes">%1$d</xliff:g> minutos</item>
+    <item quantity="other"><xliff:g example="3" id="minutes">%1$d</xliff:g> minutos</item>
+  </plurals>
   <string name="pref_title_near_future_time">Mostrar notificación antes de la alarma</string>
   <string name="pref_category_ring_actions_title">Acciones mientras suena</string>
   <string name="pref_title_action_on_button">Al presionar la tecla</string>

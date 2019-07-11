@@ -17,7 +17,10 @@
     <string name="pref_summaryon_vibrate">Vibrate when ringing</string>
 
     <string name="pref_title_snooze_time">Snooze time</string>
-    <string name="pref_summary_snooze_time"><xliff:g example="3" id="minutes">%1$d</xliff:g> minutes</string>
+    <plurals name="pref_summary_snooze_time">
+        <item quantity="one">%d minute</item>
+        <item quantity="other">%d minutes</item>
+    </plurals>
 
     <string name="pref_title_auto_snooze">Auto snooze alarm</string>
     <string name="pref_summaryoff_auto_snooze">Don\'t snooze automatically</string>

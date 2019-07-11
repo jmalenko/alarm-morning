@@ -12,7 +12,10 @@
   <string name="pref_summaryoff_vibrate">响铃时不要振动</string>
   <string name="pref_summaryon_vibrate">响铃时振动</string>
   <string name="pref_title_snooze_time">打瞌睡直到</string>
-  <string name="pref_summary_snooze_time"><xliff:g example="3" id="minutes">%1$d</xliff:g> 分钟</string>
+  <plurals name="pref_summary_snooze_time">
+    <item quantity="one"><xliff:g example="3" id="minutes">%1$d</xliff:g> 分钟</item>
+    <item quantity="other"><xliff:g example="3" id="minutes">%1$d</xliff:g> 分钟</item>
+  </plurals>
   <string name="pref_title_near_future_time">报警前显示通知</string>
   <string name="pref_category_ring_actions_title">在响铃时设置动作</string>
   <string name="pref_title_action_on_button">按任意键设置</string>

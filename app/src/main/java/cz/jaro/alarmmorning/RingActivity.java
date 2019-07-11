@@ -217,14 +217,14 @@ public class RingActivity extends Activity implements RingInterface {
                 snoozeTimeTextView.setVisibility(View.VISIBLE);
 
                 int minutes = calcSnoozeMinutes(0, 0, true);
-                snoozeTimeTextView.setText(getResources().getString(R.string.snooze_time_text, minutes));
+                snoozeTimeTextView.setText(getResources().getQuantityString(R.plurals.snooze_time_text, minutes, minutes));
             }
 
             @Override
             public void onMove(View v, float dx, float dy, boolean click) {
                 Log.v(TAG, "onMove(dx=" + dx + ", dy=" + dy + ", click=" + click + ")");
                 int minutes = calcSnoozeMinutes(dx, dy, click);
-                snoozeTimeTextView.setText(getResources().getString(R.string.snooze_time_text, minutes));
+                snoozeTimeTextView.setText(getResources().getQuantityString(R.plurals.snooze_time_text, minutes, minutes));
             }
 
             @Override

@@ -12,7 +12,10 @@
   <string name="pref_summaryoff_vibrate">Не вибрирај кога звони</string>
   <string name="pref_summaryon_vibrate">Вибрирај кога звони</string>
   <string name="pref_title_snooze_time">Одложено време</string>
-  <string name="pref_summary_snooze_time"><xliff:g example="3" id="minutes">%1$d</xliff:g> минути</string>
+  <plurals name="pref_summary_snooze_time">
+    <item quantity="one"><xliff:g example="3" id="minutes">%1$d</xliff:g> минути</item>
+    <item quantity="other"><xliff:g example="3" id="minutes">%1$d</xliff:g> минути</item>
+  </plurals>
   <string name="pref_title_near_future_time">Прикажи известување пред алармот</string>
   <string name="pref_category_ring_actions_title">Акции додека звони</string>
   <string name="pref_title_action_on_button">Кога се кликира на буква</string>
