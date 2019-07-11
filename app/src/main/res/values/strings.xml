@@ -157,6 +157,16 @@
     <string name="tomorrow">Tomorrow</string>
     <string name="holiday">Holiday</string>
 
+    <plurals name="relative_time_minute">
+        <item quantity="one">%d minute</item>
+        <item quantity="other">%d minutes</item>
+    </plurals>
+    <plurals name="relative_time_hour">
+        <item quantity="one">%d hour</item>
+        <item quantity="other">%d hours</item>
+    </plurals>
+    <string name="relative_time_hour_min">%1$s and %2$s</string>
+
     <!-- Descriptions for accessibility -->
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
@@ -186,7 +196,6 @@
     <string name="relative_time_picker_label_minute">Minute</string>
 
     <!-- Preferences -->
-    <string name="pref_summary_relative_time"><xliff:g example="2" id="hours">%1$d</xliff:g> hours and <xliff:g example="3" id="minutes">%2$d</xliff:g> minutes</string>
     <string name="pref_summary_time_preference"><xliff:g example="22:00" id="time">%1$s</xliff:g></string>
 
     <!-- Files -->
