@@ -101,10 +101,10 @@ public class CheckAlarmTime {
         register(checkAlarmTimeAtPreference);
     }
 
-    private void register(String stringValue) {
-        Log.d(TAG, "register(stringValue=)" + stringValue);
+    private void register(String checkAlarmTimeAtPreference) {
+        Log.d(TAG, "register(checkAlarmTimeAtPreference=" + checkAlarmTimeAtPreference);
 
-        Calendar checkAlarmTimeAt = calcNextOccurence(stringValue);
+        Calendar checkAlarmTimeAt = calcNextOccurence(checkAlarmTimeAtPreference);
 
         String action = ACTION_CHECK_ALARM_TIME;
         Log.i(TAG, "Setting system alarm at " + checkAlarmTimeAt.getTime().toString() + " with action " + action);
