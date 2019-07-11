@@ -580,16 +580,25 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
             if (diff < 0) {
                 toastText = res.getString(R.string.time_to_ring_toast_passed);
             } else {
+                String timeText;
                 TimeDifference timeDifference = new TimeDifference(diff);
                 if (timeDifference.days > 0) {
-                    toastText = res.getString(R.string.time_to_ring_toast_days, timeDifference.days, timeDifference.hours, timeDifference.minutes);
+                    timeText = res.getString(R.string.time_day_hour_min,
+                            res.getQuantityString(R.plurals.time_day, (int) timeDifference.days, timeDifference.days),
+                            res.getQuantityString(R.plurals.time_hour, (int) timeDifference.hours, timeDifference.hours),
+                            res.getQuantityString(R.plurals.time_minute, (int) timeDifference.minutes, timeDifference.minutes));
                 } else if (timeDifference.hours > 0) {
-                    toastText = res.getString(R.string.time_to_ring_toast_hours, timeDifference.hours, timeDifference.minutes);
+                    timeText = res.getString(R.string.time_hour_min,
+                            res.getQuantityString(R.plurals.time_hour, (int) timeDifference.hours, timeDifference.hours),
+                            res.getQuantityString(R.plurals.time_minute, (int) timeDifference.minutes, timeDifference.minutes));
                 } else if (timeDifference.minutes > 0) {
-                    toastText = res.getString(R.string.time_to_ring_toast_minutes, timeDifference.minutes, timeDifference.seconds);
+                    timeText = res.getString(R.string.time_min_sec,
+                            res.getQuantityString(R.plurals.time_minute, (int) timeDifference.minutes, timeDifference.minutes),
+                            res.getQuantityString(R.plurals.time_second, (int) timeDifference.seconds, timeDifference.seconds));
                 } else {
-                    toastText = res.getString(R.string.time_to_ring_toast_seconds, timeDifference.seconds);
+                    timeText = res.getQuantityString(R.plurals.time_second, (int) timeDifference.seconds, timeDifference.seconds);
                 }
+                toastText = res.getString(R.string.time_to_ring_toast_time, timeText);
             }
         }
         return toastText;

@@ -363,8 +363,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 Context context = preference.getContext();
                 Resources res = context.getResources();
                 String summaryText = hours == 0 ?
-                        res.getQuantityString(R.plurals.relative_time_minute, minutes, minutes) :
-                        res.getString(R.string.relative_time_hour_min, res.getQuantityString(R.plurals.relative_time_hour, hours, hours), res.getQuantityString(R.plurals.relative_time_minute, minutes, minutes));
+                        res.getQuantityString(R.plurals.time_minute, minutes, minutes) :
+                        res.getString(R.string.time_hour_min, res.getQuantityString(R.plurals.time_hour, hours, hours), res.getQuantityString(R.plurals.time_minute, minutes, minutes));
 
                 preference.setSummary(summaryText);
             } else if (preference instanceof TimePreference) {

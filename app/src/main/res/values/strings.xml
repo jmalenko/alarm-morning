@@ -138,10 +138,7 @@
     <string name="action_revert">Revert to time by rule (<xliff:g example="07:00" id="time">%1$s</xliff:g>)</string>
     <string name="action_add_alarm">Add alarm</string>
 
-    <string name="time_to_ring_toast_days">This alarm is set for <xliff:g example="1" id="days">%1$d</xliff:g> days, <xliff:g example="2" id="hours">%2$d</xliff:g> hours and <xliff:g example="3" id="minutes">%3$d</xliff:g> minutes from now</string>
-    <string name="time_to_ring_toast_hours">This alarm is set for <xliff:g example="2" id="hours">%1$d</xliff:g> hours and <xliff:g example="3" id="minutes">%2$d</xliff:g> minutes from now</string>
-    <string name="time_to_ring_toast_minutes">This alarm is set for <xliff:g example="3" id="minutes">%1$d</xliff:g> minutes and <xliff:g example="4" id="seconds">%2$d</xliff:g> seconds from now</string>
-    <string name="time_to_ring_toast_seconds">This alarm is set for <xliff:g example="4" id="seconds">%1$d</xliff:g> seconds from now</string>
+    <string name="time_to_ring_toast_time">This alarm is set for <xliff:g example="1 day, 2 hours and 3 minutes" id="time">%1$s</xliff:g> from now</string>
     <string name="time_to_ring_toast_off">This alarm is off</string>
     <string name="time_to_ring_toast_passed">This alarm is set to passed time; it will not ring</string>
 
@@ -157,15 +154,25 @@
     <string name="tomorrow">Tomorrow</string>
     <string name="holiday">Holiday</string>
 
-    <plurals name="relative_time_minute">
+    <plurals name="time_second">
+        <item quantity="one">%d second</item>
+        <item quantity="other">%d seconds</item>
+    </plurals>
+    <plurals name="time_minute">
         <item quantity="one">%d minute</item>
         <item quantity="other">%d minutes</item>
     </plurals>
-    <plurals name="relative_time_hour">
+    <plurals name="time_hour">
         <item quantity="one">%d hour</item>
         <item quantity="other">%d hours</item>
     </plurals>
-    <string name="relative_time_hour_min">%1$s and %2$s</string>
+    <plurals name="time_day">
+        <item quantity="one">%d day</item>
+        <item quantity="other">%d days</item>
+    </plurals>
+    <string name="time_day_hour_min">%1$s, %2$s and %3$s</string>
+    <string name="time_hour_min">%1$s and %2$s</string>
+    <string name="time_min_sec">%1$s and %2$s</string>
 
     <!-- Descriptions for accessibility -->
     <string name="drawer_open">Open navigation drawer</string>

@@ -139,10 +139,7 @@
     <string name="action_revert">Vrátit na čas podle pravidla (<xliff:g example="07:00" id="time">%1$s</xliff:g>)</string>
     <string name="action_add_alarm">Přidat budík</string>
 
-    <string name="time_to_ring_toast_days">Budík zazvoní za <xliff:g example="1" id="days">%1$d</xliff:g> dny, <xliff:g example="2" id="hours">%2$d</xliff:g> hodin a <xliff:g example="3" id="minutes">%3$d</xliff:g> minut</string>
-    <string name="time_to_ring_toast_hours">Budík zazvoní za <xliff:g example="2" id="hours">%1$d</xliff:g> hodin a <xliff:g example="3" id="minutes">%2$d</xliff:g> minut</string>
-    <string name="time_to_ring_toast_minutes">Budík zazvoní za <xliff:g example="3" id="minutes">%1$d</xliff:g> minut a <xliff:g example="4" id="seconds">%2$d</xliff:g> sekund</string>
-    <string name="time_to_ring_toast_seconds">Budík zazvoní za <xliff:g example="4" id="seconds">%1$d</xliff:g> sekund</string>
+    <string name="time_to_ring_toast_time">Budík zazvoní za <xliff:g example="1 day, 2 hours and 3 minutes" id="time">%1$s</xliff:g></string>
     <string name="time_to_ring_toast_off">Budík je vypnutý</string>
     <string name="time_to_ring_toast_passed">Budík je nastaven na čas v minulosti, nezazvoní</string>
 
@@ -157,17 +154,29 @@
     <string name="tomorrow">Zítra</string>
     <string name="holiday">Státní svátek</string>
 
-    <plurals name="relative_time_minute">
+    <plurals name="time_second">
+        <item quantity="one">%d sekunda</item>
+        <item quantity="few">%d sekundy</item>
+        <item quantity="other">%d sekund</item>
+    </plurals>
+    <plurals name="time_minute">
         <item quantity="one">%d minuta</item>
         <item quantity="few">%d minuty</item>
         <item quantity="other">%d minut</item>
     </plurals>
-    <plurals name="relative_time_hour">
+    <plurals name="time_hour">
         <item quantity="one">%d hodina</item>
         <item quantity="few">%d hodiny</item>
         <item quantity="other">%d hodin</item>
     </plurals>
-    <string name="relative_time_hour_min">%1$s a %2$s</string>
+    <plurals name="time_day">
+        <item quantity="one">%d den</item>
+        <item quantity="few">%d dny</item>
+        <item quantity="other">%d dnů</item>
+    </plurals>
+    <string name="time_day_hour_min">%1$s, %2$s a %3$s</string>
+    <string name="time_hour_min">%1$s a %2$s</string>
+    <string name="time_min_sec">%1$s a %2$s</string>
 
     <!-- Descriptions for accessibility -->
     <string name="drawer_open">Otevřít navigační menu</string>
