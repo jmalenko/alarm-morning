@@ -102,6 +102,8 @@ public class RingActivity extends Activity implements RingInterface {
     LocalBroadcastManager bManager;
     private static final IntentFilter b_intentFilter;
 
+    private boolean focusDuringOnPause;
+
     private Blink blink;
 
     static {
@@ -338,12 +340,35 @@ public class RingActivity extends Activity implements RingInterface {
     }
 
     @Override
+    public void onPause() {
+        Log.v(TAG, "onPause()");
+
+        // Problem: When starting activity, the activity lifecycle calls are as follows: onCreate, onStart, onResume, onPause, onStop, onStart, onResume
+        // Source: https://stackoverflow.com/questions/25369909/onpause-and-onstop-called-immediately-after-starting-activity
+
+        super.onPause();
+
+        focusDuringOnPause = hasWindowFocus();
+    }
+
+    @Override
     protected void onStop() {
         Log.v(TAG, "onStop()");
 
         super.onStop();
-        if (!actionPerformed) {
-            doSnooze(false);
+
+        if (focusDuringOnPause) {
+            // Normal scenario
+            Log.d(TAG, "onStop: Normal scenario");
+
+            if (!actionPerformed) {
+                doSnooze(false);
+            }
+        } else {
+            // Activity was started when screen was off / screen was on with keyguard displayed
+
+            Log.v(TAG, "onStop: Exceptional scenario - Activity was started when screen was off / screen was on with keyguard displayed");
+            // Do nothing
         }
     }
 
