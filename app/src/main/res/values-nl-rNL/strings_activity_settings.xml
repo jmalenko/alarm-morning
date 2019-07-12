@@ -12,10 +12,6 @@
   <string name="pref_summaryoff_vibrate">Niet trillen wanneer rinkelt</string>
   <string name="pref_summaryon_vibrate">Trillen wanneer rinkelt</string>
   <string name="pref_title_snooze_time">Snooze-tijd</string>
-  <plurals name="pref_summary_snooze_time">
-    <item quantity="one"><xliff:g example="3" id="minutes">%1$d</xliff:g> minuten</item>
-    <item quantity="other"><xliff:g example="3" id="minutes">%1$d</xliff:g> minuten</item>
-  </plurals>
   <string name="pref_title_near_future_time">Melding weergeven voordat het alarm overgaat</string>
   <string name="pref_category_ring_actions_title">Acties terwijl rinkelt</string>
   <string name="pref_title_action_on_button">Op toets indrukken</string>

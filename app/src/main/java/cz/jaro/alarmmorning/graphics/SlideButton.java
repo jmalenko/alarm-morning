@@ -1,6 +1,7 @@
 package cz.jaro.alarmmorning.graphics;
 
 import android.animation.ObjectAnimator;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
@@ -49,6 +50,7 @@ public class SlideButton extends android.support.v7.widget.AppCompatSeekBar {
         setOnTouchListener(new View.OnTouchListener() {
             private boolean isInvalidMove;
 
+            @SuppressLint("ClickableViewAccessibility")
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 switch (motionEvent.getAction()) {

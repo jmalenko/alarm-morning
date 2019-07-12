@@ -85,7 +85,7 @@
   <string name="alarm_state_changed">Сменето</string>
   <string name="alarm_state_passed">Помина</string>
   <string name="alarm_state_ringing">Звони</string>
-  <string name="alarm_state_snoozed">Одложено</string>
+  <string name="alarm_state_snoozed">Одложено <xliff:g example="07:00" id="time">%1$s</xliff:g></string>
   <string name="alarm_state_dismissed_before_ringing">Отфрлен пред да ѕвони</string>
   <string name="action_dismiss">Отфрли</string>
   <string name="action_snooze">Одложете</string>
@@ -96,9 +96,7 @@
   <string name="action_disable">Disable</string>
   <string name="action_revert">Revert to time by rule (<xliff:g example="07:00" id="time">%1$s</xliff:g>)</string>
   <string name="action_add_alarm">Add alarm</string>
-  <string name="time_to_ring_toast_days">Алармот поставен на <xliff:g example="1" id="days">%1$d</xliff:g> денови, <xliff:g example="2" id="hours">%2$d</xliff:g> саати и <xliff:g example="3" id="minutes">%3$d</xliff:g> минути од сега</string>
-  <string name="time_to_ring_toast_hours">Овој аларм е поставен на <xliff:g example="2" id="hours">%1$d</xliff:g> саати и <xliff:g example="3" id="minutes">%2$d</xliff:g> минути од сега</string>
-  <string name="time_to_ring_toast_minutes">Овој аларм е поставен на<xliff:g example="3" id="minutes">%1$d</xliff:g> минуути и <xliff:g example="4" id="seconds">%2$d</xliff:g> секунди од сега</string>
+  <string name="time_to_ring_toast_time">Алармот поставен на <xliff:g example="1" id="days">%1$s</xliff:g> од сега</string>
   <string name="time_to_ring_toast_off">Алармот е исклучен</string>
   <string name="time_to_ring_toast_passed">Овој аларм е поставен на поминато време; нема да ѕвони</string>
     <string name="time_to_ring_message_days_and_hours"><xliff:g example="1" id="days">%1$d</xliff:g>д <xliff:g example="2" id="hours">%2$d</xliff:g>с</string>
@@ -106,6 +104,25 @@
   <string name="time_to_ring_message_minutes_and_seconds"><xliff:g example="3" id="minutes">%1$d</xliff:g>м <xliff:g example="4" id="seconds">%2$d</xliff:g>с</string>
   <string name="tomorrow">Утре</string>
   <string name="holiday">Празник</string>
+  <plurals name="time_second">
+    <item quantity="one">%d секунди</item>
+    <item quantity="other">%d секунди</item>
+  </plurals>
+  <plurals name="time_minute">
+    <item quantity="one">%d минути</item>
+    <item quantity="other">%d минути</item>
+  </plurals>
+  <plurals name="time_hour">
+    <item quantity="one">%d саати</item>
+    <item quantity="other">%d саати</item>
+  </plurals>
+  <plurals name="time_day">
+    <item quantity="one">%d денови</item>
+    <item quantity="other">%d денови</item>
+  </plurals>
+  <string name="time_day_hour_min">%1$s, %2$s и %3$s</string>
+  <string name="time_hour_min">%1$s и %2$s</string>
+  <string name="time_min_sec">%1$s и %2$s</string>
   <!-- Descriptions for accessibility -->
   <string name="drawer_open">Отвори фиока за навигација</string>
   <string name="drawer_close">Отвори фиока за навигација</string>
@@ -129,7 +146,6 @@
   <string name="relative_time_picker_label_hour">Час</string>
   <string name="relative_time_picker_label_minute">Минута</string>
   <!-- Preferences -->
-  <string name="pref_summary_relative_time"><xliff:g example="2" id="hours">%1$d</xliff:g> саати и <xliff:g example="3" id="minutes">%2$d</xliff:g> минути</string>
   <string name="pref_summary_time_preference"><xliff:g example="22:00" id="time">%1$s</xliff:g></string>
   <!-- Files -->
   <string name="alarmtone_title_church_bell">Црквено звоно</string>

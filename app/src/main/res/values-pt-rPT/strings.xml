@@ -85,7 +85,7 @@
   <string name="alarm_state_changed">Alterada</string>
   <string name="alarm_state_passed">Passados</string>
   <string name="alarm_state_ringing">Tocando</string>
-  <string name="alarm_state_snoozed">Dormitar</string>
+  <string name="alarm_state_snoozed">Dormitar <xliff:g example="07:00" id="time">%1$s</xliff:g></string>
   <string name="alarm_state_dismissed_before_ringing">Demitido antes de tocar</string>
   <string name="action_dismiss">Dispensar</string>
   <string name="action_snooze">Dormitar</string>
@@ -96,9 +96,7 @@
   <string name="action_disable">Disable</string>
   <string name="action_revert">Revert to time by rule (<xliff:g example="07:00" id="time">%1$s</xliff:g>)</string>
   <string name="action_add_alarm">Add alarm</string>
-  <string name="time_to_ring_toast_days">Este alarme é definido por <xliff:g example="1" id="days">%1$d </xliff:g> dias, <xliff:g example="2" id="hours">%2$d </xliff:g> horas e <xliff:g example="3" id="minutes">%3$d </xliff:g> minutos a partir de agora</string>
-  <string name="time_to_ring_toast_hours">Este alarme é definido por <xliff:g example="2" id="hours">%1$d </xliff:g> horas e <xliff:g example="3" id="minutes">%2$d </xliff:g> minutos a partir de agora</string>
-  <string name="time_to_ring_toast_minutes">Este alarme é definido por <xliff:g example="3" id="minutes">%1$d </xliff:g> minutos e <xliff:g example="4" id="seconds">%2$d </xliff:g> segundos a partir de agora</string>
+  <string name="time_to_ring_toast_time">Este alarme é definido por <xliff:g example="1" id="days">%1$s</xliff:g> a partir de agora</string>
   <string name="time_to_ring_toast_off">Este alarme é desligado</string>
   <string name="time_to_ring_toast_passed">Este alarme é definido como o tempo passado; Ele não tocará</string>
     <string name="time_to_ring_message_days_and_hours"><xliff:g example="1" id="days">%1$d</xliff:g>d<xliff:g example="2" id="hours">%2$d</xliff:g>h</string>
@@ -106,6 +104,25 @@
   <string name="time_to_ring_message_minutes_and_seconds"><xliff:g example="3" id="minutes">%1$d</xliff:g>m <xliff:g example="4" id="seconds">%2$d</xliff:g>s</string>
   <string name="tomorrow">Amanhã</string>
   <string name="holiday">Feriado</string>
+  <plurals name="time_second">
+    <item quantity="one">%d segundos</item>
+    <item quantity="other">%d segundos</item>
+  </plurals>
+  <plurals name="time_minute">
+    <item quantity="one">%d minutos</item>
+    <item quantity="other">%d minutos</item>
+  </plurals>
+  <plurals name="time_hour">
+    <item quantity="one">%d horas</item>
+    <item quantity="other">%d horas</item>
+  </plurals>
+  <plurals name="time_day">
+    <item quantity="one">%d dias</item>
+    <item quantity="other">%d dias</item>
+  </plurals>
+  <string name="time_day_hour_min">%1$s, %2$s e %3$s</string>
+  <string name="time_hour_min">%1$s e %2$s</string>
+  <string name="time_min_sec">%1$s e %2$s</string>
   <!-- Descriptions for accessibility -->
   <string name="drawer_open">Abrir painel de navegação</string>
   <string name="drawer_close">Fechar painel de navegação</string>
@@ -129,7 +146,6 @@
   <string name="relative_time_picker_label_hour">Hora</string>
   <string name="relative_time_picker_label_minute">Minuto</string>
   <!-- Preferences -->
-  <string name="pref_summary_relative_time"><xliff:g example="2" id="hours">%1$d </xliff:g> horas e <xliff:g example="3" id="minutes">%2$d </xliff:g> minutos</string>
   <string name="pref_summary_time_preference"><xliff:g example="22:00" id="time">%1$s</xliff:g></string>
   <!-- Files -->
   <string name="alarmtone_title_church_bell">Sino de igreja</string>

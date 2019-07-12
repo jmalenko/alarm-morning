@@ -12,9 +12,6 @@
   <string name="pref_summaryoff_vibrate">Tidak bergetar ketika dering</string>
   <string name="pref_summaryon_vibrate">Bergetar saat berdering</string>
   <string name="pref_title_snooze_time">Batas waktu tunda</string>
-  <plurals name="pref_summary_snooze_time">
-    <item quantity="one"><xliff:g example="3" id="minutes">%1$d</xliff:g> minutes</item>
-  </plurals>
   <string name="pref_title_near_future_time">Tampilkan pemberitahuan sebelum alarm</string>
   <string name="pref_category_ring_actions_title">Atur tindakan saat alarm menyala</string>
   <string name="pref_title_action_on_button">Saat tombol ditekan</string>

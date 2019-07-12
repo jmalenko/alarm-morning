@@ -84,7 +84,7 @@
   <string name="alarm_state_changed">Modificat</string>
   <string name="alarm_state_passed">A trecut</string>
   <string name="alarm_state_ringing">Sună</string>
-  <string name="alarm_state_snoozed">Amânați</string>
+  <string name="alarm_state_snoozed">Amânați <xliff:g example="07:00" id="time">%1$s</xliff:g></string>
   <string name="alarm_state_dismissed_before_ringing">Dezavtivată înainte de sunare</string>
   <string name="action_dismiss">Dezactivare</string>
   <string name="action_snooze">Amânare</string>
@@ -95,9 +95,7 @@
   <string name="action_disable">Disable</string>
   <string name="action_revert">Revert to time by rule (<xliff:g example="07:00" id="time">%1$s</xliff:g>)</string>
   <string name="action_add_alarm">Add alarm</string>
-  <string name="time_to_ring_toast_days">Aceată alarmă este setată pentru <xliff:g example="1" id="days">%1$d</xliff:g> zile, <xliff:g example="2" id="hours">%2$d</xliff:g> ore și <xliff:g example="3" id="minutes">%3$d</xliff:g> minute de acum</string>
-  <string name="time_to_ring_toast_hours">Această alarmă este setată <xliff:g example="2" id="hours">%1$d</xliff:g> ore și <xliff:g example="3" id="minutes">%2$d</xliff:g> minute de acum</string>
-  <string name="time_to_ring_toast_minutes">Această alarmă este setată pentru <xliff:g example="3" id="minutes">%1$d</xliff:g> minute și <xliff:g example="4" id="seconds">%2$d</xliff:g> secunde de acum</string>
+  <string name="time_to_ring_toast_time">Aceată alarmă este setată pentru <xliff:g example="1" id="days">%1$s</xliff:g> de acum</string>
   <string name="time_to_ring_toast_off">Alarma este dezactivată</string>
   <string name="time_to_ring_toast_passed">Această alarmă este setată la timpul trecut; nu va suna</string>
     <string name="time_to_ring_message_days_and_hours"><xliff:g example="1" id="days">%1$d</xliff:g>z <xliff:g example="2" id="hours">%2$d</xliff:g></string>
@@ -105,6 +103,29 @@
   <string name="time_to_ring_message_minutes_and_seconds"><xliff:g example="3" id="minutes">%1$d</xliff:g>m <xliff:g example="4" id="seconds">%2$d</xliff:g>s</string>
   <string name="tomorrow">Mâine</string>
   <string name="holiday">Sărbătoare</string>
+  <plurals name="time_second">
+    <item quantity="one">%d secunde</item>
+    <item quantity="few">%d secunde</item>
+    <item quantity="other">%d secunde</item>
+  </plurals>
+  <plurals name="time_minute">
+    <item quantity="one">%d minute</item>
+    <item quantity="few">%d minute</item>
+    <item quantity="other">%d minute</item>
+  </plurals>
+  <plurals name="time_hour">
+    <item quantity="one">%d ore</item>
+    <item quantity="few">%d ore</item>
+    <item quantity="other">%d ore</item>
+  </plurals>
+  <plurals name="time_day">
+    <item quantity="one">%d zile</item>
+    <item quantity="few">%d zile</item>
+    <item quantity="other">%d zile</item>
+  </plurals>
+  <string name="time_day_hour_min">%1$s, %2$s și %3$s</string>
+  <string name="time_hour_min">%1$s și %2$s</string>
+  <string name="time_min_sec">%1$s și %2$s</string>
   <!-- Descriptions for accessibility -->
   <string name="drawer_open">Deschide sistemul de navigație</string>
   <string name="drawer_close">Închide sistemul de navigație</string>
@@ -128,7 +149,6 @@
   <string name="relative_time_picker_label_hour">Oră</string>
   <string name="relative_time_picker_label_minute">Minut</string>
   <!-- Preferences -->
-  <string name="pref_summary_relative_time"><xliff:g example="2" id="hours">%1$d</xliff:g> ore și <xliff:g example="3" id="minutes">%2$d</xliff:g> minute</string>
   <string name="pref_summary_time_preference"><xliff:g example="22:00" id="time">%1$s</xliff:g></string>
   <!-- Files -->
   <string name="alarmtone_title_church_bell">Clopoțelul bisericii</string>

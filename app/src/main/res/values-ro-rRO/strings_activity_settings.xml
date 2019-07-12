@@ -7,16 +7,11 @@
   <string name="pref_summary_volume"><xliff:g example="80" id="level">%1$d</xliff:g>%%</string>
   <string name="pref_title_volume_increasing">Crește volumul</string>
   <string name="pref_summaryoff_volume_increasing">Nu crește volmul</string>
-  <string name="pref_summaryon_volume_increasing">Crește volumul cu 1% fiecare secundă</string>
+  <string name="pref_summaryon_volume_increasing">Crește volumul cu 1&#x0025; fiecare secundă</string>
   <string name="pref_title_vibrate">Vibrează</string>
   <string name="pref_summaryoff_vibrate">Nu vibra când sună</string>
   <string name="pref_summaryon_vibrate">Vibrează când sună</string>
   <string name="pref_title_snooze_time">Timp amânare</string>
-  <plurals name="pref_summary_snooze_time">
-    <item quantity="one"><xliff:g example="3" id="minutes">%1$d</xliff:g> minute</item>
-    <item quantity="few"><xliff:g example="3" id="minutes">%1$d</xliff:g> minute</item>
-    <item quantity="other"><xliff:g example="3" id="minutes">%1$d</xliff:g> minute</item>
-  </plurals>
   <string name="pref_title_near_future_time">Arată notificarea înainte de alarmă</string>
   <string name="pref_category_ring_actions_title">Acțiuni în timp ce sună</string>
   <string name="pref_title_action_on_button">Pe apăsarea tastei</string>

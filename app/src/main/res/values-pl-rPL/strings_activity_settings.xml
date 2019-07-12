@@ -12,11 +12,6 @@
   <string name="pref_summaryoff_vibrate">Nie wibruj gdy dzwoni</string>
   <string name="pref_summaryon_vibrate">Wibruj gdy dzwoni</string>
   <string name="pref_title_snooze_time">Czas drzemki</string>
-  <plurals name="pref_summary_snooze_time">
-    <item quantity="few"><xliff:g example="3" id="minutes">%1$d</xliff:g> minut</item>
-    <item quantity="many"><xliff:g example="3" id="minutes">%1$d</xliff:g> minut</item>
-    <item quantity="one"><xliff:g example="3" id="minutes">%1$d</xliff:g> minut</item>
-  </plurals>
   <string name="pref_title_near_future_time">Pokaż powiadomienia przed alarmem</string>
   <string name="pref_category_ring_actions_title">Czynności wykonywane podczas dzwonienia</string>
   <string name="pref_title_action_on_button">Przy naciśnięciu klawisza</string>

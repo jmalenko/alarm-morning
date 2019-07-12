@@ -85,7 +85,7 @@
   <string name="alarm_state_changed">已更改</string>
   <string name="alarm_state_passed">通过</string>
   <string name="alarm_state_ringing">响铃中</string>
-  <string name="alarm_state_snoozed">打瞌睡</string>
+  <string name="alarm_state_snoozed">打瞌睡 <xliff:g example="07:00" id="time">%1$s </xliff:g></string>
   <string name="alarm_state_dismissed_before_ringing">在响铃之前被取消</string>
   <string name="action_dismiss">取消</string>
   <string name="action_snooze">打瞌睡</string>
@@ -96,9 +96,7 @@
   <string name="action_disable">Disable</string>
   <string name="action_revert">Revert to time by rule (<xliff:g example="07:00" id="time">%1$s</xliff:g>)</string>
   <string name="action_add_alarm">Add alarm</string>
-  <string name="time_to_ring_toast_days">此闹钟设置为 <xliff:g example="1" id="days">%1$d </xliff:g> 天、<xliff:g example="2" id="hours">%2$d </xliff:g> 小时和 <xliff:g example="3" id="minutes">%3$d </xliff:g> 分钟 (从现在开始)</string>
-  <string name="time_to_ring_toast_hours">此闹钟设置为<xliff:g example="2" id="hours">%1$d</xliff:g> 小时和 <xliff:g example="3" id="minutes">%2$d</xliff:g> 分钟 (从现在开始)</string>
-  <string name="time_to_ring_toast_minutes">此闹钟设置为 <xliff:g example="3" id="minutes">%1$d </xliff:g> 分钟和 <xliff:g example="4" id="seconds">%2$d </xliff:g> 秒 (从现在开始)</string>
+  <string name="time_to_ring_toast_time">此闹钟设置为 <xliff:g example="1" id="days">%1$s</xliff:g> (从现在开始)</string>
   <string name="time_to_ring_toast_off">此警报关闭</string>
   <string name="time_to_ring_toast_passed">此警报设置为过去时间; 它不会响</string>
     <string name="time_to_ring_message_days_and_hours"><xliff:g example="1" id="days">%1$d</xliff:g>d <xliff:g example="2" id="hours">%2$d</xliff:g>h</string>
@@ -106,6 +104,25 @@
   <string name="time_to_ring_message_minutes_and_seconds"><xliff:g example="3" id="minutes">%1$d</xliff:g>m <xliff:g example="4" id="seconds">%2$d</xliff:g>s</string>
   <string name="tomorrow">明天</string>
   <string name="holiday">假期</string>
+  <plurals name="time_second">
+    <item quantity="one">%d 秒</item>
+    <item quantity="other">%d 秒</item>
+  </plurals>
+  <plurals name="time_minute">
+    <item quantity="one">%d 分钟</item>
+    <item quantity="other">%d 分钟</item>
+  </plurals>
+  <plurals name="time_hour">
+    <item quantity="one">%d 小时和</item>
+    <item quantity="other">%d 小时和</item>
+  </plurals>
+  <plurals name="time_day">
+    <item quantity="one">%d 天</item>
+    <item quantity="other">%d 天</item>
+  </plurals>
+  <string name="time_day_hour_min">%1$s、 %2$s %3$s</string>
+  <string name="time_hour_min">%1$s %2$s</string>
+  <string name="time_min_sec">%1$s %2$s</string>
   <!-- Descriptions for accessibility -->
   <string name="drawer_open">打开导航栏</string>
   <string name="drawer_close">关闭导航栏</string>
@@ -129,7 +146,6 @@
   <string name="relative_time_picker_label_hour">时</string>
   <string name="relative_time_picker_label_minute">分</string>
   <!-- Preferences -->
-  <string name="pref_summary_relative_time"><xliff:g example="2" id="hours">%1$d </xliff:g> 小时和 <xliff:g example="3" id="minutes">%2$d </xliff:g> 分钟</string>
   <string name="pref_summary_time_preference"><xliff:g example="22:00" id="time">%1$s </xliff:g></string>
   <!-- Files -->
   <string name="alarmtone_title_church_bell">教堂响铃</string>

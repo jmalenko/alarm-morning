@@ -85,7 +85,7 @@
   <string name="alarm_state_changed">Diubah</string>
   <string name="alarm_state_passed">Selesai</string>
   <string name="alarm_state_ringing">Berdering</string>
-  <string name="alarm_state_snoozed">Tunda</string>
+  <string name="alarm_state_snoozed">Tunda <xliff:g example="07:00" id="time">%1$s</xliff:g></string>
   <string name="alarm_state_dismissed_before_ringing">Hentikan sebelum dering</string>
   <string name="action_dismiss">Abaikan</string>
   <string name="action_snooze">Tunda</string>
@@ -96,9 +96,7 @@
   <string name="action_disable">Disable</string>
   <string name="action_revert">Revert to time by rule (<xliff:g example="07:00" id="time">%1$s</xliff:g>)</string>
   <string name="action_add_alarm">Add alarm</string>
-  <string name="time_to_ring_toast_days">Alarm ini diatur untuk <xliff:g example="1" id="days">%1$d</xliff:g> hari, <xliff:g example="2" id="hours">%2$d</xliff:g> jam dan <xliff:g example="3" id="minutes">%3$d</xliff:g> menit dari sekarang</string>
-  <string name="time_to_ring_toast_hours">Alarm ini diatur untuk <xliff:g example="2" id="hours">%1$d</xliff:g> jam dan <xliff:g example="3" id="minutes">%2$d</xliff:g> menit dari sekarang</string>
-  <string name="time_to_ring_toast_minutes">Alarm ini diatur untuk <xliff:g example="3" id="minutes">%1$d</xliff:g> menit dan <xliff:g example="4" id="seconds">%2$d</xliff:g> detik dari sekarang</string>
+  <string name="time_to_ring_toast_time">Alarm ini diatur untuk <xliff:g example="1" id="days">%1$s</xliff:g> dari sekarang</string>
   <string name="time_to_ring_toast_off">Alarm ini tidak aktif</string>
   <string name="time_to_ring_toast_passed">Jam alarm ini diatur ke waktu di masa lalu; tidak akan berdering</string>
     <string name="time_to_ring_message_days_and_hours"><xliff:g example="1" id="days">%1$d</xliff:g>d <xliff:g example="2" id="hours">%2$d</xliff:g>h</string>
@@ -106,6 +104,25 @@
   <string name="time_to_ring_message_minutes_and_seconds"><xliff:g example="3" id="minutes">%1$d</xliff:g>m <xliff:g example="4" id="seconds">%2$d</xliff:g>s</string>
   <string name="tomorrow">Besok</string>
   <string name="holiday">Liburan</string>
+  <plurals name="time_second">
+    <item quantity="one">%d detik</item>
+    <item quantity="other">%d detik</item>
+  </plurals>
+  <plurals name="time_minute">
+    <item quantity="one">%d menit</item>
+    <item quantity="other">%d menit</item>
+  </plurals>
+  <plurals name="time_hour">
+    <item quantity="one">%d jam</item>
+    <item quantity="other">%d jam</item>
+  </plurals>
+  <plurals name="time_day">
+    <item quantity="one">%d hari</item>
+    <item quantity="other">%d hari</item>
+  </plurals>
+  <string name="time_day_hour_min">%1$s, %2$s dan %3$s</string>
+  <string name="time_hour_min">%1$s dan %2$s</string>
+  <string name="time_min_sec">%1$s dan %2$s</string>
   <!-- Descriptions for accessibility -->
   <string name="drawer_open">Buka navigasi</string>
   <string name="drawer_close">Tutup navigasi</string>
@@ -129,7 +146,6 @@
   <string name="relative_time_picker_label_hour">Jam</string>
   <string name="relative_time_picker_label_minute">Menit</string>
   <!-- Preferences -->
-  <string name="pref_summary_relative_time"><xliff:g example="2" id="hours">%1$d</xliff:g> jam dan <xliff:g example="3" id="minutes">%2$d</xliff:g> menit</string>
   <string name="pref_summary_time_preference"><xliff:g example="22:00" id="time">%1$s</xliff:g></string>
   <!-- Files -->
   <string name="alarmtone_title_church_bell">Lonceng gereja</string>
