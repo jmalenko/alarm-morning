@@ -354,9 +354,12 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         }
 
         // To prevent updating of the whole item, we update only the name
-        RelativeLayout itemView = (RelativeLayout) recyclerView.getChildAt(pos);
-        TextView textName = itemView.findViewById(R.id.textName);
-        textName.setText(oneTimeAlarm.getName());
+        CalendarAdapter.CalendarViewHolder viewHolder = (CalendarAdapter.CalendarViewHolder) recyclerView.findViewHolderForAdapterPosition(pos);
+        if (viewHolder != null) { // is visible (= was not recycled)
+            TextView textName = viewHolder.getTextName();
+            textName.setText(oneTimeAlarm.getName());
+        }
+        check();
     }
 
     /*
