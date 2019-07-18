@@ -54,13 +54,19 @@ public class NighttimeBell {
         return instance;
     }
 
-    public void checkAndRegister() {
-        Log.v(TAG, "checkAndRegister()");
+    public boolean isEnabled() {
+        Log.v(TAG, "isEnabled()");
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         boolean nighttimeBellPreference = preferences.getBoolean(SettingsActivity.PREF_NIGHTTIME_BELL, SettingsActivity.PREF_NIGHTTIME_BELL_DEFAULT);
 
-        if (nighttimeBellPreference) {
+        return nighttimeBellPreference;
+    }
+
+    public void checkAndRegister() {
+        Log.v(TAG, "checkAndRegister()");
+
+        if (isEnabled()) {
             register();
         }
     }
@@ -123,6 +129,9 @@ public class NighttimeBell {
         Log.i(TAG, "Acting on CheckAlarmTime. action=" + action);
 
         if (action.equals(ACTION_PLAY)) {
+            // The condition is needed for cases we are unable to unregister a system alarm.
+            if (!isEnabled()) return;
+
             onPlay(context);
         } else {
             throw new IllegalArgumentException("Unexpected argument " + action);

@@ -81,13 +81,19 @@ public class CheckAlarmTime {
         return instance;
     }
 
-    public void checkAndRegister() {
-        Log.v(TAG, "checkAndRegister()");
+    public boolean isEnabled() {
+        Log.v(TAG, "isEnabled()");
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         boolean checkAlarmTimePreference = preferences.getBoolean(SettingsActivity.PREF_CHECK_ALARM_TIME, SettingsActivity.PREF_CHECK_ALARM_TIME_DEFAULT);
 
-        if (checkAlarmTimePreference) {
+        return checkAlarmTimePreference;
+    }
+
+    public void checkAndRegister() {
+        Log.v(TAG, "checkAndRegister()");
+
+        if (isEnabled()) {
             register();
         }
     }
@@ -188,6 +194,9 @@ public class CheckAlarmTime {
 
         switch (action) {
             case ACTION_CHECK_ALARM_TIME:
+                // The condition is needed for cases we are unable to unregister a system alarm.
+                if (!isEnabled()) return;
+
                 onCheckAlarmTime();
                 break;
             case ACTION_AUTO_HIDE_NOTIFICATION:
