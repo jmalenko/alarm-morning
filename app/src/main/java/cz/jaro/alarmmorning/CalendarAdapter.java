@@ -168,23 +168,27 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
             String name = oneTimeAlarm.getName();
 
             viewHolder.getTextName().setVisibility(View.VISIBLE);
-            viewHolder.getTextName().setText(name == null || name.isEmpty() ? "" : name);
+            viewHolder.getTextName().setText(name == null ? "" : name);
+
+            viewHolder.getTextName().setHint(" "); // This is required on my Samsung Galaxy S9. Otherwise, when the name is empty, it the touch (to start renaming) doesn't work.
 
             // Increase touch area
             View delegate = viewHolder.getTextName();
             final View parent = (View) delegate.getParent();
-            parent.post(new Runnable() {
-                // Post in the parent's message queue to make sure the parent lays out its children before we call getHitRect()
-                public void run() {
-                    final Rect r = new Rect();
-                    delegate.getHitRect(r);
-                    RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) delegate.getLayoutParams();
-                    r.top -= params.rightMargin;
-                    r.bottom += params.rightMargin;
-                    r.left -= params.rightMargin;
-                    r.right += params.rightMargin;
-                    parent.setTouchDelegate(new TouchDelegate(r, delegate));
-                }
+            // Post in the parent's message queue to make sure the parent lays out its children before we call getHitRect()
+            parent.post(() -> {
+                final Rect r = new Rect();
+                delegate.getHitRect(r);
+
+                RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) delegate.getLayoutParams();
+                int gap = params.rightMargin;
+
+                r.top -= gap; // Align touch area the right edge of activity (display)
+                r.bottom += gap;
+                r.left -= 2 * gap;
+                r.right += gap;
+
+                parent.setTouchDelegate(new TouchDelegate(r, delegate));
             });
 
             // Listeners for setting name

@@ -64,7 +64,6 @@
         android:layout_alignParentEnd="true"
         android:layout_below="@id/textState"
         android:layout_marginEnd="@dimen/margin_medium"
-        android:layout_toEndOf="@id/textTimeCal"
         android:background="@null"
         android:ellipsize="end"
         android:gravity="end"
@@ -79,14 +78,13 @@
         android:id="@+id/textComment"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
         android:layout_alignParentEnd="true"
+        android:layout_below="@id/textName"
         android:layout_marginEnd="@dimen/margin_medium"
         android:layout_toEndOf="@id/textTimeCal"
         android:ellipsize="end"
         android:gravity="end"
         android:maxLines="1"
-        android:paddingBottom="@dimen/margin_small"
         android:textAlignment="textEnd"
         tools:text="12m 34s" />
 
