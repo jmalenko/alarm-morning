@@ -187,13 +187,10 @@ public class SystemAlarm {
         Calendar now = clock.now();
 
         GlobalManager globalManager = GlobalManager.getInstance();
-        AppAlarm nextAlarmToRingWithoutCurrent = globalManager.getNextAlarm(clock, new AppAlarmFilter() { // XXX Workaround - Robolectric doesn't allow shadow of a class with lambda
-            @Override
-            public boolean match(AppAlarm appAlarm) {
-                Log.v(TAG, "   checking filter condition for " + appAlarm);
-                int state = globalManager.getState(appAlarm);
-                return state != STATE_DISMISSED_BEFORE_RINGING && state != STATE_DISMISSED;
-            }
+        AppAlarm nextAlarmToRingWithoutCurrent = globalManager.getNextAlarm(clock, appAlarm -> {
+            Log.v(TAG, "   checking filter condition for " + appAlarm);
+            int state = globalManager.getState(appAlarm);
+            return state != STATE_DISMISSED_BEFORE_RINGING && state != STATE_DISMISSED;
         });
 
         AppAlarm nearestDismissedAlarm = findNearestDismissedAlarm(clock);

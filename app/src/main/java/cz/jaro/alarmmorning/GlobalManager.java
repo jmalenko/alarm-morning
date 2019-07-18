@@ -154,16 +154,12 @@ public class GlobalManager {
         if (isRingingOrSnoozed()) {
             Log.v(TAG, "   loading the ringing or snoozed alarm");
 
-            AppAlarm ringingAlarm = getRingingAlarm();
-            return ringingAlarm;
+            appAlarm = getRingingAlarm();
         } else {
-            appAlarm = getNextAlarm(clock(), new AppAlarmFilter() { // XXX Workaround - Robolectric doesn't allow shadow of a class with lambda
-                @Override
-                public boolean match(AppAlarm appAlarm) {
-                    Log.v(TAG, "   checking filter condition for " + appAlarm);
-                    int state = getState(appAlarm);
-                    return state != STATE_DISMISSED_BEFORE_RINGING && state != STATE_DISMISSED;
-                }
+            appAlarm = getNextAlarm(clock(), appAlarm2 -> {
+                Log.v(TAG, "   checking filter condition for " + appAlarm2);
+                int state = getState(appAlarm2);
+                return state != STATE_DISMISSED_BEFORE_RINGING && state != STATE_DISMISSED;
             });
         }
 
@@ -178,13 +174,10 @@ public class GlobalManager {
     public AppAlarm getNextAlarm() {
         Log.v(TAG, "getNextAlarm()");
 
-        AppAlarm appAlarm = getNextAlarm(clock(), new AppAlarmFilter() { // XXX Workaround - Robolectric doesn't allow shadow of a class with lambda
-            @Override
-            public boolean match(AppAlarm appAlarm) {
-                Log.v(TAG, "   checking filter condition for " + appAlarm);
-                int state = getState(appAlarm);
-                return state != STATE_DISMISSED_BEFORE_RINGING && state != STATE_DISMISSED && state != STATE_RINGING && state != STATE_SNOOZED;
-            }
+        AppAlarm appAlarm = getNextAlarm(clock(), appAlarm2 -> {
+            Log.v(TAG, "   checking filter condition for " + appAlarm2);
+            int state = getState(appAlarm2);
+            return state != STATE_DISMISSED_BEFORE_RINGING && state != STATE_DISMISSED && state != STATE_RINGING && state != STATE_SNOOZED;
         });
 
         return appAlarm;
