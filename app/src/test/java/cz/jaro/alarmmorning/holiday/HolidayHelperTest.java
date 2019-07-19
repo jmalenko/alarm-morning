@@ -1,5 +1,6 @@
 package cz.jaro.alarmmorning.holiday;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -7,6 +8,7 @@ import org.robolectric.RobolectricTestRunner;
 
 import java.util.List;
 
+import cz.jaro.alarmmorning.FixedTimeTest;
 import cz.jaro.alarmmorning.SettingsActivity;
 
 import static org.hamcrest.core.Is.is;
@@ -39,7 +41,10 @@ public class HolidayHelperTest {
         holidayHelper = HolidayHelper.getInstance();
     }
 
-    // TODO The tests must be run one-by-one (via "Rerun Failed Tests")
+    @After
+    public void after() {
+        FixedTimeTest.resetSingletons();
+    }
 
     @Test
     public void list() {
@@ -146,7 +151,7 @@ public class HolidayHelperTest {
 
         valid = holidayHelper.isPathValid(DE_BY_AG);
         assertThat(valid, is(true));
-        
+
         valid = holidayHelper.isPathValid(NON_EXISTENT);
         assertThat(valid, is(false));
 
