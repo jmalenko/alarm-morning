@@ -24,7 +24,7 @@ public class HolidayHelperTest {
 
     public static final String CZ = "CZ";
     public static final String DE = "DE";
-    public static final String DE_B = "DE.b"; // Berlin (B) doen;t have subregions
+    public static final String DE_BB = "DE.bb"; // Brandenburg (BB) has no subregions
     public static final String DE_BY = "DE.by"; // Bavaria (BY) has subregions
     public static final String DE_BY_AG = "DE.by.ag";
 
@@ -62,7 +62,7 @@ public class HolidayHelperTest {
         result = holidayHelper.list(DE);
         assertThat(result.size() > 0, is(true));
 
-        result = holidayHelper.list(DE_B);
+        result = holidayHelper.list(DE_BB);
         assertThat(result.size() == 0, is(true));
 
         result = holidayHelper.list(DE_BY);
@@ -100,8 +100,8 @@ public class HolidayHelperTest {
         str = holidayHelper.preferenceToDisplayName(DE);
         assertThat(str, is("Germany"));
 
-        str = holidayHelper.preferenceToDisplayName(DE_B);
-        assertThat(str, is("Germany – Berlin"));
+        str = holidayHelper.preferenceToDisplayName(DE_BB);
+        assertThat(str, is("Germany – Brandenburg"));
 
         str = holidayHelper.preferenceToDisplayName(DE_BY);
         assertThat(str, is("Germany – Bavaria"));
@@ -138,7 +138,7 @@ public class HolidayHelperTest {
         valid = holidayHelper.isPathValid(DE);
         assertThat(valid, is(true));
 
-        valid = holidayHelper.isPathValid(DE_B);
+        valid = holidayHelper.isPathValid(DE_BB);
         assertThat(valid, is(true));
 
         valid = holidayHelper.isPathValid(DE_BY);
