@@ -52,7 +52,8 @@ public class BootReceiverTest extends FixedTimeTest {
 
         // Initialize same as after booting
         BroadcastReceiver receiver = new BootReceiver();
-        receiver.onReceive(context, null);
+        Intent intent = new Intent(Intent.ACTION_BOOT_COMPLETED);
+        receiver.onReceive(context, intent);
     }
 
     @Test
