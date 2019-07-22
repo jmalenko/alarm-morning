@@ -189,7 +189,7 @@
         <cz.jaro.alarmmorning.graphics.HolidayPreference
             android:key="pref_holiday"
             android:title="@string/pref_title_holiday"
-            android:defaultValue="-NONE"/>
+            android:defaultValue="" />
 
         <Preference
             android:key="pref_start_wizard"

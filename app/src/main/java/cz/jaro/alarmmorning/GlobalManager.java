@@ -1682,11 +1682,7 @@ public class GlobalManager {
         editor.apply();
 
         // Set defaults
-        // XXX Workaround - Robolectric hasn't implemented setDefaultValues() yet, we have to set each setting individually (as the need for testing arises)
-//        PreferenceManager.setDefaultValues(context, R.xml.preferences, true);
-        editor = preferences.edit();
-        editor.putString(SettingsActivity.PREF_HOLIDAY, SettingsActivity.PREF_HOLIDAY_NONE);
-        editor.commit();
+        PreferenceManager.setDefaultValues(context, R.xml.preferences, true);
     }
 
     /**
