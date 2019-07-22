@@ -416,6 +416,10 @@ public class AlarmMorningAppTest extends FixedTimeTest {
     }
 
     public static void assertNotificationAction(Context context, Notification notification, int index, String title, String actionString) {
+        assertNotificationAction(context, notification, index, title, actionString, NotificationReceiver.class);
+    }
+
+    public static void assertNotificationAction(Context context, Notification notification, int index, String title, String actionString, Class expectedIntentClass) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             Notification.Action actionButton = notification.actions[index];
             assertThat("Notification action title", actionButton.title, is(title));
@@ -423,7 +427,7 @@ public class AlarmMorningAppTest extends FixedTimeTest {
             PendingIntent intent1 = actionButton.actionIntent;
             ShadowPendingIntent shadowIntent1 = Shadows.shadowOf(intent1);
 
-            Intent expectedIntent = new Intent(context, NotificationReceiver.class);
+            Intent expectedIntent = new Intent(context, expectedIntentClass);
 
             assertThat("Broadcast", shadowIntent1.isBroadcastIntent(), is(true));
             assertThat("Intent count", shadowIntent1.getSavedIntents().length, is(1));

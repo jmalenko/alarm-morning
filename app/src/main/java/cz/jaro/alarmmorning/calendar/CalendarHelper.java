@@ -57,7 +57,9 @@ public class CalendarHelper {
     }
 
     /**
-     * Find the first event that<br/> 1. starts between {@code from} and {@code to}, and<br/> 2. matches {@code match}.
+     * Find the earliest event that<br/>
+     * 1. starts between {@code from} and {@code to}, and<br/>
+     * 2. matches {@code filter}.
      *
      * @param from   Beginning of the interval in which the returned event starts
      * @param to     End of the interval in which the returned event starts
@@ -65,7 +67,7 @@ public class CalendarHelper {
      * @return calendar event
      */
     public CalendarEvent find(Calendar from, Calendar to, CalendarEventFilter filter) {
-        Log.d(TAG, "Find the first calendar item that starts between " + from.getTime() + " and " + to.getTime());
+        Log.d(TAG, "Find the earliest calendar item that starts between " + from.getTime() + " and " + to.getTime());
 
         int permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission.READ_CALENDAR);
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
@@ -81,6 +83,8 @@ public class CalendarHelper {
             Cursor cur = cr.query(builder.build(), INSTANCE_PROJECTION, null, null, sortOrder);
 
             if (cur != null) {
+                CalendarEvent eventEarliest = null;
+
                 while (cur.moveToNext()) {
                     CalendarEvent event = load(cur);
 
@@ -89,11 +93,19 @@ public class CalendarHelper {
 
                     if (!event.begin.before(from)) { // event starts on or after startOfTomorrow
                         if (filter == null || filter.match(event)) { // match filter
-                            Log.d(TAG, "Found");
-                            return event;
+                            if (eventEarliest == null || event.getBegin().before(eventEarliest.getBegin())) {
+                                eventEarliest = event;
+                            }
                         }
                     }
                 }
+
+                if (eventEarliest != null) {
+                    String timeStr = Localization.timeToString(eventEarliest.begin.getTime(), context);
+                    Log.d(TAG, "Found event: " + timeStr + " " + eventEarliest.getTitle());
+                    return eventEarliest;
+                }
+
                 Log.d(TAG, "Calendar query returned no events that match criteria");
             } else {
                 Log.d(TAG, "Calendar query returned null");

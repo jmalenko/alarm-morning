@@ -13,7 +13,7 @@ public class CalendarEvent {
     String location;
     boolean allDay;
 
-    CalendarEvent() {
+    public CalendarEvent() {
     }
 
     public long getEventID() {

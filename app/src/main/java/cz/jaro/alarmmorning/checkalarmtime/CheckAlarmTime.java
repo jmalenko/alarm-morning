@@ -220,13 +220,18 @@ public class CheckAlarmTime {
         register();
 
         MorningInfo morningInfo = new MorningInfo(context);
+        onCheckAlarmTime(morningInfo);
+
+        // Save analytics
+        morningInfo.analytics.save();
+    }
+
+    void onCheckAlarmTime(MorningInfo morningInfo) {
+        Log.d(TAG, "onCheckAlarmTime(morningInfo=" + morningInfo + ")");
         if (morningInfo.attentionNeeded) {
             showNotification(morningInfo.day, morningInfo.targetAlarmTime, morningInfo.checkAlarmTimeGap, morningInfo.event);
             registerNotificationDismiss(morningInfo.alarmTime);
         }
-
-        // Save analytics
-        morningInfo.analytics.save();
     }
 
     private void onAutoHideNotification() {
@@ -273,7 +278,7 @@ public class CheckAlarmTime {
     /**
      * Checks that the current time is after the check alarm time and before the alarm time tomorrow.
      *
-     * @return True iff the current time is after the check alarm time and before the alarm time tomorrow. If the alarm is disabled tomorrow, then return true,
+     * @return True iff the current time is after the check alarm time and before the alarm time tomorrow. If the alarm is disabled tomorrow, then return true.
      */
     private boolean isBetweenCheckAlarmTimeAndAlarmTime() {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -283,14 +288,14 @@ public class CheckAlarmTime {
         Clock clock = globalManager.clock();
         Calendar now = clock.now();
 
-        Calendar checkAlarmTimeAt = calcLastOccurence(checkAlarmTimeAtPreference);
-
+        Calendar checkAlarmTimeAtLast = calcLastOccurence(checkAlarmTimeAtPreference);
         Calendar checkAlarmTimeAtToday = calcTodaysOccurence(checkAlarmTimeAtPreference);
+
         Calendar date = now.before(checkAlarmTimeAtToday) ? CalendarUtils.beginningOfToday(now) : CalendarUtils.beginningOfTomorrow(now);
         Day day = globalManager.loadDay(date);
 
-        Log.v(TAG, !day.isEnabled() ? "Alarm is disabled on " + day.getDate().getTime() : "Now " + now.getTime() + " is in period between " + checkAlarmTimeAt.getTime() + " and " + day.getDateTime().getTime());
-        boolean res = !day.isEnabled() || (now.after(checkAlarmTimeAt) && now.before(day.getDateTime()));
+        Log.v(TAG, !day.isEnabled() ? "Alarm is disabled on " + day.getDate().getTime() : "Now " + now.getTime() + " is in period between " + checkAlarmTimeAtLast.getTime() + " and " + day.getDateTime().getTime());
+        boolean res = !day.isEnabled() || (now.after(checkAlarmTimeAtLast) && now.before(day.getDateTime()));
         Log.d(TAG, "isBetweenCheckAlarmTimeAndAlarmTime() returns " + res);
         return res;
     }
@@ -462,7 +467,7 @@ public class CheckAlarmTime {
 class MorningInfo {
     private static final String TAG = GlobalManager.createLogTag(MorningInfo.class);
 
-    private final Context context;
+    private Context context;
 
     Day day;
     int checkAlarmTimeGap;
@@ -477,6 +482,13 @@ class MorningInfo {
         init();
     }
 
+    MorningInfo() {  // The empty constructor is here for testing with Mockito
+    }
+
+    public void setContext(Context context) {
+        this.context = context;
+    }
+
     /**
      * Compare the alarm time for tomorrow with the first meeting tomorrow. If the alarm time is nut sufficiently long before the meeting, then offer user to
      * quickly change the alarm time.
@@ -489,7 +501,7 @@ class MorningInfo {
      * <p>
      * 3. Entry is not all-day
      */
-    private void init() {
+    public void init() {
         Log.d(TAG, "onCheckAlarmTime()");
 
         // Find first calendar event
@@ -506,7 +518,7 @@ class MorningInfo {
         // Load tomorrow's alarm time
         day = globalManager.loadDay(tomorrowStart);
         alarmTime = day.getDateTime();
-        Log.v(TAG, "alarmTime=" + alarmTime.getTime());
+        Log.v(TAG, "alarmTime=" + alarmTime.getTime() + ", enabled=" + day.isEnabled());
 
         // Load gap
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -518,24 +530,17 @@ class MorningInfo {
         analytics.set(Analytics.Param.Check_alarm_time_gap, checkAlarmTimeGap);
         // TODO Analytics - add device location
 
-        CalendarHelper calendarHelper = new CalendarHelper(context);
-        CalendarEventFilter notAllDay = new CalendarEventFilter() {
-            @Override
-            public boolean match(CalendarEvent event) {
-                return !event.getAllDay();
-            }
-        };
-        event = calendarHelper.find(tomorrowStart, tomorrowNoon, notAllDay);
+        event = getEarliestEvent(tomorrowStart, tomorrowNoon);
 
         if (event != null) {
             targetAlarmTime = (Calendar) event.getBegin().clone();
             targetAlarmTime.add(Calendar.MINUTE, -checkAlarmTimeGap);
-            Log.v(TAG, "      targetAlarmTime=" + targetAlarmTime.getTime());
+            Log.v(TAG, "targetAlarmTime=" + targetAlarmTime.getTime());
 
             // TODO Currently, the alarm time must be on the same date. Support alarm on the previous day.
             if (targetAlarmTime.before(tomorrowStart)) {
                 targetAlarmTime = tomorrowStart;
-                Log.v(TAG, "      adjusted targetAlarmTime to " + targetAlarmTime.getTime());
+                Log.v(TAG, "adjusted targetAlarmTime to " + targetAlarmTime.getTime());
             }
 
             analytics.set(Analytics.Param.Appointment_begin, Analytics.calendarToTime(event.getBegin()));
@@ -543,6 +548,7 @@ class MorningInfo {
             analytics.set(Analytics.Param.Appointment_location, event.getLocation());
 
             attentionNeeded = !day.isEnabled() || targetAlarmTime.before(alarmTime);
+            Log.v(TAG, "attentionNeeded=" + attentionNeeded);
             if (attentionNeeded) {
                 Log.d(TAG, "Appointment that needs and earlier alarm time found");
                 analytics.set(Analytics.Param.Check_alarm_time_action, CHECK_ALARM_TIME_ACTION__SHOW_NOTIFICATION);
@@ -555,5 +561,32 @@ class MorningInfo {
 
             analytics.set(Analytics.Param.Check_alarm_time_action, CHECK_ALARM_TIME_ACTION__NO_APPOINTMENT);
         }
+    }
+
+    CalendarEvent getEarliestEvent(Calendar tomorrowStart, Calendar tomorrowNoon) {
+        if (tomorrowStart == null || tomorrowNoon == null) // Needed for mock initialization
+            return null;
+
+        CalendarHelper calendarHelper = new CalendarHelper(context);
+        CalendarEventFilter notAllDay = new CalendarEventFilter() {
+            @Override
+            public boolean match(CalendarEvent event) {
+                return !event.getAllDay();
+            }
+        };
+        return calendarHelper.find(tomorrowStart, tomorrowNoon, notAllDay);
+    }
+
+    @Override
+    public String toString() {
+        return "MorningInfo{" +
+                ", day=" + day +
+                ", checkAlarmTimeGap=" + checkAlarmTimeGap +
+                ", analytics=" + analytics +
+                ", event=" + event +
+                ", alarmTime=" + alarmTime +
+                ", targetAlarmTime=" + targetAlarmTime +
+                ", attentionNeeded=" + attentionNeeded +
+                '}';
     }
 }

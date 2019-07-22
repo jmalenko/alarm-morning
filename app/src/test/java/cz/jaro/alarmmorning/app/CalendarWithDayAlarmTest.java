@@ -786,6 +786,10 @@ public class CalendarWithDayAlarmTest extends AlarmMorningAppTest {
     }
 
     private void setAlarm(Calendar date) {
+        setAlarm(date, globalManager);
+    }
+
+    public static void setAlarm(Calendar date, GlobalManager globalManager) {
         Day day = new Day();
         day.setDate(date);
         day.setState(Day.STATE_ENABLED);
