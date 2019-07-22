@@ -34,8 +34,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
     private static final String TAG = GlobalManager.createLogTag(AppCompatPreferenceActivity.class);
 
-    // TODO Reregister system alarm if the preference for future time changes
-
     /**
      * Value is ringtone URI.
      */
