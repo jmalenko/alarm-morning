@@ -5,9 +5,9 @@ import org.junit.Test;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-import cz.jaro.alarmmorning.Analytics;
 import cz.jaro.alarmmorning.FixedTimeTest;
 import cz.jaro.alarmmorning.GlobalManager;
+import cz.jaro.alarmmorning.app.CalendarWithDayAlarmTest;
 import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.clock.FixedClock;
 
@@ -22,24 +22,9 @@ import static org.junit.Assert.assertThat;
 public class GlobalManager1NextAlarm1DayTest extends FixedTimeTest {
 
     private void setAlarmToToday() {
-        Calendar date = new GregorianCalendar(DayTest.YEAR, DayTest.MONTH, DayTest.DAY, DayTest.HOUR, DayTest.MINUTE);
+        Calendar date = new GregorianCalendar(DayTest.YEAR, DayTest.MONTH, DayTest.DAY, DayTest.HOUR_DAY, DayTest.MINUTE_DAY);
 
-        Day day = new Day();
-        day.setDate(date);
-        day.setState(Day.STATE_ENABLED);
-        day.setHourDay(DayTest.HOUR_DAY);
-        day.setMinuteDay(DayTest.MINUTE_DAY);
-
-        Defaults defaults = new Defaults();
-        int dayOfWeek = date.get(Calendar.DAY_OF_WEEK);
-        defaults.setDayOfWeek(dayOfWeek);
-        defaults.setState(Defaults.STATE_DISABLED);
-
-        day.setDefaults(defaults);
-
-        Analytics analytics = new Analytics(Analytics.Channel.Test, Analytics.ChannelName.Calendar);
-
-        globalManager.modifyDayAlarm(day, analytics);
+        CalendarWithDayAlarmTest.setAlarm(date, globalManager);
     }
 
     @Test
