@@ -28,8 +28,7 @@
             android:layout_below="@id/snoozeTimeTextView"
             android:layout_centerHorizontal="true"
             android:background="@drawable/snooze_button"
-            android:contentDescription="@string/action_snooze"
-            android:onClick="onSnooze" />
+            android:contentDescription="@string/action_snooze" />
 
         <TextView
             android:id="@+id/muted"
