@@ -302,7 +302,7 @@ public class CheckAlarmTime {
 
     private boolean isNotificationVisible() {
         Intent notificationIntent = new Intent(context, CheckAlarmTimeNotificationReceiver.class);
-        PendingIntent test = PendingIntent.getBroadcast(context, REQUEST_CODE, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent test = PendingIntent.getBroadcast(context, REQUEST_CODE, notificationIntent, PendingIntent.FLAG_NO_CREATE);
         return test != null;
     }
 
@@ -445,8 +445,8 @@ public class CheckAlarmTime {
 
         MorningInfo morningInfo = new MorningInfo(context);
 
-        // If the alarm time was changed to a time long enough before the first meeting and notication exists, then hide the notification
-        if (!morningInfo.attentionNeeded) {
+        // If the alarm time was changed to a time long enough before the first meeting and notification exists, then hide the notification
+        if (!morningInfo.attentionNeeded && isNotificationVisible()) {
             unregisterNotificationDismiss(morningInfo.targetAlarmTime);
             hideNotification();
 
