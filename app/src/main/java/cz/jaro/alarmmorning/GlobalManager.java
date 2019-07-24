@@ -436,7 +436,7 @@ public class GlobalManager {
 
     }
 
-    public long loadSnoozeCount() {
+    private long loadSnoozeCount() {
         Log.v(TAG, "loadSnoozeCount()");
 
         Context context = AlarmMorningApplication.getAppContext();
