@@ -264,6 +264,7 @@ public class GlobalManager {
     private static final String PERSIST_LAST_ALARM_TYPE = "persist_last_alarm_type";
     private static final String PERSIST_LAST_ALARM_ID = "persist_last_alarm_id";
     private static final String PERSIST_LAST_RING_AFTER_SNOOZE_TIME = "persist_last_ring_after_snooze_time";
+    private static final String PERSIST_LAST_SNOOZE_COUNT = "persist_last_snooze_count";
 
     /*
      * Contains info about the dismissed alarms.
@@ -403,6 +404,47 @@ public class GlobalManager {
         Calendar ringAfterSnoozeTime = Analytics.datetimeUTCStringToCalendar(ringAfterSnoozeTimeStr);
 
         return ringAfterSnoozeTime;
+    }
+
+    private void zeroSnoozeCount() {
+        Log.v(TAG, "zeroSnoozeCount()");
+
+        saveSnoozeCount(0);
+    }
+
+    private long increaseSnoozeCount() {
+        Log.v(TAG, "increaseSnoozeCount()");
+
+        long snoozeCount = loadSnoozeCount();
+        snoozeCount++;
+
+        saveSnoozeCount(snoozeCount);
+
+        return snoozeCount;
+    }
+
+    private void saveSnoozeCount(long snoozeCount) {
+        Log.v(TAG, "saveSnoozeCount()");
+
+        Context context = AlarmMorningApplication.getAppContext();
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = preferences.edit();
+
+        editor.putLong(PERSIST_LAST_SNOOZE_COUNT, snoozeCount);
+
+        editor.apply();
+
+    }
+
+    public long loadSnoozeCount() {
+        Log.v(TAG, "loadSnoozeCount()");
+
+        Context context = AlarmMorningApplication.getAppContext();
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+
+        long snoozeCount = preferences.getLong(PERSIST_LAST_SNOOZE_COUNT, LONG_UNDEFINED);
+
+        return snoozeCount;
     }
 
     /**
@@ -1012,9 +1054,13 @@ public class GlobalManager {
 
         setState(STATE_RINGING, appAlarm);
 
+        if (isNew) {
+            zeroSnoozeCount();
+        }
+
         Analytics analytics = new Analytics(context, Analytics.Event.Ring, Analytics.Channel.Time, Analytics.ChannelName.Alarm);
         analytics.setAppAlarm(appAlarm);
-        // TODO Analytics - add number of snoozes
+        analytics.set(Analytics.Param.Snooze_count, loadSnoozeCount());
         // TODO Analytics - add device location
         analytics.save();
 
@@ -1113,7 +1159,7 @@ public class GlobalManager {
         analytics.setContext(context);
         analytics.setEvent(Analytics.Event.Snooze);
         analytics.setAppAlarm(nextAlarmToRing);
-        // TODO Analytics - add number of snoozes
+        analytics.set(Analytics.Param.Snooze_count, increaseSnoozeCount());
         analytics.save();
 
         setState(STATE_SNOOZED, getRingingAlarm());

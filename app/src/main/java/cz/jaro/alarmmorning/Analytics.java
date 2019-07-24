@@ -113,6 +113,7 @@ public class Analytics {
         Alarm_state,
         Default_alarm_time,
         Alarm_id,
+        Snooze_count,
 
         Alarm_time_old,
         Skipped_alarm_times,
@@ -712,6 +713,8 @@ public class Analytics {
                 padRight(Param.Day_of_week_type, 7) + " | " +
                 padRight(Param.Alarm_state, 15) + " | " +
                 padLeft(Param.Default_alarm_time, 8) + " | " +
+                padRight(Param.Alarm_id, 8) + " | " +
+                padRight(Param.Snooze_count, 2) + " | " +
 
                 padLeft(Param.Alarm_time_old, 8) + " | " +
                 padRight(Param.Skipped_alarm_times, 20) + " | " +
