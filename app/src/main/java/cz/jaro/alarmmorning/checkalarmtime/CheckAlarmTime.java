@@ -110,17 +110,21 @@ public class CheckAlarmTime {
     private void register(String checkAlarmTimeAtPreference) {
         Log.d(TAG, "register(checkAlarmTimeAtPreference=" + checkAlarmTimeAtPreference);
 
-        Calendar checkAlarmTimeAt = calcNextOccurence(checkAlarmTimeAtPreference);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
+            Calendar checkAlarmTimeAt = calcNextOccurence(checkAlarmTimeAtPreference);
 
-        String action = ACTION_CHECK_ALARM_TIME;
-        Log.i(TAG, "Setting system alarm at " + checkAlarmTimeAt.getTime().toString() + " with action " + action);
+            String action = ACTION_CHECK_ALARM_TIME;
+            Log.i(TAG, "Setting system alarm at " + checkAlarmTimeAt.getTime().toString() + " with action " + action);
 
-        Intent intent = new Intent(context, CheckAlarmTimeAlarmReceiver.class);
-        intent.setAction(action);
+            Intent intent = new Intent(context, CheckAlarmTimeAlarmReceiver.class);
+            intent.setAction(action);
 
-        operation = PendingIntent.getBroadcast(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            operation = PendingIntent.getBroadcast(context, 1, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        SystemAlarm.setSystemAlarm(alarmManager, checkAlarmTimeAt, operation);
+            SystemAlarm.setSystemAlarm(alarmManager, checkAlarmTimeAt, operation);
+        } else {
+            CalendarEventChangeReceiverAsJob.schedule(context);
+        }
     }
 
     public void unregister() {

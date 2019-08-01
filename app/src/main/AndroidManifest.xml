@@ -120,6 +120,10 @@
                 <data android:host="com.android.calendar" />
             </intent-filter>
         </receiver>
+
+        <service
+            android:name=".checkalarmtime.CalendarEventChangeReceiverAsJob"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
         <receiver android:name=".nighttimebell.NighttimeBellAlarmReceiver" />
     </application>
 </manifest>
