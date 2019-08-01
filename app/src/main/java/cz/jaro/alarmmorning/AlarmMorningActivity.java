@@ -606,7 +606,7 @@ public class AlarmMorningActivity extends AppCompatActivity {
     private Intent rateIntentForUrl(String uri) {
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri + getPackageName()));
         int flags = Intent.FLAG_ACTIVITY_NO_HISTORY | Intent.FLAG_ACTIVITY_MULTIPLE_TASK;
-        if (Build.VERSION.SDK_INT >= 21) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             flags |= Intent.FLAG_ACTIVITY_NEW_DOCUMENT;
         } else {
             flags |= Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET;
