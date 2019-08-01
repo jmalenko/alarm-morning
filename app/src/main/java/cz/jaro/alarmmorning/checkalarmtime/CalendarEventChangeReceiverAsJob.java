@@ -9,10 +9,8 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Handler;
 import android.provider.CalendarContract;
 import android.util.Log;
-import android.widget.Toast;
 
 import cz.jaro.alarmmorning.GlobalManager;
 
@@ -32,9 +30,6 @@ public class CalendarEventChangeReceiverAsJob extends JobService {
         JobInfo.Builder jobInfoBuilder = new JobInfo.Builder(JOB_ID, oComponentName);
         jobInfoBuilder.addTriggerContentUri(new JobInfo.TriggerContentUri(CalendarContract.CONTENT_URI, JobInfo.TriggerContentUri.FLAG_NOTIFY_FOR_DESCENDANTS));
         jobInfoBuilder.addTriggerContentUri(new JobInfo.TriggerContentUri(CALENDAR_URI, 0));
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            jobInfoBuilder.setImportantWhileForeground(true);
-        }
         JobScheduler jobScheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
         jobScheduler.schedule(jobInfoBuilder.build());
     }
@@ -46,8 +41,7 @@ public class CalendarEventChangeReceiverAsJob extends JobService {
         // Reschedule to receive future changes
         schedule(this);
 
-        DisplayToast("Calendar has been modified. Do some work!");
-
+        // Do check
         CheckAlarmTime checkAlarmTime = CheckAlarmTime.getInstance(this);
         checkAlarmTime.onCalendarUpdated();
 
@@ -58,17 +52,5 @@ public class CalendarEventChangeReceiverAsJob extends JobService {
     synchronized public boolean onStopJob(JobParameters params) {
         Log.v(TAG, "onStopJob(...)");
         return false;
-    }
-
-
-    final Handler mHandler = new Handler(); //Just to display Toasts // TODO REMOVE
-
-    void DisplayToast(final CharSequence text) {
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(CalendarEventChangeReceiverAsJob.this, text, Toast.LENGTH_SHORT).show();
-            }
-        });
     }
 }
