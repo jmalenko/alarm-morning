@@ -20,12 +20,13 @@ import io.fabric.sdk.android.Fabric;
  */
 public class AlarmMorningApplication extends Application {
 
-    private static final String TAG = GlobalManager.createLogTag(Application.class);
+    private static final String TAG = GlobalManager.createLogTag(AlarmMorningApplication.class);
 
     private static Context appContext;
 
     @Override
     public void onCreate() {
+        Log.v(TAG, "onCreate()");
         super.onCreate();
         appContext = this;
 
