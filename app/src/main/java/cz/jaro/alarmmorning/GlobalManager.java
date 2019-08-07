@@ -1741,7 +1741,7 @@ public class GlobalManager {
     }
 
     public static String createLogTag(Class c) {
-        return c.getSimpleName() + "_AlarmMorning";
+        return c.getSimpleName() + "[AM]";
     }
 
 }
