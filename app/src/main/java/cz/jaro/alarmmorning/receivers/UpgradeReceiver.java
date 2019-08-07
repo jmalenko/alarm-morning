@@ -41,9 +41,10 @@ public class UpgradeReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         WakeLocker.acquire(context);
 
-        if (intent.getAction().equals(Intent.ACTION_PACKAGE_REPLACED)) {
-            Log.v(TAG, "onReceive()");
+        String action = intent.getAction();
+        Log.v(TAG, "onReceive(action=" + action + ")");
 
+        if (action.equals(Intent.ACTION_MY_PACKAGE_REPLACED)) {
             new Analytics(context, Analytics.Event.Start, Analytics.Channel.External, Analytics.ChannelName.Upgrade).setConfigurationInfo().save();
 
             // Update default values of preferences
