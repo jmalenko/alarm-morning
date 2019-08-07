@@ -4,6 +4,7 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Build;
@@ -12,6 +13,7 @@ import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
@@ -590,6 +592,62 @@ public class Analytics {
             } catch (Exception e) {
                 Log.v(TAG, "Cannot get advertising id", e);
             }
+
+            confSystem.put("settings_secure_android_id", Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID));
+            confSystem.put("Settings.Secure.default_input_method", Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.DEFAULT_INPUT_METHOD));
+
+            try {
+                // The commented lines require new permissions or requires a higher API level
+
+                final TelephonyManager tm = (TelephonyManager) getContext().getSystemService(Context.TELEPHONY_SERVICE);
+                confSystem.put("telephonyManager_simCountryIso", tm.getSimCountryIso());
+                confSystem.put("telephonyManager_simOperator", tm.getSimOperator());
+                confSystem.put("telephonyManager_simOperatorName", tm.getSimOperatorName());
+//                confSystem.put("telephonyManager_simSerialNumber", tm.getSimSerialNumber());
+
+                confSystem.put("telephonyManager_networkCountryIso", tm.getNetworkCountryIso());
+                confSystem.put("telephonyManager_networkOperator", tm.getNetworkOperator());
+                confSystem.put("telephonyManager_networkOperatorName", tm.getNetworkOperatorName());
+                confSystem.put("telephonyManager_networkType", tm.getNetworkType());
+
+                confSystem.put("telephonyManager_phoneType", tm.getPhoneType());
+
+//                confSystem.put("telephonyManager_voiceMailNumber", tm.getVoiceMailNumber());
+//                confSystem.put("telephonyManager_voiceNetworkType", tm.getVoiceNetworkType());
+//                confSystem.put("telephonyManager_voiceMailAlphaTag", tm.getVoiceMailAlphaTag());
+
+//                confSystem.put("telephonyManager_dataEnabled", tm.isDataEnabled());
+//                confSystem.put("telephonyManager_smsCapable", tm.isSmsCapable());
+//                confSystem.put("telephonyManager_voiceCapable", tm.isVoiceCapable());
+
+//                confSystem.put("telephonyManager_deviceId", tm.getDeviceId());
+//                confSystem.put("telephonyManager_imei", tm.getImei());
+//                confSystem.put("telephonyManager_meid", tm.getMeid());
+//                confSystem.put("telephonyManager_deviceSoftwareVersion", tm.getDeviceSoftwareVersion());
+//                confSystem.put("telephonyManager_line1Number", tm.getLine1Number());
+//                confSystem.put("telephonyManager_nai", tm.getNai());
+//                confSystem.put("telephonyManager_subscriberId", tm.getSubscriberId());
+            } catch (Exception e) {
+                Log.v(TAG, "Cannot get data from telephony manager", e);
+            }
+
+            try {
+                PackageInfo pInfo = getContext().getPackageManager().getPackageInfo(this.getClass().getPackage().getName(), 0);
+                confSystem.put("packageInfo_versionName", pInfo.versionName);
+            } catch (PackageManager.NameNotFoundException e) {
+                Log.v(TAG, "Cannot get data from package info", e);
+            }
+
+            // TODO Other sources of data for analytics
+            /*
+            Google account - https://stackoverflow.com/questions/2245545/accessing-google-account-id-username-via-android
+            Primary e-mail address - https://stackoverflow.com/questions/2112965/how-to-get-the-android-devices-primary-e-mail-address
+            Wifi MAC address - https://stackoverflow.com/questions/11705906/programmatically-getting-the-mac-of-an-android-device
+            Wifi SSID - https://stackoverflow.com/questions/21391395/get-ssid-when-wifi-is-connected
+            Bluetooth MAC address - https://stackoverflow.com/questions/41014764/is-it-possible-to-get-bluetooth-mac-address-in-android-jar-library
+            Network connection type - https://stackoverflow.com/questions/2802472/detect-network-connection-type-on-android
+            Device serial number - https://stackoverflow.com/questions/11029294/android-how-to-programmatically-access-the-device-serial-number-shown-in-the-av
+             */
 
             conf.put("system", confSystem);
 
