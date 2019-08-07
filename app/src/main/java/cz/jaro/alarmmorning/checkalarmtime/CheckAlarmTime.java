@@ -7,18 +7,23 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
+import android.text.Html;
+import android.text.SpannableString;
 import android.util.Log;
 
 import java.util.Calendar;
+import java.util.NoSuchElementException;
 
 import cz.jaro.alarmmorning.Analytics;
 import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.Localization;
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.SettingsActivity;
+import cz.jaro.alarmmorning.SharedPreferencessHelper;
 import cz.jaro.alarmmorning.SystemAlarm;
 import cz.jaro.alarmmorning.SystemNotification;
 import cz.jaro.alarmmorning.calendar.CalendarEvent;
@@ -28,12 +33,14 @@ import cz.jaro.alarmmorning.calendar.CalendarUtils;
 import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.graphics.TimePreference;
 import cz.jaro.alarmmorning.model.Day;
+import cz.jaro.alarmmorning.model.Defaults;
 
 import static cz.jaro.alarmmorning.Analytics.CHECK_ALARM_TIME_ACTION__DON_T_SHOW_NOTIFICATION;
 import static cz.jaro.alarmmorning.Analytics.CHECK_ALARM_TIME_ACTION__NO_APPOINTMENT;
 import static cz.jaro.alarmmorning.Analytics.CHECK_ALARM_TIME_ACTION__SHOW_NOTIFICATION;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.beginningOfTomorrow;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.justBeforeNoonTomorrow;
+import static cz.jaro.alarmmorning.calendar.CalendarUtils.onTheSameDate;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.roundDown;
 
 /**
@@ -69,6 +76,19 @@ public class CheckAlarmTime {
      */
     public static final String ACTION_AUTO_HIDE_NOTIFICATION = "AUTO_HIDE_NOTIFICATION";
 
+    /*
+     * Contains info about the current check.
+     */
+    static final String PERSIST__CHECK_ALARM_TIME__NOTIFICATION_EVENT_BEGIN = "PERSIST__CHECK_ALARM_TIME__NOTIFICATION_EVENT_BEGIN";
+    static final String PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION = "PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION";
+
+    static final String PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION__NOTIFICATION_NOT_DISPLAYED = "NOTIFICATION_NOT_DISPLAYED";
+    static final String PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION__NOTIFICATION_DISPLAYED = "NOTIFICATION_DISPLAYED";
+    static final String PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION__DELETED = "DELETED";
+    static final String PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION__SET_TO_DEFAULT = "SET_TO_DEFAULT";
+    static final String PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION__SET_TO_CUSTOM = "SET_TO_CUSTOM";
+    static final String PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION__AUTO_HIDDEN = "AUTO_HIDDEN";
+
     private CheckAlarmTime(Context context) {
         this.context = context;
         alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
@@ -99,12 +119,19 @@ public class CheckAlarmTime {
     }
 
     public void register() {
-        Log.d(TAG, "register()");
+        Log.v(TAG, "register()");
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         String checkAlarmTimeAtPreference = preferences.getString(SettingsActivity.PREF_CHECK_ALARM_TIME_AT, SettingsActivity.PREF_CHECK_ALARM_TIME_AT_DEFAULT);
 
         register(checkAlarmTimeAtPreference);
+
+        // Do the check if the time is after the check time
+        boolean betweenCheckAlarmTimeAndAlarmTime = isBetweenCheckAlarmTimeAndAlarmTime();
+        if (betweenCheckAlarmTimeAndAlarmTime) {
+            Log.i(TAG, "Doing the check immediately after registering");
+            doCheckAlarmTime();
+        }
     }
 
     private void register(String checkAlarmTimeAtPreference) {
@@ -128,11 +155,11 @@ public class CheckAlarmTime {
     }
 
     public void unregister() {
-        Log.d(TAG, "unregister()");
+        Log.v(TAG, "unregister()");
 
         if (operation != null) {
             // Method 1: standard
-            Log.d(TAG, "Cancelling current system alarm");
+            Log.d(TAG, "Cancelling current system alarm for Check Alarm Time");
             operation.cancel();
         } else {
             // Method 2: try to recreate the operation
@@ -147,6 +174,15 @@ public class CheckAlarmTime {
                 operation2.cancel();
             }
         }
+
+        // Hide the notification if displayed
+        if (isNotificationVisible()) {
+            hideNotification();
+        }
+
+        // Cleanup the preferences
+        SharedPreferencessHelper.remove(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_EVENT_BEGIN);
+        SharedPreferencessHelper.remove(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION);
     }
 
     public void reregister(String stringValue) {
@@ -155,7 +191,7 @@ public class CheckAlarmTime {
     }
 
     private void registerNotificationDismiss(Calendar time) {
-        Log.d(TAG, "registerNotificationDismiss()");
+        Log.v(TAG, "registerNotificationDismiss()");
 
         String action = ACTION_AUTO_HIDE_NOTIFICATION;
         Log.i(TAG, "Setting system alarm at " + time.getTime().toString() + " with action " + action);
@@ -168,20 +204,19 @@ public class CheckAlarmTime {
         alarmManager.set(AlarmManager.RTC, time.getTimeInMillis(), operationDismissNotification);
     }
 
-    private void unregisterNotificationDismiss(Calendar time) {
-        Log.d(TAG, "unregisterNotificationDismiss()");
+    private void unregisterNotificationDismiss() {
+        Log.v(TAG, "unregisterNotificationDismiss()");
 
         if (operationDismissNotification != null) {
             // Method 1: standard
-            Log.d(TAG, "Cancelling current system alarm");
+            Log.d(TAG, "Cancelling current system alarm for notification dismiss");
             operationDismissNotification.cancel();
         } else {
             // Method 2: try to recreate the operation
             Log.d(TAG, "Recreating operation when cancelling system alarm");
 
-            String action = ACTION_AUTO_HIDE_NOTIFICATION;
             Intent intentDismissNotification2 = new Intent(context, CheckAlarmTimeAlarmReceiver.class);
-            intentDismissNotification2.setAction(action);
+            intentDismissNotification2.setAction(ACTION_AUTO_HIDE_NOTIFICATION);
 
             PendingIntent operationDismissNotification2 = PendingIntent.getBroadcast(context, 1, intentDismissNotification2, PendingIntent.FLAG_NO_CREATE);
 
@@ -207,8 +242,6 @@ public class CheckAlarmTime {
                 onAutoHideNotification();
                 break;
             case Intent.ACTION_PROVIDER_CHANGED:
-                // TODO May not work in Oreo and later. Solution is at https://stackoverflow.com/questions/49616809/oreo-calendar-changes
-                // TODO Intent is received even when calendar is not changed.
                 onCalendarUpdated();
                 Log.v(TAG, "data = " + intent.getData());
                 break;
@@ -218,63 +251,130 @@ public class CheckAlarmTime {
     }
 
     private void onCheckAlarmTime() {
-        Log.d(TAG, "onCheckAlarmTime()");
+        Log.v(TAG, "onCheckAlarmTime()");
 
         // Register for tomorrow
         register();
 
+        // Do the check
+        doCheckAlarmTime();
+    }
+
+    private void doCheckAlarmTime() {
         MorningInfo morningInfo = new MorningInfo(context);
-        onCheckAlarmTime(morningInfo);
+        doCheckAlarmTime(morningInfo);
 
         // Save analytics
         morningInfo.analytics.save();
     }
 
-    void onCheckAlarmTime(MorningInfo morningInfo) {
-        Log.d(TAG, "onCheckAlarmTime(morningInfo=" + morningInfo + ")");
+    void doCheckAlarmTime(MorningInfo morningInfo) {
+        Log.v(TAG, "doCheckAlarmTime(morningInfo=" + morningInfo + ")");
         if (morningInfo.attentionNeeded) {
-            showNotification(morningInfo.day, morningInfo.targetAlarmTime, morningInfo.checkAlarmTimeGap, morningInfo.event);
+            showNotification(morningInfo.day, morningInfo.targetAlarmTime, morningInfo.event);
             registerNotificationDismiss(morningInfo.alarmTime);
+
+            SharedPreferencessHelper.save(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_EVENT_BEGIN, Analytics.calendarToDatetimeStringUTC(morningInfo.event.getBegin()));
+            SharedPreferencessHelper.save(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION,
+                    morningInfo.attentionNeeded
+                            ? PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION__NOTIFICATION_DISPLAYED
+                            : PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION__NOTIFICATION_NOT_DISPLAYED);
         }
     }
 
     private void onAutoHideNotification() {
-        Log.d(TAG, "onAutoHideNotification()");
+        Log.v(TAG, "onAutoHideNotification()");
+
         new Analytics(context, Analytics.Event.Hide, Analytics.Channel.Time, Analytics.ChannelName.Check_alarm_time).save();
+
+        SharedPreferencessHelper.save(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION, PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION__AUTO_HIDDEN);
 
         hideNotification();
     }
 
     /**
-     * Note that Android broadcast and Intent "something happed with calendar" (specifically the PROVIDER_CHANGED action). However this intent doesn't have any
+     * Note that Android broadcast an intent "something happened with calendar" (specifically the PROVIDER_CHANGED action). However this intent doesn't have any
      * attributes describing what happened. Therefore all the calendar events must be checked.
      */
-    private void onCalendarUpdated() {
+    void onCalendarUpdated() {
+        Log.v(TAG, "onCalendarUpdated()");
         boolean betweenCheckAlarmTimeAndAlarmTime = isBetweenCheckAlarmTimeAndAlarmTime();
         if (betweenCheckAlarmTimeAndAlarmTime) {
             boolean notificationVisible = isNotificationVisible();
+
+            Calendar notificationEventBegin;
+            String notificationAction;
+            try {
+                String notificationEventBeginStr = (String) SharedPreferencessHelper.load(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_EVENT_BEGIN);
+                notificationEventBegin = Analytics.datetimeUTCStringToCalendar(notificationEventBeginStr);
+                notificationAction = (String) SharedPreferencessHelper.load(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION);
+            } catch (NoSuchElementException e) {
+                notificationEventBegin = null;
+                notificationAction = null;
+            }
+
+            Log.v(TAG, "notificationEventBegin=" + (notificationEventBegin != null ? Analytics.calendarToDatetimeStringUTC(notificationEventBegin) : "null"));
+            Log.v(TAG, "notificationAction=" + notificationAction);
+
             MorningInfo morningInfo = new MorningInfo(context);
-            if (morningInfo.attentionNeeded) {
+            Calendar eventBegin = morningInfo.event != null ? morningInfo.event.getBegin() : null;
+
+            Log.v(TAG, "morningInfo=" + morningInfo);
+
+            // Check for an earlier event
+
+            boolean checkForAnEarlierEvent = morningInfo.attentionNeeded
+                    && (notificationEventBegin == null || (!onTheSameDate(notificationEventBegin, morningInfo.day.getDate()) || (eventBegin != null && eventBegin.before(notificationEventBegin))));
+            Log.d(TAG, "Check for an earlier event = " + checkForAnEarlierEvent);
+            if (checkForAnEarlierEvent) {
+                Log.i(TAG, "Updating notification because of an earlier event");
+
                 if (notificationVisible) {
-                    // TODO Update notification if the target alarm time changed
-                    boolean targetAlarmTimeChanged = true;
-                    if (targetAlarmTimeChanged) {
-                        showNotification(morningInfo.day, morningInfo.targetAlarmTime, morningInfo.checkAlarmTimeGap, morningInfo.event);
-                    }
-                } else {
-                    // TODO Show notification but ignore if the user already dismissed the notification about this event (maybe only duration changed)
-                    boolean dismissedNotification = false;
-                    if (!dismissedNotification) {
-                        showNotification(morningInfo.day, morningInfo.targetAlarmTime, morningInfo.checkAlarmTimeGap, morningInfo.event);
-                        registerNotificationDismiss(morningInfo.alarmTime);
-                    }
+                    unregisterNotificationDismiss();
                 }
-            } else {
-                if (notificationVisible) {
-                    // Hide notification
-                    unregisterNotificationDismiss(morningInfo.targetAlarmTime);
+                showNotification(morningInfo.day, morningInfo.targetAlarmTime, morningInfo.event);
+                registerNotificationDismiss(morningInfo.alarmTime);
+
+                SharedPreferencessHelper.save(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_EVENT_BEGIN, Analytics.calendarToDatetimeStringUTC(morningInfo.event.getBegin()));
+                SharedPreferencessHelper.save(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION, PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION__NOTIFICATION_DISPLAYED);
+            }
+
+            // Check for a deleted event (that triggered setting the alarm)
+
+            boolean checkForADeletedEvent = notificationEventBegin != null && notificationAction != null && (eventBegin == null || notificationEventBegin.before(eventBegin));
+            Log.d(TAG, "Check for a deleted event (that triggered setting the alarm) = " + checkForADeletedEvent);
+            if (checkForADeletedEvent) {
+                if (notificationAction.equals(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION__NOTIFICATION_DISPLAYED)) {
+                    Log.i(TAG, "Updating notification because of a deleted event");
+
                     hideNotification();
+
+                    if (morningInfo.attentionNeeded) {
+                        showNotification(morningInfo.day, morningInfo.targetAlarmTime, morningInfo.event);
+                        registerNotificationDismiss(morningInfo.alarmTime);
+                        SharedPreferencessHelper.save(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_EVENT_BEGIN, Analytics.calendarToDatetimeStringUTC(morningInfo.event.getBegin()));
+                        SharedPreferencessHelper.save(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION, PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION__NOTIFICATION_DISPLAYED);
+                    }
+                } else if (notificationAction.equals(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION__SET_TO_CUSTOM)
+                        || notificationAction.equals(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION__SET_TO_DEFAULT)) {
+                    Log.i(TAG, "Showing notification because of a deleted event");
+
+                    showNotification(morningInfo.day, morningInfo.targetAlarmTime, morningInfo.event, true);
+                    registerNotificationDismiss(morningInfo.alarmTime);
+
+                    Calendar newNotificationEventBegin = morningInfo.event != null ? morningInfo.event.getBegin() : justBeforeNoonTomorrow(calcMorningDate());
+
+                    SharedPreferencessHelper.save(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_EVENT_BEGIN, Analytics.calendarToDatetimeStringUTC(newNotificationEventBegin));
+                    SharedPreferencessHelper.save(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION, PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION__NOTIFICATION_DISPLAYED);
                 }
+            }
+
+            // Otherwise hide (e.g. a meeting that triggered the notification
+            boolean hide = !checkForADeletedEvent && !morningInfo.attentionNeeded && notificationVisible;
+            Log.d(TAG, "Check for hide notification =  = " + hide);
+            if (hide) {
+                Log.i(TAG, "Hiding notification");
+                hideNotification();
             }
         }
     }
@@ -304,14 +404,36 @@ public class CheckAlarmTime {
         return res;
     }
 
+    /**
+     * @return The date on which the alarm should be compared to the earliest event. (Note: the actual check is usually done in the evening of previous day.)
+     */
+    private Calendar calcMorningDate() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        String checkAlarmTimeAtPreference = preferences.getString(SettingsActivity.PREF_CHECK_ALARM_TIME_AT, SettingsActivity.PREF_CHECK_ALARM_TIME_AT_DEFAULT);
+
+        GlobalManager globalManager = GlobalManager.getInstance();
+        Clock clock = globalManager.clock();
+        Calendar now = clock.now();
+
+        Calendar checkAlarmTimeAtToday = calcTodaysOccurence(checkAlarmTimeAtPreference);
+
+        Calendar date = now.before(checkAlarmTimeAtToday) ? CalendarUtils.beginningOfToday(now) : CalendarUtils.beginningOfTomorrow(now);
+        return date;
+    }
+
     private boolean isNotificationVisible() {
-        Intent notificationIntent = new Intent(context, CheckAlarmTimeNotificationReceiver.class);
-        PendingIntent test = PendingIntent.getBroadcast(context, REQUEST_CODE, notificationIntent, PendingIntent.FLAG_NO_CREATE);
+        Intent intent = new Intent(context, CheckAlarmTimeNotificationReceiver.class);
+        intent.setAction(CheckAlarmTimeNotificationReceiver.ACTION_CHECK_ALARM_TIME_CLICK);
+        PendingIntent test = PendingIntent.getBroadcast(context, REQUEST_CODE, intent, PendingIntent.FLAG_NO_CREATE);
         return test != null;
     }
 
-    private void showNotification(Day day, Calendar targetAlarmTime, int checkAlarmTimeGapPreference, CalendarEvent event) {
-        Log.d(TAG, "showNotification()");
+    private void showNotification(Day day, Calendar targetAlarmTime, CalendarEvent event) {
+        showNotification(day, targetAlarmTime, event, false);
+    }
+
+    private void showNotification(Day day, Calendar targetAlarmTime, CalendarEvent event, boolean originalEventDeleted) {
+        Log.v(TAG, "showNotification()");
         Resources res = context.getResources();
 
         String contentTitle;
@@ -328,14 +450,33 @@ public class CheckAlarmTime {
                 .setContentTitle(contentTitle)
                 .setPriority(NotificationCompat.PRIORITY_MAX);
 
-        String meetingTimeText = Localization.timeToString(event.getBegin().get(Calendar.HOUR_OF_DAY), event.getBegin().get(Calendar.MINUTE), context);
-        String contentText;
-        if (event.getLocation() != null && !event.getLocation().isEmpty()) {
-            contentText = res.getString(R.string.notification_check_text_with_location, meetingTimeText, event.getTitle(), event.getLocation());
+        String contentText = "";
+        String bodyText = "";
+        if (originalEventDeleted) {
+            contentText += res.getString(R.string.notification_check_text_event_deleted) + " ";
+            bodyText += res.getString(R.string.notification_check_text_event_deleted) + "<br>";
+        }
+        if (event != null) {
+            String meetingTimeText = Localization.timeToString(event.getBegin().get(Calendar.HOUR_OF_DAY), event.getBegin().get(Calendar.MINUTE), context);
+            if (event.getLocation() != null && !event.getLocation().isEmpty()) {
+                contentText += res.getString(R.string.notification_check_text_with_location, meetingTimeText, event.getTitle(), event.getLocation());
+                bodyText += res.getString(R.string.notification_check_text_with_location, meetingTimeText, event.getTitle(), event.getLocation());
+            } else {
+                contentText += res.getString(R.string.notification_check_text_without_location, meetingTimeText, event.getTitle());
+                bodyText += res.getString(R.string.notification_check_text_without_location, meetingTimeText, event.getTitle());
+            }
         } else {
-            contentText = res.getString(R.string.notification_check_text_without_location, meetingTimeText, event.getTitle());
+            contentText += res.getString(R.string.notification_check_no_event);
+            bodyText += res.getString(R.string.notification_check_no_event);
         }
         mBuilder.setContentText(contentText);
+
+        SpannableString formattedBody = new SpannableString(
+                Build.VERSION.SDK_INT < Build.VERSION_CODES.N
+                        ? Html.fromHtml(bodyText)
+                        : Html.fromHtml(bodyText, Html.FROM_HTML_MODE_LEGACY)
+        );
+        mBuilder.setStyle(new NotificationCompat.BigTextStyle().bigText(formattedBody).setBigContentTitle(contentTitle));
 
         Intent intent = new Intent(context, CheckAlarmTimeNotificationReceiver.class);
         intent.setAction(CheckAlarmTimeNotificationReceiver.ACTION_CHECK_ALARM_TIME_CLICK);
@@ -347,29 +488,64 @@ public class CheckAlarmTime {
         PendingIntent deletePendingIntent = PendingIntent.getBroadcast(context, REQUEST_CODE, deleteIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         mBuilder.setDeleteIntent(deletePendingIntent);
 
-        String targetTimeText = Localization.timeToString(targetAlarmTime.get(Calendar.HOUR_OF_DAY), targetAlarmTime.get(Calendar.MINUTE), context);
-        String setText = res.getString(R.string.notification_check_text_set_at, targetTimeText);
-        Intent setIntent = new Intent(context, CheckAlarmTimeNotificationReceiver.class);
-        setIntent.setAction(CheckAlarmTimeNotificationReceiver.ACTION_CHECK_ALARM_TIME_SET_TO);
-        setIntent.putExtra(CheckAlarmTimeNotificationReceiver.EXTRA_NEW_ALARM_TIME, targetAlarmTime.getTimeInMillis());
-        PendingIntent setPendingIntent = PendingIntent.getBroadcast(context, REQUEST_CODE, setIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        mBuilder.addAction(R.drawable.ic_alarm_on_white, setText, setPendingIntent);
+        if (event != null) {
+            String targetTimeText = Localization.timeToString(targetAlarmTime.get(Calendar.HOUR_OF_DAY), targetAlarmTime.get(Calendar.MINUTE), context);
+            String setText = res.getString(R.string.notification_check_text_set_at, targetTimeText);
+            Intent setIntent = new Intent(context, CheckAlarmTimeNotificationReceiver.class);
+            setIntent.setAction(CheckAlarmTimeNotificationReceiver.ACTION_CHECK_ALARM_TIME_SET_TO);
+            setIntent.putExtra(CheckAlarmTimeNotificationReceiver.EXTRA_NEW_ALARM_TIME, targetAlarmTime.getTimeInMillis());
+            PendingIntent setPendingIntent = PendingIntent.getBroadcast(context, REQUEST_CODE, setIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            mBuilder.addAction(R.drawable.ic_alarm_on_white, setText, setPendingIntent);
 
-        String dialogText = res.getString(R.string.notification_check_text_set_dialog);
-        Intent dialogIntent = new Intent(context, CheckAlarmTimeNotificationReceiver.class);
-        dialogIntent.setAction(CheckAlarmTimeNotificationReceiver.ACTION_CHECK_ALARM_TIME_SET_DIALOG);
-        dialogIntent.putExtra(CheckAlarmTimeNotificationReceiver.EXTRA_NEW_ALARM_TIME, targetAlarmTime.getTimeInMillis());
-        PendingIntent dialogPendingIntent = PendingIntent.getBroadcast(context, REQUEST_CODE, dialogIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        mBuilder.addAction(R.drawable.ic_alarm_white, dialogText, dialogPendingIntent);
+            String dialogText = res.getString(R.string.notification_check_text_set_dialog);
+            Intent dialogIntent = new Intent(context, CheckAlarmTimeNotificationReceiver.class);
+            dialogIntent.setAction(CheckAlarmTimeNotificationReceiver.ACTION_CHECK_ALARM_TIME_SET_DIALOG);
+            dialogIntent.putExtra(CheckAlarmTimeNotificationReceiver.EXTRA_NEW_ALARM_TIME, targetAlarmTime.getTimeInMillis());
+            PendingIntent dialogPendingIntent = PendingIntent.getBroadcast(context, REQUEST_CODE, dialogIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            mBuilder.addAction(R.drawable.ic_alarm_white, dialogText, dialogPendingIntent);
+        } else {
+            // Time from default if relevant (different from current alarm time and default is enabled)
+            Defaults defaults = day.getDefaults();
+            if (!day.sameAsDefault() && defaults.isEnabled()) {
+                GlobalManager globalManager = GlobalManager.getInstance();
+                Clock clock = globalManager.clock();
+                Calendar now = clock.now();
+
+                Calendar defaultAlarmTime = beginningOfTomorrow(now);
+                defaultAlarmTime.set(Calendar.HOUR_OF_DAY, defaults.getHour());
+                defaultAlarmTime.set(Calendar.MINUTE, defaults.getMinute());
+
+                String targetTimeText = Localization.timeToString(defaults.getHour(), defaults.getMinute(), context);
+                String setText = res.getString(R.string.notification_check_text_set_at, targetTimeText);
+                Intent setIntent = new Intent(context, CheckAlarmTimeNotificationReceiver.class);
+                setIntent.setAction(CheckAlarmTimeNotificationReceiver.ACTION_CHECK_ALARM_TIME_SET_TO);
+                setIntent.putExtra(CheckAlarmTimeNotificationReceiver.EXTRA_NEW_ALARM_TIME, defaultAlarmTime.getTimeInMillis());
+                PendingIntent setPendingIntent = PendingIntent.getBroadcast(context, REQUEST_CODE, setIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                mBuilder.addAction(R.drawable.ic_alarm_on_white, setText, setPendingIntent);
+            }
+
+            String disableText = res.getString(R.string.action_disable);
+            Intent disableIntent = new Intent(context, CheckAlarmTimeNotificationReceiver.class);
+            disableIntent.setAction(CheckAlarmTimeNotificationReceiver.ACTION_CHECK_ALARM_TIME_DISABLE);
+            disableIntent.putExtra(CheckAlarmTimeNotificationReceiver.EXTRA_NEW_ALARM_TIME, day.getDate().getTimeInMillis());
+            PendingIntent setPendingIntent = PendingIntent.getBroadcast(context, REQUEST_CODE, disableIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            mBuilder.addAction(R.drawable.ic_alarm_on_white, disableText, setPendingIntent);
+        }
 
         NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
     }
 
-    public void hideNotification() {
-        Log.d(TAG, "hideNotification()");
+    private void hideNotificationOnly() {
+        Log.v(TAG, "hideNotificationOnly()");
         NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.cancel(NOTIFICATION_ID);
+    }
+
+    void hideNotification() {
+        Log.d(TAG, "Hide notification");
+        unregisterNotificationDismiss();
+        hideNotificationOnly();
     }
 
     /**
@@ -445,13 +621,12 @@ public class CheckAlarmTime {
      */
 
     public void onAlarmSet() {
-        Log.d(TAG, "onAlarmSet()");
+        Log.v(TAG, "onAlarmSet()");
 
         MorningInfo morningInfo = new MorningInfo(context);
 
         // If the alarm time was changed to a time long enough before the first meeting and notification exists, then hide the notification
         if (!morningInfo.attentionNeeded && isNotificationVisible()) {
-            unregisterNotificationDismiss(morningInfo.targetAlarmTime);
             hideNotification();
 
             // Modify and save analytics
@@ -506,7 +681,7 @@ class MorningInfo {
      * 3. Entry is not all-day
      */
     public void init() {
-        Log.d(TAG, "onCheckAlarmTime()");
+        Log.v(TAG, "init()");
 
         // Find first calendar event
         GlobalManager globalManager = GlobalManager.getInstance();
@@ -586,10 +761,11 @@ class MorningInfo {
         return "MorningInfo{" +
                 ", day=" + day +
                 ", checkAlarmTimeGap=" + checkAlarmTimeGap +
-                ", analytics=" + analytics +
-                ", event=" + event +
-                ", alarmTime=" + alarmTime +
-                ", targetAlarmTime=" + targetAlarmTime +
+//                ", analytics=" + analytics +
+//                ", event=" + event +
+                ", event begin=" + (event != null ? Analytics.calendarToDatetimeStringUTC(event.getBegin()) : "null") +
+                ", alarmTime=" + Analytics.calendarToDatetimeStringUTC(alarmTime) +
+                ", targetAlarmTime=" + (targetAlarmTime != null ? Analytics.calendarToDatetimeStringUTC(targetAlarmTime) : "null") +
                 ", attentionNeeded=" + attentionNeeded +
                 '}';
     }

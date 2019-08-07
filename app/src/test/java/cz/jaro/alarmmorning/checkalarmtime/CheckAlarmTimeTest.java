@@ -167,6 +167,37 @@ public class CheckAlarmTimeTest extends FixedTimeTest {
         assertNotificationCount(0);
     }
 
+    @Test
+    public void t200_onCalendarUpdated() {
+        // TODO Implement once Robolectric supports test for two notifications in one test
+        /*  Preconditions:
+                - Reset all app settings
+                - Set default for tomorrow at 7:10
+            Steps:
+                Action: Add a calendar event at 9:00
+                    Check: Notification is not displayed
+                Action: Add a calendar event at 8:00
+                    Check: Notification is displayed (updated), with first appointment at 8:00, action button "Set to 7:00" and "Set to..."
+                Action: Add a calendar event at 7:00
+                    Check: Notification is displayed (updated), with first appointment at 7:00, action button "Set to 6:00" and "Set to..."
+                Action: Delete the calendar event at 7:00
+                    Check: Notification is displayed, with first appointment at 8:00, action button "Set to 7:00" and "Set to...", with warning about the deleted event
+                Action: Touch "Set to 7:00" action button in the notification
+                    Check: Notification is hidden
+                    Check: Alarm is set at 7:00
+                Action: Delete the calendar event at 8:00
+                    Check: Notification is displayed, with first appointment at 9:00, action button "Set to 8:00" and "Set to...", with warning about the deleted event
+                Action: Touch "Set to 8:00" action button in the notification
+                    Check: Notification is hidden
+                    Check: Alarm is set at 8:00
+                Action: Delete the calendar event at 9:00
+                    Check: Notification is displayed, with no morning appointment, action button "Set to 7:10" and "Disable", with warning about the deleted event
+                Action: Touch "Disable" action button in the notification
+                    Check: Notification is hidden
+                    Check: Alarm is disabled
+         */
+    }
+
     private void doCheckInTheEvening(MorningInfo morningInfo) {
         // Shift clock
         shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, 22, MINUTE_DEFAULT)));
@@ -175,7 +206,7 @@ public class CheckAlarmTimeTest extends FixedTimeTest {
         morningInfo.init();
 
         // Trigger the check
-        checkAlarmTime.onCheckAlarmTime(morningInfo);
+        checkAlarmTime.doCheckAlarmTime(morningInfo);
     }
 
     private void setAlarm(Calendar cal) {

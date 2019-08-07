@@ -113,6 +113,8 @@
     <string name="notification_check_title_currently_unset">Budík je nyní vypnutý</string>
     <string name="notification_check_text_with_location">První schůzka: <xliff:g example="07:00" id="time">%1$s</xliff:g> <xliff:g example="Dentist" id="title">%2$s</xliff:g> (<xliff:g example="Main St" id="location">%3$s</xliff:g>)</string>
     <string name="notification_check_text_without_location">První schůzka: <xliff:g example="07:00" id="time">%1$s</xliff:g> <xliff:g example="Dentist" id="title">%2$s</xliff:g></string>
+    <string name="notification_check_text_event_deleted">Schůzka podle které jste nastavili budík byla smazána. Zkontrolujte čas budíku.</string>
+    <string name="notification_check_no_event">Dopoledne nemáte žádnou schůzku.</string>
     <string name="notification_check_text_set_at">Nastavit na <xliff:g example="07:00" id="time">%1$s</xliff:g></string>
     <string name="notification_check_text_set_dialog">Nastavit…</string>
 

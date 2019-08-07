@@ -13,6 +13,7 @@ import java.util.Calendar;
 import cz.jaro.alarmmorning.Analytics;
 import cz.jaro.alarmmorning.CalendarFragment;
 import cz.jaro.alarmmorning.GlobalManager;
+import cz.jaro.alarmmorning.SharedPreferencessHelper;
 import cz.jaro.alarmmorning.calendar.CalendarUtils;
 import cz.jaro.alarmmorning.graphics.TimePickerDialogWithDisable;
 import cz.jaro.alarmmorning.model.Day;
@@ -84,6 +85,8 @@ public class SetTimeActivity extends AppCompatActivity implements TimePickerDial
 
                 updateDay(this, disable, saveAlarmTime, analytics);
             }
+
+            SharedPreferencessHelper.save(CheckAlarmTime.PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION, CheckAlarmTime.PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION__SET_TO_CUSTOM);
 
             finish();
         }
