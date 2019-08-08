@@ -29,7 +29,6 @@ import cz.jaro.alarmmorning.SystemNotification;
 import cz.jaro.alarmmorning.calendar.CalendarEvent;
 import cz.jaro.alarmmorning.calendar.CalendarEventFilter;
 import cz.jaro.alarmmorning.calendar.CalendarHelper;
-import cz.jaro.alarmmorning.calendar.CalendarUtils;
 import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.graphics.TimePreference;
 import cz.jaro.alarmmorning.model.Day;
@@ -38,8 +37,9 @@ import cz.jaro.alarmmorning.model.Defaults;
 import static cz.jaro.alarmmorning.Analytics.CHECK_ALARM_TIME_ACTION__DON_T_SHOW_NOTIFICATION;
 import static cz.jaro.alarmmorning.Analytics.CHECK_ALARM_TIME_ACTION__NO_APPOINTMENT;
 import static cz.jaro.alarmmorning.Analytics.CHECK_ALARM_TIME_ACTION__SHOW_NOTIFICATION;
+import static cz.jaro.alarmmorning.calendar.CalendarUtils.beginningOfToday;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.beginningOfTomorrow;
-import static cz.jaro.alarmmorning.calendar.CalendarUtils.justBeforeNoonTomorrow;
+import static cz.jaro.alarmmorning.calendar.CalendarUtils.justBeforeNoonToday;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.onTheSameDate;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.roundDown;
 
@@ -362,7 +362,7 @@ public class CheckAlarmTime {
                     showNotification(morningInfo.day, morningInfo.targetAlarmTime, morningInfo.event, true);
                     registerNotificationDismiss(morningInfo.alarmTime);
 
-                    Calendar newNotificationEventBegin = morningInfo.event != null ? morningInfo.event.getBegin() : justBeforeNoonTomorrow(calcMorningDate());
+                    Calendar newNotificationEventBegin = morningInfo.event != null ? morningInfo.event.getBegin() : justBeforeNoonToday(calcMorningDate()); // Note: relative to morning
 
                     SharedPreferencessHelper.save(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_EVENT_BEGIN, Analytics.calendarToDatetimeStringUTC(newNotificationEventBegin));
                     SharedPreferencessHelper.save(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION, PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION__NOTIFICATION_DISPLAYED);
@@ -380,34 +380,26 @@ public class CheckAlarmTime {
     }
 
     /**
-     * Checks that the current time is after the check alarm time and before the alarm time tomorrow.
+     * Checks that the current time is after the check alarm time and before the following noon.
      *
-     * @return True iff the current time is after the check alarm time and before the alarm time tomorrow. If the alarm is disabled tomorrow, then return true.
+     * @return True iff the current time is after the check alarm time and before the following noon.
      */
     private boolean isBetweenCheckAlarmTimeAndAlarmTime() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        String checkAlarmTimeAtPreference = preferences.getString(SettingsActivity.PREF_CHECK_ALARM_TIME_AT, SettingsActivity.PREF_CHECK_ALARM_TIME_AT_DEFAULT);
-
-        GlobalManager globalManager = GlobalManager.getInstance();
-        Clock clock = globalManager.clock();
-        Calendar now = clock.now();
-
-        Calendar checkAlarmTimeAtLast = calcLastOccurence(checkAlarmTimeAtPreference);
-        Calendar checkAlarmTimeAtToday = calcTodaysOccurence(checkAlarmTimeAtPreference);
-
-        Calendar date = now.before(checkAlarmTimeAtToday) ? CalendarUtils.beginningOfToday(now) : CalendarUtils.beginningOfTomorrow(now);
-        Day day = globalManager.loadDay(date);
-
-        Log.v(TAG, !day.isEnabled() ? "Alarm is disabled on " + day.getDate().getTime() : "Now " + now.getTime() + " is in period between " + checkAlarmTimeAtLast.getTime() + " and " + day.getDateTime().getTime());
-        boolean res = !day.isEnabled() || (now.after(checkAlarmTimeAtLast) && now.before(day.getDateTime()));
-        Log.d(TAG, "isBetweenCheckAlarmTimeAndAlarmTime() returns " + res);
-        return res;
+        return calcMorningDate() != null;
     }
 
     /**
      * @return The date on which the alarm should be compared to the earliest event. (Note: the actual check is usually done in the evening of previous day.)
      */
     private Calendar calcMorningDate() {
+        return calcMorningDate(context);
+    }
+
+    /**
+     * @return The date on which the alarm should be compared to the earliest event. (Note: the actual check is usually done in the evening of previous day.)
+     */
+    static public Calendar calcMorningDate(Context context) {
+        Log.v(TAG, "calcMorningDate()");
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         String checkAlarmTimeAtPreference = preferences.getString(SettingsActivity.PREF_CHECK_ALARM_TIME_AT, SettingsActivity.PREF_CHECK_ALARM_TIME_AT_DEFAULT);
 
@@ -417,8 +409,23 @@ public class CheckAlarmTime {
 
         Calendar checkAlarmTimeAtToday = calcTodaysOccurence(checkAlarmTimeAtPreference);
 
-        Calendar date = now.before(checkAlarmTimeAtToday) ? CalendarUtils.beginningOfToday(now) : CalendarUtils.beginningOfTomorrow(now);
-        return date;
+        Log.d(TAG, "checkAlarmTimeAtToday=" + checkAlarmTimeAtToday.getTime());
+
+        if (!now.before(checkAlarmTimeAtToday)) {
+            Calendar beginningOfTomorrow = beginningOfTomorrow(now);
+            Log.d(TAG, "calcMorningDate returns " + beginningOfTomorrow.getTime());
+            return beginningOfTomorrow;
+        }
+
+        Calendar todayNoon = justBeforeNoonToday(now);
+        if (now.before(todayNoon)) {
+            Calendar beginningOfToday = beginningOfToday(now);
+            Log.d(TAG, "calcMorningDate returns " + beginningOfToday.getTime());
+            return beginningOfToday;
+        }
+
+        Log.d(TAG, "calcMorningDate returns null");
+        return null;
     }
 
     private boolean isNotificationVisible() {
@@ -683,19 +690,21 @@ class MorningInfo {
     public void init() {
         Log.v(TAG, "init()");
 
+        // Note: This is usually executed in the evening (during the regular check). But it is also executed in the morning of the day on wh:
+        // 1. The user enables the check (in the Settings) between modnight nad noon
+        // 2. There is an update of calendar events
+
         // Find first calendar event
         GlobalManager globalManager = GlobalManager.getInstance();
-        Clock clock = globalManager.clock();
-        Calendar now = clock.now();
 
-        Calendar tomorrowStart = beginningOfTomorrow(now);
-        Log.v(TAG, "tomorrowStart=" + tomorrowStart.getTime());
+        Calendar morningStart = CheckAlarmTime.calcMorningDate(context);
+        Log.v(TAG, "morningStart=" + morningStart.getTime());
 
-        Calendar tomorrowNoon = justBeforeNoonTomorrow(now);
-        Log.v(TAG, "tomorrowNoon=" + tomorrowNoon.getTime());
+        Calendar morningNoon = justBeforeNoonToday(morningStart); // Note: relative to morningStart
+        Log.v(TAG, "morningNoon=" + morningNoon.getTime());
 
         // Load tomorrow's alarm time
-        day = globalManager.loadDay(tomorrowStart);
+        day = globalManager.loadDay(morningStart);
         alarmTime = day.getDateTime();
         Log.v(TAG, "alarmTime=" + alarmTime.getTime() + ", enabled=" + day.isEnabled());
 
@@ -709,16 +718,16 @@ class MorningInfo {
         analytics.set(Analytics.Param.Check_alarm_time_gap, checkAlarmTimeGap);
         // TODO Analytics - add device location
 
-        event = getEarliestEvent(tomorrowStart, tomorrowNoon);
+        event = getEarliestEvent(morningStart, morningNoon);
 
         if (event != null) {
             targetAlarmTime = (Calendar) event.getBegin().clone();
             targetAlarmTime.add(Calendar.MINUTE, -checkAlarmTimeGap);
             Log.v(TAG, "targetAlarmTime=" + targetAlarmTime.getTime());
 
-            // TODO Currently, the alarm time must be on the same date. Support alarm on the previous day.
-            if (targetAlarmTime.before(tomorrowStart)) {
-                targetAlarmTime = tomorrowStart;
+            // TODO The alarm time must be on the same date. If it's before that then shift the alarm time to midnight. Task: Support alarm on the previous day.
+            if (targetAlarmTime.before(morningStart)) {
+                targetAlarmTime = morningStart;
                 Log.v(TAG, "adjusted targetAlarmTime to " + targetAlarmTime.getTime());
             }
 

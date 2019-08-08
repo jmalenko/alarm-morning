@@ -398,11 +398,11 @@ public class AlarmMorningAppTest extends FixedTimeTest {
         assertThat("Notification count", shadowNotificationManager.size(), is(count));
     }
 
-    public static void assertNotification(Notification notification, String bigContentTitle, String bigContentText) {
+    public static void assertNotification(Notification notification, String contentTitle, String contentText) {
         ShadowNotification shadowNotification = Shadows.shadowOf(notification);
 
-        assertThat("Notification title", shadowNotification.getBigContentTitle(), is(bigContentTitle));
-        assertThat("Notification text", shadowNotification.getBigContentText(), is(bigContentText));
+        assertThat("Notification title", shadowNotification.getContentTitle(), is(contentTitle));
+        assertThat("Notification text", shadowNotification.getContentText(), is(contentText));
     }
 
     public static void assertNotificationActionCount(Notification notification, int count) {

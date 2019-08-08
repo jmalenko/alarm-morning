@@ -156,8 +156,10 @@ public abstract class FixedTimeTest {
         dyingViews.clear();
     }
 
-    private Clock clock() {
-        // Time at which the test is executed
+    /**
+     * @return Time at which the test is executed
+     */
+    public Clock clock() {
         return new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, DayTest.HOUR, DayTest.MINUTE));
     }
 }

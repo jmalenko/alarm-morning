@@ -20,6 +20,7 @@ import java.util.GregorianCalendar;
 import cz.jaro.alarmmorning.FixedTimeTest;
 import cz.jaro.alarmmorning.app.CalendarWithDayAlarmTest;
 import cz.jaro.alarmmorning.calendar.CalendarEvent;
+import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.clock.FixedClock;
 
 import static cz.jaro.alarmmorning.app.AlarmMorningAppTest.assertNotification;
@@ -167,9 +168,9 @@ public class CheckAlarmTimeTest extends FixedTimeTest {
         assertNotificationCount(0);
     }
 
-    @Test
-    public void t200_onCalendarUpdated() {
-        // TODO Implement once Robolectric supports test for two notifications in one test
+//    @Test
+//    public void t200_onCalendarUpdated() {
+    // TODO Implement once Robolectric supports test for two notifications in one test
         /*  Preconditions:
                 - Reset all app settings
                 - Set default for tomorrow at 7:10
@@ -196,7 +197,7 @@ public class CheckAlarmTimeTest extends FixedTimeTest {
                     Check: Notification is hidden
                     Check: Alarm is disabled
          */
-    }
+//    }
 
     private void doCheckInTheEvening(MorningInfo morningInfo) {
         // Shift clock
@@ -221,4 +222,10 @@ public class CheckAlarmTimeTest extends FixedTimeTest {
         CalendarWithDayAlarmTest.assertNotificationAction(context, notification, index, title, actionString, CheckAlarmTimeNotificationReceiver.class);
     }
 
+    @Override
+    public Clock clock() {
+        return new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, 22, 0));
+        // Note: it's worth running the test with the following
+//        return new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY + 1, 1, 0));
+    }
 }

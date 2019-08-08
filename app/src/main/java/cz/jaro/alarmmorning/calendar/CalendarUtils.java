@@ -327,7 +327,7 @@ public class CalendarUtils {
     }
 
     /**
-     * Returns new {@link Calendar} object with date and time that is the last millisecond before the noon on the day with <code>now</code>.
+     * Returns new {@link Calendar} object with date and time that is the last millisecond before the noon on tomorrow.
      *
      * @param now Date.
      * @return Date and time of the the last millisecond before noon on the day with <code>now</code>.
@@ -339,6 +339,21 @@ public class CalendarUtils {
         addMilliSeconds(justBeforeNoonTomorrow, -1);
 
         return justBeforeNoonTomorrow;
+    }
+
+    /**
+     * Returns new {@link Calendar} object with date and time that is the last millisecond before the noon today.
+     *
+     * @param now Date.
+     * @return Date and time of the the last millisecond before noon on the day with <code>now</code>.
+     */
+    public static Calendar justBeforeNoonToday(Calendar now) {
+        Calendar justBeforeNoonToday = beginningOfToday(now);
+
+        justBeforeNoonToday.set(Calendar.HOUR_OF_DAY, 12);
+        addMilliSeconds(justBeforeNoonToday, -1);
+
+        return justBeforeNoonToday;
     }
 
     /**
