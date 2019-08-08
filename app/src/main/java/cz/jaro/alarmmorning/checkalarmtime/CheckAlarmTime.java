@@ -625,21 +625,23 @@ public class CheckAlarmTime {
     public void onAlarmSet() {
         Log.v(TAG, "onAlarmSet()");
 
-        MorningInfo morningInfo = new MorningInfo(context);
+        if (isBetweenCheckAlarmTimeAndAlarmTime()) {
+            MorningInfo morningInfo = new MorningInfo(context);
 
-        // If the alarm time was changed to a time long enough before the first meeting and notification exists, then hide the notification
-        if (!morningInfo.attentionNeeded && isNotificationVisible()) {
-            hideNotification();
+            // If the alarm time was changed to a time long enough before the first meeting and notification exists, then hide the notification
+            if (!morningInfo.attentionNeeded && isNotificationVisible()) {
+                hideNotification();
 
-            // Modify and save analytics
-            Analytics analytics = new Analytics(context, Analytics.Event.Hide, Analytics.Channel.External, Analytics.ChannelName.Check_alarm_time);
-            analytics.set(Analytics.Param.Check_alarm_time_action, CHECK_ALARM_TIME_ACTION__DON_T_SHOW_NOTIFICATION);
-            analytics.setDay(morningInfo.day);
-            analytics.set(Analytics.Param.Check_alarm_time_gap, morningInfo.checkAlarmTimeGap);
-            analytics.set(Analytics.Param.Appointment_begin, morningInfo.event != null ? Analytics.calendarToTime(morningInfo.event.getBegin()) : "No event");
-            analytics.set(Analytics.Param.Appointment_title, morningInfo.event != null ? morningInfo.event.getTitle() : "");
-            analytics.set(Analytics.Param.Appointment_location, morningInfo.event != null ? morningInfo.event.getLocation() : "");
-            analytics.save();
+                // Modify and save analytics
+                Analytics analytics = new Analytics(context, Analytics.Event.Hide, Analytics.Channel.External, Analytics.ChannelName.Check_alarm_time);
+                analytics.set(Analytics.Param.Check_alarm_time_action, CHECK_ALARM_TIME_ACTION__DON_T_SHOW_NOTIFICATION);
+                analytics.setDay(morningInfo.day);
+                analytics.set(Analytics.Param.Check_alarm_time_gap, morningInfo.checkAlarmTimeGap);
+                analytics.set(Analytics.Param.Appointment_begin, morningInfo.event != null ? Analytics.calendarToTime(morningInfo.event.getBegin()) : "No event");
+                analytics.set(Analytics.Param.Appointment_title, morningInfo.event != null ? morningInfo.event.getTitle() : "");
+                analytics.set(Analytics.Param.Appointment_location, morningInfo.event != null ? morningInfo.event.getLocation() : "");
+                analytics.save();
+            }
         }
     }
 
