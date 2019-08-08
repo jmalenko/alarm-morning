@@ -118,11 +118,6 @@ public class NighttimeBell {
         }
     }
 
-    public void reregister(String stringValue) {
-        unregister();
-        register(stringValue);
-    }
-
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
 

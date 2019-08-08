@@ -392,18 +392,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 preference.setSummary(stringValue);
             }
 
-            // Reset alarms
-
-            if (key.equals(PREF_CHECK_ALARM_TIME_AT)) {
-                Context context = preference.getContext();
-                CheckAlarmTime checkAlarmTime = CheckAlarmTime.getInstance(context);
-                checkAlarmTime.reregister(stringValue);
-            } else if (key.equals(PREF_NIGHTTIME_BELL_AT)) {
-                Context context = preference.getContext();
-                NighttimeBell nighttimeBell = NighttimeBell.getInstance(context);
-                nighttimeBell.reregister(stringValue);
-            }
-
             return true;
         }
     };

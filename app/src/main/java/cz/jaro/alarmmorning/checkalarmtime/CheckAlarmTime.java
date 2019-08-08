@@ -185,11 +185,6 @@ public class CheckAlarmTime {
         SharedPreferencessHelper.remove(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION);
     }
 
-    public void reregister(String stringValue) {
-        unregister();
-        register(stringValue);
-    }
-
     private void registerNotificationDismiss(Calendar time) {
         Log.v(TAG, "registerNotificationDismiss()");
 
