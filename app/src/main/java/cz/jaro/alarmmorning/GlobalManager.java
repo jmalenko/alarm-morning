@@ -833,6 +833,11 @@ public class GlobalManager {
         Log.i(TAG, "Save one-time alarm at " + oneTimeAlarm.getDateTime().getTime().toString());
 
         dataSource.saveOneTimeAlarm(oneTimeAlarm);
+
+        // Delete old one-time alarms
+        Calendar to = clock().now();
+        CalendarUtils.addDays(to, -7);
+        dataSource.deleteOneTimeAlarmsOlderThan(to);
     }
 
     private void remove(OneTimeAlarm oneTimeAlarm, Analytics analytics) {
@@ -844,7 +849,7 @@ public class GlobalManager {
 
         Log.i(TAG, "Delete one-time alarm at " + oneTimeAlarm.getDateTime());
 
-        dataSource.removeOneTimeAlarm(oneTimeAlarm);
+        dataSource.deleteOneTimeAlarm(oneTimeAlarm);
     }
 
     /*

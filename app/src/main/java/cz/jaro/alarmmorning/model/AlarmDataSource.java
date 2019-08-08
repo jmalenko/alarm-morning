@@ -184,8 +184,6 @@ public class AlarmDataSource {
         return oneTimeAlarm;
     }
 
-    // TODO Remove one-time alarms older than today (if we keep the passed alarms in calendar, or now) (but not the currently ringing one).
-
     /**
      * Retrieve a set of {@code OneTimeAlarm}s objects from the database.
      *
@@ -201,10 +199,7 @@ public class AlarmDataSource {
             selection = null;
             selectionArgs = null;
         } else {
-            TimeZone utcTZ = TimeZone.getTimeZone(OneTimeAlarm.UTC);
-            Calendar fromUTC = Calendar.getInstance(utcTZ);
-            CalendarUtils.copyAllFields(from, fromUTC);
-            long fromMS = fromUTC.getTimeInMillis();
+            long fromMS = calendarToMilliseconds(from);
 
             selection = "? <= " + AlarmDbHelper.COLUMN_ONETIMEALARM_ALARM_TIME;
             selectionArgs = new String[]{String.valueOf(fromMS)};
@@ -256,8 +251,39 @@ public class AlarmDataSource {
      *
      * @param oneTimeAlarm object to be deleted.
      */
-    public void removeOneTimeAlarm(OneTimeAlarm oneTimeAlarm) {
+    public void deleteOneTimeAlarm(OneTimeAlarm oneTimeAlarm) {
         database.delete(AlarmDbHelper.TABLE_ONETIMEALARM, AlarmDbHelper.COLUMN_ONETIMEALARM_ID + " = ?", new String[]{String.valueOf(oneTimeAlarm.getId())});
+    }
+
+    /**
+     * Remove one-time alarms with alarm times before or equal to {@code to}.
+     *
+     * @param to The one-time alarms with alarm times before or equal this argument will be removed.
+     * @return The number of affected rows
+     */
+    public int deleteOneTimeAlarmsOlderThan(Calendar to) {
+        String selection;
+        String[] selectionArgs;
+        if (to == null) {
+            selection = null;
+            selectionArgs = null;
+        } else {
+            long toMS = calendarToMilliseconds(to);
+
+            selection = AlarmDbHelper.COLUMN_ONETIMEALARM_ALARM_TIME + " <= ?";
+            selectionArgs = new String[]{String.valueOf(toMS)};
+        }
+
+        int affectedRows = database.delete(AlarmDbHelper.TABLE_ONETIMEALARM, selection, selectionArgs);
+
+        return affectedRows;
+    }
+
+    static private long calendarToMilliseconds(Calendar calendar) {
+        TimeZone utcTZ = TimeZone.getTimeZone(OneTimeAlarm.UTC);
+        Calendar toUTC = Calendar.getInstance(utcTZ);
+        CalendarUtils.copyAllFields(calendar, toUTC);
+        return toUTC.getTimeInMillis();
     }
 
     private String dateToText(Calendar date) {
