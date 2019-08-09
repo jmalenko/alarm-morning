@@ -64,7 +64,6 @@
   <string name="notification_text_future">Atinge pentru a vizualiza toate alarmele</string>
   <string name="notification_text_ringing">Sună</string>
   <string name="notification_text_snoozed">Amânare până <xliff:g example="07:00" id="time">%1$s</xliff:g></string>
-  <string name="notification_title_long">Alarmă la<xliff:g example="07:00" id="time">%1$s</xliff:g> pe<xliff:g example="23/12" id="date">%2$s</xliff:g></string>
   <string name="notification_text_cancelled">Alarmă anulată</string>
   <string name="notification_text_skipped">Au fost <xliff:g example="3" id="skippedAlarmsCount">%1$d</xliff:g> alarme sărite în timp ce aparatul a fost oprit</string>
   <!-- Widget -->

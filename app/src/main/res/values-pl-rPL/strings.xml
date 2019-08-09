@@ -61,7 +61,6 @@
   <string name="notification_text_future">Dotknij, aby zobaczyć wszystkie alarmy</string>
   <string name="notification_text_ringing">Dzwoni</string>
   <string name="notification_text_snoozed">Drzemka do <xliff:g example="07:00" id="time">%1$s</xliff:g></string>
-  <string name="notification_title_long">Alarm o <xliff:g example="07:00" id="time">%1$s</xliff:g> w <xliff:g example="23/12" id="date">%2$s</xliff:g></string>
   <string name="notification_text_cancelled">Alarm odwołany</string>
   <string name="notification_text_skipped">Podczas gdy urządzenie było wyłączone, pominięto <xliff:g example="3" id="skippedAlarmsCount">%1$d</xliff:g> alarmy</string>
   <!-- Widget -->

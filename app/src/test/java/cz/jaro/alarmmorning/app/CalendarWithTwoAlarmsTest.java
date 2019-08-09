@@ -727,10 +727,9 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
         // Check notification
         assertNotificationCount(2);
 
-        // TODO Cannot check two notifications in one test
-//        Notification notification2 = shadowNotificationManager.getAllNotifications().get(0);
-//        assertNotification(notification2, "Alarm at 4:31 AM", "Cancelled");
-//        assertNotificationActionCount(notification2, 0);
+        Notification notification2 = shadowNotificationManager.getAllNotifications().get(1);
+        assertNotification(notification2, "Alarm at 4:31 AM", "Alarm cancelled");
+        assertNotificationActionCount(notification2, 0);
 
         Notification notification3 = shadowNotificationManager.getAllNotifications().get(0);
         assertNotification(notification3, "Alarm at 4:32 AM", "Ringing");
@@ -768,10 +767,9 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
         // Check notification
         assertNotificationCount(1);
 
-        // TODO Cannot check two notifications in one test
-//        Notification notification2 = shadowNotificationManager.getAllNotifications().get(0);
-//        assertNotification(notification2, "Alarm at 4:31 AM", "Cancelled");
-//        assertNotificationActionCount(notification2, 0);
+        Notification notification4 = shadowNotificationManager.getAllNotifications().get(0);
+        assertNotification(notification4, "Alarm at 4:31 AM", "Alarm cancelled");
+        assertNotificationActionCount(notification4, 0);
 
         // Check widget
         assertWidget(R.drawable.ic_alarm_off_white, "No alarm", null);
@@ -845,16 +843,15 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
         // Check notification
         assertNotificationCount(2);
 
+        Notification notification2 = shadowNotificationManager.getAllNotifications().get(1);
+        assertNotification(notification2, "Alarm at 4:30 AM – Two", "Alarm cancelled");
+        assertNotificationActionCount(notification2, 0);
+
         Notification notification = shadowNotificationManager.getAllNotifications().get(0);
         assertNotification(notification, "Alarm at 4:30 AM – One", "Ringing");
         assertNotificationActionCount(notification, 2);
         assertNotificationAction(notification, 0, "Dismiss", NotificationReceiver.ACTION_DISMISS);
         assertNotificationAction(notification, 1, "Snooze", NotificationReceiver.ACTION_SNOOZE);
-
-        // TODO Cannot check two notifications in one test
-//        Notification notification2 = shadowNotificationManager.getAllNotifications().get(0);
-//        assertNotification(notification2, "Alarm at 4:30 AM Two", "Cancelled");
-//        assertNotificationActionCount(notification2, 0);
 
         // Check widget
         assertWidget(R.drawable.ic_alarm_white, "4:30 AM", null);
@@ -885,10 +882,9 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
         // Check notification
         assertNotificationCount(1);
 
-        // TODO Cannot check two notifications in one test
-//        Notification notification2 = shadowNotificationManager.getAllNotifications().get(0);
-//        assertNotification(notification2, "Alarm at 4:30 AM Two", "Cancelled");
-//        assertNotificationActionCount(notification2, 0);
+        Notification notification3 = shadowNotificationManager.getAllNotifications().get(0);
+        assertNotification(notification3, "Alarm at 4:30 AM – Two", "Alarm cancelled");
+        assertNotificationActionCount(notification3, 0);
 
         // Check widget
         assertWidget(R.drawable.ic_alarm_off_white, "No alarm", null);

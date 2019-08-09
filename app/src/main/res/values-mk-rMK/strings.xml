@@ -65,7 +65,6 @@
   <string name="notification_text_future">Допрете за да ги видите сите аларми</string>
   <string name="notification_text_ringing">Звони</string>
   <string name="notification_text_snoozed">Откажен до <xliff:g example="07:00" id="time">%1$s</xliff:g></string>
-  <string name="notification_title_long">Аларм на <xliff:g example="07:00" id="time">%1$s</xliff:g> на <xliff:g example="23/12" id="date">%2$s</xliff:g></string>
   <string name="notification_text_cancelled">Аларм откажен</string>
   <string name="notification_text_skipped">Имаше <xliff:g example="3" id="skippedAlarmsCount">%1$d</xliff:g> прескокани аларми додека уредот беше исклучен</string>
   <!-- Widget -->

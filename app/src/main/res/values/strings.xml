@@ -98,7 +98,6 @@
     <string name="notification_text_ringing">Ringing</string>
     <string name="notification_text_snoozed">Snoozed until <xliff:g example="07:00" id="time">%1$s</xliff:g></string>
 
-    <string name="notification_title_long">Alarm at <xliff:g example="07:00" id="time">%1$s</xliff:g> on <xliff:g example="23/12" id="date">%2$s</xliff:g></string>
     <string name="notification_text_cancelled">Alarm cancelled</string>
 
     <string name="notification_text_skipped">There were <xliff:g example="3" id="skippedAlarmsCount">%1$d</xliff:g> skipped alarms while the device was off</string>

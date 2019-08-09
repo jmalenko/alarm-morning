@@ -333,14 +333,9 @@ public class SystemNotification {
     public void notifyCancelledAlarm(AppAlarm appAlarm) {
         Log.d(TAG, "notifyCancelledAlarm(appAlarm=" + appAlarm + ")");
 
-        NotificationCompat.Builder mBuilder = buildNotification(appAlarm);
+        NotificationCompat.Builder mBuilder = buildNotification(appAlarm); // TODO The title shows just the time. Task: On mignight, after the notification was displayed, update the notification such that the title includes both time and date
 
         Resources res = context.getResources();
-        String timeText = Localization.timeToString(appAlarm.getDateTime().get(Calendar.HOUR_OF_DAY), appAlarm.getDateTime().get(Calendar.MINUTE), context);
-        String dateText = Localization.dateToStringVeryShort(res, appAlarm.getDateTime().getTime());
-        String contentTitle = res.getString(R.string.notification_title_long, timeText, dateText);
-        mBuilder.setContentTitle(contentTitle);
-
         String contentText = res.getString(R.string.notification_text_cancelled);
         mBuilder.setContentText(contentText);
 

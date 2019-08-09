@@ -65,7 +65,6 @@
   <string name="notification_text_future">Toque para exibir todos os alarmes</string>
   <string name="notification_text_ringing">Tocando</string>
   <string name="notification_text_snoozed">Dormiu até<xliff:g example="07:00" id="time">%1$s</xliff:g></string>
-  <string name="notification_title_long">Alarme no<xliff:g example="07:00" id="time">%1$s</xliff:g> na <xliff:g example="23/12" id="date">%2$s</xliff:g></string>
   <string name="notification_text_cancelled">Alarme cancelado</string>
   <string name="notification_text_skipped">Não houve alarmes <xliff:g example="3" id="skippedAlarmsCount">%1$d </xliff:g> ignorada enquanto o dispositivo foi desligado</string>
   <!-- Widget -->

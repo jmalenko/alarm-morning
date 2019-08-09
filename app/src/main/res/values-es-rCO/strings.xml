@@ -64,7 +64,6 @@
   <string name="notification_text_future">Toca para ver todas las alarmas</string>
   <string name="notification_text_ringing">Repicando</string>
   <string name="notification_text_snoozed">Posponer hasta <xliff:g ejemplo="07:00" id="time">%1$s</xliff:g></string>
-  <string name="notification_title_long">Alarma a <xliff:g ejemplo="07:00" id="time">%1$s</xliff:g> en <xliff:g ejemplo="23/12" id="fecha">%2$s</xliff:g></string>
   <string name="notification_text_cancelled">Alarma cancelada</string>
   <string name="notification_text_skipped">Había <xliff:g ejemplo="3" id="skippedAlarmsCount">%1$d</xliff:g> alarmas perdidas mientras el dispositivo estaba apagado</string>
   <!-- Widget -->

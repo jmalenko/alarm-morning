@@ -65,7 +65,6 @@
   <string name="notification_text_future">Tik om alle alarmen te bekijken</string>
   <string name="notification_text_ringing">Bellen</string>
   <string name="notification_text_snoozed">Snooze tot <xliff:g example="07:00" id="time">%1$s</xliff:g></string>
-  <string name="notification_title_long">Alarm om <xliff:g example="07:00" id="time">%1$s</xliff:g> op <xliff:g example="23/12" id="date">%2$s</xliff:g></string>
   <string name="notification_text_cancelled">Alarm geannuleerd</string>
   <string name="notification_text_skipped">Er waren <xliff:g example="3" id="skippedAlarmsCount">%1$d </xliff:g> gemiste alarmen, terwijl het apparaat uitgeschakeld was</string>
   <!-- Widget -->

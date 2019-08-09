@@ -407,7 +407,7 @@ public class AlarmMorningAppTest extends FixedTimeTest {
 
     public static void assertNotificationActionCount(Notification notification, int count) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            assertThat("Notification action count", notification.actions.length, is(count));
+            assertThat("Notification action count", notification.actions != null ? notification.actions.length : 0, is(count));
         }
     }
 
