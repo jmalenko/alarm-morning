@@ -244,6 +244,7 @@ public class RingActivity extends Activity implements RingInterface {
                 snoozeTimeTextView.setVisibility(View.INVISIBLE);
             }
         });
+        snoozeButton.setOnClickListener(this::onSnooze);
 
         startAll();
     }
