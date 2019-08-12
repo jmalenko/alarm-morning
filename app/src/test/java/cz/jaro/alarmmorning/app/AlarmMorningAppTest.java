@@ -17,6 +17,7 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -71,6 +72,7 @@ import cz.jaro.alarmmorning.wizard.Wizard;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.robolectric.Robolectric.buildActivity;
 
 /**
@@ -244,12 +246,14 @@ public class AlarmMorningAppTest extends FixedTimeTest {
     }
 
     public static void clickContextMenu(RecyclerView recyclerView, int id) {
-        // TODO Check that the context menu contains this id and that this id is is visible (not yet easily supported by Roboletric)
+        final MenuItem contextMenuItem = new RoboMenuItem(id);
+
+        // Check that the context menu contains this id and that this id is visible
+        assertTrue("MenuItem visible", contextMenuItem.isVisible());
 
         // Select the context menu item
         ShadowViewGroup shadowViewGroup = Shadows.shadowOf(recyclerView);
         android.app.Fragment calendarFragment = (CalendarFragment) shadowViewGroup.getOnCreateContextMenuListener();
-        final RoboMenuItem contextMenuItem = new RoboMenuItem(id);
         calendarFragment.onContextItemSelected(contextMenuItem);
     }
 
