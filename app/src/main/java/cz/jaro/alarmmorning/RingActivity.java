@@ -178,35 +178,7 @@ public class RingActivity extends Activity implements RingInterface {
         }
         appAlarm = globalManager.load(alarmType, alarmId);
 
-        if (appAlarm == null) {
-            // TODO This should not happen, but it does sometimes (see crash reporting). Therefore we log everything. Possible explanation is that the users
-            // Activity manually started without specifying the extra.
-            StringBuilder str = new StringBuilder();
-            str.append("Stack trace:\n");
-            str.append(Log.getStackTraceString(new IllegalStateException("Alarm time should not be null")));
-            str.append("\n");
-            str.append("Debug info:\n");
-            str.append("savedInstanceState is" + (savedInstanceState == null ? "" : " not") + " null");
-            str.append("\n");
-            str.append("\n");
-            str.append("Analytics:\n");
-            str.append(this.toString());
-            str.append("\n");
-            str.append("\n");
-            str.append("Analytics with configuration info\n");
-            Analytics analytics = new Analytics(this, Analytics.Event.Ring, Analytics.Channel.External, Analytics.ChannelName.Ring);
-            analytics.setConfigurationInfo();
-            str.append(analytics.toString());
-            str.append("\n");
-            str.append("\n");
-            str.append("Database dump:\n");
-            str.append(globalManager.dumpDB());
-
-            Crashlytics.log(str.toString());
-            throw new NullPointerException("Cannot get the alarm object");
-        }
-
-        SlideButton dismissButton = (SlideButton) findViewById(R.id.dismissButton);
+        SlideButton dismissButton = findViewById(R.id.dismissButton);
         dismissButton.setOnClickListener(this::onDismiss);
 
         snoozeTimeTextView = findViewById(R.id.snoozeTimeTextView);

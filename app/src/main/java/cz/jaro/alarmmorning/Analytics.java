@@ -324,29 +324,6 @@ public class Analytics {
     }
 
     public Analytics setDay(Day day) {
-        if (day == null) {
-            // TODO Verify that this invalid state doe not happen (see crash reporting). Then, this block can be deleted.
-            StringBuilder str = new StringBuilder();
-            str.append("Stack trace:\n");
-            str.append(Log.getStackTraceString(new IllegalStateException("Day should not be null")));
-            str.append("\n");
-            str.append("Analytics:\n");
-            str.append(this.toString());
-            str.append("\n");
-            str.append("\n");
-            str.append("Analytics with configuration info\n");
-            setConfigurationInfo();
-            str.append(this.toString());
-            str.append("\n");
-            str.append("\n");
-            str.append("Database dump:\n");
-            GlobalManager globalManager = GlobalManager.getInstance();
-            str.append(globalManager.dumpDB());
-
-            Crashlytics.log(str.toString());
-            return this;
-        }
-
         Calendar alarmTime = day.getDateTime();
 
         String alarmDateString = calendarToStringDate(alarmTime);
