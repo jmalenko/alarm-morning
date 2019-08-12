@@ -335,7 +335,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         else if (pos1 < positionAction && positionAction < pos2)
             positionAction--;
         else if (pos2 < positionAction && positionAction < pos1)
-                positionAction++;
+            positionAction++;
     }
 
     public void onModifyOneTimeAlarmName(OneTimeAlarm oneTimeAlarm) {
@@ -359,7 +359,6 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
             TextView textName = viewHolder.getTextName();
             textName.setText(oneTimeAlarm.getName());
         }
-        check();
     }
 
     /*
@@ -621,6 +620,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
      */
     public void refresh() {
         loadItems();
+        positionNextAlarm = calcPositionNextAlarm();
         adapter.notifyDataSetChanged();
     }
 
@@ -828,7 +828,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
         // Change user interface
 
-        CalendarFragment.hideSoftKeyboard(getActivity());
+        hideSoftKeyboard(getActivity());
         viewHolder.getTextName().clearFocus();
     }
 
