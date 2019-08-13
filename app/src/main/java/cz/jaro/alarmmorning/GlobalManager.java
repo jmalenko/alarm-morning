@@ -675,7 +675,7 @@ public class GlobalManager {
 
                 List<Calendar> skippedAlarmTimes = new ArrayList<>();
 
-                if (!isDismissedAny()) {
+                if (!isDismissedAny() && getRingingAlarm() != null) {
                     skippedAlarmTimes.add(getRingingAlarm().getDateTime());
                 }
 
