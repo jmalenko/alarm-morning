@@ -11,7 +11,7 @@ import android.util.AttributeSet;
  * Source: https://stackoverflow.com/a/36479831/5726150
  */
 
-public class EditTextWithoutSuggestion extends android.support.v7.widget.AppCompatEditText {
+public class EditTextWithoutSuggestion extends androidx.appcompat.widget.AppCompatEditText {
     public EditTextWithoutSuggestion(Context context) {
         super(context);
     }

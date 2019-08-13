@@ -1,13 +1,12 @@
 package cz.jaro.alarmmorning.model;
 
-import android.support.test.runner.AndroidJUnit4;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.GregorianCalendar;
 
+import androidx.test.runner.AndroidJUnit4;
 import cz.jaro.alarmmorning.Analytics;
 import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.clock.FixedClock;

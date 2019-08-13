@@ -16,7 +16,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.preference.PreferenceManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
@@ -50,6 +49,7 @@ import org.robolectric.shadows.ShadowViewGroup;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+import androidx.recyclerview.widget.RecyclerView;
 import cz.jaro.alarmmorning.AlarmMorningActivity;
 import cz.jaro.alarmmorning.AlarmMorningActivityTest;
 import cz.jaro.alarmmorning.CalendarFragment;

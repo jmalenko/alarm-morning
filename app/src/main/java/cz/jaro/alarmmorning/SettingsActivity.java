@@ -12,8 +12,6 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
-import android.support.v4.app.NavUtils;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.TypedValue;
@@ -22,6 +20,8 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.NavUtils;
 import cz.jaro.alarmmorning.checkalarmtime.CheckAlarmTime;
 import cz.jaro.alarmmorning.graphics.AppCompatPreferenceActivity;
 import cz.jaro.alarmmorning.graphics.RelativeTimePreference;

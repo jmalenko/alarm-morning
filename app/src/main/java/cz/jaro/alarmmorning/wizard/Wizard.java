@@ -8,14 +8,14 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import com.github.paolorotolo.appintro.AppIntro;
 
 import java.util.ArrayList;
 
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 import cz.jaro.alarmmorning.GlobalManager;
 
 /**

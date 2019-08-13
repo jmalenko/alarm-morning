@@ -1,12 +1,12 @@
 package cz.jaro.alarmmorning.graphics;
 
 import android.content.Context;
-import android.support.v7.widget.AppCompatImageButton;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
+import androidx.appcompat.widget.AppCompatImageButton;
 import cz.jaro.alarmmorning.GlobalManager;
 
 /**

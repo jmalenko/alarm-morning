@@ -14,7 +14,7 @@ import android.widget.SeekBar;
  * SlideButton is a button that needs to be slided instead of clicked. This is useful for sensitive actions where a click can be done too easily and a more
  * intentional action (like slide) is required.
  */
-public class SlideButton extends android.support.v7.widget.AppCompatSeekBar {
+public class SlideButton extends androidx.appcompat.widget.AppCompatSeekBar {
 
     private Drawable thumb;
 

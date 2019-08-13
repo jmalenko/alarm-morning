@@ -5,7 +5,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 
@@ -19,6 +18,7 @@ import org.robolectric.shadows.ShadowPendingIntent;
 
 import java.util.Calendar;
 
+import androidx.recyclerview.widget.RecyclerView;
 import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.model.AlarmDataSource;
 import cz.jaro.alarmmorning.receivers.AlarmReceiver;

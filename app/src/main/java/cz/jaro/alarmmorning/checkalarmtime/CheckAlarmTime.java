@@ -9,8 +9,6 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Build;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.v4.app.NotificationCompat;
 import android.text.Html;
 import android.text.SpannableString;
 import android.util.Log;
@@ -18,6 +16,8 @@ import android.util.Log;
 import java.util.Calendar;
 import java.util.NoSuchElementException;
 
+import androidx.annotation.NonNull;
+import androidx.core.app.NotificationCompat;
 import cz.jaro.alarmmorning.Analytics;
 import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.Localization;

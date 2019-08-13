@@ -8,11 +8,11 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.preference.PreferenceManager;
-import android.support.design.widget.NavigationView;
-import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+
+import com.google.android.material.navigation.NavigationView;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -25,6 +25,7 @@ import org.robolectric.shadows.ShadowActivity;
 import java.util.Calendar;
 import java.util.Locale;
 
+import androidx.recyclerview.widget.RecyclerView;
 import cz.jaro.alarmmorning.model.AlarmDataSource;
 import cz.jaro.alarmmorning.model.Defaults;
 import cz.jaro.alarmmorning.wizard.Wizard;

@@ -9,9 +9,9 @@ android {
         applicationId "cz.jaro.alarmmorning"
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 13
-        versionName "0.93"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        versionCode 14
+        versionName "0.94"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         android.compileOptions.sourceCompatibility 1.8
         android.compileOptions.targetCompatibility 1.8
     }
@@ -51,8 +51,8 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:support-v4:28.0.0'
-    implementation 'com.android.support:design:28.0.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'com.google.android.material:material:1.0.0'
 
     implementation 'com.ibm.icu:icu4j:64.2'
     androidTestImplementation 'com.ibm.icu:icu4j:64.2'
@@ -73,13 +73,13 @@ dependencies {
     // Optional -- Mockito framework
     testImplementation 'org.mockito:mockito-core:1.10.19'
 
-    androidTestImplementation 'com.android.support:support-annotations:28.0.0'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test:rules:1.0.2'
+    androidTestImplementation 'androidx.annotation:annotation:1.0.0'
+    androidTestImplementation 'androidx.test:runner:1.1.0'
+    androidTestImplementation 'androidx.test:rules:1.1.0'
     // Optional -- Hamcrest library
     androidTestImplementation 'org.hamcrest:hamcrest-library:1.3'
     // Optional -- UI testing with Espresso
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'
     // Optional -- UI testing with UI Automator
     // androidTestImplementation 'com.android.support.test.uiautomator:uiautomator-v18:2.1.1'
 }

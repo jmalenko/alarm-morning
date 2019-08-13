@@ -1,9 +1,8 @@
 package cz.jaro.alarmmorning.model;
 
-import android.support.annotation.NonNull;
-
 import java.util.Calendar;
 
+import androidx.annotation.NonNull;
 import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.clock.Clock;
 

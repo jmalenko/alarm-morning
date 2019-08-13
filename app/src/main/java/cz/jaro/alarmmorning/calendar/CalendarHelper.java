@@ -8,11 +8,11 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.CalendarContract;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import java.util.Calendar;
 
+import androidx.core.content.ContextCompat;
 import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.Localization;
 
