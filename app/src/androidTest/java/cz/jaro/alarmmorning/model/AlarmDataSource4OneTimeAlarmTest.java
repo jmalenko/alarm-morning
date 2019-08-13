@@ -7,7 +7,7 @@ import org.junit.runner.RunWith;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import androidx.test.runner.AndroidJUnit4;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 import cz.jaro.alarmmorning.Analytics;
 import cz.jaro.alarmmorning.GlobalManager;
 
