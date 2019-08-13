@@ -58,7 +58,7 @@ dependencies {
     androidTestImplementation 'com.ibm.icu:icu4j:64.2'
 
     implementation 'de.galgtonold.jollydayandroid:jollyday-android:0.1.9'
-9
+
     implementation 'com.github.paolorotolo:appintro:4.0.0'
 
     implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
