@@ -9,8 +9,8 @@ android {
         applicationId "cz.jaro.alarmmorning"
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 14
-        versionName "0.94"
+        versionCode 13
+        versionName "0.93"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         android.compileOptions.sourceCompatibility 1.8
         android.compileOptions.targetCompatibility 1.8
