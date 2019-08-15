@@ -106,6 +106,9 @@ public class CalendarHelper {
                     return eventEarliest;
                 }
 
+                cur.close();
+                ;
+
                 Log.d(TAG, "Calendar query returned no events that match criteria");
             } else {
                 Log.d(TAG, "Calendar query returned null");

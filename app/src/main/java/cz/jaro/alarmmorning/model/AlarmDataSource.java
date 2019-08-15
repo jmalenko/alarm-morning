@@ -137,8 +137,8 @@ public class AlarmDataSource {
         } else {
             cursor.moveToFirst();
             day = cursorToDay(cursor);
-            cursor.close();
         }
+        cursor.close();
 
         return day;
     }
@@ -178,8 +178,8 @@ public class AlarmDataSource {
         } else {
             cursor.moveToFirst();
             oneTimeAlarm = cursorToOneTimeAlarm(cursor);
-            cursor.close();
         }
+        cursor.close();
 
         return oneTimeAlarm;
     }
@@ -210,6 +210,7 @@ public class AlarmDataSource {
             OneTimeAlarm oneTimeAlarm = cursorToOneTimeAlarm(cursor);
             oneTimeAlarms.add(oneTimeAlarm);
         }
+        cursor.close();
 
         return oneTimeAlarms;
     }
