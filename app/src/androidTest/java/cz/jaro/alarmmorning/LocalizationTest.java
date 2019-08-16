@@ -160,7 +160,7 @@ public class LocalizationTest {
         assertEquals(com.ibm.icu.util.Calendar.WEEKDAY, c.getDayOfWeekType(Calendar.MONDAY));
         assertEquals(com.ibm.icu.util.Calendar.WEEKDAY, c.getDayOfWeekType(Calendar.TUESDAY));
         assertEquals(com.ibm.icu.util.Calendar.WEEKDAY, c.getDayOfWeekType(Calendar.WEDNESDAY));
-        assertEquals(com.ibm.icu.util.Calendar.WEEKEND, c.getDayOfWeekType(Calendar.THURSDAY));
+        assertEquals(com.ibm.icu.util.Calendar.WEEKDAY, c.getDayOfWeekType(Calendar.THURSDAY));
         assertEquals(com.ibm.icu.util.Calendar.WEEKEND, c.getDayOfWeekType(Calendar.FRIDAY));
         assertEquals(com.ibm.icu.util.Calendar.WEEKDAY, c.getDayOfWeekType(Calendar.SATURDAY));
     }
