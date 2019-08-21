@@ -38,7 +38,7 @@ public class Shake extends SensorEventDetector {
         boolean result = false;
 
         long timeBetweenEvents = event.timestamp - mLastEventTime;
-        float force = Math.abs(x + y + z - mLastX - mLastY - mLastZ) / timeBetweenEvents * 1000000000;
+        float force = (Math.abs(x - mLastX) + Math.abs(y - mLastY) + Math.abs(z - mLastZ)) / timeBetweenEvents * 1000000000;
         if (FORCE_THRESHOLD < force) {
             if (mShakeStartTime == 0)
                 mShakeStartTime = event.timestamp;
