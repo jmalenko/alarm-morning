@@ -27,7 +27,8 @@ android {
 
     buildTypes {
         release {
-            // minifyEnabled true // XXX Workaround - minimization does not work reliably with Jack (but lowers the APK size from 15.5 MB to 13.5 MB). https://code.google.com/p/android/issues/detail?id=218917&sort=-opened&colspec=ID%20Status%20Priority%20Owner%20Summary%20Stars%20Reporter%20Opened
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.myconfig
         }
