@@ -333,7 +333,7 @@ public class GlobalManager {
 
             return state;
         } catch (NoSuchElementException e) {
-            return STATE_UNDEFINED; // TODO Remove this artificial state
+            return STATE_UNDEFINED;
         }
     }
 
