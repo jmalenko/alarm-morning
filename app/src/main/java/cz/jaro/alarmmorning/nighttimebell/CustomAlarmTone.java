@@ -3,13 +3,11 @@ package cz.jaro.alarmmorning.nighttimebell;
 import android.Manifest;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.media.MediaScannerConnection;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Environment;
-import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.Log;
 
@@ -19,12 +17,14 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.NoSuchElementException;
 
 import androidx.core.content.ContextCompat;
 import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.JSONSharedPreferences;
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.SettingsActivity;
+import cz.jaro.alarmmorning.SharedPreferencesHelper;
 
 /**
  * This class copies the alarm tone distributed with this app (in the APK) into the alarms directory on the device's shared storage
@@ -58,9 +58,7 @@ public class CustomAlarmTone {
 
         int permissionCheck = ContextCompat.checkSelfPermission(mContext, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-
-            boolean filesInstalledPreference = preferences.getBoolean(CustomAlarmTone.PREF_FILES_INSTALLED, CustomAlarmTone.PREF_FILES_INSTALLED_DEFAULT);
+            boolean filesInstalledPreference = (boolean) SharedPreferencesHelper.load(CustomAlarmTone.PREF_FILES_INSTALLED, CustomAlarmTone.PREF_FILES_INSTALLED_DEFAULT);
             if (!filesInstalledPreference) {
                 Log.i(TAG, "Copying ringtone files");
 
@@ -69,9 +67,7 @@ public class CustomAlarmTone {
 
                 if (status) {
                     // Remember that files were installed
-                    SharedPreferences.Editor editor = preferences.edit();
-                    editor.putBoolean(PREF_FILES_INSTALLED, true);
-                    editor.apply();
+                    SharedPreferencesHelper.save(PREF_FILES_INSTALLED, true);
                 }
             } else {
                 Log.d(TAG, "Already installed");
@@ -146,20 +142,21 @@ public class CustomAlarmTone {
             );
 
             // Save local path
-            JSONObject map = JSONSharedPreferences.loadJSONObject(mContext, INSTALLED_FILES_PATH);
+            JSONObject map = JSONSharedPreferences.loadJSONObject(INSTALLED_FILES_PATH);
             map.put(filename, newUri.toString());
-            JSONSharedPreferences.saveJSONObject(mContext, INSTALLED_FILES_PATH, map);
+            JSONSharedPreferences.saveJSONObject(INSTALLED_FILES_PATH, map);
 
             if (setAsDefault) {
-                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-
                 // Update the preference if set to default
-                String ringtonePreference = preferences.getString(SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE, SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE_DEFAULT);
+                String ringtonePreference;
+                try {
+                    ringtonePreference = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE);
+                } catch (NoSuchElementException e) {
+                    ringtonePreference = SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE_DEFAULT;
+                }
                 if (ringtonePreference.equals(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM).toString())
                         || ringtonePreference.equals(SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE_DEFAULT)) {
-                    SharedPreferences.Editor editor = preferences.edit();
-                    editor.putString(SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE, newUri.toString());
-                    editor.apply();
+                    SharedPreferencesHelper.save(SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE, newUri.toString());
                 }
             }
 

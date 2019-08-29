@@ -5,13 +5,12 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Build;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 import java.util.Calendar;
+import java.util.NoSuchElementException;
 
 import androidx.core.app.NotificationCompat;
 import cz.jaro.alarmmorning.clock.Clock;
@@ -150,22 +149,28 @@ public class SystemNotification {
     }
 
     private boolean currentlyDisplayedNotificationIsAbout(AppAlarm appAlarm) {
-        String retrieveAlarmType = retrieveAlarmType();
+        try {
+            String retrieveAlarmType = (String) SharedPreferencesHelper.load(PERSIST_NOTIFICATION_ALARM_TYPE);
 
-        if (appAlarm instanceof Day) {
-            Day day = (Day) appAlarm;
-            if (retrieveAlarmType.equals("Day")) {
-                Calendar retrieveDayAlarmDate = retrieveDayAlarmDate();
-                return onTheSameDate(day.getDate(), retrieveDayAlarmDate);
+            if (appAlarm instanceof Day) {
+                Day day = (Day) appAlarm;
+                if (retrieveAlarmType.equals("Day")) {
+                    String dateStr = (String) SharedPreferencesHelper.load(PERSIST_NOTIFICATION_DAY_ALARM_DATE);
+                    Calendar retrieveDayAlarmDate = Analytics.dateStringToCalendar(dateStr);
+                    return onTheSameDate(day.getDate(), retrieveDayAlarmDate);
+                }
+            } else if (appAlarm instanceof OneTimeAlarm) {
+                OneTimeAlarm oneTimeAlarm = (OneTimeAlarm) appAlarm;
+                if (retrieveAlarmType.equals("OneTimeAlarm")) {
+                    long retrieveOneTimeAlarmId = (long) SharedPreferencesHelper.load(PERSIST_NOTIFICATION_ONE_TIME_ALARM_ID);
+                    return oneTimeAlarm.getId() == retrieveOneTimeAlarmId;
+                }
+            } else {
+                throw new IllegalArgumentException("Unexpected class " + appAlarm.getClass());
             }
-        } else if (appAlarm instanceof OneTimeAlarm) {
-            OneTimeAlarm oneTimeAlarm = (OneTimeAlarm) appAlarm;
-            if (retrieveAlarmType.equals("OneTimeAlarm")) {
-                Long retrieveOneTimeAlarmId = retrieveOneTimeAlarmId();
-                return oneTimeAlarm.getId() == retrieveOneTimeAlarmId;
-            }
-        } else {
-            throw new IllegalArgumentException("Unexpected class " + appAlarm.getClass());
+        } catch (NoSuchElementException e) {
+            Log.v(TAG, "The persisted data is incomplete", e);
+            return false;
         }
 
         return false;
@@ -376,69 +381,27 @@ public class SystemNotification {
         mNotificationManager.notify(++NOTIFICATION_ERROR_ID, mBuilder.build());
     }
 
-    private String retrieveAlarmType() {
-        Log.v(TAG, "retrieveAlarmType()");
-
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-
-        String datatype = preferences.getString(PERSIST_NOTIFICATION_ALARM_TYPE, "");
-
-        return datatype;
-    }
-
-    private Calendar retrieveDayAlarmDate() {
-        Log.v(TAG, "retrieveDayAlarmDate()");
-
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-
-        String dateStr = preferences.getString(PERSIST_NOTIFICATION_DAY_ALARM_DATE, "");
-
-        Calendar dateCal = Analytics.dateStringToCalendar(dateStr);
-
-        return dateCal;
-    }
-
-    private Long retrieveOneTimeAlarmId() {
-        Log.v(TAG, "retrieveOneTimeAlarmId()");
-
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-
-        Long id = preferences.getLong(PERSIST_NOTIFICATION_ONE_TIME_ALARM_ID, -1);
-
-        return id;
-    }
-
     public void persist(AppAlarm appAlarm) {
         Log.v(TAG, "persist(appAlarm=" + appAlarm + ")");
 
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = preferences.edit();
-
-        editor.putString(PERSIST_NOTIFICATION_ALARM_TYPE, appAlarm.getClass().getSimpleName());
+        SharedPreferencesHelper.save(PERSIST_NOTIFICATION_ALARM_TYPE, appAlarm.getClass().getSimpleName());
         if (appAlarm instanceof Day) {
             Day day = (Day) appAlarm;
-            editor.putString(PERSIST_NOTIFICATION_DAY_ALARM_DATE, Analytics.calendarToStringDate(day.getDate()));
+            SharedPreferencesHelper.save(PERSIST_NOTIFICATION_DAY_ALARM_DATE, Analytics.calendarToStringDate(day.getDate()));
         } else if (appAlarm instanceof OneTimeAlarm) {
             OneTimeAlarm oneTimeAlarm = (OneTimeAlarm) appAlarm;
-            editor.putLong(PERSIST_NOTIFICATION_ONE_TIME_ALARM_ID, oneTimeAlarm.getId());
+            SharedPreferencesHelper.save(PERSIST_NOTIFICATION_ONE_TIME_ALARM_ID, oneTimeAlarm.getId());
         } else {
             throw new IllegalArgumentException("Unexpected class " + appAlarm.getClass());
         }
-
-        editor.apply();
     }
 
     public void persistRemove() {
         Log.v(TAG, "persistRemove()");
 
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = preferences.edit();
-
-        editor.remove(PERSIST_NOTIFICATION_ALARM_TYPE);
-        editor.remove(PERSIST_NOTIFICATION_DAY_ALARM_DATE);
-        editor.remove(PERSIST_NOTIFICATION_ONE_TIME_ALARM_ID);
-
-        editor.apply();
+        SharedPreferencesHelper.remove(PERSIST_NOTIFICATION_ALARM_TYPE);
+        SharedPreferencesHelper.remove(PERSIST_NOTIFICATION_DAY_ALARM_DATE);
+        SharedPreferencesHelper.remove(PERSIST_NOTIFICATION_ONE_TIME_ALARM_ID);
     }
 
 }

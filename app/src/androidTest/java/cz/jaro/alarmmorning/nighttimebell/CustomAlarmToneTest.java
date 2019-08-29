@@ -16,6 +16,7 @@ import androidx.test.InstrumentationRegistry;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.SettingsActivity;
+import cz.jaro.alarmmorning.SharedPreferencesHelper;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotSame;
@@ -61,7 +62,7 @@ public class CustomAlarmToneTest {
         assertTrue(mFile.length() > 0);
 
         // Make sure the shared prefs are set correctly
-        assertTrue(mSharedPreferences.getBoolean(CustomAlarmTone.PREF_FILES_INSTALLED, false));
+        assertTrue((boolean) SharedPreferencesHelper.load(CustomAlarmTone.PREF_FILES_INSTALLED, false));
     }
 
     @Test
@@ -76,7 +77,7 @@ public class CustomAlarmToneTest {
 
         // Check if the pref was overridden
         assertNotSame(
-                mSharedPreferences.getString(SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE, ""),
+                (String) SharedPreferencesHelper.load(SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE, ""),
                 "");
     }
 
@@ -92,7 +93,7 @@ public class CustomAlarmToneTest {
         // Make sure the ringtone pref wasn't changed
         assertEquals(
                 "something_other_than_default",
-                mSharedPreferences.getString(SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE, ""));
+                (String) SharedPreferencesHelper.load(SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE, ""));
     }
 
     @Test
@@ -107,7 +108,7 @@ public class CustomAlarmToneTest {
 
         installAlarmTones();
 
-        assertTrue(mSharedPreferences.getBoolean(CustomAlarmTone.PREF_FILES_INSTALLED, false));
+        assertTrue((boolean) SharedPreferencesHelper.load(CustomAlarmTone.PREF_FILES_INSTALLED, false));
     }
 
     //

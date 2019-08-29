@@ -107,7 +107,6 @@ public class CalendarHelper {
                 }
 
                 cur.close();
-                ;
 
                 Log.d(TAG, "Calendar query returned no events that match criteria");
             } else {

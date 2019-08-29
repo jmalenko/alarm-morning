@@ -4,10 +4,8 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.github.paolorotolo.appintro.AppIntro;
@@ -17,6 +15,7 @@ import java.util.ArrayList;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import cz.jaro.alarmmorning.GlobalManager;
+import cz.jaro.alarmmorning.SharedPreferencesHelper;
 
 /**
  * Wizard contains several fragments that allow the user to quickly configure the app.
@@ -96,12 +95,7 @@ public class Wizard extends AppIntro {
         super.onDonePressed(currentFragment);
 
         // Remember that wizard finished
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        SharedPreferences.Editor editor = preferences.edit();
-
-        editor.putBoolean(PREF_WIZARD, true);
-
-        editor.apply();
+        SharedPreferencesHelper.save(PREF_WIZARD, true);
 
         // Set return intent
         Intent returnIntent = new Intent();
@@ -111,8 +105,7 @@ public class Wizard extends AppIntro {
     }
 
     static public boolean loadWizardFinished(Context context) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        boolean wizardPreference = preferences.getBoolean(Wizard.PREF_WIZARD, Wizard.PREF_WIZARD_DEFAULT);
+        boolean wizardPreference = (boolean) SharedPreferencesHelper.load(Wizard.PREF_WIZARD, Wizard.PREF_WIZARD_DEFAULT);
         return wizardPreference;
     }
 

@@ -5,7 +5,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -16,7 +15,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Vibrator;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -226,9 +224,7 @@ public class RingActivity extends Activity implements RingInterface {
 
         if (click) {
             // Use default snooze time
-            Context context = AlarmMorningApplication.getAppContext();
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-            minutes = preferences.getInt(SettingsActivity.PREF_SNOOZE_TIME, SettingsActivity.PREF_SNOOZE_TIME_DEFAULT);
+            minutes = (int) SharedPreferencesHelper.load(SettingsActivity.PREF_SNOOZE_TIME, SettingsActivity.PREF_SNOOZE_TIME_DEFAULT);
         } else {
             // Calculate the snooze time from the button position
             double minutesD = positionDeltaToMinutes(dx, dy);
@@ -390,9 +386,7 @@ public class RingActivity extends Activity implements RingInterface {
     private void doSnooze(boolean autoSnooze) {
         Log.v(TAG, "doSnooze(autoSnooze=" + autoSnooze + ")");
 
-        Context context = AlarmMorningApplication.getAppContext();
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        int minutes = preferences.getInt(SettingsActivity.PREF_SNOOZE_TIME, SettingsActivity.PREF_SNOOZE_TIME_DEFAULT);
+        int minutes = (int) SharedPreferencesHelper.load(SettingsActivity.PREF_SNOOZE_TIME, SettingsActivity.PREF_SNOOZE_TIME_DEFAULT);
 
         doSnooze(minutes, autoSnooze);
     }
@@ -638,14 +632,12 @@ public class RingActivity extends Activity implements RingInterface {
         GlobalManager globalManager = GlobalManager.getInstance();
         Calendar now = globalManager.clock().now();
 
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-
         // Note: Do auto-dismiss before auto-snooze
 
         // Check auto dismiss
-        boolean autoDismiss = preferences.getBoolean(SettingsActivity.PREF_AUTO_DISMISS, SettingsActivity.PREF_AUTO_DISMISS_DEFAULT);
+        boolean autoDismiss = (boolean) SharedPreferencesHelper.load(SettingsActivity.PREF_AUTO_DISMISS, SettingsActivity.PREF_AUTO_DISMISS_DEFAULT);
         if (autoDismiss) {
-            long autoDismissTime = preferences.getInt(SettingsActivity.PREF_AUTO_DISMISS_TIME, SettingsActivity.PREF_AUTO_DISMISS_TIME_DEFAULT);
+            long autoDismissTime = (int) SharedPreferencesHelper.load(SettingsActivity.PREF_AUTO_DISMISS_TIME, SettingsActivity.PREF_AUTO_DISMISS_TIME_DEFAULT);
 
             Calendar alarmTime = appAlarm.getDateTime();
             // The following a little hack to account for the fact that when the code is scheduled at particular time, the code that saves the current time is executed few milliseconds later. This applies to both now and lastRingingStartTime bellow variables. We just trim the milliseconds (assumes that the execution happens within one second).
@@ -663,9 +655,9 @@ public class RingActivity extends Activity implements RingInterface {
         }
 
         // Check auto snooze
-        boolean autoSnooze = preferences.getBoolean(SettingsActivity.PREF_AUTO_SNOOZE, SettingsActivity.PREF_AUTO_SNOOZE_DEFAULT);
+        boolean autoSnooze = (boolean) SharedPreferencesHelper.load(SettingsActivity.PREF_AUTO_SNOOZE, SettingsActivity.PREF_AUTO_SNOOZE_DEFAULT);
         if (autoSnooze) {
-            long autoSnoozeTime = preferences.getInt(SettingsActivity.PREF_AUTO_SNOOZE_TIME, SettingsActivity.PREF_AUTO_SNOOZE_TIME_DEFAULT);
+            long autoSnoozeTime = (int) SharedPreferencesHelper.load(SettingsActivity.PREF_AUTO_SNOOZE_TIME, SettingsActivity.PREF_AUTO_SNOOZE_TIME_DEFAULT);
 
             long diffFromLastRingingStartTime = (now.getTimeInMillis() / 1000 - lastRingingStartTime.getTimeInMillis() / 1000) / 60; // in minutes
 
@@ -685,10 +677,9 @@ public class RingActivity extends Activity implements RingInterface {
 
     private Uri getRingtoneUri() {
         Uri ringtoneUri;
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 
-        if (preferences.contains(SettingsActivity.PREF_RINGTONE)) {
-            String ringtonePreference = preferences.getString(SettingsActivity.PREF_RINGTONE, SettingsActivity.PREF_RINGTONE_DEFAULT);
+        if (SharedPreferencesHelper.contains(SettingsActivity.PREF_RINGTONE)) {
+            String ringtonePreference = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_RINGTONE, SettingsActivity.PREF_RINGTONE_DEFAULT);
             ringtoneUri = ringtonePreference.equals(SettingsActivity.PREF_RINGTONE_DEFAULT) ? null : Uri.parse(ringtonePreference);
         } else {
             ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
@@ -838,8 +829,7 @@ public class RingActivity extends Activity implements RingInterface {
     private void startVolume() {
         Log.d(TAG, "startVolume()");
 
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        int volumePreference = preferences.getInt(SettingsActivity.PREF_VOLUME, SettingsActivity.PREF_VOLUME_DEFAULT);
+        int volumePreference = (int) SharedPreferencesHelper.load(SettingsActivity.PREF_VOLUME, SettingsActivity.PREF_VOLUME_DEFAULT);
 
         if (volumePreference == 0)
             Log.w(TAG, "Volume is set to 0");
@@ -856,7 +846,7 @@ public class RingActivity extends Activity implements RingInterface {
         Log.v(TAG, "max volume= " + maxVolume);
         Log.v(TAG, "volume = " + volume);
 
-        increasing = preferences.getBoolean(SettingsActivity.PREF_VOLUME_INCREASING, SettingsActivity.PREF_VOLUME_INCREASING_DEFAULT);
+        increasing = (boolean) SharedPreferencesHelper.load(SettingsActivity.PREF_VOLUME_INCREASING, SettingsActivity.PREF_VOLUME_INCREASING_DEFAULT);
 
         if (increasing) {
             increasingVolumePercentage = 0;
@@ -916,8 +906,7 @@ public class RingActivity extends Activity implements RingInterface {
     private void startVibrate() {
         Log.d(TAG, "startVibrate()");
 
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        boolean vibratePreference = preferences.getBoolean(SettingsActivity.PREF_VIBRATE, SettingsActivity.PREF_VIBRATE_DEFAULT);
+        boolean vibratePreference = (boolean) SharedPreferencesHelper.load(SettingsActivity.PREF_VIBRATE, SettingsActivity.PREF_VIBRATE_DEFAULT);
 
         isVibrating = false;
 
@@ -983,8 +972,7 @@ public class RingActivity extends Activity implements RingInterface {
     public boolean onKeyDown(int keycode, KeyEvent e) {
         Log.d(TAG, "onKeyDown(keycode=" + keycode + ")");
 
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-        String buttonActionPreference = preferences.getString(SettingsActivity.PREF_ACTION_ON_BUTTON, SettingsActivity.PREF_ACTION_DEFAULT);
+        String buttonActionPreference = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_ACTION_ON_BUTTON, SettingsActivity.PREF_ACTION_DEFAULT);
 
         if (SettingsActivity.PREF_ACTION_DEFAULT.equals(buttonActionPreference)) {
             if (keycode == KeyEvent.KEYCODE_BACK) {

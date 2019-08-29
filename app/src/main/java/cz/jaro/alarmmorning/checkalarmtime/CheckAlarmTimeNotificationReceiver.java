@@ -10,7 +10,7 @@ import java.util.Calendar;
 import cz.jaro.alarmmorning.AlarmMorningActivity;
 import cz.jaro.alarmmorning.Analytics;
 import cz.jaro.alarmmorning.GlobalManager;
-import cz.jaro.alarmmorning.SharedPreferencessHelper;
+import cz.jaro.alarmmorning.SharedPreferencesHelper;
 import cz.jaro.alarmmorning.calendar.CalendarUtils;
 
 import static cz.jaro.alarmmorning.Analytics.CHECK_ALARM_TIME_METHOD__QUICK;
@@ -50,7 +50,7 @@ public class CheckAlarmTimeNotificationReceiver extends BroadcastReceiver {
             case ACTION_CHECK_ALARM_TIME_DELETE:
                 new Analytics(context, Analytics.Event.Hide, Analytics.Channel.Notification, Analytics.ChannelName.Check_alarm_time).save();
 
-                SharedPreferencessHelper.save(CheckAlarmTime.PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION, CheckAlarmTime.PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION__DELETED);
+                SharedPreferencesHelper.save(CheckAlarmTime.PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION, CheckAlarmTime.PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION__DELETED);
                 break;
             case ACTION_CHECK_ALARM_TIME_SET_TO: {
                 // Read parameters from extra
@@ -66,7 +66,7 @@ public class CheckAlarmTimeNotificationReceiver extends BroadcastReceiver {
 
                 SetTimeActivity.updateDay(context, newAlarmTime, analytics);
 
-                SharedPreferencessHelper.save(CheckAlarmTime.PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION, CheckAlarmTime.PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION__SET_TO_DEFAULT);
+                SharedPreferencesHelper.save(CheckAlarmTime.PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION, CheckAlarmTime.PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION__SET_TO_DEFAULT);
                 break;
             }
             case ACTION_CHECK_ALARM_TIME_DISABLE: {
@@ -83,7 +83,7 @@ public class CheckAlarmTimeNotificationReceiver extends BroadcastReceiver {
 
                 SetTimeActivity.updateDay(context, true, dayDate, analytics, true);
 
-                SharedPreferencessHelper.save(CheckAlarmTime.PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION, CheckAlarmTime.PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION__SET_TO_DEFAULT);
+                SharedPreferencesHelper.save(CheckAlarmTime.PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION, CheckAlarmTime.PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION__SET_TO_DEFAULT);
                 break;
             }
             case ACTION_CHECK_ALARM_TIME_SET_DIALOG: {

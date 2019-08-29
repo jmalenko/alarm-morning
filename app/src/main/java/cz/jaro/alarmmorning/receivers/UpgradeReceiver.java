@@ -3,7 +3,6 @@ package cz.jaro.alarmmorning.receivers;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.preference.PreferenceManager;
@@ -21,6 +20,7 @@ import cz.jaro.alarmmorning.Analytics;
 import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.JSONSharedPreferences;
 import cz.jaro.alarmmorning.R;
+import cz.jaro.alarmmorning.SharedPreferencesHelper;
 import cz.jaro.alarmmorning.WakeLocker;
 import cz.jaro.alarmmorning.checkalarmtime.CheckAlarmTime;
 import cz.jaro.alarmmorning.model.Day;
@@ -97,14 +97,12 @@ public class UpgradeReceiver extends BroadcastReceiver {
 
     private void updateTo11(Context context) {
         // There is a change of format of dismissed alarms (from alarm times to type+id).
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = preferences.edit();
 
         // Get old preference
         Set<Long> dismissedAlarms = getDismissedAlarms();
 
         // Remove old preference
-        editor.remove(PERSIST_DISMISSED_1);
+        SharedPreferencesHelper.remove(PERSIST_DISMISSED_1);
 
         // Migrate the old preference to new preference
         GlobalManager globalManager = GlobalManager.getInstance();
@@ -117,8 +115,6 @@ public class UpgradeReceiver extends BroadcastReceiver {
                 globalManager.addDismissedAlarm(day);
             }
         }
-
-        editor.apply();
     }
 
     private static final String PERSIST_DISMISSED_1 = "persist_dismissed";
@@ -128,7 +124,7 @@ public class UpgradeReceiver extends BroadcastReceiver {
 
         try {
             Context context = AlarmMorningApplication.getAppContext();
-            JSONArray dismissedAlarmsJSON = JSONSharedPreferences.loadJSONArray(context, PERSIST_DISMISSED_1);
+            JSONArray dismissedAlarmsJSON = JSONSharedPreferences.loadJSONArray(PERSIST_DISMISSED_1);
             Set<Long> dismissedAlarms = jsonToSet(dismissedAlarmsJSON);
             return dismissedAlarms;
         } catch (JSONException e) {

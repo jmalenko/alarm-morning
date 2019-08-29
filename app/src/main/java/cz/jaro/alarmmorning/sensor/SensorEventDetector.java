@@ -1,12 +1,10 @@
 package cz.jaro.alarmmorning.sensor;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 import java.util.Arrays;
@@ -14,6 +12,7 @@ import java.util.Arrays;
 import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.RingInterface;
 import cz.jaro.alarmmorning.SettingsActivity;
+import cz.jaro.alarmmorning.SharedPreferencesHelper;
 
 /**
  * SensorEventDetector implements sensor handling. Contains common features of all sensors.
@@ -106,8 +105,7 @@ public abstract class SensorEventDetector implements SensorEventListener {
 
     private String getActionFromPreference() {
         Log.v(TAG, "getActionFromPreference()");
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(ringInterface.getContextI());
-        return preferences.getString(preferenceName, SettingsActivity.PREF_ACTION_DEFAULT);
+        return (String) SharedPreferencesHelper.load(preferenceName, SettingsActivity.PREF_ACTION_DEFAULT);
     }
 
     protected boolean use() {

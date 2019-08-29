@@ -13,9 +13,7 @@ import android.appwidget.AppWidgetProviderInfo;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Build;
-import android.preference.PreferenceManager;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
@@ -59,6 +57,7 @@ import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.RingActivity;
 import cz.jaro.alarmmorning.SettingsActivity;
+import cz.jaro.alarmmorning.SharedPreferencesHelper;
 import cz.jaro.alarmmorning.TimePickerFragment;
 import cz.jaro.alarmmorning.WidgetProvider;
 import cz.jaro.alarmmorning.graphics.SlideButton;
@@ -163,10 +162,7 @@ public class AlarmMorningAppTest extends FixedTimeTest {
     }
 
     public static void setNearFuturePeriodPreference(Context context, int minutes) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putInt(SettingsActivity.PREF_NEAR_FUTURE_TIME, minutes);
-        editor.commit();
+        SharedPreferencesHelper.save(SettingsActivity.PREF_NEAR_FUTURE_TIME, minutes);
     }
 
     int calendar_setDayAlarm(int itemPosition, int hourCheck, int minuteCheck, int hour, int minute) {

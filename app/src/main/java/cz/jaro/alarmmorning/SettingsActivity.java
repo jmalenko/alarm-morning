@@ -442,47 +442,47 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         Object newValue;
         switch (key) {
             case PREF_RINGTONE:
-                newValue = defaultSharedPreferences.getString(preference.getKey(), PREF_RINGTONE_DEFAULT);
+                newValue = SharedPreferencesHelper.load(preference.getKey(), PREF_RINGTONE_DEFAULT);
                 break;
             case PREF_VOLUME:
-                newValue = defaultSharedPreferences.getInt(preference.getKey(), PREF_VOLUME_DEFAULT);
+                newValue = SharedPreferencesHelper.load(preference.getKey(), PREF_VOLUME_DEFAULT);
                 break;
             case PREF_SNOOZE_TIME:
-                newValue = defaultSharedPreferences.getInt(preference.getKey(), PREF_SNOOZE_TIME_DEFAULT);
+                newValue = SharedPreferencesHelper.load(preference.getKey(), PREF_SNOOZE_TIME_DEFAULT);
                 break;
             case PREF_AUTO_SNOOZE_TIME:
-                newValue = defaultSharedPreferences.getInt(preference.getKey(), PREF_AUTO_SNOOZE_TIME_DEFAULT);
+                newValue = SharedPreferencesHelper.load(preference.getKey(), PREF_AUTO_SNOOZE_TIME_DEFAULT);
                 break;
             case PREF_AUTO_DISMISS_TIME:
-                newValue = defaultSharedPreferences.getInt(preference.getKey(), PREF_AUTO_DISMISS_TIME_DEFAULT);
+                newValue = SharedPreferencesHelper.load(preference.getKey(), PREF_AUTO_DISMISS_TIME_DEFAULT);
                 break;
             case PREF_ACTION_ON_BUTTON:
             case PREF_ACTION_ON_MOVE:
             case PREF_ACTION_ON_FLIP:
             case PREF_ACTION_ON_SHAKE:
             case PREF_ACTION_ON_PROXIMITY:
-                newValue = defaultSharedPreferences.getString(preference.getKey(), PREF_ACTION_DEFAULT);
+                newValue = SharedPreferencesHelper.load(preference.getKey(), PREF_ACTION_DEFAULT);
                 break;
             case PREF_CHECK_ALARM_TIME_AT:
-                newValue = defaultSharedPreferences.getString(preference.getKey(), PREF_CHECK_ALARM_TIME_AT_DEFAULT);
+                newValue = SharedPreferencesHelper.load(preference.getKey(), PREF_CHECK_ALARM_TIME_AT_DEFAULT);
                 break;
             case PREF_CHECK_ALARM_TIME_GAP:
-                newValue = defaultSharedPreferences.getInt(preference.getKey(), PREF_CHECK_ALARM_TIME_GAP_DEFAULT);
+                newValue = SharedPreferencesHelper.load(preference.getKey(), PREF_CHECK_ALARM_TIME_GAP_DEFAULT);
                 break;
             case PREF_NIGHTTIME_BELL_AT:
-                newValue = defaultSharedPreferences.getString(preference.getKey(), PREF_NIGHTTIME_BELL_AT_DEFAULT);
+                newValue = SharedPreferencesHelper.load(preference.getKey(), PREF_NIGHTTIME_BELL_AT_DEFAULT);
                 break;
             case PREF_NIGHTTIME_BELL_RINGTONE:
-                newValue = defaultSharedPreferences.getString(preference.getKey(), PREF_NIGHTTIME_BELL_RINGTONE_DEFAULT);
+                newValue = SharedPreferencesHelper.load(preference.getKey(), PREF_NIGHTTIME_BELL_RINGTONE_DEFAULT);
                 break;
             case PREF_NEAR_FUTURE_TIME:
-                newValue = defaultSharedPreferences.getInt(preference.getKey(), PREF_NEAR_FUTURE_TIME_DEFAULT);
+                newValue = SharedPreferencesHelper.load(preference.getKey(), PREF_NEAR_FUTURE_TIME_DEFAULT);
                 break;
             case PREF_NAP_TIME:
-                newValue = defaultSharedPreferences.getInt(preference.getKey(), PREF_NAP_TIME_DEFAULT);
+                newValue = SharedPreferencesHelper.load(preference.getKey(), PREF_NAP_TIME_DEFAULT);
                 break;
             case PREF_HOLIDAY:
-                newValue = defaultSharedPreferences.getString(preference.getKey(), PREF_HOLIDAY_DEFAULT);
+                newValue = SharedPreferencesHelper.load(preference.getKey(), PREF_HOLIDAY_DEFAULT);
                 break;
             default:
                 throw new IllegalArgumentException("Unexpected argument " + key);

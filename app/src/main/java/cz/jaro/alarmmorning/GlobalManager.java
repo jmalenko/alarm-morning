@@ -4,7 +4,6 @@ import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.RemoteViews;
@@ -19,6 +18,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import androidx.annotation.VisibleForTesting;
@@ -280,45 +280,39 @@ public class GlobalManager {
     public NextAction getNextAction() throws IllegalArgumentException {
         Log.v(TAG, "getNextAction()");
 
-        Context context = AlarmMorningApplication.getAppContext();
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        try {
+            String action = (String) SharedPreferencesHelper.load(PERSIST_ACTION);
 
-        String action = preferences.getString(PERSIST_ACTION, STRING_UNDEFINED);
-        long timeInMS = preferences.getLong(PERSIST_TIME, LONG_UNDEFINED);
-        String alarmType = preferences.getString(PERSIST_ALARM_TYPE, STRING_UNDEFINED);
-        String alarmId = preferences.getString(PERSIST_ALARM_ID, STRING_UNDEFINED);
+            long timeInMS = (long) SharedPreferencesHelper.load(PERSIST_TIME);
+            Calendar time = CalendarUtils.newGregorianCalendar(timeInMS);
 
-        if (action.equals(STRING_UNDEFINED)
-                || timeInMS == LONG_UNDEFINED
-                || alarmType.equals(STRING_UNDEFINED)
-                || (!alarmType.equals(NULL) && alarmId.equals(STRING_UNDEFINED))) {
-            throw new IllegalArgumentException("The persisted data is incomplete");
+            String alarmType = (String) SharedPreferencesHelper.load(PERSIST_ALARM_TYPE);
+            AppAlarm appAlarm;
+            if (alarmType.equals(NULL)) {
+                appAlarm = null;
+            } else {
+                String alarmId = (String) SharedPreferencesHelper.load(PERSIST_ALARM_ID);
+                appAlarm = load(alarmType, alarmId);
+            }
+
+            NextAction nextAction = new NextAction(action, time, appAlarm);
+            return nextAction;
+        } catch (NoSuchElementException e) {
+            throw new IllegalArgumentException("The persisted data is incomplete", e);
         }
-
-        Calendar time = CalendarUtils.newGregorianCalendar(timeInMS);
-        AppAlarm appAlarm = alarmType.equals(NULL) ? null : load(alarmType, alarmId);
-
-        NextAction nextAction = new NextAction(action, time, appAlarm);
-        return nextAction;
     }
 
     public void setNextAction(NextAction nextAction) {
         Log.v(TAG, "setNextAction(action=" + nextAction.action + ", time=" + nextAction.time.getTime() + ", appAlarm=" + nextAction.appAlarm + ")");
 
-        Context context = AlarmMorningApplication.getAppContext();
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = preferences.edit();
-
-        editor.putString(PERSIST_ACTION, nextAction.action);
-        editor.putLong(PERSIST_TIME, nextAction.time.getTimeInMillis());
+        SharedPreferencesHelper.save(PERSIST_ACTION, nextAction.action);
+        SharedPreferencesHelper.save(PERSIST_TIME, nextAction.time.getTimeInMillis());
         if (nextAction.appAlarm == null) {
-            editor.putString(PERSIST_ALARM_TYPE, NULL);
+            SharedPreferencesHelper.save(PERSIST_ALARM_TYPE, NULL);
         } else {
-            editor.putString(PERSIST_ALARM_TYPE, nextAction.appAlarm.getClass().getSimpleName());
-            editor.putString(PERSIST_ALARM_ID, nextAction.appAlarm.getPersistenceId());
+            SharedPreferencesHelper.save(PERSIST_ALARM_TYPE, nextAction.appAlarm.getClass().getSimpleName());
+            SharedPreferencesHelper.save(PERSIST_ALARM_ID, nextAction.appAlarm.getPersistenceId());
         }
-
-        editor.apply();
     }
 
     // Persisted state
@@ -333,26 +327,29 @@ public class GlobalManager {
      */
     private int getState() {
         Log.v(TAG, "getState()");
-        Context context = AlarmMorningApplication.getAppContext();
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 
-        int state = preferences.getInt(PERSIST_LAST_STATE, STATE_UNDEFINED);
+        try {
+            int state = (int) SharedPreferencesHelper.load(PERSIST_LAST_STATE);
 
-        return state;
+            return state;
+        } catch (NoSuchElementException e) {
+            return STATE_UNDEFINED; // TODO Remove this artificial state
+        }
     }
 
     public AppAlarm getRingingAlarm() {
         Log.v(TAG, "getRingingAlarm()");
 
-        Context context = AlarmMorningApplication.getAppContext();
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-
-        String alarmType = preferences.getString(PERSIST_LAST_ALARM_TYPE, STRING_UNDEFINED);
-        String alarmId = preferences.getString(PERSIST_LAST_ALARM_ID, STRING_UNDEFINED);
-
         try {
+            String alarmType = (String) SharedPreferencesHelper.load(PERSIST_LAST_ALARM_TYPE);
+            String alarmId = (String) SharedPreferencesHelper.load(PERSIST_LAST_ALARM_ID);
+
             return load(alarmType, alarmId);
+        } catch (NoSuchElementException e) {
+            Log.v(TAG, "The persisted data is incomplete", e);
+            return null;
         } catch (IllegalArgumentException e) {
+            Log.v(TAG, "Cannot load ringing alarm", e);
             return null;
         }
     }
@@ -360,46 +357,31 @@ public class GlobalManager {
     public void setState(int state, AppAlarm appAlarm) {
         Log.v(TAG, "setState(state=" + state + "(" + stateToString(state) + "}, appAlarm=" + appAlarm + ")");
 
-        Context context = AlarmMorningApplication.getAppContext();
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = preferences.edit();
-
-        editor.putInt(PERSIST_LAST_STATE, state);
-        editor.putString(PERSIST_LAST_ALARM_TYPE, appAlarm.getClass().getSimpleName());
+        SharedPreferencesHelper.save(PERSIST_LAST_STATE, state);
+        SharedPreferencesHelper.save(PERSIST_LAST_ALARM_TYPE, appAlarm.getClass().getSimpleName());
         if (appAlarm instanceof Day) {
             Day day = (Day) appAlarm;
-            editor.putString(PERSIST_LAST_ALARM_ID, Analytics.calendarToStringDate(day.getDate()));
+            SharedPreferencesHelper.save(PERSIST_LAST_ALARM_ID, Analytics.calendarToStringDate(day.getDate()));
         } else if (appAlarm instanceof OneTimeAlarm) {
             OneTimeAlarm oneTimeAlarm = (OneTimeAlarm) appAlarm;
-            editor.putString(PERSIST_LAST_ALARM_ID, String.valueOf(oneTimeAlarm.getId()));
+            SharedPreferencesHelper.save(PERSIST_LAST_ALARM_ID, String.valueOf(oneTimeAlarm.getId()));
         } else {
             throw new IllegalArgumentException("Unexpected class " + appAlarm.getClass());
         }
-
-        editor.apply();
     }
 
     private void saveRingAfterSnoozeTime(Calendar ringAfterSnoozeTime) {
         Log.v(TAG, "saveRingAfterSnoozeTime(ringAfterSnoozeTime=" + ringAfterSnoozeTime + ")");
 
-        Context context = AlarmMorningApplication.getAppContext();
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = preferences.edit();
-
         String ringAfterSnoozeTimeStr = Analytics.calendarToDatetimeStringUTC(ringAfterSnoozeTime);
 
-        editor.putString(PERSIST_LAST_RING_AFTER_SNOOZE_TIME, ringAfterSnoozeTimeStr);
-
-        editor.apply();
+        SharedPreferencesHelper.save(PERSIST_LAST_RING_AFTER_SNOOZE_TIME, ringAfterSnoozeTimeStr);
     }
 
     public Calendar loadRingAfterSnoozeTime() {
         Log.v(TAG, "loadRingAfterSnoozeTime()");
 
-        Context context = AlarmMorningApplication.getAppContext();
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-
-        String ringAfterSnoozeTimeStr = preferences.getString(PERSIST_LAST_RING_AFTER_SNOOZE_TIME, STRING_UNDEFINED);
+        String ringAfterSnoozeTimeStr = (String) SharedPreferencesHelper.load(PERSIST_LAST_RING_AFTER_SNOOZE_TIME);
 
         Calendar ringAfterSnoozeTime = Analytics.datetimeUTCStringToCalendar(ringAfterSnoozeTimeStr);
 
@@ -426,23 +408,14 @@ public class GlobalManager {
     private void saveSnoozeCount(long snoozeCount) {
         Log.v(TAG, "saveSnoozeCount()");
 
-        Context context = AlarmMorningApplication.getAppContext();
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = preferences.edit();
-
-        editor.putLong(PERSIST_LAST_SNOOZE_COUNT, snoozeCount);
-
-        editor.apply();
+        SharedPreferencesHelper.save(PERSIST_LAST_SNOOZE_COUNT, snoozeCount);
 
     }
 
     private long loadSnoozeCount() {
         Log.v(TAG, "loadSnoozeCount()");
 
-        Context context = AlarmMorningApplication.getAppContext();
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-
-        long snoozeCount = preferences.getLong(PERSIST_LAST_SNOOZE_COUNT, LONG_UNDEFINED);
+        long snoozeCount = (long) SharedPreferencesHelper.load(PERSIST_LAST_SNOOZE_COUNT);
 
         return snoozeCount;
     }
@@ -457,7 +430,7 @@ public class GlobalManager {
 
         try {
             Context context = AlarmMorningApplication.getAppContext();
-            JSONArray jsonArray = JSONSharedPreferences.loadJSONArray(context, PERSIST_DISMISSED);
+            JSONArray jsonArray = JSONSharedPreferences.loadJSONArray(PERSIST_DISMISSED);
 
             Set<AppAlarm> dismissedAlarms = new HashSet<>(jsonArray.length());
             for (int i = 0; i < jsonArray.length(); i++) {
@@ -540,7 +513,7 @@ public class GlobalManager {
 
             // Save
             Context context = AlarmMorningApplication.getAppContext();
-            JSONSharedPreferences.saveJSONArray(context, PERSIST_DISMISSED, jsonArray);
+            JSONSharedPreferences.saveJSONArray(PERSIST_DISMISSED, jsonArray);
         } catch (JSONException e) {
             Log.w(TAG, "Cannot convert to JSON, therefore cannot store dismissed alarms", e);
         }
@@ -1142,9 +1115,7 @@ public class GlobalManager {
     public Calendar onSnooze(AppAlarm appAlarm, Analytics analytics) {
         Log.d(TAG, "onSnooze()");
 
-        Context context = AlarmMorningApplication.getAppContext();
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        int snoozeTime = preferences.getInt(SettingsActivity.PREF_SNOOZE_TIME, SettingsActivity.PREF_SNOOZE_TIME_DEFAULT);
+        int snoozeTime = (int) SharedPreferencesHelper.load(SettingsActivity.PREF_SNOOZE_TIME, SettingsActivity.PREF_SNOOZE_TIME_DEFAULT);
 
         return onSnooze(appAlarm, snoozeTime, analytics);
     }
@@ -1402,9 +1373,7 @@ public class GlobalManager {
     public Calendar getRingAfterSnoozeTime(Clock clock) {
         Log.d(TAG, "getRingAfterSnoozeTime()");
 
-        Context context = AlarmMorningApplication.getAppContext();
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        int snoozeTime = preferences.getInt(SettingsActivity.PREF_SNOOZE_TIME, SettingsActivity.PREF_SNOOZE_TIME_DEFAULT);
+        int snoozeTime = (int) SharedPreferencesHelper.load(SettingsActivity.PREF_SNOOZE_TIME, SettingsActivity.PREF_SNOOZE_TIME_DEFAULT);
 
         return getRingAfterSnoozeTime(clock, snoozeTime);
     }
@@ -1470,10 +1439,12 @@ public class GlobalManager {
     public String loadHoliday() {
         Log.v(TAG, "loadHoliday()");
 
-        Context context = AlarmMorningApplication.getAppContext();
-
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        String holidayPreference = preferences.getString(SettingsActivity.PREF_HOLIDAY, SettingsActivity.PREF_HOLIDAY_DEFAULT);
+        String holidayPreference;
+        try {
+            holidayPreference = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_HOLIDAY);
+        } catch (NoSuchElementException e) {
+            holidayPreference = SettingsActivity.PREF_HOLIDAY_DEFAULT;
+        }
 
         // TODO If the region path does not exist (because the library stopped supporting it or it disappeared) then use the first existing super-region
 
@@ -1488,15 +1459,8 @@ public class GlobalManager {
     public void saveHoliday(String holidayPreference) {
         Log.d(TAG, "saveHoliday(holidayPreference=" + holidayPreference + ")");
 
-        Context context = AlarmMorningApplication.getAppContext();
-
         // Save
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = preferences.edit();
-
-        editor.putString(SettingsActivity.PREF_HOLIDAY, holidayPreference);
-
-        editor.apply();
+        SharedPreferencesHelper.save(SettingsActivity.PREF_HOLIDAY, holidayPreference);
 
         // Reset alarm
         onAlarmSet();
@@ -1724,14 +1688,9 @@ public class GlobalManager {
      */
     private void resetSettings() {
         Context context = AlarmMorningApplication.getAppContext();
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 
         // Clear preferences
-        SharedPreferences.Editor editor = preferences.edit();
-
-        editor.clear();
-
-        editor.apply();
+        SharedPreferencesHelper.clear();
 
         // Set defaults
         PreferenceManager.setDefaultValues(context, R.xml.preferences, true);

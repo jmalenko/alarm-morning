@@ -4,12 +4,10 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.AssetFileDescriptor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -19,6 +17,7 @@ import cz.jaro.alarmmorning.Analytics;
 import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.SettingsActivity;
+import cz.jaro.alarmmorning.SharedPreferencesHelper;
 import cz.jaro.alarmmorning.SystemAlarm;
 import cz.jaro.alarmmorning.checkalarmtime.CheckAlarmTime;
 
@@ -57,8 +56,7 @@ public class NighttimeBell {
     public boolean isEnabled() {
         Log.v(TAG, "isEnabled()");
 
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        boolean nighttimeBellPreference = preferences.getBoolean(SettingsActivity.PREF_NIGHTTIME_BELL, SettingsActivity.PREF_NIGHTTIME_BELL_DEFAULT);
+        boolean nighttimeBellPreference = (boolean) SharedPreferencesHelper.load(SettingsActivity.PREF_NIGHTTIME_BELL, SettingsActivity.PREF_NIGHTTIME_BELL_DEFAULT);
 
         return nighttimeBellPreference;
     }
@@ -74,8 +72,7 @@ public class NighttimeBell {
     public void register() {
         Log.d(TAG, "register()");
 
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        String nighttimeBellAtPreference = preferences.getString(SettingsActivity.PREF_NIGHTTIME_BELL_AT, SettingsActivity.PREF_NIGHTTIME_BELL_AT_DEFAULT);
+        String nighttimeBellAtPreference = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_NIGHTTIME_BELL_AT, SettingsActivity.PREF_NIGHTTIME_BELL_AT_DEFAULT);
 
         register(nighttimeBellAtPreference);
     }
@@ -178,10 +175,9 @@ public class NighttimeBell {
      */
     private Uri getRingtoneUri() {
         Uri ringtoneUri;
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 
-        if (preferences.contains(SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE)) {
-            String ringtonePreference = preferences.getString(SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE, SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE_DEFAULT);
+        if (SharedPreferencesHelper.contains(SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE)) {
+            String ringtonePreference = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE, SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE_DEFAULT);
             ringtoneUri = ringtonePreference.equals(SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE_DEFAULT) ? null : Uri.parse(ringtonePreference);
         } else {
             ringtoneUri = null;

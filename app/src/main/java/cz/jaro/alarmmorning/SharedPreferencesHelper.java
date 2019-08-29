@@ -8,9 +8,9 @@ import android.util.Log;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-public class SharedPreferencessHelper {
+public class SharedPreferencesHelper {
 
-    private static final String TAG = GlobalManager.createLogTag(SharedPreferencessHelper.class);
+    private static final String TAG = GlobalManager.createLogTag(SharedPreferencesHelper.class);
 
     public static void save(String key, Object value) {
         Log.v(TAG, "save(key=" + key + ", value=" + value + ")");
@@ -95,6 +95,14 @@ public class SharedPreferencessHelper {
         throw new IllegalStateException("This should not happen");
     }
 
+    public static Object load(String key, Object defaultValue) {
+        try {
+            return load(key);
+        } catch (NoSuchElementException e) {
+            return defaultValue;
+        }
+    }
+
     public static void remove(String key) {
         Log.v(TAG, "remove(key=" + key + ")");
 
@@ -103,6 +111,27 @@ public class SharedPreferencessHelper {
         SharedPreferences.Editor editor = preferences.edit();
 
         editor.remove(key);
+
+        editor.apply();
+    }
+
+    public static boolean contains(String key) {
+        Log.v(TAG, "contains(key=" + key + ")");
+
+        Context context = AlarmMorningApplication.getAppContext();
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+
+        return preferences.contains(key);
+    }
+
+    public static void clear() {
+        Log.v(TAG, "clear()");
+
+        Context context = AlarmMorningApplication.getAppContext();
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = preferences.edit();
+
+        editor.clear();
 
         editor.apply();
     }

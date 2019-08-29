@@ -4,10 +4,8 @@ import android.app.Application;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.preference.PreferenceManager;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -61,10 +59,7 @@ public class AlarmMorningActivityTest extends FixedTimeTest {
         Context context = AlarmMorningApplication.getAppContext();
 
         // Set to default
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean(Wizard.PREF_WIZARD, wizardPreference);
-        editor.commit();
+        SharedPreferencesHelper.save(Wizard.PREF_WIZARD, wizardPreference);
     }
 
     @Test

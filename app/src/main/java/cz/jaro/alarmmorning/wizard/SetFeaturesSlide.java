@@ -1,8 +1,6 @@
 package cz.jaro.alarmmorning.wizard;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.widget.CheckBox;
 
 import cz.jaro.alarmmorning.Analytics;
@@ -10,6 +8,7 @@ import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.Localization;
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.SettingsActivity;
+import cz.jaro.alarmmorning.SharedPreferencesHelper;
 import cz.jaro.alarmmorning.graphics.TimePreference;
 
 /**
@@ -26,35 +25,31 @@ public class SetFeaturesSlide extends BaseFragment {
 
     @Override
     public void onSlideDeselected() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-        SharedPreferences.Editor editor = preferences.edit();
 
         CheckBox onCheckAlarmTime = getView().findViewById(R.id.onCheckAlarmTime);
-        editor.putBoolean(SettingsActivity.PREF_CHECK_ALARM_TIME, onCheckAlarmTime.isChecked());
+        SharedPreferencesHelper.save(SettingsActivity.PREF_CHECK_ALARM_TIME, onCheckAlarmTime.isChecked());
         if (onCheckAlarmTime.isChecked()) {
-            savePreference(getContext(), editor, SettingsActivity.PREF_CHECK_ALARM_TIME_AT, SettingsActivity.PREF_CHECK_ALARM_TIME_AT_DEFAULT);
-            savePreference(getContext(), editor, SettingsActivity.PREF_CHECK_ALARM_TIME_GAP, SettingsActivity.PREF_CHECK_ALARM_TIME_GAP_DEFAULT);
+            savePreference(getContext(), SettingsActivity.PREF_CHECK_ALARM_TIME_AT, SettingsActivity.PREF_CHECK_ALARM_TIME_AT_DEFAULT);
+            savePreference(getContext(), SettingsActivity.PREF_CHECK_ALARM_TIME_GAP, SettingsActivity.PREF_CHECK_ALARM_TIME_GAP_DEFAULT);
         }
 
         CheckBox onPlayNighttimeBell = getView().findViewById(R.id.onPlayNighttimeBell);
-        editor.putBoolean(SettingsActivity.PREF_NIGHTTIME_BELL, onPlayNighttimeBell.isChecked());
+        SharedPreferencesHelper.save(SettingsActivity.PREF_NIGHTTIME_BELL, onPlayNighttimeBell.isChecked());
         if (onPlayNighttimeBell.isChecked()) {
-            savePreference(getContext(), editor, SettingsActivity.PREF_NIGHTTIME_BELL_AT, SettingsActivity.PREF_NIGHTTIME_BELL_AT_DEFAULT);
+            savePreference(getContext(), SettingsActivity.PREF_NIGHTTIME_BELL_AT, SettingsActivity.PREF_NIGHTTIME_BELL_AT_DEFAULT);
         }
-
-        editor.apply();
     }
 
-    protected static void savePreference(Context context, SharedPreferences.Editor editor, String pref, String value) {
+    protected static void savePreference(Context context, String pref, String value) {
         analytics(context, pref, value);
 
-        editor.putString(pref, value);
+        SharedPreferencesHelper.save(pref, value);
     }
 
-    protected static void savePreference(Context context, SharedPreferences.Editor editor, String pref, int value) {
+    protected static void savePreference(Context context, String pref, int value) {
         analytics(context, pref, value);
 
-        editor.putInt(pref, value);
+        SharedPreferencesHelper.save(pref, value);
     }
 
     protected static void analytics(Context context, String pref, Object value) {

@@ -23,7 +23,7 @@ import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.Localization;
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.SettingsActivity;
-import cz.jaro.alarmmorning.SharedPreferencessHelper;
+import cz.jaro.alarmmorning.SharedPreferencesHelper;
 import cz.jaro.alarmmorning.SystemAlarm;
 import cz.jaro.alarmmorning.SystemNotification;
 import cz.jaro.alarmmorning.calendar.CalendarEvent;
@@ -105,7 +105,7 @@ public class CheckAlarmTime {
         Log.v(TAG, "isEnabled()");
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        boolean checkAlarmTimePreference = preferences.getBoolean(SettingsActivity.PREF_CHECK_ALARM_TIME, SettingsActivity.PREF_CHECK_ALARM_TIME_DEFAULT);
+        boolean checkAlarmTimePreference = (boolean) SharedPreferencesHelper.load(SettingsActivity.PREF_CHECK_ALARM_TIME, SettingsActivity.PREF_CHECK_ALARM_TIME_DEFAULT);
 
         return checkAlarmTimePreference;
     }
@@ -121,8 +121,7 @@ public class CheckAlarmTime {
     public void register() {
         Log.v(TAG, "register()");
 
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        String checkAlarmTimeAtPreference = preferences.getString(SettingsActivity.PREF_CHECK_ALARM_TIME_AT, SettingsActivity.PREF_CHECK_ALARM_TIME_AT_DEFAULT);
+        String checkAlarmTimeAtPreference = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_CHECK_ALARM_TIME_AT, SettingsActivity.PREF_CHECK_ALARM_TIME_AT_DEFAULT);
 
         register(checkAlarmTimeAtPreference);
 
@@ -181,8 +180,8 @@ public class CheckAlarmTime {
         }
 
         // Cleanup the preferences
-        SharedPreferencessHelper.remove(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_EVENT_BEGIN);
-        SharedPreferencessHelper.remove(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION);
+        SharedPreferencesHelper.remove(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_EVENT_BEGIN);
+        SharedPreferencesHelper.remove(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION);
     }
 
     private void registerNotificationDismiss(Calendar time) {
@@ -269,8 +268,8 @@ public class CheckAlarmTime {
             showNotification(morningInfo.day, morningInfo.targetAlarmTime, morningInfo.event);
             registerNotificationDismiss(morningInfo.alarmTime);
 
-            SharedPreferencessHelper.save(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_EVENT_BEGIN, Analytics.calendarToDatetimeStringUTC(morningInfo.event.getBegin()));
-            SharedPreferencessHelper.save(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION,
+            SharedPreferencesHelper.save(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_EVENT_BEGIN, Analytics.calendarToDatetimeStringUTC(morningInfo.event.getBegin()));
+            SharedPreferencesHelper.save(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION,
                     morningInfo.attentionNeeded
                             ? PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION__NOTIFICATION_DISPLAYED
                             : PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION__NOTIFICATION_NOT_DISPLAYED);
@@ -282,7 +281,7 @@ public class CheckAlarmTime {
 
         new Analytics(context, Analytics.Event.Hide, Analytics.Channel.Time, Analytics.ChannelName.Check_alarm_time).save();
 
-        SharedPreferencessHelper.save(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION, PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION__AUTO_HIDDEN);
+        SharedPreferencesHelper.save(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION, PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION__AUTO_HIDDEN);
 
         hideNotification();
     }
@@ -300,9 +299,9 @@ public class CheckAlarmTime {
             Calendar notificationEventBegin;
             String notificationAction;
             try {
-                String notificationEventBeginStr = (String) SharedPreferencessHelper.load(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_EVENT_BEGIN);
+                String notificationEventBeginStr = (String) SharedPreferencesHelper.load(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_EVENT_BEGIN);
                 notificationEventBegin = Analytics.datetimeUTCStringToCalendar(notificationEventBeginStr);
-                notificationAction = (String) SharedPreferencessHelper.load(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION);
+                notificationAction = (String) SharedPreferencesHelper.load(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION);
             } catch (NoSuchElementException e) {
                 notificationEventBegin = null;
                 notificationAction = null;
@@ -330,8 +329,8 @@ public class CheckAlarmTime {
                 showNotification(morningInfo.day, morningInfo.targetAlarmTime, morningInfo.event);
                 registerNotificationDismiss(morningInfo.alarmTime);
 
-                SharedPreferencessHelper.save(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_EVENT_BEGIN, Analytics.calendarToDatetimeStringUTC(morningInfo.event.getBegin()));
-                SharedPreferencessHelper.save(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION, PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION__NOTIFICATION_DISPLAYED);
+                SharedPreferencesHelper.save(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_EVENT_BEGIN, Analytics.calendarToDatetimeStringUTC(morningInfo.event.getBegin()));
+                SharedPreferencesHelper.save(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION, PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION__NOTIFICATION_DISPLAYED);
             }
 
             // Check for a deleted event (that triggered setting the alarm)
@@ -347,8 +346,8 @@ public class CheckAlarmTime {
                     if (morningInfo.attentionNeeded) {
                         showNotification(morningInfo.day, morningInfo.targetAlarmTime, morningInfo.event);
                         registerNotificationDismiss(morningInfo.alarmTime);
-                        SharedPreferencessHelper.save(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_EVENT_BEGIN, Analytics.calendarToDatetimeStringUTC(morningInfo.event.getBegin()));
-                        SharedPreferencessHelper.save(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION, PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION__NOTIFICATION_DISPLAYED);
+                        SharedPreferencesHelper.save(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_EVENT_BEGIN, Analytics.calendarToDatetimeStringUTC(morningInfo.event.getBegin()));
+                        SharedPreferencesHelper.save(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION, PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION__NOTIFICATION_DISPLAYED);
                     }
                 } else if (notificationAction.equals(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION__SET_TO_CUSTOM)
                         || notificationAction.equals(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION__SET_TO_DEFAULT)) {
@@ -359,8 +358,8 @@ public class CheckAlarmTime {
 
                     Calendar newNotificationEventBegin = morningInfo.event != null ? morningInfo.event.getBegin() : justBeforeNoonToday(calcMorningDate()); // Note: relative to morning
 
-                    SharedPreferencessHelper.save(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_EVENT_BEGIN, Analytics.calendarToDatetimeStringUTC(newNotificationEventBegin));
-                    SharedPreferencessHelper.save(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION, PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION__NOTIFICATION_DISPLAYED);
+                    SharedPreferencesHelper.save(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_EVENT_BEGIN, Analytics.calendarToDatetimeStringUTC(newNotificationEventBegin));
+                    SharedPreferencesHelper.save(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION, PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION__NOTIFICATION_DISPLAYED);
                 }
             }
 
@@ -395,8 +394,7 @@ public class CheckAlarmTime {
      */
     static public Calendar calcMorningDate(Context context) {
         Log.v(TAG, "calcMorningDate()");
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        String checkAlarmTimeAtPreference = preferences.getString(SettingsActivity.PREF_CHECK_ALARM_TIME_AT, SettingsActivity.PREF_CHECK_ALARM_TIME_AT_DEFAULT);
+        String checkAlarmTimeAtPreference = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_CHECK_ALARM_TIME_AT, SettingsActivity.PREF_CHECK_ALARM_TIME_AT_DEFAULT);
 
         GlobalManager globalManager = GlobalManager.getInstance();
         Clock clock = globalManager.clock();
@@ -706,8 +704,7 @@ class MorningInfo {
         Log.v(TAG, "alarmTime=" + alarmTime.getTime() + ", enabled=" + day.isEnabled());
 
         // Load gap
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        checkAlarmTimeGap = preferences.getInt(SettingsActivity.PREF_CHECK_ALARM_TIME_GAP, SettingsActivity.PREF_CHECK_ALARM_TIME_GAP_DEFAULT);
+        checkAlarmTimeGap = (int) SharedPreferencesHelper.load(SettingsActivity.PREF_CHECK_ALARM_TIME_GAP, SettingsActivity.PREF_CHECK_ALARM_TIME_GAP_DEFAULT);
         Log.v(TAG, "checkAlarmTimeGap=" + checkAlarmTimeGap + " minutes");
 
         analytics = new Analytics(context, Analytics.Event.Show, Analytics.Channel.Time, Analytics.ChannelName.Check_alarm_time);

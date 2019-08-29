@@ -3,13 +3,11 @@ package cz.jaro.alarmmorning;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.util.Log;
@@ -450,77 +448,75 @@ public class Analytics {
 
         try {
             // Settings
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-
             JSONObject confPreferences = new JSONObject();
-            String ringtonePreference = preferences.getString(SettingsActivity.PREF_RINGTONE, SettingsActivity.PREF_RINGTONE_DEFAULT);
+            String ringtonePreference = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_RINGTONE, SettingsActivity.PREF_RINGTONE_DEFAULT);
             confPreferences.put(SettingsActivity.PREF_RINGTONE, ringtonePreference);
 
-            int volumePreference = preferences.getInt(SettingsActivity.PREF_VOLUME, SettingsActivity.PREF_VOLUME_DEFAULT);
+            int volumePreference = (int) SharedPreferencesHelper.load(SettingsActivity.PREF_VOLUME, SettingsActivity.PREF_VOLUME_DEFAULT);
             int volume = SettingsActivity.getRealVolume(volumePreference, 100);
             confPreferences.put(SettingsActivity.PREF_VOLUME, volume);
 
-            boolean increasing = preferences.getBoolean(SettingsActivity.PREF_VOLUME_INCREASING, SettingsActivity.PREF_VOLUME_INCREASING_DEFAULT);
+            boolean increasing = (boolean) SharedPreferencesHelper.load(SettingsActivity.PREF_VOLUME_INCREASING, SettingsActivity.PREF_VOLUME_INCREASING_DEFAULT);
             confPreferences.put(SettingsActivity.PREF_VOLUME_INCREASING, increasing);
 
-            boolean vibratePreference = preferences.getBoolean(SettingsActivity.PREF_VIBRATE, SettingsActivity.PREF_VIBRATE_DEFAULT);
+            boolean vibratePreference = (boolean) SharedPreferencesHelper.load(SettingsActivity.PREF_VIBRATE, SettingsActivity.PREF_VIBRATE_DEFAULT);
             confPreferences.put(SettingsActivity.PREF_VIBRATE, vibratePreference);
 
-            int snoozeTime = preferences.getInt(SettingsActivity.PREF_SNOOZE_TIME, SettingsActivity.PREF_SNOOZE_TIME_DEFAULT);
+            int snoozeTime = (int) SharedPreferencesHelper.load(SettingsActivity.PREF_SNOOZE_TIME, SettingsActivity.PREF_SNOOZE_TIME_DEFAULT);
             confPreferences.put(SettingsActivity.PREF_SNOOZE_TIME, snoozeTime);
 
-            boolean autoSnooze = preferences.getBoolean(SettingsActivity.PREF_AUTO_SNOOZE, SettingsActivity.PREF_AUTO_SNOOZE_DEFAULT);
+            boolean autoSnooze = (boolean) SharedPreferencesHelper.load(SettingsActivity.PREF_AUTO_SNOOZE, SettingsActivity.PREF_AUTO_SNOOZE_DEFAULT);
             confPreferences.put(SettingsActivity.PREF_AUTO_SNOOZE, autoSnooze);
 
-            int autoSnoozeMinutes = preferences.getInt(SettingsActivity.PREF_AUTO_SNOOZE_TIME, SettingsActivity.PREF_AUTO_SNOOZE_TIME_DEFAULT);
+            int autoSnoozeMinutes = (int) SharedPreferencesHelper.load(SettingsActivity.PREF_AUTO_SNOOZE_TIME, SettingsActivity.PREF_AUTO_SNOOZE_TIME_DEFAULT);
             confPreferences.put(SettingsActivity.PREF_AUTO_SNOOZE_TIME, autoSnoozeMinutes);
 
-            boolean autoDismiss = preferences.getBoolean(SettingsActivity.PREF_AUTO_DISMISS, SettingsActivity.PREF_AUTO_DISMISS_DEFAULT);
+            boolean autoDismiss = (boolean) SharedPreferencesHelper.load(SettingsActivity.PREF_AUTO_DISMISS, SettingsActivity.PREF_AUTO_DISMISS_DEFAULT);
             confPreferences.put(SettingsActivity.PREF_AUTO_DISMISS, autoDismiss);
 
-            int autoDismissMinutes = preferences.getInt(SettingsActivity.PREF_AUTO_DISMISS_TIME, SettingsActivity.PREF_AUTO_DISMISS_TIME_DEFAULT);
+            int autoDismissMinutes = (int) SharedPreferencesHelper.load(SettingsActivity.PREF_AUTO_DISMISS_TIME, SettingsActivity.PREF_AUTO_DISMISS_TIME_DEFAULT);
             confPreferences.put(SettingsActivity.PREF_AUTO_DISMISS_TIME, autoDismissMinutes);
 
-            int nearFutureMinutes = preferences.getInt(SettingsActivity.PREF_NEAR_FUTURE_TIME, SettingsActivity.PREF_NEAR_FUTURE_TIME_DEFAULT);
+            int nearFutureMinutes = (int) SharedPreferencesHelper.load(SettingsActivity.PREF_NEAR_FUTURE_TIME, SettingsActivity.PREF_NEAR_FUTURE_TIME_DEFAULT);
             confPreferences.put(SettingsActivity.PREF_NEAR_FUTURE_TIME, nearFutureMinutes);
 
-            boolean napTimeEnabled = preferences.getBoolean(SettingsActivity.PREF_NAP_ENABLED, SettingsActivity.PREF_NAP_ENABLED_DEFAULT);
+            boolean napTimeEnabled = (boolean) SharedPreferencesHelper.load(SettingsActivity.PREF_NAP_ENABLED, SettingsActivity.PREF_NAP_ENABLED_DEFAULT);
             confPreferences.put(SettingsActivity.PREF_NAP_ENABLED, napTimeEnabled);
 
-            int napTime = preferences.getInt(SettingsActivity.PREF_NAP_TIME, SettingsActivity.PREF_NAP_TIME_DEFAULT);
+            int napTime = (int) SharedPreferencesHelper.load(SettingsActivity.PREF_NAP_TIME, SettingsActivity.PREF_NAP_TIME_DEFAULT);
             confPreferences.put(SettingsActivity.PREF_NAP_TIME, napTime);
 
-            String buttonActionPreference = preferences.getString(SettingsActivity.PREF_ACTION_ON_BUTTON, SettingsActivity.PREF_ACTION_DEFAULT);
+            String buttonActionPreference = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_ACTION_ON_BUTTON, SettingsActivity.PREF_ACTION_DEFAULT);
             confPreferences.put(SettingsActivity.PREF_ACTION_ON_BUTTON, SettingsActivity.actionCodeToString(buttonActionPreference));
 
-            String moveActionPreference = preferences.getString(SettingsActivity.PREF_ACTION_ON_BUTTON, SettingsActivity.PREF_ACTION_DEFAULT);
+            String moveActionPreference = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_ACTION_ON_BUTTON, SettingsActivity.PREF_ACTION_DEFAULT);
             confPreferences.put(SettingsActivity.PREF_ACTION_ON_MOVE, SettingsActivity.actionCodeToString(moveActionPreference));
 
-            String flipActionPreference = preferences.getString(SettingsActivity.PREF_ACTION_ON_BUTTON, SettingsActivity.PREF_ACTION_DEFAULT);
+            String flipActionPreference = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_ACTION_ON_BUTTON, SettingsActivity.PREF_ACTION_DEFAULT);
             confPreferences.put(SettingsActivity.PREF_ACTION_ON_FLIP, SettingsActivity.actionCodeToString(flipActionPreference));
 
-            String shakeActionPreference = preferences.getString(SettingsActivity.PREF_ACTION_ON_BUTTON, SettingsActivity.PREF_ACTION_DEFAULT);
+            String shakeActionPreference = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_ACTION_ON_BUTTON, SettingsActivity.PREF_ACTION_DEFAULT);
             confPreferences.put(SettingsActivity.PREF_ACTION_ON_SHAKE, SettingsActivity.actionCodeToString(shakeActionPreference));
 
-            String proximityActionPreference = preferences.getString(SettingsActivity.PREF_ACTION_ON_BUTTON, SettingsActivity.PREF_ACTION_DEFAULT);
+            String proximityActionPreference = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_ACTION_ON_BUTTON, SettingsActivity.PREF_ACTION_DEFAULT);
             confPreferences.put(SettingsActivity.PREF_ACTION_ON_PROXIMITY, SettingsActivity.actionCodeToString(proximityActionPreference));
 
-            boolean checkAlarmTimePreference = preferences.getBoolean(SettingsActivity.PREF_CHECK_ALARM_TIME, SettingsActivity.PREF_CHECK_ALARM_TIME_DEFAULT);
+            boolean checkAlarmTimePreference = (boolean) SharedPreferencesHelper.load(SettingsActivity.PREF_CHECK_ALARM_TIME, SettingsActivity.PREF_CHECK_ALARM_TIME_DEFAULT);
             confPreferences.put(SettingsActivity.PREF_CHECK_ALARM_TIME, checkAlarmTimePreference);
 
-            String checkAlarmTimeAtPreference = preferences.getString(SettingsActivity.PREF_CHECK_ALARM_TIME_AT, SettingsActivity.PREF_CHECK_ALARM_TIME_AT_DEFAULT);
+            String checkAlarmTimeAtPreference = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_CHECK_ALARM_TIME_AT, SettingsActivity.PREF_CHECK_ALARM_TIME_AT_DEFAULT);
             confPreferences.put(SettingsActivity.PREF_CHECK_ALARM_TIME_AT, checkAlarmTimeAtPreference);
 
-            int checkAlarmTimeGap = preferences.getInt(SettingsActivity.PREF_CHECK_ALARM_TIME_GAP, SettingsActivity.PREF_CHECK_ALARM_TIME_GAP_DEFAULT);
+            int checkAlarmTimeGap = (int) SharedPreferencesHelper.load(SettingsActivity.PREF_CHECK_ALARM_TIME_GAP, SettingsActivity.PREF_CHECK_ALARM_TIME_GAP_DEFAULT);
             confPreferences.put(SettingsActivity.PREF_CHECK_ALARM_TIME_GAP, checkAlarmTimeGap);
 
-            boolean nighttimeBellPreference = preferences.getBoolean(SettingsActivity.PREF_NIGHTTIME_BELL, SettingsActivity.PREF_NIGHTTIME_BELL_DEFAULT);
+            boolean nighttimeBellPreference = (boolean) SharedPreferencesHelper.load(SettingsActivity.PREF_NIGHTTIME_BELL, SettingsActivity.PREF_NIGHTTIME_BELL_DEFAULT);
             confPreferences.put(SettingsActivity.PREF_NIGHTTIME_BELL, nighttimeBellPreference);
 
-            String nighttimeBellAtPreference = preferences.getString(SettingsActivity.PREF_NIGHTTIME_BELL_AT, SettingsActivity.PREF_NIGHTTIME_BELL_AT_DEFAULT);
+            String nighttimeBellAtPreference = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_NIGHTTIME_BELL_AT, SettingsActivity.PREF_NIGHTTIME_BELL_AT_DEFAULT);
             confPreferences.put(SettingsActivity.PREF_NIGHTTIME_BELL_AT, nighttimeBellAtPreference);
 
-            String nighttimeBellRingtonePreference = preferences.getString(SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE, SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE_DEFAULT);
+            String nighttimeBellRingtonePreference = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE, SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE_DEFAULT);
             confPreferences.put(SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE, nighttimeBellRingtonePreference);
 
             conf.put("preferences", confPreferences);
@@ -802,18 +798,15 @@ public class Analytics {
     private String getUserId() {
         String userId;
 
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mContext);
-        if (preferences.contains(PREF_USER_ID)) {
-            userId = preferences.getString(PREF_USER_ID, PREF_USER_ID_UNSET);
+        if (SharedPreferencesHelper.contains(PREF_USER_ID)) {
+            userId = (String) SharedPreferencesHelper.load(PREF_USER_ID);
         } else {
             char[] CHARSET_AZ_09 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toCharArray();
             userId = randomString(CHARSET_AZ_09, USER_ID_LENGTH);
 
             Log.d(TAG, "Created user_id=" + userId);
 
-            SharedPreferences.Editor editor = preferences.edit();
-            editor.putString(PREF_USER_ID, userId);
-            editor.apply();
+            SharedPreferencesHelper.save(PREF_USER_ID, userId);
         }
 
         return userId;

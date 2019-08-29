@@ -1,13 +1,12 @@
 package cz.jaro.alarmmorning.wizard;
 
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 import android.widget.CheckBox;
 
 import cz.jaro.alarmmorning.Analytics;
 import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.SettingsActivity;
+import cz.jaro.alarmmorning.SharedPreferencesHelper;
 
 /**
  * When run repeatedly, behaves as run for the first time.
@@ -23,34 +22,29 @@ public class SetActionsSlide extends BaseFragment {
 
     @Override
     public void onSlideDeselected() {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-        SharedPreferences.Editor editor = preferences.edit();
-
         CheckBox onMoveCheckBox = getView().findViewById(R.id.onMoveCheckBox);
         if (onMoveCheckBox.isChecked()) {
-            saveActionPreference(editor, SettingsActivity.PREF_ACTION_ON_MOVE, SettingsActivity.PREF_ACTION_MUTE);
+            saveActionPreference(SettingsActivity.PREF_ACTION_ON_MOVE, SettingsActivity.PREF_ACTION_MUTE);
         }
 
         CheckBox onFlipCheckBox = getView().findViewById(R.id.onFlipCheckBox);
         if (onFlipCheckBox.isChecked()) {
-            saveActionPreference(editor, SettingsActivity.PREF_ACTION_ON_FLIP, SettingsActivity.PREF_ACTION_SNOOZE);
+            saveActionPreference(SettingsActivity.PREF_ACTION_ON_FLIP, SettingsActivity.PREF_ACTION_SNOOZE);
         }
 
         CheckBox onShakeCheckBox = getView().findViewById(R.id.onShakeCheckBox);
         if (onShakeCheckBox.isChecked()) {
-            saveActionPreference(editor, SettingsActivity.PREF_ACTION_ON_SHAKE, SettingsActivity.PREF_ACTION_DISMISS);
+            saveActionPreference(SettingsActivity.PREF_ACTION_ON_SHAKE, SettingsActivity.PREF_ACTION_DISMISS);
         }
-
-        editor.apply();
     }
 
-    private void saveActionPreference(SharedPreferences.Editor editor, String pref, String value) {
+    private void saveActionPreference(String pref, String value) {
         Analytics analytics = new Analytics(getContext(), Analytics.Event.Change_setting, Analytics.Channel.Activity, Analytics.ChannelName.Wizard);
         analytics.set(Analytics.Param.Preference_key, pref);
         analytics.set(Analytics.Param.Preference_value, SettingsActivity.actionCodeToString(value));
         analytics.save();
 
-        editor.putString(pref, value);
+        SharedPreferencesHelper.save(pref, value);
     }
 
     @Override

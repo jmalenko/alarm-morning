@@ -4,9 +4,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Build;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 import java.util.Calendar;
@@ -264,8 +262,7 @@ public class SystemAlarm {
     }
 
     public static boolean useNearFutureTime(Context context) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        int nearFutureMinutes = preferences.getInt(SettingsActivity.PREF_NEAR_FUTURE_TIME, SettingsActivity.PREF_NEAR_FUTURE_TIME_DEFAULT);
+        int nearFutureMinutes = (int) SharedPreferencesHelper.load(SettingsActivity.PREF_NEAR_FUTURE_TIME, SettingsActivity.PREF_NEAR_FUTURE_TIME_DEFAULT);
 
         return 0 < nearFutureMinutes;
     }
@@ -275,8 +272,7 @@ public class SystemAlarm {
     }
 
     public static Calendar getNearFutureTime(Context context, Calendar alarmTime) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        int nearFutureMinutes = preferences.getInt(SettingsActivity.PREF_NEAR_FUTURE_TIME, SettingsActivity.PREF_NEAR_FUTURE_TIME_DEFAULT);
+        int nearFutureMinutes = (int) SharedPreferencesHelper.load(SettingsActivity.PREF_NEAR_FUTURE_TIME, SettingsActivity.PREF_NEAR_FUTURE_TIME_DEFAULT);
 
         Calendar nearFutureTime = (Calendar) alarmTime.clone();
         nearFutureTime.add(Calendar.MINUTE, -nearFutureMinutes);

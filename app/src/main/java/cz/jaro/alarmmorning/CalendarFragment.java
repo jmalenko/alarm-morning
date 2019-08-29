@@ -3,10 +3,8 @@ package cz.jaro.alarmmorning;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Fragment;
-import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -652,11 +650,10 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         // Preset time
         Calendar now = clock().now();
 
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        boolean presetNap = preferences.getBoolean(SettingsActivity.PREF_NAP_ENABLED, SettingsActivity.PREF_NAP_ENABLED_DEFAULT);
+        boolean presetNap = (boolean) SharedPreferencesHelper.load(SettingsActivity.PREF_NAP_ENABLED, SettingsActivity.PREF_NAP_ENABLED_DEFAULT);
         Bundle bundle = new Bundle();
         if (presetNap) {
-            int napTime = preferences.getInt(SettingsActivity.PREF_NAP_TIME, SettingsActivity.PREF_NAP_TIME_DEFAULT);
+            int napTime = (int) SharedPreferencesHelper.load(SettingsActivity.PREF_NAP_TIME, SettingsActivity.PREF_NAP_TIME_DEFAULT);
 
             now.add(Calendar.MINUTE, napTime);
 
