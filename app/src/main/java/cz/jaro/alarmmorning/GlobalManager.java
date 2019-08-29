@@ -808,7 +808,7 @@ public class GlobalManager {
         dataSource.saveOneTimeAlarm(oneTimeAlarm);
 
         // Delete old one-time alarms
-        // TODO we cannot delete old one-time alarm like in the following because then the automated tests (that use year 2016) fail
+        // TODO We cannot delete old one-time alarm like in the following because then the automated tests (that use year 2016) fail
 //        Calendar to = clock().now();
 //        CalendarUtils.addDays(to, -7);
 //        dataSource.deleteOneTimeAlarmsOlderThan(to);

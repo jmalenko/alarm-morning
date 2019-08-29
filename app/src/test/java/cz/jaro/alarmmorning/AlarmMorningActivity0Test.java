@@ -19,6 +19,7 @@ import org.robolectric.shadows.ShadowPendingIntent;
 import java.util.Calendar;
 
 import androidx.recyclerview.widget.RecyclerView;
+import cz.jaro.alarmmorning.app.AlarmMorningAppTest;
 import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.model.AlarmDataSource;
 import cz.jaro.alarmmorning.receivers.AlarmReceiver;
@@ -49,11 +50,7 @@ public class AlarmMorningActivity0Test extends FixedTimeTest {
         DefaultsActivity activity = Robolectric.setupActivity(DefaultsActivity.class);
 
         RecyclerView recyclerView = activity.findViewById(R.id.defaults_recycler_view);
-
-        // XXX Workaround Robolectric - RecyclerView needs to be measured and laid out manually in Robolectric.
-        // Source: http://stackoverflow.com/questions/27052866/android-robolectric-click-recyclerview-item
-        recyclerView.measure(0, 0);
-        recyclerView.layout(0, 0, 100, 10000);
+        AlarmMorningAppTest.refreshRecyclerView(recyclerView);
 
         assertThat(recyclerView.getChildCount()).isEqualTo(AlarmDataSource.allDaysOfWeek.length);
 
@@ -73,11 +70,7 @@ public class AlarmMorningActivity0Test extends FixedTimeTest {
         Resources res = activity.getResources();
 
         RecyclerView recyclerView = activity.findViewById(R.id.calendar_recycler_view);
-
-        // XXX Workaround Robolectric - RecyclerView needs to be measured and laid out manually in Robolectric.
-        // Source: http://stackoverflow.com/questions/27052866/android-robolectric-click-recyclerview-item
-        recyclerView.measure(0, 0);
-        recyclerView.layout(0, 0, 100, 10000);
+        AlarmMorningAppTest.refreshRecyclerView(recyclerView);
 
         assertThat(recyclerView.getChildCount()).isEqualTo(GlobalManager.HORIZON_DAYS);
 

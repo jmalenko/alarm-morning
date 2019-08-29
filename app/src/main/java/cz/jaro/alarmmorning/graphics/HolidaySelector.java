@@ -118,8 +118,6 @@ public class HolidaySelector extends LinearLayout implements AdapterView.OnItemS
             return;
         }
 
-        // TODO This is sometimes called twice. When Germany–Berlin is selected and then changed to Germany–Bavaria, this is called for spinner2 and spinner3
-
         HolidayAdapter holidayAdapter = (HolidayAdapter) parent.getAdapter();
         String path = holidayAdapter.positionToPreferenceString(position);
         updateView(path);
@@ -221,7 +219,7 @@ public class HolidaySelector extends LinearLayout implements AdapterView.OnItemS
                 if (str.length() > 0)
                     str.append('\n');
 
-                str.append(Localization.dateToStringFull(res, h.getDate().toDate())); // TODO Localization - Format date, medium
+                str.append(Localization.dateToStringFull(res, h.getDate().toDate()));
                 str.append(" – ");
                 str.append(h.getDescription());
             }

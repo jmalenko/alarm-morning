@@ -83,7 +83,7 @@ public class AlarmMorningActivity extends AppCompatActivity {
     public static final String URL_TRANSLATE = "https://crowdin.com/project/alarm-morning";
     public static final String URL_DONATE = "https://www.paypal.me/jaromirmalenko/10usd";
 
-    // TODO Set programmatically (when that becomes possible in Android). For now, keep consistent with res/values directories. https://stackoverflow.com/questions/34797956/android-programmatically-check-if-app-is-localized-for-a-language
+    // TODO Set list of languages programmatically (when that becomes possible in Android). For now, keep consistent with res/values directories. https://stackoverflow.com/questions/34797956/android-programmatically-check-if-app-is-localized-for-a-language
     private static final List<String> TRANSLATIONS = Arrays.asList(
             "en_US", // default language
             "cs_CZ", // manually updated by author Jaromír Malenko

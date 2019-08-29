@@ -611,8 +611,9 @@ public class Analytics {
                 Log.v(TAG, "Cannot get data from package info", e);
             }
 
-            // TODO Other sources of data for analytics
             /*
+            Other sources of data for analytics:
+
             Google account - https://stackoverflow.com/questions/2245545/accessing-google-account-id-username-via-android
             Primary e-mail address - https://stackoverflow.com/questions/2112965/how-to-get-the-android-devices-primary-e-mail-address
             Wifi MAC address - https://stackoverflow.com/questions/11705906/programmatically-getting-the-mac-of-an-android-device

@@ -170,7 +170,7 @@ public class CheckAlarmTimeTest extends FixedTimeTest {
 
 //    @Test
 //    public void t200_onCalendarUpdated() {
-    // TODO Implement once Robolectric supports test for two notifications in one test
+    // TODO Implement complex test for calendar changes
         /*  Preconditions:
                 - Reset all app settings
                 - Set default for tomorrow at 7:10
