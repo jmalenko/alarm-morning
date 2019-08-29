@@ -366,7 +366,10 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
     public void onTimeOrTimeZoneChange() {
         Log.d(TAG, "onTimeOrTimeZoneChange()");
+
+        loadItems();
         today = getToday(clock());
+        positionNextAlarm = calcPositionNextAlarm();
         adapter.notifyDataSetChanged();
     }
 
