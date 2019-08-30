@@ -265,8 +265,6 @@ public class GlobalManager {
      */
     private static final String PERSIST_DISMISSED = "persist_dismissed_2"; // There vas a change in format in versionCode = 15, and we don't want to use one key with different formats. Therefore we use the suffix number.
 
-    private static final String STRING_UNDEFINED = "";
-
     // Persisted next action
     // =====================
 
@@ -1600,20 +1598,10 @@ public class GlobalManager {
     }
 
     public AppAlarm load(String alarmType, String alarmId) throws IllegalArgumentException {
-        if (alarmType.equals(STRING_UNDEFINED)) // XXX Refactor this (remove constant)
-            throw new IllegalArgumentException("Invalid alarm type: " + alarmType);
-
         if (alarmType.equals(Day.class.getSimpleName())) {
-            if (alarmId.equals(STRING_UNDEFINED))
-                throw new IllegalArgumentException("Invalid date string: " + alarmId);
-
             Calendar date = Analytics.dateStringToCalendar(alarmId);
-
             return loadDay(date);
         } else if (alarmType.equals(OneTimeAlarm.class.getSimpleName())) {
-            if (alarmId.equals(STRING_UNDEFINED))
-                throw new IllegalArgumentException("Invalid one-time alarm id: " + alarmId);
-
             return loadOneTimeAlarm(Long.decode(alarmId));
         } else {
             throw new IllegalArgumentException("Unexpected class " + alarmType);
