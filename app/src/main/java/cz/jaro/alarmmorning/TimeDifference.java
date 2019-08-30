@@ -19,7 +19,7 @@ public class TimeDifference {
         split(diff);
     }
 
-    void split(long diff) {
+    private void split(long diff) {
         negative = diff < 0;
 
         long remaining = negative ? -diff : diff;

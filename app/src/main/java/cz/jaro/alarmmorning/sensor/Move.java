@@ -42,9 +42,7 @@ public class Move extends SensorEventDetector {
             double delta = mAccelCurrent - mAccelLast;
             mAccel = mAccel * 0.9f + delta;
 
-            boolean result = 1 < Math.abs(mAccel);
-
-            return result;
+            return 1 < Math.abs(mAccel);
         }
     }
 }

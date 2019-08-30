@@ -20,7 +20,7 @@ public class SetWelcomeSlide extends BaseFragment {
         View view = super.onCreateView(inflater, container, savedInstanceState);
 
         // Set color of bottom description
-        if (Wizard.loadWizardFinished(getContext())) {
+        if (Wizard.loadWizardFinished()) {
             TextView description2View = view.findViewById(R.id.description2);
             description2View.setTextColor(getResources().getColor(R.color.Deep_Orange_200));
         }
@@ -40,7 +40,7 @@ public class SetWelcomeSlide extends BaseFragment {
 
     @Override
     protected String getDescriptionBottom() {
-        if (Wizard.loadWizardFinished(getContext())) {
+        if (Wizard.loadWizardFinished()) {
             return getString(R.string.wizard_welcome_overwrite_warning);
         } else {
             return null;

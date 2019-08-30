@@ -44,7 +44,7 @@ public class CustomAlarmTone {
      */
     public static final String INSTALLED_FILES_PATH = "installed_files_path";
 
-    private Context mContext;
+    private final Context mContext;
 
     public CustomAlarmTone(Context context) {
         mContext = context;

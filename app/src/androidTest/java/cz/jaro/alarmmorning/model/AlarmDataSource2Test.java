@@ -35,7 +35,7 @@ public class AlarmDataSource2Test {
     private Day day2;
 
     @Before
-    public void before() throws Exception {
+    public void before() {
         globalManager = GlobalManager.getInstance();
         globalManager.reset();
 

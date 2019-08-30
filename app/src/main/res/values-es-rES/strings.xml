@@ -2,8 +2,7 @@
 <resources xmlns:xliff="http://schemas.android.com/tools">
   <string name="app_name">Alarm Morning</string>
   <!-- Calendar activity -->
-  <string name="title_activity_calendar">Alarmas programadas</string>
-  <string name="menu_day_header">Alarma en <xliff:g example="07:00" id="time">%1$s</xliff:g> del <xliff:g example="Sat" id="dayOfWeek">%2$s</xliff:g>, <xliff:g example="23/12" id="date">%3$s</xliff:g></string>
+    <string name="menu_day_header">Alarma en <xliff:g example="07:00" id="time">%1$s</xliff:g> del <xliff:g example="Sat" id="dayOfWeek">%2$s</xliff:g>, <xliff:g example="23/12" id="date">%3$s</xliff:g></string>
   <string name="menu_day_header_disabled">Alarma desactivada en <xliff:g example="Sat" id="dayOfWeek">%1$s</xliff:g>, <xliff:g example="23/12" id="date">%2$s</xliff:g></string>
   <!-- Default activity -->
   <string name="title_activity_defaults">Alarmas por defecto</string>

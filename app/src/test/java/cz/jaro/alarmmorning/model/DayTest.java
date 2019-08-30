@@ -41,7 +41,6 @@ public class DayTest extends FixedTimeTest {
     public static final int HOLIDAY_YEAR = YEAR;
     public static final int HOLIDAY_MONTH = Calendar.JANUARY;
     public static final int HOLIDAY_DAY = 1;
-    public static final int HOLIDAY_DAY_OF_WEEK = Calendar.FRIDAY;
 
     private Defaults defaults;
     private Day day;

@@ -38,7 +38,7 @@ public class SetHolidaySlide extends BaseFragment {
 
         // Preset
         String holidayPreference;
-        if (Wizard.loadWizardFinished(getContext())) {
+        if (Wizard.loadWizardFinished()) {
             GlobalManager globalManager = GlobalManager.getInstance();
             holidayPreference = globalManager.loadHoliday();
         } else {
@@ -59,7 +59,7 @@ public class SetHolidaySlide extends BaseFragment {
         super.onSlideSelected();
 
         if (firstSelection) {
-            if (!Wizard.loadWizardFinished(getContext())) {
+            if (!Wizard.loadWizardFinished()) {
                 if (recommendationContainer.getChildCount() > 0) {
                     View v = recommendationContainer.getChildAt(0);
                     String countryCode = (String) v.getTag(R.id.button_tag_country_code);

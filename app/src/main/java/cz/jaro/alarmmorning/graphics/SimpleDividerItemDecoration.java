@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import cz.jaro.alarmmorning.R;
 
@@ -12,14 +13,14 @@ import cz.jaro.alarmmorning.R;
  * A divider with a border on bottom.
  */
 public class SimpleDividerItemDecoration extends RecyclerView.ItemDecoration {
-    private Drawable divider;
+    private final Drawable divider;
 
     public SimpleDividerItemDecoration(Context context) {
         divider = context.getResources().getDrawable(R.drawable.line_divider);
     }
 
     @Override
-    public void onDrawOver(Canvas c, RecyclerView parent, RecyclerView.State state) {
+    public void onDrawOver(@NonNull Canvas c, RecyclerView parent, @NonNull RecyclerView.State state) {
         int left = parent.getPaddingLeft();
         int right = parent.getWidth() - parent.getPaddingRight();
 

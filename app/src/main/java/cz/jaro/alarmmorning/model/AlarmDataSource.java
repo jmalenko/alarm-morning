@@ -28,7 +28,7 @@ public class AlarmDataSource {
     private final SimpleDateFormat iso8601Format = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
 
     private SQLiteDatabase database;
-    private AlarmDbHelper dbHelper;
+    private final AlarmDbHelper dbHelper;
 
     // Table fields
     private static final String[] allColumnsDefaults = {AlarmDbHelper.COLUMN_DEFAULTS_ID, AlarmDbHelper.COLUMN_DEFAULTS_DAY_OF_WEEK, AlarmDbHelper.COLUMN_DEFAULTS_STATE, AlarmDbHelper.COLUMN_DEFAULTS_HOUR, AlarmDbHelper.COLUMN_DEFAULTS_MINUTE};
@@ -275,9 +275,7 @@ public class AlarmDataSource {
             selectionArgs = new String[]{String.valueOf(toMS)};
         }
 
-        int affectedRows = database.delete(AlarmDbHelper.TABLE_ONETIMEALARM, selection, selectionArgs);
-
-        return affectedRows;
+        return database.delete(AlarmDbHelper.TABLE_ONETIMEALARM, selection, selectionArgs);
     }
 
     static private long calendarToMilliseconds(Calendar calendar) {
@@ -293,9 +291,8 @@ public class AlarmDataSource {
 
     private Calendar textToDate(String dateText) {
         try {
-            Date date2 = iso8601Format.parse(dateText);
-            Calendar date = CalendarUtils.newGregorianCalendar(date2.getTime());
-            return date;
+            Date date = iso8601Format.parse(dateText);
+            return CalendarUtils.newGregorianCalendar(date.getTime());
         } catch (ParseException e) {
             Log.e(TAG, "Unable to parse date from string: " + dateText);
             throw new RuntimeException("Invalid date format", e);

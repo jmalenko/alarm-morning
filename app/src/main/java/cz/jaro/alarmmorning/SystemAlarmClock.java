@@ -26,8 +26,8 @@ public class SystemAlarmClock {
 
     private static SystemAlarmClock instance;
 
-    private Context context;
-    private AlarmManager alarmManager;
+    private final Context context;
+    private final AlarmManager alarmManager;
 
     private SystemAlarmClock(Context context) {
         this.context = context;

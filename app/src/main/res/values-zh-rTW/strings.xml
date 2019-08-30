@@ -2,8 +2,7 @@
 <resources xmlns:xliff="http://schemas.android.com/tools">
   <string name="app_name">早上鬧鐘</string>
   <!-- Calendar activity -->
-  <string name="title_activity_calendar">定時報警</string>
-  <string name="menu_day_header">於 <xliff:g example="Sat" id="dayOfWeek">%2$s </xliff:g> <xliff:g example="07:00" id="time">%1$s </xliff:g> 的鬧鐘, <xliff:g example="23/12" id="date">%3$s </xliff:g></string>
+    <string name="menu_day_header">於 <xliff:g example="Sat" id="dayOfWeek">%2$s </xliff:g> <xliff:g example="07:00" id="time">%1$s </xliff:g> 的鬧鐘, <xliff:g example="23/12" id="date">%3$s </xliff:g></string>
   <string name="menu_day_header_disabled">於 <xliff:g example="Sat" id="dayOfWeek">%1$s </xliff:g> 停用鬧鐘, <xliff:g example="23/12" id="date">%2$s </xliff:g></string>
   <!-- Default activity -->
   <string name="title_activity_defaults">預設鬧鐘</string>

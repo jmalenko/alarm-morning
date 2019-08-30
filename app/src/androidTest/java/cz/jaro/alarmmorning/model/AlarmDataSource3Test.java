@@ -32,7 +32,7 @@ public class AlarmDataSource3Test {
     private GlobalManager globalManager;
 
     @Before
-    public void before() throws Exception {
+    public void before() {
         globalManager = GlobalManager.getInstance();
         globalManager.reset();
 

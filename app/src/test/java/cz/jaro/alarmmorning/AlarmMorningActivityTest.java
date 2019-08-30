@@ -57,8 +57,6 @@ public class AlarmMorningActivityTest extends FixedTimeTest {
     }
 
     public static void saveWizardPreference(boolean wizardPreference) {
-        Context context = AlarmMorningApplication.getAppContext();
-
         // Set to default
         SharedPreferencesHelper.save(Wizard.PREF_WIZARD, wizardPreference);
     }
@@ -337,7 +335,7 @@ public class AlarmMorningActivityTest extends FixedTimeTest {
 
             String dayOfWeekText = Localization.dayOfWeekToStringShort(res, AlarmDataSource.allDaysOfWeek[position]); // week starts with Sunday
 
-            assertThat(Integer.toString(position) + textDayOfWeek.getText()).isEqualTo(Integer.toString(position) + dayOfWeekText);
+            assertThat(Integer.toString(position) + textDayOfWeek.getText()).isEqualTo(position + dayOfWeekText);
         }
     }
 

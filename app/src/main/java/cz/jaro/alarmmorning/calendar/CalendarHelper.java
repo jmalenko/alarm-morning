@@ -24,7 +24,7 @@ public class CalendarHelper {
     private static final String TAG = GlobalManager.createLogTag(CalendarHelper.class);
 
     // Projection for calendar instances
-    public static final String[] INSTANCE_PROJECTION = new String[]{
+    private static final String[] INSTANCE_PROJECTION = new String[]{
             CalendarContract.Instances.EVENT_ID,        // 0
             CalendarContract.Instances.BEGIN,           // 1
             CalendarContract.Instances.TITLE,           // 2
@@ -33,11 +33,11 @@ public class CalendarHelper {
     };
 
     // The indices for the projection array above
-    public static final int PROJECTION_ID_INDEX = 0;
-    public static final int PROJECTION_BEGIN_INDEX = 1;
-    public static final int PROJECTION_TITLE_INDEX = 2;
-    public static final int PROJECTION_LOCATION_INDEX = 3;
-    public static final int PROJECTION_ALL_DAY_INDEX = 4;
+    private static final int PROJECTION_ID_INDEX = 0;
+    private static final int PROJECTION_BEGIN_INDEX = 1;
+    private static final int PROJECTION_TITLE_INDEX = 2;
+    private static final int PROJECTION_LOCATION_INDEX = 3;
+    private static final int PROJECTION_ALL_DAY_INDEX = 4;
 
     private final Context context;
 
@@ -118,7 +118,7 @@ public class CalendarHelper {
         return null;
     }
 
-    CalendarEvent load(Cursor cur) {
+    private CalendarEvent load(Cursor cur) {
         CalendarEvent event = new CalendarEvent();
 
         long eventID = cur.getLong(PROJECTION_ID_INDEX);

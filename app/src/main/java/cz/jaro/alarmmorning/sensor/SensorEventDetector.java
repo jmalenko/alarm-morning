@@ -21,12 +21,12 @@ public abstract class SensorEventDetector implements SensorEventListener {
 
     private static final String TAG = GlobalManager.createLogTag(SensorEventDetector.class);
 
-    protected final RingInterface ringInterface;
+    private final RingInterface ringInterface;
     private final String name;
     private final int type;
     private final String preferenceName;
 
-    SensorManager mSensorManager;
+    private SensorManager mSensorManager;
     Sensor mSensor;
 
     private boolean isUsed;
@@ -41,6 +41,9 @@ public abstract class SensorEventDetector implements SensorEventListener {
         this.preferenceName = preferenceName;
     }
 
+    /**
+     * @return true if the detector started properly
+     */
     public boolean start() {
         Log.v(TAG, "start()");
 
@@ -108,14 +111,14 @@ public abstract class SensorEventDetector implements SensorEventListener {
         return (String) SharedPreferencesHelper.load(preferenceName, SettingsActivity.PREF_ACTION_DEFAULT);
     }
 
-    protected boolean use() {
+    private boolean use() {
         Log.v(TAG, "use()");
         String action = getActionFromPreference();
 
         return !action.equals(SettingsActivity.PREF_ACTION_NOTHING);
     }
 
-    void onFire() {
+    private void onFire() {
         Log.v(TAG, "onFire()");
 
         String action = getActionFromPreference();

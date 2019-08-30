@@ -30,7 +30,7 @@ public class AlarmDataSource4OneTimeAlarmTest {
     private Analytics analytics;
 
     @Before
-    public void before() throws Exception {
+    public void before() {
         globalManager = GlobalManager.getInstance();
         globalManager.reset();
 

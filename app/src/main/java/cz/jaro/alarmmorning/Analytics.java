@@ -54,7 +54,6 @@ public class Analytics {
     private static final String TAG = GlobalManager.createLogTag(Analytics.class);
 
     private static final String PREF_USER_ID = "user_id";
-    private static final String PREF_USER_ID_UNSET = "";
     private static final int USER_ID_LENGTH = 12;
 
     private static final String DATETIME_FORMAT_UTC = "yyyy-MM-dd HH:mm:ss.SSS";
@@ -221,7 +220,7 @@ public class Analytics {
     private Context mContext;
     private FirebaseAnalytics mFirebaseAnalytics;
     private Event mEvent;
-    private Bundle mPayload;
+    private final Bundle mPayload;
 
     public Analytics() {
         mPayload = new Bundle();
@@ -270,7 +269,7 @@ public class Analytics {
         }
     }
 
-    public Context getContext() {
+    private Context getContext() {
         return mContext;
     }
 
@@ -363,7 +362,7 @@ public class Analytics {
         return this;
     }
 
-    public Analytics setDefaults(Defaults defaults) {
+    private Analytics setDefaults(Defaults defaults) {
         if (defaults != null && defaults.isEnabled()) {
             String defaultAlarmTimeString = getDefaultsAlarmTimeString(defaults);
             mPayload.putString(Param.Default_alarm_time.name(), defaultAlarmTimeString);
@@ -792,8 +791,7 @@ public class Analytics {
 
     private Calendar now() {
         Clock clock = new SystemClock();
-        Calendar now = clock.now();
-        return now;
+        return clock.now();
     }
 
     private String getUserId() {

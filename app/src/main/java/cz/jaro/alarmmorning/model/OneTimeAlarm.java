@@ -95,8 +95,7 @@ public class OneTimeAlarm extends AppAlarm {
     }
 
     public Calendar getDate() {
-        Calendar dateTimeUTC = getDateTimeUTC();
-        return dateTimeUTC;
+        return getDateTimeUTC();
     }
 
     public void setDate(Calendar date) {

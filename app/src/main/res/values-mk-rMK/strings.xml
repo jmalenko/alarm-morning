@@ -2,8 +2,7 @@
 <resources xmlns:xliff="http://schemas.android.com/tools">
   <string name="app_name">Утрински Аларм</string>
   <!-- Calendar activity -->
-  <string name="title_activity_calendar">Планирани аларми</string>
-  <string name="menu_day_header">Аларм во <xliff:g example="07:00" id="time">%1$s</xliff:g> во <xliff:g example="Sat" id="dayOfWeek">%2$s</xliff:g>, <xliff:g example="23/12" id="date">%3$s</xliff:g></string>
+    <string name="menu_day_header">Аларм во <xliff:g example="07:00" id="time">%1$s</xliff:g> во <xliff:g example="Sat" id="dayOfWeek">%2$s</xliff:g>, <xliff:g example="23/12" id="date">%3$s</xliff:g></string>
   <string name="menu_day_header_disabled">Алармот оневозможен на <xliff:g example="Sat" id="dayOfWeek">%1$s</xliff:g>, <xliff:g example="23/12" id="date">%2$s</xliff:g></string>
   <!-- Default activity -->
   <string name="title_activity_defaults">Стандардни аларми</string>

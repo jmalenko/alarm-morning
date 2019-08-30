@@ -879,7 +879,6 @@ public class CalendarWithOneTimeAlarmTest extends AlarmMorningAppTest {
         assertWidget(R.drawable.ic_alarm_white, "4:30 AM", null);
 
         // Check ring activity
-        Calendar alarmTime = new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE);
         startActivityRing(globalManager.loadOneTimeAlarms().get(0));
 
         assertThat("Date visibility", textDate.getVisibility(), is(View.VISIBLE));
@@ -960,7 +959,6 @@ public class CalendarWithOneTimeAlarmTest extends AlarmMorningAppTest {
         prepareUntilRing();
 
         // Start ring activity
-        Calendar alarmTime = new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE, 10);
         startActivityRing(globalManager.loadOneTimeAlarms().get(0));
 
         dismissButton.performClick();
@@ -1059,7 +1057,6 @@ public class CalendarWithOneTimeAlarmTest extends AlarmMorningAppTest {
         consumeNextScheduledAlarm();
 
         // Start ring activity
-        Calendar alarmTime = new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE, 10);
         startActivityRing(globalManager.loadOneTimeAlarms().get(0));
 
         snoozeButton.performClick();
@@ -1668,7 +1665,6 @@ public class CalendarWithOneTimeAlarmTest extends AlarmMorningAppTest {
         consumeNextScheduledAlarm();
 
         // Start ring activity
-        Calendar alarmTime = new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE);
         startActivityRing(globalManager.loadOneTimeAlarms().get(0));
 
         snoozeButton.performClick();

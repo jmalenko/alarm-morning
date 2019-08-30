@@ -124,9 +124,9 @@ public class AlarmMorningActivity extends AppCompatActivity {
     private static final IntentFilter s_intentFilterTime;
 
     private LocalBroadcastManager bManager;
-    private static IntentFilter s_intentFilterInternal;
+    private static final IntentFilter s_intentFilterInternal;
 
-    boolean consumed; // Whether the touch event ACTION_DOWN was consumed (so we can consume the following event ACTION_UP)
+    private boolean consumed; // Whether the touch event ACTION_DOWN was consumed (so we can consume the following event ACTION_UP)
 
     static {
         s_intentFilterTime = new IntentFilter();
@@ -154,6 +154,9 @@ public class AlarmMorningActivity extends AppCompatActivity {
             Log.d(TAG, "onReceive()");
             Log.i(TAG, "Refreshing view on time or timezone change");
 
+            Analytics analytics = new Analytics(context, Analytics.Event.Start, Analytics.Channel.External, Analytics.ChannelName.TimeZoneChange);
+            analytics.save();
+
             if (mFragment instanceof CalendarFragment) {
                 CalendarFragment calendarFragment = (CalendarFragment) mFragment;
                 calendarFragment.onTimeOrTimeZoneChange();
@@ -161,7 +164,7 @@ public class AlarmMorningActivity extends AppCompatActivity {
         }
     };
 
-    private BroadcastReceiver bReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver bReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
@@ -235,7 +238,7 @@ public class AlarmMorningActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         // Possibly run the wizard
-        boolean wizardPreference = Wizard.loadWizardFinished(getBaseContext());
+        boolean wizardPreference = Wizard.loadWizardFinished();
         if (!wizardPreference) {
             Intent wizardIntent = new Intent(this, Wizard.class);
             startActivityForResult(wizardIntent, REQUEST_CODE_WIZARD);
@@ -585,7 +588,7 @@ public class AlarmMorningActivity extends AppCompatActivity {
      * Start with rating the app.
      * Determine if the Play Store app is installed on the device.
      */
-    public void rateApp() {
+    private void rateApp() {
         try {
             Intent rateIntent = rateIntentForUrl("market://details?id=");
             startActivity(rateIntent);

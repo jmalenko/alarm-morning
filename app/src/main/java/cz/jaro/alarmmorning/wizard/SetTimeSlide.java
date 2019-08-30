@@ -57,8 +57,8 @@ public class SetTimeSlide extends BaseFragment implements TimePicker.OnTimeChang
 
     private static final String TAG = GlobalManager.createLogTag(SetTimeSlide.class);
 
-    int hourOfDay;
-    int minute;
+    private int hourOfDay;
+    private int minute;
 
     @Nullable
     @Override
@@ -88,7 +88,7 @@ public class SetTimeSlide extends BaseFragment implements TimePicker.OnTimeChang
      * When run from Settings, the workdays may have different alarm times. We take median time and use it.
      */
     private void presetTime() {
-        if (Wizard.loadWizardFinished(getContext())) {
+        if (Wizard.loadWizardFinished()) {
             boolean set;
 
             set = presetTimeFromDefaults();
@@ -158,9 +158,7 @@ public class SetTimeSlide extends BaseFragment implements TimePicker.OnTimeChang
         // Take median
         int medianIndex = times.size() / 2;
 
-        int time = times.get(medianIndex);
-
-        return time;
+        return times.get(medianIndex);
     }
 
     private void log(String message, List<Integer> times) {
@@ -237,11 +235,9 @@ public class SetTimeSlide extends BaseFragment implements TimePicker.OnTimeChang
         return setTimeFromMedian(times);
     }
 
-    private boolean presetTimeFromConstants() {
+    private void presetTimeFromConstants() {
         hourOfDay = AlarmDbHelper.DEFAULT_ALARM_HOUR;
         minute = AlarmDbHelper.DEFAULT_ALARM_MINUTE;
-
-        return true;
     }
 
     @Override

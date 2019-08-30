@@ -1,8 +1,6 @@
 package cz.jaro.alarmmorning.holiday;
 
-import android.app.Application;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.util.Log;
 
@@ -19,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import cz.jaro.alarmmorning.AlarmMorningApplication;
 import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.SettingsActivity;
@@ -44,10 +43,10 @@ public class HolidayHelper {
     public static final String STRING_PATH_SEPARATOR = " – ";
 
     private static HolidayHelper instance;
-    private Context context;
+    private final Context context;
 
     private HolidayHelper() {
-        context = findContext();
+        context = AlarmMorningApplication.getAppContext();
     }
 
     public static HolidayHelper getInstance() {
@@ -275,23 +274,6 @@ public class HolidayHelper {
     }
 
     /**
-     * This is a hack that allows getting a {@link Context} such that it's not passed as a method argument. The <code>Context</code> is needed to read holiday
-     * settings from {@link SharedPreferences} and clock from {@link GlobalManager}.
-     *
-     * @return Context
-     */
-    private Context findContext() {
-        try {
-            Application application = (Application) Class.forName("android.app.ActivityThread")
-                    .getMethod("currentApplication").invoke(null, (Object[]) null);
-            Context context = application.getApplicationContext();
-            return context;
-        } catch (Exception e) {
-            throw new IllegalStateException("Cannot get context", e);
-        }
-    }
-
-    /**
      * Returns the number of levels of a region identifier.
      *
      * @param path path identifier of a region
@@ -358,7 +340,7 @@ public class HolidayHelper {
      */
     public boolean isPathValid(String path) {
         try {
-            Map<String, CalendarHierarchy> children = pathInfo(path);
+            pathInfo(path);
             return true;
         } catch (IllegalStateException e) {
             return false;
@@ -499,7 +481,7 @@ class Region {
     String id;
     String description;
 
-    boolean isTop() {
+    private boolean isTop() {
         return parentPath.equals(PATH_TOP);
     }
 

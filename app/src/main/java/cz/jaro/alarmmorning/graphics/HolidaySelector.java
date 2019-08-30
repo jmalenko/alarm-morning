@@ -45,18 +45,18 @@ public class HolidaySelector extends LinearLayout implements AdapterView.OnItemS
     private final LinearLayout recommendation;
     private final LinearLayout recommendationContainer;
 
-    private Spinner spinner1;
-    private Spinner spinner2;
-    private Spinner spinner3;
+    private final Spinner spinner1;
+    private final Spinner spinner2;
+    private final Spinner spinner3;
 
-    private HolidayAdapter adapter1;
-    private HolidayAdapter adapter2;
-    private HolidayAdapter adapter3;
+    private final HolidayAdapter adapter1;
+    private final HolidayAdapter adapter2;
+    private final HolidayAdapter adapter3;
 
-    private LinearLayout listOfHolidays;
-    private TextView listOfHolidaysDetails;
+    private final LinearLayout listOfHolidays;
+    private final TextView listOfHolidaysDetails;
 
-    private boolean[] spinnerInitialized = new boolean[3]; // which spinners have been initialized
+    private final boolean[] spinnerInitialized = new boolean[3]; // which spinners have been initialized
 
     private int listOfHolidaysVisibility = View.VISIBLE;
 
@@ -334,7 +334,7 @@ public class HolidaySelector extends LinearLayout implements AdapterView.OnItemS
                 // Show...
                 //    in Wizard shown for the 1st time: if there are 2 (or more) regions. Because the 1st resgion is preselected.
                 //    otherwise: if a detected region is different from the selected one
-                if (!Wizard.loadWizardFinished(getContext())) {
+                if (!Wizard.loadWizardFinished()) {
                     if (recommendationContainer.getChildCount() == 2)
                         recommendation.setVisibility(VISIBLE);
                 } else {

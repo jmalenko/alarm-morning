@@ -21,7 +21,7 @@ public class LocationProviderRegionDetector extends RegionDetector {
 
     private static final String TAG = GlobalManager.createLogTag(LocationProviderRegionDetector.class);
 
-    private String provider;
+    private final String provider;
 
     public LocationProviderRegionDetector(Context context, String provider) {
         super(context);

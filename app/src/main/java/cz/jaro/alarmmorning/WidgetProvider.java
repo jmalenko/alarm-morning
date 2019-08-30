@@ -139,7 +139,7 @@ public class WidgetProvider extends AppWidgetProvider {
         }
     }
 
-    public void onDateChange() {
+    private void onDateChange() {
         Log.v(TAG, "onDateChange()");
 
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);

@@ -3,7 +3,6 @@ package cz.jaro.alarmmorning;
 import android.content.res.Resources;
 import android.graphics.Rect;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.TouchDelegate;
 import android.view.View;
@@ -44,6 +43,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
     /**
      * Create new views (invoked by the layout manager)
      */
+    @NonNull
     @Override
     public CalendarViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.calendar_row_item, viewGroup, false);
@@ -54,7 +54,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
      * Replaces the contents of a view (invoked by the layout manager)
      */
     @Override
-    public void onBindViewHolder(CalendarViewHolder viewHolder, final int position) {
+    public void onBindViewHolder(@NonNull CalendarViewHolder viewHolder, final int position) {
         Log.v(TAG, "onBindViewHolder(position=" + position);
 
         AppAlarm appAlarm = fragment.loadPosition(position);
@@ -73,12 +73,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
 
         if (appAlarm instanceof OneTimeAlarm) {
             LinearLayout headerView = viewHolder.getHeaderDate();
-            headerView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    fragment.onSetDate(viewHolder.itemView);
-                }
-            });
+            headerView.setOnClickListener(v -> fragment.onSetDate(viewHolder.itemView));
         }
 
         // Set appearance
@@ -192,25 +187,19 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
             });
 
             // Listeners for setting name
-            viewHolder.getTextName().setOnFocusChangeListener(new View.OnFocusChangeListener() {
-                @Override
-                public void onFocusChange(View v, boolean hasFocus) {
-                    if (hasFocus) {
-                        fragment.onEditNameBegin(viewHolder);
-                    }
+            viewHolder.getTextName().setOnFocusChangeListener((v, hasFocus) -> {
+                if (hasFocus) {
+                    fragment.onEditNameBegin(viewHolder);
                 }
             });
 
-            viewHolder.getTextName().setOnEditorActionListener(new TextView.OnEditorActionListener() {
-                @Override
-                public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                    if (actionId == EditorInfo.IME_ACTION_DONE) {
-                        fragment.onEditNameEnd();
+            viewHolder.getTextName().setOnEditorActionListener((v, actionId, event) -> {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    fragment.onEditNameEnd();
 
-                        return true;
-                    }
-                    return false;
+                    return true;
                 }
+                return false;
             });
         }
 
@@ -232,8 +221,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
     String getDurationToAlarm(AppAlarm appAlarm) {
         long diff = appAlarm.getTimeToRing(fragment.clock());
 
-        String messageText = formatTimeDifference(diff, false, fragment.getResources());
-        return messageText;
+        return formatTimeDifference(diff, false, fragment.getResources());
     }
 
     @NonNull
@@ -285,7 +273,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
         private final TextView textComment;
         private final LinearLayout headerDate;
 
-        public CalendarViewHolder(View view) {
+        CalendarViewHolder(View view) {
             super(view);
 
             textDayOfWeek = view.findViewById(R.id.textDayOfWeekCal);
@@ -299,19 +287,19 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
             view.setOnLongClickListener(this);
         }
 
-        public TextView getTextDayOfWeek() {
+        TextView getTextDayOfWeek() {
             return textDayOfWeek;
         }
 
-        public TextView getTextDate() {
+        TextView getTextDate() {
             return textDate;
         }
 
-        public TextView getTextTime() {
+        TextView getTextTime() {
             return textTime;
         }
 
-        public TextView getTextState() {
+        TextView getTextState() {
             return textState;
         }
 
@@ -319,11 +307,11 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
             return textName;
         }
 
-        public TextView getTextComment() {
+        TextView getTextComment() {
             return textComment;
         }
 
-        public LinearLayout getHeaderDate() {
+        LinearLayout getHeaderDate() {
             return headerDate;
         }
 

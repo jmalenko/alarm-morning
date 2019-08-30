@@ -25,7 +25,6 @@ public class RelativeTimePreference extends DialogPreference {
     private final int mMaxHour;
     private NumberPicker mHourPicker;
     private NumberPicker mMinutePicker;
-    private TextView mSeparator;
 
     public RelativeTimePreference(final Context context, final AttributeSet attrs) {
         super(context, attrs);
@@ -63,7 +62,7 @@ public class RelativeTimePreference extends DialogPreference {
         mMinutePicker.setMaxValue(59);
         mMinutePicker.setValue(valueToMinute(mSelectedValue));
 
-        mSeparator = view.findViewById(R.id.separator);
+        TextView mSeparator = view.findViewById(R.id.separator);
         String currentValue = Localization.getValue(getContext().getResources(), R.string.hour_minute_separator);
         mSeparator.setText(currentValue != null && !currentValue.isEmpty() ? currentValue : ":");
     }

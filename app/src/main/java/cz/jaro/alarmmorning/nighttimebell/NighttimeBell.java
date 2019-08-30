@@ -31,8 +31,8 @@ public class NighttimeBell {
 
     private static NighttimeBell instance;
 
-    private Context context;
-    private AlarmManager alarmManager;
+    private final Context context;
+    private final AlarmManager alarmManager;
 
     private PendingIntent operation;
 
@@ -56,9 +56,7 @@ public class NighttimeBell {
     public boolean isEnabled() {
         Log.v(TAG, "isEnabled()");
 
-        boolean nighttimeBellPreference = (boolean) SharedPreferencesHelper.load(SettingsActivity.PREF_NIGHTTIME_BELL, SettingsActivity.PREF_NIGHTTIME_BELL_DEFAULT);
-
-        return nighttimeBellPreference;
+        return (boolean) SharedPreferencesHelper.load(SettingsActivity.PREF_NIGHTTIME_BELL, SettingsActivity.PREF_NIGHTTIME_BELL_DEFAULT);
     }
 
     public void checkAndRegister() {

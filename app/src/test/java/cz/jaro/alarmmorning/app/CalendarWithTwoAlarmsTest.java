@@ -627,7 +627,6 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
         assertThat("Intent component", intentNext.getComponent(), is(expectedIntentNext.getComponent()));
 
         // Check ring activity
-        Calendar alarmTime = new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE + 1);
         startActivityRing(globalManager.loadOneTimeAlarms().get(0));
 
         assertThat("Date visibility", textDate.getVisibility(), is(View.VISIBLE));
@@ -697,7 +696,6 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
         assertThat("Intent component", intentNext2.getComponent(), is(expectedIntentNext2.getComponent()));
 
         // Check ring activity
-        Calendar alarmTime2 = new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE + 2);
         startActivityRing(globalManager.loadOneTimeAlarms().get(1));
 
         assertThat("Date visibility", textDate.getVisibility(), is(View.VISIBLE));
@@ -821,7 +819,6 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
         assertCalendarItem(3, "2/2", "Tue", "Off", "", null, ""); // Tomorrow
 
         // Check ring activity
-        Calendar alarmTime = new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE);
         startActivityRing(globalManager.loadOneTimeAlarms().get(0));
 
         assertThat("Date visibility", textDate.getVisibility(), is(View.VISIBLE));

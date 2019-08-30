@@ -32,7 +32,7 @@ public class CustomAlarmToneTest {
     private SharedPreferences mSharedPreferences;
 
     @Before
-    public void before() throws Exception {
+    public void before() {
         Context appContext = InstrumentationRegistry.getTargetContext();
 
         mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(appContext);
@@ -49,7 +49,7 @@ public class CustomAlarmToneTest {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @After
-    public void after() throws Exception {
+    public void after() {
         // Delete the file
         mFile.delete();
     }
@@ -77,7 +77,7 @@ public class CustomAlarmToneTest {
 
         // Check if the pref was overridden
         assertNotSame(
-                (String) SharedPreferencesHelper.load(SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE, ""),
+                SharedPreferencesHelper.load(SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE, ""),
                 "");
     }
 
@@ -93,7 +93,7 @@ public class CustomAlarmToneTest {
         // Make sure the ringtone pref wasn't changed
         assertEquals(
                 "something_other_than_default",
-                (String) SharedPreferencesHelper.load(SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE, ""));
+                SharedPreferencesHelper.load(SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE, ""));
     }
 
     @Test

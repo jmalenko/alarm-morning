@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import com.ibm.icu.util.Calendar;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import cz.jaro.alarmmorning.model.AlarmDataSource;
 import cz.jaro.alarmmorning.model.Defaults;
@@ -31,6 +32,7 @@ public class DefaultsAdapter extends RecyclerView.Adapter<DefaultsAdapter.Defaul
     /**
      * Create new views (invoked by the layout manager)
      */
+    @NonNull
     @Override
     public DefaultViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.defaults_row_item, viewGroup, false);
@@ -87,7 +89,7 @@ public class DefaultsAdapter extends RecyclerView.Adapter<DefaultsAdapter.Defaul
         private final TextView textDayOfWeek;
         private final TextView textTime;
 
-        public DefaultViewHolder(View view) {
+        DefaultViewHolder(View view) {
             super(view);
 
             textDayOfWeek = view.findViewById(R.id.textDayOfWeek);
@@ -96,11 +98,11 @@ public class DefaultsAdapter extends RecyclerView.Adapter<DefaultsAdapter.Defaul
             view.setOnLongClickListener(this);
         }
 
-        public TextView getTextDayOfWeek() {
+        TextView getTextDayOfWeek() {
             return textDayOfWeek;
         }
 
-        public TextView getTextTime() {
+        TextView getTextTime() {
             return textTime;
         }
 

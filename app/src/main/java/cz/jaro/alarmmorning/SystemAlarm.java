@@ -30,8 +30,8 @@ public class SystemAlarm {
 
     private static SystemAlarm instance;
 
-    private Context context;
-    private AlarmManager alarmManager;
+    private final Context context;
+    private final AlarmManager alarmManager;
 
     private PendingIntent operation;
 
@@ -165,7 +165,7 @@ public class SystemAlarm {
      *
      * @return the next action and system alarm
      */
-    protected NextAction calcNextAction() {
+    NextAction calcNextAction() {
         Log.d(TAG, "calcNextAction()");
 
         GlobalManager globalManager = GlobalManager.getInstance();
@@ -237,7 +237,7 @@ public class SystemAlarm {
         return nearestDismissedAlarm;
     }
 
-    protected boolean nextActionShouldChange() {
+    boolean nextActionShouldChange() {
         Log.v(TAG, "nextActionShouldChange()");
 
         NextAction nextAction = calcNextAction();
@@ -253,25 +253,16 @@ public class SystemAlarm {
     }
 
     public static Calendar getResetTime(Calendar now) {
-        Calendar resetTime = beginningOfTomorrow(now);
-        return resetTime;
+        return beginningOfTomorrow(now);
     }
 
-    public boolean useNearFutureTime() {
-        return useNearFutureTime(context);
-    }
-
-    public static boolean useNearFutureTime(Context context) {
+    public static boolean useNearFutureTime() {
         int nearFutureMinutes = (int) SharedPreferencesHelper.load(SettingsActivity.PREF_NEAR_FUTURE_TIME, SettingsActivity.PREF_NEAR_FUTURE_TIME_DEFAULT);
 
         return 0 < nearFutureMinutes;
     }
 
-    private Calendar getNearFutureTime(Calendar alarmTime) {
-        return getNearFutureTime(context, alarmTime);
-    }
-
-    public static Calendar getNearFutureTime(Context context, Calendar alarmTime) {
+    public static Calendar getNearFutureTime(Calendar alarmTime) {
         int nearFutureMinutes = (int) SharedPreferencesHelper.load(SettingsActivity.PREF_NEAR_FUTURE_TIME, SettingsActivity.PREF_NEAR_FUTURE_TIME_DEFAULT);
 
         Calendar nearFutureTime = (Calendar) alarmTime.clone();

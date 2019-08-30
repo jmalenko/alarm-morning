@@ -31,9 +31,9 @@ public class SetTimeActivity extends AppCompatActivity implements TimePickerDial
 
     private static final String TAG = GlobalManager.createLogTag(SetTimeActivity.class);
 
-    public static final String ALARM_TIME = "ALARM_TIME";
+    private static final String ALARM_TIME = "ALARM_TIME";
 
-    Calendar newAlarmTime;
+    private Calendar newAlarmTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

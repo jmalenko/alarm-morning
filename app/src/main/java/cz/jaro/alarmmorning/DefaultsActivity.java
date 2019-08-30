@@ -39,7 +39,7 @@ public class DefaultsActivity extends AppCompatActivity implements View.OnCreate
     private Defaults defaults;
     private List<Integer> otherWeekdaysWithTheSameAlarmTime;
 
-    protected int firstDayOfWeek;
+    int firstDayOfWeek;
 
     private Snackbar snackbar;
 
@@ -80,8 +80,7 @@ public class DefaultsActivity extends AppCompatActivity implements View.OnCreate
     public Defaults loadPosition(int position) {
         GlobalManager globalManager = GlobalManager.getInstance();
         int dayOfWeek = positionToDayOfWeek(position);
-        Defaults defaults = globalManager.loadDefault(dayOfWeek);
-        return defaults;
+        return globalManager.loadDefault(dayOfWeek);
     }
 
     private int positionToDayOfWeek(int position) {
@@ -258,7 +257,7 @@ public class DefaultsActivity extends AppCompatActivity implements View.OnCreate
         }
     }
 
-    final View.OnClickListener snackbarClickListener = new View.OnClickListener() {
+    private final View.OnClickListener snackbarClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             for (int dayOfWeek : otherWeekdaysWithTheSameAlarmTime) {

@@ -57,7 +57,6 @@ public class SlideButton extends androidx.appcompat.widget.AppCompatSeekBar {
                     case MotionEvent.ACTION_DOWN:
                         return isInvalidMove = motionEvent.getX() > getThumb().getIntrinsicWidth();
                     case MotionEvent.ACTION_MOVE:
-                        return isInvalidMove;
                     case MotionEvent.ACTION_UP:
                         return isInvalidMove;
                 }

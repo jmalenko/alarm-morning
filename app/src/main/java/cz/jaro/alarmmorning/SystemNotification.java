@@ -31,7 +31,7 @@ public class SystemNotification {
     private static final String TAG = GlobalManager.createLogTag(SystemNotification.class);
 
     private static SystemNotification instance;
-    private Context context;
+    private final Context context;
 
     public static final String CHANNEL_ID = "MAIN_NOTIFICATION";
     private static final int NOTIFICATION_ID = 0;
@@ -113,7 +113,7 @@ public class SystemNotification {
      * =============================
      */
 
-    protected void onNearFuture(AppAlarm appAlarm) {
+    void onNearFuture(AppAlarm appAlarm) {
         Log.d(TAG, "onNearFuture(appAlarm=" + appAlarm + ")");
 
         NotificationCompat.Builder mBuilder = buildNotification(appAlarm);
@@ -176,7 +176,7 @@ public class SystemNotification {
         return false;
     }
 
-    protected void onRing(AppAlarm appAlarm) {
+    void onRing(AppAlarm appAlarm) {
         Log.d(TAG, "onRing(appAlarm=" + appAlarm + ")");
 
         NotificationCompat.Builder mBuilder = buildNotification(appAlarm);
@@ -272,8 +272,8 @@ public class SystemNotification {
 
                 Calendar alarmTime = nextAlarm.getDateTime();
 
-                if (SystemAlarm.useNearFutureTime(context)) {
-                    Calendar nearFutureTime = SystemAlarm.getNearFutureTime(context, alarmTime);
+                if (SystemAlarm.useNearFutureTime()) {
+                    Calendar nearFutureTime = SystemAlarm.getNearFutureTime(alarmTime);
 
                     if (nearFutureTime.before(now)) {
                         onNearFuture(nextAlarm);
@@ -307,12 +307,12 @@ public class SystemNotification {
             Calendar now = clock.now();
 
             Calendar alarmTime = oneTimeAlarm.getDateTime();
-            Calendar nearFutureTime = SystemAlarm.getNearFutureTime(context, alarmTime);
+            Calendar nearFutureTime = SystemAlarm.getNearFutureTime(alarmTime);
 
             if (now.before(nearFutureTime)) {
                 // Nothing
             } else if (now.before(alarmTime)) {
-                if (SystemAlarm.useNearFutureTime(context)) {
+                if (SystemAlarm.useNearFutureTime()) {
                     onNearFuture(oneTimeAlarm);
                 }
             } else {
@@ -381,7 +381,7 @@ public class SystemNotification {
         mNotificationManager.notify(++NOTIFICATION_ERROR_ID, mBuilder.build());
     }
 
-    public void persist(AppAlarm appAlarm) {
+    private void persist(AppAlarm appAlarm) {
         Log.v(TAG, "persist(appAlarm=" + appAlarm + ")");
 
         SharedPreferencesHelper.save(PERSIST_NOTIFICATION_ALARM_TYPE, appAlarm.getClass().getSimpleName());
@@ -396,7 +396,7 @@ public class SystemNotification {
         }
     }
 
-    public void persistRemove() {
+    private void persistRemove() {
         Log.v(TAG, "persistRemove()");
 
         SharedPreferencesHelper.remove(PERSIST_NOTIFICATION_ALARM_TYPE);

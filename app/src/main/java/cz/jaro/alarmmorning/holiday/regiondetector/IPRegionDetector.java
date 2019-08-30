@@ -19,8 +19,6 @@ public class IPRegionDetector extends RegionDetector {
 
     private static final String URL = "http://ip-api.com/json";
     public static final String COUNTRY_CODE = "countryCode";
-    public static final String LAT = "lat";
-    public static final String LON = "lon";
 
     public IPRegionDetector(Context context) {
         super(context);

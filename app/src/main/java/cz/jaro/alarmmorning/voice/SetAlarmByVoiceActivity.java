@@ -71,7 +71,7 @@ public class SetAlarmByVoiceActivity extends Activity {
     private boolean ok;
     private Calendar now;
 
-    private static int ROUND_IF_LESS_THAN__SECONDS = 120;
+    private static final int ROUND_IF_LESS_THAN__SECONDS = 120;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -223,7 +223,7 @@ public class SetAlarmByVoiceActivity extends Activity {
         alarmTime.add(Calendar.SECOND, seconds);
     }
 
-    public static void addOneTimeAlarm(Calendar saveAlarmTime, String name, Analytics analytics) {
+    private static void addOneTimeAlarm(Calendar saveAlarmTime, String name, Analytics analytics) {
         GlobalManager globalManager = GlobalManager.getInstance();
 
         // Convert alarm time to UTC

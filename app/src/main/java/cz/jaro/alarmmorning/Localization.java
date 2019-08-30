@@ -320,9 +320,8 @@ public class Localization {
 
         String dateText = Localization.dateToStringVeryShort(resources, dateTime.getTime());
         String timeText = Localization.timeToString(dateTime.getTime(), context);
-        String dateTimeText = resources.getString(R.string.datetime_format, timeText, dateText);
 
-        return dateTimeText;
+        return resources.getString(R.string.datetime_format, timeText, dateText);
     }
 
     /**

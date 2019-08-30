@@ -40,13 +40,7 @@ public class SetFeaturesSlide extends BaseFragment {
         }
     }
 
-    protected static void savePreference(Context context, String pref, String value) {
-        analytics(context, pref, value);
-
-        SharedPreferencesHelper.save(pref, value);
-    }
-
-    protected static void savePreference(Context context, String pref, int value) {
+    protected static void savePreference(Context context, String pref, Object value) {
         analytics(context, pref, value);
 
         SharedPreferencesHelper.save(pref, value);

@@ -5,10 +5,8 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Build;
-import android.preference.PreferenceManager;
 import android.text.Html;
 import android.text.SpannableString;
 import android.util.Log;
@@ -59,8 +57,8 @@ public class CheckAlarmTime {
 
     private static CheckAlarmTime instance;
 
-    private Context context;
-    private AlarmManager alarmManager;
+    private final Context context;
+    private final AlarmManager alarmManager;
 
     private PendingIntent operation;
     private PendingIntent operationDismissNotification;
@@ -104,10 +102,7 @@ public class CheckAlarmTime {
     public boolean isEnabled() {
         Log.v(TAG, "isEnabled()");
 
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        boolean checkAlarmTimePreference = (boolean) SharedPreferencesHelper.load(SettingsActivity.PREF_CHECK_ALARM_TIME, SettingsActivity.PREF_CHECK_ALARM_TIME_DEFAULT);
-
-        return checkAlarmTimePreference;
+        return (boolean) SharedPreferencesHelper.load(SettingsActivity.PREF_CHECK_ALARM_TIME, SettingsActivity.PREF_CHECK_ALARM_TIME_DEFAULT);
     }
 
     public void checkAndRegister() {
@@ -385,14 +380,7 @@ public class CheckAlarmTime {
     /**
      * @return The date on which the alarm should be compared to the earliest event. (Note: the actual check is usually done in the evening of previous day.)
      */
-    private Calendar calcMorningDate() {
-        return calcMorningDate(context);
-    }
-
-    /**
-     * @return The date on which the alarm should be compared to the earliest event. (Note: the actual check is usually done in the evening of previous day.)
-     */
-    static public Calendar calcMorningDate(Context context) {
+    static public Calendar calcMorningDate() {
         Log.v(TAG, "calcMorningDate()");
         String checkAlarmTimeAtPreference = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_CHECK_ALARM_TIME_AT, SettingsActivity.PREF_CHECK_ALARM_TIME_AT_DEFAULT);
 
@@ -692,7 +680,7 @@ class MorningInfo {
         // Find first calendar event
         GlobalManager globalManager = GlobalManager.getInstance();
 
-        Calendar morningStart = CheckAlarmTime.calcMorningDate(context);
+        Calendar morningStart = CheckAlarmTime.calcMorningDate();
         Log.v(TAG, "morningStart=" + morningStart.getTime());
 
         Calendar morningNoon = justBeforeNoonToday(morningStart); // Note: relative to morningStart

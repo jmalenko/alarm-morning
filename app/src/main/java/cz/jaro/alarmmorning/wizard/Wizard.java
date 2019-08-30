@@ -2,7 +2,6 @@ package cz.jaro.alarmmorning.wizard;
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -104,9 +103,8 @@ public class Wizard extends AppIntro {
         finish();
     }
 
-    static public boolean loadWizardFinished(Context context) {
-        boolean wizardPreference = (boolean) SharedPreferencesHelper.load(Wizard.PREF_WIZARD, Wizard.PREF_WIZARD_DEFAULT);
-        return wizardPreference;
+    static public boolean loadWizardFinished() {
+        return (boolean) SharedPreferencesHelper.load(Wizard.PREF_WIZARD, Wizard.PREF_WIZARD_DEFAULT);
     }
 
 }

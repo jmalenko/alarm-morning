@@ -15,7 +15,6 @@ import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Set;
 
-import cz.jaro.alarmmorning.AlarmMorningApplication;
 import cz.jaro.alarmmorning.Analytics;
 import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.JSONSharedPreferences;
@@ -84,7 +83,7 @@ public class UpgradeReceiver extends BroadcastReceiver {
 
             switch (versionCode) {
                 case 11: // versionName "0.91"
-                    updateTo11(context);
+                    updateTo11();
                     break;
             }
         } catch (PackageManager.NameNotFoundException e) {
@@ -95,7 +94,7 @@ public class UpgradeReceiver extends BroadcastReceiver {
     // Update To 11
     // ------------
 
-    private void updateTo11(Context context) {
+    private void updateTo11() {
         // There is a change of format of dismissed alarms (from alarm times to type+id).
 
         // Get old preference
@@ -119,14 +118,12 @@ public class UpgradeReceiver extends BroadcastReceiver {
 
     private static final String PERSIST_DISMISSED_1 = "persist_dismissed";
 
-    public Set<Long> getDismissedAlarms() {
+    private Set<Long> getDismissedAlarms() {
         Log.v(TAG, "getDismissedAlarm()");
 
         try {
-            Context context = AlarmMorningApplication.getAppContext();
             JSONArray dismissedAlarmsJSON = JSONSharedPreferences.loadJSONArray(PERSIST_DISMISSED_1);
-            Set<Long> dismissedAlarms = jsonToSet(dismissedAlarmsJSON);
-            return dismissedAlarms;
+            return jsonToSet(dismissedAlarmsJSON);
         } catch (JSONException e) {
             Log.w(TAG, "Error getting dismissed alarms", e);
             return new HashSet<>();

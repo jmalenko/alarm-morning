@@ -63,7 +63,7 @@ public class RingActivity extends Activity implements RingInterface {
 
     private AppAlarm appAlarm;
 
-    public static final String LAST_RINGING_START_TIME = "last_ringing_start_time";
+    private static final String LAST_RINGING_START_TIME = "last_ringing_start_time";
     private Calendar lastRingingStartTime;
 
     private Ringtone ringtone;
@@ -97,7 +97,7 @@ public class RingActivity extends Activity implements RingInterface {
 
     private boolean actionPerformed = false; // User performed and action (snooze or dismiss) in the activity. That includes auto-snooze and auto-actions.
 
-    LocalBroadcastManager bManager;
+    private LocalBroadcastManager bManager;
     private static final IntentFilter b_intentFilter;
 
     private boolean focusDuringOnPause;
@@ -628,7 +628,6 @@ public class RingActivity extends Activity implements RingInterface {
      */
     private boolean checkAutoActions() {
         Log.v(TAG, "checkAutoActions()");
-        Context context = this;
         GlobalManager globalManager = GlobalManager.getInstance();
         Calendar now = globalManager.clock().now();
 
@@ -927,7 +926,7 @@ public class RingActivity extends Activity implements RingInterface {
         }
     }
 
-    public final BroadcastReceiver vibrateReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver vibrateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF)) {

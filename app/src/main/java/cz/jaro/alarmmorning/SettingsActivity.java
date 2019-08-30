@@ -2,7 +2,6 @@ package cz.jaro.alarmmorning;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
@@ -10,7 +9,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
-import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
 import android.text.TextUtils;
 import android.util.Log;
@@ -396,7 +394,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         }
     };
 
-    static void analytics(Preference preference, Object value) {
+    private static void analytics(Preference preference, Object value) {
         String stringValue = value.toString();
         String key = preference.getKey();
 
@@ -438,7 +436,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
         // Trigger the listener immediately with the preference's current value.
         String key = preference.getKey();
-        SharedPreferences defaultSharedPreferences = PreferenceManager.getDefaultSharedPreferences(preference.getContext());
         Object newValue;
         switch (key) {
             case PREF_RINGTONE:

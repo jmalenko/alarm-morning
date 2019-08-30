@@ -36,7 +36,7 @@ public class AlarmDataSource1Test {
     private Analytics analytics;
 
     @Before
-    public void before() throws Exception {
+    public void before() {
         globalManager = GlobalManager.getInstance();
         analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
     }

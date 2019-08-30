@@ -28,7 +28,7 @@ public class Day4Test {
     private Day day2;
 
     @Before
-    public void before() throws Exception {
+    public void before() {
         globalManager = GlobalManager.getInstance();
 
         day0 = new Day();

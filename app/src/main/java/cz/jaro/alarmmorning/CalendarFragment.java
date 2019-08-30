@@ -61,7 +61,6 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
     private int menuAction; // type of the action
     private int positionAction; // position of the item with which the action is performed (via context menu or via click)
-    private static final int POSITION_UNSET = -1; // constant representing "positionAction of the next alarm" when no next alarm exists
 
     private Set<Integer> positionNextAlarm; // position of the next alarm
 
@@ -864,13 +863,8 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
         AppAlarm appAlarm = loadPosition(positionAction);
         Day day = null;
-        OneTimeAlarm oneTimeAlarm = null;
         if (appAlarm instanceof Day) {
             day = (Day) appAlarm;
-        } else if (appAlarm instanceof OneTimeAlarm) {
-            oneTimeAlarm = (OneTimeAlarm) appAlarm;
-        } else {
-            throw new IllegalArgumentException("Unexpected class " + appAlarm.getClass());
         }
 
         // Set header
