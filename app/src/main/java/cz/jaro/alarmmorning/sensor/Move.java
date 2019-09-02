@@ -4,6 +4,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.util.Log;
 
+import java.text.DecimalFormat;
 import java.util.Arrays;
 
 import cz.jaro.alarmmorning.GlobalManager;
@@ -17,9 +18,7 @@ public class Move extends SensorEventDetector {
 
     private static final String TAG = GlobalManager.createLogTag(Move.class);
 
-    private boolean mInitialized;
-    private double mAccelCurrent;
-    private double mAccel;
+    private double[] gravity = new double[3];
 
     public Move(RingInterface ringInterface) {
         super(ringInterface, "move", Sensor.TYPE_ACCELEROMETER, SettingsActivity.PREF_ACTION_ON_MOVE);
@@ -28,21 +27,38 @@ public class Move extends SensorEventDetector {
     protected boolean isFiring(SensorEvent event) {
         Log.v(TAG, "isFiring(values=" + Arrays.toString(event.values) + ")");
 
-        float x = event.values[0];
-        float y = event.values[1];
-        float z = event.values[2];
+        final double alpha = 0.8;
+        gravity[0] = alpha * gravity[0] + (1 - alpha) * event.values[0];
+        gravity[1] = alpha * gravity[1] + (1 - alpha) * event.values[1];
+        gravity[2] = alpha * gravity[2] + (1 - alpha) * event.values[2];
 
-        mAccelCurrent = Math.sqrt(x * x + y * y + z * z);
+        double[] linear_acceleration = new double[3];
+        linear_acceleration[0] = event.values[0] - gravity[0];
+        linear_acceleration[1] = event.values[1] - gravity[1];
+        linear_acceleration[2] = event.values[2] - gravity[2];
 
-        if (!mInitialized) {
-            mInitialized = true;
-            return false;
-        } else {
-            double mAccelLast = mAccelCurrent;
-            double delta = mAccelCurrent - mAccelLast;
-            mAccel = mAccel * 0.9f + delta;
+        double acceleration_size = size3(linear_acceleration);
 
-            return 1 < Math.abs(mAccel);
-        }
+        // The detected gravity must be around 9.81
+        final double gravity_size_real = 9.81;
+        final double delta = 2;
+        double gravity_size = size3(gravity);
+        boolean gravity_ok = gravity_size_real - delta < gravity_size && gravity_size < gravity_size_real + delta;
+
+        DecimalFormat f = new DecimalFormat("#0.00");
+        Log.v(TAG, "Acceleration=" + f.format(acceleration_size) +
+                ", gravity_size=" + f.format(gravity_size) +
+                ", gravity=[" + f.format(gravity[0]) + ", " + f.format(gravity[1]) + ", " + f.format(gravity[2]) + "]");
+
+        // The "real" acceleration must be high enough
+        final double acceleration_size_min = 10;
+        return gravity_ok && acceleration_size_min < acceleration_size;
+    }
+
+    public static double size3(double[] vector) {
+        return Math.sqrt(vector[0] * vector[0] +
+                vector[1] * vector[1] +
+                vector[2] * vector[2]
+        );
     }
 }
