@@ -31,7 +31,7 @@ public class TimePickerFragment extends DialogFragment {
         View view = super.onCreateView(inflater, container, savedInstanceState);
         getDialog().setCanceledOnTouchOutside(true);
 
-        // XXX Workaround for Samsung Galaxy S7 - without this, the title is disapled with curently selected time. The title is duplicate as there are large buttons for hours and minutes in the dialog.
+        // XXX Workaround for Samsung Galaxy S7 - without this, the title is displayed with currently selected time. The title is duplicate as there are large buttons for hours and minutes in the dialog.
         getDialog().setTitle(null);
 
         return view;

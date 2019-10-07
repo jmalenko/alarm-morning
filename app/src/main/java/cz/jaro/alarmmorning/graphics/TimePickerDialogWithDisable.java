@@ -66,16 +66,15 @@ public class TimePickerDialogWithDisable extends TimePickerDialog {
         final Context themeContext = getContext();
         setButton(BUTTON_POSITIVE, themeContext.getString(R.string.action_set), this);
         setButton(BUTTON_NEGATIVE, null, this); // Effectively sets the button to gone (not visible)
-        // TODO Hiding the negative button violates the Material Design guidelines, but I believe users will be fine as the dialog (in TimePickerFragment) is
-        // "cancelled on touch outside"
+        // TODO Hiding the negative button violates the Material Design guidelines, but I believe users will be fine as the dialog (in TimePickerFragment) is "cancelled on touch outside"
         setButton(BUTTON_NEUTRAL, themeContext.getString(R.string.action_disable), this);
     }
 
     /**
-     * Set the mTimePicker to display in that dialog.
+     * Set the TimePicker view to display in that dialog.
      */
     public void setView(View view) {
-        this.mTimePicker = (TimePicker) view;
+        mTimePicker = (TimePicker) view;
         super.setView(view);
     }
 
