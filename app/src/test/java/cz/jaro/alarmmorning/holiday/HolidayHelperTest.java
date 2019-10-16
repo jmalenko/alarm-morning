@@ -9,7 +9,6 @@ import org.robolectric.RobolectricTestRunner;
 import java.util.List;
 
 import cz.jaro.alarmmorning.FixedTimeTest;
-import cz.jaro.alarmmorning.SettingsActivity;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -22,7 +21,7 @@ import static org.junit.Assert.assertThat;
 @RunWith(RobolectricTestRunner.class)
 public class HolidayHelperTest {
 
-    public static final String NONE = SettingsActivity.PREF_HOLIDAY_NONE;
+    public static final String NONE = HolidayHelper.PATH_TOP;
 
     public static final String CZ = "CZ";
     public static final String DE = "DE";
@@ -31,8 +30,9 @@ public class HolidayHelperTest {
     public static final String DE_BY_AG = "DE.by.ag";
 
     public static final String NON_EXISTENT = "nonexistent";
-    public static final String NON_EXISTENT2 = CZ + "." + NON_EXISTENT;
-    public static final String NON_EXISTENT3 = DE + "." + NON_EXISTENT;
+    public static final String CZ_NON_EXISTENT = CZ + "." + NON_EXISTENT;
+    public static final String DE_NON_EXISTENT = DE + "." + NON_EXISTENT;
+    public static final String DE_BB_NON_EXISTENT = DE_BB + "." + NON_EXISTENT;
 
     private HolidayHelper holidayHelper;
 
@@ -84,12 +84,12 @@ public class HolidayHelperTest {
 
     @Test(expected = IllegalStateException.class)
     public void list_nonexistent2() {
-        holidayHelper.list(NON_EXISTENT2);
+        holidayHelper.list(CZ_NON_EXISTENT);
     }
 
     @Test(expected = IllegalStateException.class)
     public void list_nonexistent3() {
-        holidayHelper.list(NON_EXISTENT3);
+        holidayHelper.list(DE_NON_EXISTENT);
     }
 
     @Test
@@ -121,13 +121,18 @@ public class HolidayHelperTest {
     }
 
     @Test(expected = IllegalStateException.class)
-    public void preferenceToDisplayName_nonexistent2() {
-        holidayHelper.preferenceToDisplayName(NON_EXISTENT2);
+    public void preferenceToDisplayName_nonexistent_CZ() {
+        holidayHelper.preferenceToDisplayName(CZ_NON_EXISTENT);
     }
 
     @Test(expected = IllegalStateException.class)
-    public void preferenceToDisplayName_nonexistent3() {
-        holidayHelper.preferenceToDisplayName(NON_EXISTENT3);
+    public void preferenceToDisplayName_nonexistent_DE() {
+        holidayHelper.preferenceToDisplayName(DE_NON_EXISTENT);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void preferenceToDisplayName_nonexistent_DE_BB() {
+        holidayHelper.preferenceToDisplayName(DE_BB_NON_EXISTENT);
     }
 
     @Test
@@ -155,10 +160,25 @@ public class HolidayHelperTest {
         valid = holidayHelper.isPathValid(NON_EXISTENT);
         assertThat(valid, is(false));
 
-        valid = holidayHelper.isPathValid(NON_EXISTENT2);
+        valid = holidayHelper.isPathValid(CZ_NON_EXISTENT);
         assertThat(valid, is(false));
 
-        valid = holidayHelper.isPathValid(NON_EXISTENT3);
+        valid = holidayHelper.isPathValid(DE_NON_EXISTENT);
         assertThat(valid, is(false));
+
+        valid = holidayHelper.isPathValid(DE_BB_NON_EXISTENT);
+        assertThat(valid, is(false));
+    }
+
+    @Test
+    public void findExistingParent() {
+        assertThat(holidayHelper.findExistingParent(HolidayHelper.PATH_TOP), is(HolidayHelper.PATH_TOP));
+        assertThat(holidayHelper.findExistingParent(NON_EXISTENT), is(HolidayHelper.PATH_TOP));
+
+        assertThat(holidayHelper.findExistingParent(DE), is(DE));
+        assertThat(holidayHelper.findExistingParent(DE_NON_EXISTENT), is(DE));
+
+        assertThat(holidayHelper.findExistingParent(DE_BB), is(DE_BB));
+        assertThat(holidayHelper.findExistingParent(DE_BB_NON_EXISTENT), is(DE_BB));
     }
 }

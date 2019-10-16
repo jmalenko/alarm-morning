@@ -470,6 +470,20 @@ public class HolidayHelper {
         return list;
     }
 
+    /**
+     * Returns an existing region, starting with the region path and checking the existence of the parent region.
+     * <p>
+     * This is useful when the region path does not exist (because the library stopped supporting it or it disappeared).
+     *
+     * @param path path identifier of a region
+     * @return path identifier of an existing region
+     */
+    public String findExistingParent(String path) {
+        while (!isPathValid(path) && 0 < pathLength(path)) {
+            path = pathPrefix(path, pathLength(path) - 1);
+        }
+        return path;
+    }
 }
 
 /**

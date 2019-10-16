@@ -27,6 +27,7 @@ import cz.jaro.alarmmorning.calendar.CalendarUtils;
 import cz.jaro.alarmmorning.checkalarmtime.CheckAlarmTime;
 import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.clock.SystemClock;
+import cz.jaro.alarmmorning.holiday.HolidayHelper;
 import cz.jaro.alarmmorning.model.AlarmDataSource;
 import cz.jaro.alarmmorning.model.AppAlarm;
 import cz.jaro.alarmmorning.model.AppAlarmFilter;
@@ -1428,7 +1429,9 @@ public class GlobalManager {
             holidayPreference = SettingsActivity.PREF_HOLIDAY_DEFAULT;
         }
 
-        // TODO If the region path does not exist (because the library stopped supporting it or it disappeared) then use the first existing super-region
+        // If the region path does not exist (because the library stopped supporting it or it disappeared) then use the first existing super-region
+        HolidayHelper holidayHelper = HolidayHelper.getInstance();
+        holidayPreference = holidayHelper.findExistingParent(holidayPreference);
 
         return holidayPreference;
     }
