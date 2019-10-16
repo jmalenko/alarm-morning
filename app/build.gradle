@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
+apply plugin: 'com.google.gms.google-services'
 
 android {
     compileSdkVersion 28
@@ -9,8 +10,8 @@ android {
         applicationId "cz.jaro.alarmmorning"
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 13
-        versionName "0.93"
+        versionCode 14
+        versionName "0.94"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         android.compileOptions.sourceCompatibility 1.8
         android.compileOptions.targetCompatibility 1.8
@@ -63,30 +64,19 @@ dependencies {
     implementation 'com.github.paolorotolo:appintro:4.0.0'
 
     implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
-    implementation 'com.google.firebase:firebase-core:16.0.9'
+    implementation 'com.google.firebase:firebase-core:17.2.0'
 
-    // Required -- JUnit 4 framework
+    // Testing
+
     testImplementation 'junit:junit:4.12'
-    // AssertJ
     testImplementation "org.assertj:assertj-core:1.7.0"
-    // Robolectric
-    testImplementation "org.robolectric:robolectric:4.1"
-    // Optional -- Mockito framework
+    testImplementation "org.robolectric:robolectric:4.2.1"
     testImplementation 'org.mockito:mockito-core:1.10.19'
 
     androidTestImplementation 'androidx.annotation:annotation:1.0.0'
-    androidTestImplementation 'androidx.test:runner:1.1.0'
-    androidTestImplementation 'androidx.test:rules:1.1.0'
-    // Optional -- Hamcrest library
+    androidTestImplementation 'androidx.test:runner:1.2.0'
+    androidTestImplementation 'androidx.test:rules:1.2.0'
     androidTestImplementation 'org.hamcrest:hamcrest-library:1.3'
-    // Optional -- UI testing with Espresso
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0'
-    // Optional -- UI testing with UI Automator
-    // androidTestImplementation 'com.android.support.test.uiautomator:uiautomator-v18:2.1.1'
 
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
 }
-
-apply plugin: 'com.google.gms.google-services'
-apply plugin: 'com.android.application'
-apply plugin: 'io.fabric'
