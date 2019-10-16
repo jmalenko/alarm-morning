@@ -67,7 +67,7 @@ public class Wizard extends AppIntro {
 
             addSlide(new SetPermissionSlide());
             askForPermissions(missingPermissions, fragments.size());
-            // TODO The AppIntro library disables swiping when using askForPermissions. Source: https://github.com/PaoloRotolo/AppIntro/issues/123
+            // Note: The AppIntro library disables swiping when using askForPermissions. Source: https://github.com/PaoloRotolo/AppIntro/issues/123
         } else {
             Log.v(TAG, "All permissions are granted. Skipping permission slide.");
         }
