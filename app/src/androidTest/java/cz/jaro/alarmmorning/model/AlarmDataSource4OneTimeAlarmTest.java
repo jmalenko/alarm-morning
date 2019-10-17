@@ -1,5 +1,7 @@
 package cz.jaro.alarmmorning.model;
 
+import android.content.Context;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -8,8 +10,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
-import cz.jaro.alarmmorning.Analytics;
-import cz.jaro.alarmmorning.GlobalManager;
+import cz.jaro.alarmmorning.AlarmMorningApplication;
 
 import static cz.jaro.alarmmorning.model.AlarmDataSource1Test.DAY;
 import static cz.jaro.alarmmorning.model.AlarmDataSource1Test.MONTH;
@@ -26,20 +27,20 @@ public class AlarmDataSource4OneTimeAlarmTest {
     public static final int HOUR_ONE_TIME_ALARM = 15;
     public static final int MINUTE_ONE_TIME_ALARM = 0;
 
-    private GlobalManager globalManager;
-    private Analytics analytics;
+    private AlarmDataSource dataSource;
 
     @Before
     public void before() {
-        globalManager = GlobalManager.getInstance();
-        globalManager.reset();
+        Context context = AlarmMorningApplication.getAppContext();
+        dataSource = new AlarmDataSource(context);
+        dataSource.open();
 
-        analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
+        dataSource.resetDatabase();
     }
 
     @Test
     public void oneTimeAlarm_0_empty() {
-        List<OneTimeAlarm> oneTimeAlarms = globalManager.loadOneTimeAlarms(null);
+        List<OneTimeAlarm> oneTimeAlarms = dataSource.loadOneTimeAlarms(null);
 
         assertEquals(oneTimeAlarms.size(), 0);
     }
@@ -53,11 +54,11 @@ public class AlarmDataSource4OneTimeAlarmTest {
         oneTimeAlarm1.setHour(HOUR_ONE_TIME_ALARM);
         oneTimeAlarm1.setHour(MINUTE_ONE_TIME_ALARM);
 
-        globalManager.createOneTimeAlarm(oneTimeAlarm1, analytics);
+        dataSource.saveOneTimeAlarm(oneTimeAlarm1);
 
         // Check
 
-        List<OneTimeAlarm> oneTimeAlarms = globalManager.loadOneTimeAlarms(null);
+        List<OneTimeAlarm> oneTimeAlarms = dataSource.loadOneTimeAlarms(null);
 
         assertEquals(oneTimeAlarms.size(), 1);
 
@@ -79,11 +80,11 @@ public class AlarmDataSource4OneTimeAlarmTest {
         oneTimeAlarm1.setHour(HOUR_ONE_TIME_ALARM);
         oneTimeAlarm1.setHour(MINUTE_ONE_TIME_ALARM);
 
-        globalManager.createOneTimeAlarm(oneTimeAlarm1, analytics);
+        dataSource.saveOneTimeAlarm(oneTimeAlarm1);
 
         // Load
 
-        List<OneTimeAlarm> oneTimeAlarms = globalManager.loadOneTimeAlarms(null);
+        List<OneTimeAlarm> oneTimeAlarms = dataSource.loadOneTimeAlarms(null);
         oneTimeAlarm1 = oneTimeAlarms.get(0);
 
         // 2nd add (= change)
@@ -92,13 +93,11 @@ public class AlarmDataSource4OneTimeAlarmTest {
         oneTimeAlarm1.setHour(HOUR_ONE_TIME_ALARM + 1);
         oneTimeAlarm1.setHour(MINUTE_ONE_TIME_ALARM + 1);
 
-        Analytics analytics2 = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
-
-        globalManager.createOneTimeAlarm(oneTimeAlarm1, analytics2);
+        dataSource.saveOneTimeAlarm(oneTimeAlarm1);
 
         // Check
 
-        List<OneTimeAlarm> oneTimeAlarms2 = globalManager.loadOneTimeAlarms(null);
+        List<OneTimeAlarm> oneTimeAlarms2 = dataSource.loadOneTimeAlarms(null);
 
         assertEquals(oneTimeAlarms2.size(), 1);
 
@@ -120,20 +119,18 @@ public class AlarmDataSource4OneTimeAlarmTest {
         oneTimeAlarm1.setHour(HOUR_ONE_TIME_ALARM);
         oneTimeAlarm1.setHour(MINUTE_ONE_TIME_ALARM);
 
-        globalManager.createOneTimeAlarm(oneTimeAlarm1, analytics);
+        dataSource.saveOneTimeAlarm(oneTimeAlarm1);
 
         // Remove
 
-        List<OneTimeAlarm> oneTimeAlarms = globalManager.loadOneTimeAlarms(null);
+        List<OneTimeAlarm> oneTimeAlarms = dataSource.loadOneTimeAlarms(null);
         OneTimeAlarm oneTimeAlarm1b = oneTimeAlarms.get(0);
 
-        Analytics analytics2 = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
-
-        globalManager.deleteOneTimeAlarm(oneTimeAlarm1b, analytics2);
+        dataSource.deleteOneTimeAlarm(oneTimeAlarm1b);
 
         // Check
 
-        List<OneTimeAlarm> oneTimeAlarms2 = globalManager.loadOneTimeAlarms(null);
+        List<OneTimeAlarm> oneTimeAlarms2 = dataSource.loadOneTimeAlarms(null);
 
         assertEquals(oneTimeAlarms2.size(), 0);
     }
@@ -147,7 +144,7 @@ public class AlarmDataSource4OneTimeAlarmTest {
         oneTimeAlarm1.setHour(HOUR_ONE_TIME_ALARM);
         oneTimeAlarm1.setHour(MINUTE_ONE_TIME_ALARM);
 
-        globalManager.createOneTimeAlarm(oneTimeAlarm1, analytics);
+        dataSource.saveOneTimeAlarm(oneTimeAlarm1);
 
         // Add 2
 
@@ -156,13 +153,11 @@ public class AlarmDataSource4OneTimeAlarmTest {
         oneTimeAlarm2.setHour(HOUR_ONE_TIME_ALARM + 1);
         oneTimeAlarm2.setHour(MINUTE_ONE_TIME_ALARM + 1);
 
-        Analytics analytics2 = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
-
-        globalManager.createOneTimeAlarm(oneTimeAlarm2, analytics2);
+        dataSource.saveOneTimeAlarm(oneTimeAlarm2);
 
         // Check
 
-        List<OneTimeAlarm> oneTimeAlarms = globalManager.loadOneTimeAlarms(null);
+        List<OneTimeAlarm> oneTimeAlarms = dataSource.loadOneTimeAlarms(null);
 
         assertEquals(oneTimeAlarms.size(), 2);
 
