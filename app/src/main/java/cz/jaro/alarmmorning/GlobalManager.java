@@ -1022,7 +1022,6 @@ public class GlobalManager {
         Analytics analytics = new Analytics(context, Analytics.Event.Ring, Analytics.Channel.Time, Analytics.ChannelName.Alarm);
         analytics.setAppAlarm(appAlarm);
         analytics.set(Analytics.Param.Snooze_count, loadSnoozeCount());
-        // TODO Analytics - add device location
         analytics.save();
 
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);

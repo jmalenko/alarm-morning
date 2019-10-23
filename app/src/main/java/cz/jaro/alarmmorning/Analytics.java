@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -13,6 +14,11 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import org.json.JSONException;
@@ -97,6 +103,9 @@ public class Analytics {
     public static final String TARGET_MENU_DONATE = "Donate";
     public static final String TARGET_MENU_ADD_ONE_TIME_ALARM = "Add one time alarm";
 
+    private Task<Location> locationTask;
+    private boolean shouldSave = false; // Save the event after the asynchronous locationTask task finishes
+
     public enum Param {
         Version,
         User_ID,
@@ -117,6 +126,17 @@ public class Analytics {
         Alarm_time_old,
         Skipped_alarm_times,
         Dismiss_type,
+
+        Location_time,
+        Location_latitude,
+        Location_longitude,
+        Location_accuracy,
+        Location_altitude,
+        Location_bearing,
+        Location_speed,
+        Location_verticalAccuracyMeters,
+        Location_bearingAccuracyDegrees,
+        Location_speedAccuracyMetersPerSecond,
 
         Check_alarm_time_action,
         Check_alarm_time_gap,
@@ -280,6 +300,8 @@ public class Analytics {
 
         String userId = getUserId();
         mPayload.putString(Param.User_ID.name(), userId);
+
+        setLocation();
 
         mFirebaseAnalytics = FirebaseAnalytics.getInstance(context);
     }
@@ -717,6 +739,8 @@ public class Analytics {
     }
 
     public void save() {
+        Log.v(TAG, "save()");
+
         // Validity checks
         if (mPayload.getInt(Param.Version.name()) == 0) throw new IllegalStateException("Analytics record is not valid: Version is null");
         if (mPayload.getString(Param.User_ID.name()) == null) throw new IllegalStateException("Analytics record is not valid: User_ID is null");
@@ -727,6 +751,12 @@ public class Analytics {
         if (mPayload.getString(Param.Channel_name.name()) == null) throw new IllegalStateException("Analytics record is not valid: Channel_name is null");
 
         if (mFirebaseAnalytics == null) throw new IllegalStateException("Analytics is null");
+
+        if (!locationTask.isComplete()) {
+            Log.v(TAG, "Saving postponed until the location is acquired");
+            shouldSave = true;
+            return;
+        }
 
         mFirebaseAnalytics.logEvent(mEvent.name(), mPayload);
         Log.i(TAG, toString());
@@ -750,6 +780,17 @@ public class Analytics {
                 padLeft(Param.Alarm_time_old, 8) + " | " +
                 padRight(Param.Skipped_alarm_times, 20) + " | " +
                 padRight(Param.Dismiss_type, 6) + " | " +
+
+                padLeft(Param.Location_time, 8) + " | " +
+                padLeft(Param.Location_latitude, 8) + " | " +
+                padLeft(Param.Location_longitude, 8) + " | " +
+                padLeft(Param.Location_accuracy, 8) + " | " +
+                padLeft(Param.Location_altitude, 8) + " | " +
+                padLeft(Param.Location_bearing, 8) + " | " +
+                padLeft(Param.Location_speed, 8) + " | " +
+                padLeft(Param.Location_verticalAccuracyMeters, 8) + " | " +
+                padLeft(Param.Location_bearingAccuracyDegrees, 8) + " | " +
+                padLeft(Param.Location_speedAccuracyMetersPerSecond, 8) + " | " +
 
                 padRight(Param.Check_alarm_time_action, 23) + " | " +
                 padRight(Param.Check_alarm_time_gap, 3) + " | " +
@@ -865,6 +906,52 @@ public class Analytics {
         calendar.set(Calendar.MINUTE, minute);
 
         return calendarToTime(calendar);
+    }
+
+    private void setLocation() {
+        try {
+            GoogleApiAvailability googleApiAvailability = GoogleApiAvailability.getInstance();
+            int available = googleApiAvailability.isGooglePlayServicesAvailable(mContext);
+            if (available == ConnectionResult.SUCCESS) {
+                FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(mContext);
+
+                locationTask = fusedLocationClient.getLastLocation();
+                locationTask.addOnCompleteListener(result -> {
+                    if (result.isSuccessful()) {
+                        Location location = result.getResult();
+                        if (location != null) {
+                            set(Param.Location_time, location.getTime());
+                            set(Param.Location_latitude, location.getLatitude());
+                            set(Param.Location_longitude, location.getLongitude());
+                            set(Param.Location_accuracy, location.getAccuracy());
+                            if (location.hasAltitude())
+                                set(Param.Location_altitude, location.getAltitude());
+                            if (location.hasBearing())
+                                set(Param.Location_bearing, location.getBearing());
+                            if (location.hasSpeed())
+                                set(Param.Location_speed, location.getSpeed());
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                if (location.hasVerticalAccuracy())
+                                    set(Param.Location_verticalAccuracyMeters, location.getVerticalAccuracyMeters());
+                                if (location.hasBearingAccuracy())
+                                    set(Param.Location_bearingAccuracyDegrees, location.getBearingAccuracyDegrees());
+                                if (location.hasSpeedAccuracy())
+                                    set(Param.Location_speedAccuracyMetersPerSecond, location.getSpeedAccuracyMetersPerSecond());
+                            }
+                            Log.d(TAG, "Location acquired: " + location.getLatitude() + ", " + location.getLongitude());
+                        } else {
+                            Log.d(TAG, "The location is null.");
+                        }
+                    }
+                    if (shouldSave)
+                        save();
+                });
+            } else {
+                Log.d(TAG, "Google API not available for location acquisition. Details: " + new ConnectionResult(available));
+            }
+        } catch (Exception e) {
+            Log.w(TAG, "Exception while getting location", e);
+        }
     }
 
     @NonNull

@@ -698,7 +698,6 @@ class MorningInfo {
         analytics = new Analytics(context, Analytics.Event.Show, Analytics.Channel.Time, Analytics.ChannelName.Check_alarm_time);
         analytics.setDay(day);
         analytics.set(Analytics.Param.Check_alarm_time_gap, checkAlarmTimeGap);
-        // TODO Analytics - add device location
 
         event = getEarliestEvent(morningStart, morningNoon);
 
