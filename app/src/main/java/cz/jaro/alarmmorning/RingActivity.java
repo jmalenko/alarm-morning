@@ -988,7 +988,7 @@ public class RingActivity extends Activity implements RingInterface {
     }
 
     private void startSensors() {
-        Log.v(TAG, "startSensors()");
+        Log.d(TAG, "startSensors()");
         sensorEventDetectors = new HashSet<>();
 
         sensorEventDetectors.add(new Flip(this));
@@ -1002,7 +1002,7 @@ public class RingActivity extends Activity implements RingInterface {
     }
 
     private void stopSensors() {
-        Log.v(TAG, "stopSensors()");
+        Log.d(TAG, "stopSensors()");
 
         for (SensorEventDetector sensorEventDetector : sensorEventDetectors) {
             sensorEventDetector.stop();
