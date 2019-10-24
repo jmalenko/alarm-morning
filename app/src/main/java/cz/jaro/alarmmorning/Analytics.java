@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 import java.util.TimeZone;
+import java.util.concurrent.Callable;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -463,174 +464,172 @@ public class Analytics {
         return this;
     }
 
+    private void put(JSONObject conf, String key, Callable callable) {
+        try {
+            Object result = callable.call();
+            conf.put(key, result);
+        } catch (Exception e) {
+            Log.v(TAG, "Cannot get value for " + key, e);
+        }
+    }
+
     @NonNull
-    public JSONObject createConfiguration() {
+    JSONObject createConfiguration() {
         JSONObject conf = new JSONObject();
 
         try {
             // Settings
+
             JSONObject confPreferences = new JSONObject();
-            String ringtonePreference = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_RINGTONE, SettingsActivity.PREF_RINGTONE_DEFAULT);
-            confPreferences.put(SettingsActivity.PREF_RINGTONE, ringtonePreference);
 
-            int volumePreference = (int) SharedPreferencesHelper.load(SettingsActivity.PREF_VOLUME, SettingsActivity.PREF_VOLUME_DEFAULT);
-            int volume = SettingsActivity.getRealVolume(volumePreference, 100);
-            confPreferences.put(SettingsActivity.PREF_VOLUME, volume);
+            put(confPreferences, SettingsActivity.PREF_RINGTONE, () -> SharedPreferencesHelper.load(SettingsActivity.PREF_RINGTONE, SettingsActivity.PREF_RINGTONE_DEFAULT));
 
-            boolean increasing = (boolean) SharedPreferencesHelper.load(SettingsActivity.PREF_VOLUME_INCREASING, SettingsActivity.PREF_VOLUME_INCREASING_DEFAULT);
-            confPreferences.put(SettingsActivity.PREF_VOLUME_INCREASING, increasing);
+            put(confPreferences, SettingsActivity.PREF_VOLUME, () -> {
+                int volumePreference = (int) SharedPreferencesHelper.load(SettingsActivity.PREF_VOLUME, SettingsActivity.PREF_VOLUME_DEFAULT);
+                return SettingsActivity.getRealVolume(volumePreference, 100);
+            });
 
-            boolean vibratePreference = (boolean) SharedPreferencesHelper.load(SettingsActivity.PREF_VIBRATE, SettingsActivity.PREF_VIBRATE_DEFAULT);
-            confPreferences.put(SettingsActivity.PREF_VIBRATE, vibratePreference);
+            put(confPreferences, SettingsActivity.PREF_VOLUME_INCREASING, () -> SharedPreferencesHelper.load(SettingsActivity.PREF_VOLUME_INCREASING, SettingsActivity.PREF_VOLUME_INCREASING_DEFAULT));
 
-            int snoozeTime = (int) SharedPreferencesHelper.load(SettingsActivity.PREF_SNOOZE_TIME, SettingsActivity.PREF_SNOOZE_TIME_DEFAULT);
-            confPreferences.put(SettingsActivity.PREF_SNOOZE_TIME, snoozeTime);
+            put(confPreferences, SettingsActivity.PREF_VIBRATE, () -> SharedPreferencesHelper.load(SettingsActivity.PREF_VIBRATE, SettingsActivity.PREF_VIBRATE_DEFAULT));
 
-            boolean autoSnooze = (boolean) SharedPreferencesHelper.load(SettingsActivity.PREF_AUTO_SNOOZE, SettingsActivity.PREF_AUTO_SNOOZE_DEFAULT);
-            confPreferences.put(SettingsActivity.PREF_AUTO_SNOOZE, autoSnooze);
+            put(confPreferences, SettingsActivity.PREF_SNOOZE_TIME, () -> SharedPreferencesHelper.load(SettingsActivity.PREF_SNOOZE_TIME, SettingsActivity.PREF_SNOOZE_TIME_DEFAULT));
 
-            int autoSnoozeMinutes = (int) SharedPreferencesHelper.load(SettingsActivity.PREF_AUTO_SNOOZE_TIME, SettingsActivity.PREF_AUTO_SNOOZE_TIME_DEFAULT);
-            confPreferences.put(SettingsActivity.PREF_AUTO_SNOOZE_TIME, autoSnoozeMinutes);
+            put(confPreferences, SettingsActivity.PREF_AUTO_SNOOZE, () -> SharedPreferencesHelper.load(SettingsActivity.PREF_AUTO_SNOOZE, SettingsActivity.PREF_AUTO_SNOOZE_DEFAULT));
 
-            boolean autoDismiss = (boolean) SharedPreferencesHelper.load(SettingsActivity.PREF_AUTO_DISMISS, SettingsActivity.PREF_AUTO_DISMISS_DEFAULT);
-            confPreferences.put(SettingsActivity.PREF_AUTO_DISMISS, autoDismiss);
+            put(confPreferences, SettingsActivity.PREF_AUTO_SNOOZE_TIME, () -> SharedPreferencesHelper.load(SettingsActivity.PREF_AUTO_SNOOZE_TIME, SettingsActivity.PREF_AUTO_SNOOZE_TIME_DEFAULT));
 
-            int autoDismissMinutes = (int) SharedPreferencesHelper.load(SettingsActivity.PREF_AUTO_DISMISS_TIME, SettingsActivity.PREF_AUTO_DISMISS_TIME_DEFAULT);
-            confPreferences.put(SettingsActivity.PREF_AUTO_DISMISS_TIME, autoDismissMinutes);
+            put(confPreferences, SettingsActivity.PREF_AUTO_DISMISS, () -> SharedPreferencesHelper.load(SettingsActivity.PREF_AUTO_DISMISS, SettingsActivity.PREF_AUTO_DISMISS_DEFAULT));
 
-            int nearFutureMinutes = (int) SharedPreferencesHelper.load(SettingsActivity.PREF_NEAR_FUTURE_TIME, SettingsActivity.PREF_NEAR_FUTURE_TIME_DEFAULT);
-            confPreferences.put(SettingsActivity.PREF_NEAR_FUTURE_TIME, nearFutureMinutes);
+            put(confPreferences, SettingsActivity.PREF_AUTO_DISMISS_TIME, () -> SharedPreferencesHelper.load(SettingsActivity.PREF_AUTO_DISMISS_TIME, SettingsActivity.PREF_AUTO_DISMISS_TIME_DEFAULT));
 
-            boolean napTimeEnabled = (boolean) SharedPreferencesHelper.load(SettingsActivity.PREF_NAP_ENABLED, SettingsActivity.PREF_NAP_ENABLED_DEFAULT);
-            confPreferences.put(SettingsActivity.PREF_NAP_ENABLED, napTimeEnabled);
+            put(confPreferences, SettingsActivity.PREF_NEAR_FUTURE_TIME, () -> SharedPreferencesHelper.load(SettingsActivity.PREF_NEAR_FUTURE_TIME, SettingsActivity.PREF_NEAR_FUTURE_TIME_DEFAULT));
 
-            int napTime = (int) SharedPreferencesHelper.load(SettingsActivity.PREF_NAP_TIME, SettingsActivity.PREF_NAP_TIME_DEFAULT);
-            confPreferences.put(SettingsActivity.PREF_NAP_TIME, napTime);
+            put(confPreferences, SettingsActivity.PREF_NAP_ENABLED, () -> SharedPreferencesHelper.load(SettingsActivity.PREF_NAP_ENABLED, SettingsActivity.PREF_NAP_ENABLED_DEFAULT));
 
-            String buttonActionPreference = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_ACTION_ON_BUTTON, SettingsActivity.PREF_ACTION_DEFAULT);
-            confPreferences.put(SettingsActivity.PREF_ACTION_ON_BUTTON, SettingsActivity.actionCodeToString(buttonActionPreference));
+            put(confPreferences, SettingsActivity.PREF_NAP_TIME, () -> SharedPreferencesHelper.load(SettingsActivity.PREF_NAP_TIME, SettingsActivity.PREF_NAP_TIME_DEFAULT));
 
-            String moveActionPreference = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_ACTION_ON_BUTTON, SettingsActivity.PREF_ACTION_DEFAULT);
-            confPreferences.put(SettingsActivity.PREF_ACTION_ON_MOVE, SettingsActivity.actionCodeToString(moveActionPreference));
+            put(confPreferences, SettingsActivity.PREF_ACTION_ON_BUTTON, () -> {
+                String buttonActionPreference = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_ACTION_ON_BUTTON, SettingsActivity.PREF_ACTION_DEFAULT);
+                return SettingsActivity.actionCodeToString(buttonActionPreference);
+            });
 
-            String flipActionPreference = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_ACTION_ON_BUTTON, SettingsActivity.PREF_ACTION_DEFAULT);
-            confPreferences.put(SettingsActivity.PREF_ACTION_ON_FLIP, SettingsActivity.actionCodeToString(flipActionPreference));
+            put(confPreferences, SettingsActivity.PREF_ACTION_ON_MOVE, () -> {
+                String moveActionPreference = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_ACTION_ON_BUTTON, SettingsActivity.PREF_ACTION_DEFAULT);
+                return SettingsActivity.actionCodeToString(moveActionPreference);
+            });
 
-            String shakeActionPreference = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_ACTION_ON_BUTTON, SettingsActivity.PREF_ACTION_DEFAULT);
-            confPreferences.put(SettingsActivity.PREF_ACTION_ON_SHAKE, SettingsActivity.actionCodeToString(shakeActionPreference));
+            put(confPreferences, SettingsActivity.PREF_ACTION_ON_FLIP, () -> {
+                String flipActionPreference = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_ACTION_ON_BUTTON, SettingsActivity.PREF_ACTION_DEFAULT);
+                return SettingsActivity.actionCodeToString(flipActionPreference);
+            });
 
-            String proximityActionPreference = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_ACTION_ON_BUTTON, SettingsActivity.PREF_ACTION_DEFAULT);
-            confPreferences.put(SettingsActivity.PREF_ACTION_ON_PROXIMITY, SettingsActivity.actionCodeToString(proximityActionPreference));
+            put(confPreferences, SettingsActivity.PREF_ACTION_ON_SHAKE, () -> {
+                String shakeActionPreference = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_ACTION_ON_BUTTON, SettingsActivity.PREF_ACTION_DEFAULT);
+                return SettingsActivity.actionCodeToString(shakeActionPreference);
+            });
 
-            boolean checkAlarmTimePreference = (boolean) SharedPreferencesHelper.load(SettingsActivity.PREF_CHECK_ALARM_TIME, SettingsActivity.PREF_CHECK_ALARM_TIME_DEFAULT);
-            confPreferences.put(SettingsActivity.PREF_CHECK_ALARM_TIME, checkAlarmTimePreference);
+            put(confPreferences, SettingsActivity.PREF_ACTION_ON_PROXIMITY, () -> {
+                String proximityActionPreference = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_ACTION_ON_BUTTON, SettingsActivity.PREF_ACTION_DEFAULT);
+                return SettingsActivity.actionCodeToString(proximityActionPreference);
+            });
 
-            String checkAlarmTimeAtPreference = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_CHECK_ALARM_TIME_AT, SettingsActivity.PREF_CHECK_ALARM_TIME_AT_DEFAULT);
-            confPreferences.put(SettingsActivity.PREF_CHECK_ALARM_TIME_AT, checkAlarmTimeAtPreference);
+            put(confPreferences, SettingsActivity.PREF_CHECK_ALARM_TIME, () -> SharedPreferencesHelper.load(SettingsActivity.PREF_CHECK_ALARM_TIME, SettingsActivity.PREF_CHECK_ALARM_TIME_DEFAULT));
 
-            int checkAlarmTimeGap = (int) SharedPreferencesHelper.load(SettingsActivity.PREF_CHECK_ALARM_TIME_GAP, SettingsActivity.PREF_CHECK_ALARM_TIME_GAP_DEFAULT);
-            confPreferences.put(SettingsActivity.PREF_CHECK_ALARM_TIME_GAP, checkAlarmTimeGap);
+            put(confPreferences, SettingsActivity.PREF_CHECK_ALARM_TIME_AT, () -> SharedPreferencesHelper.load(SettingsActivity.PREF_CHECK_ALARM_TIME_AT, SettingsActivity.PREF_CHECK_ALARM_TIME_AT_DEFAULT));
 
-            boolean nighttimeBellPreference = (boolean) SharedPreferencesHelper.load(SettingsActivity.PREF_NIGHTTIME_BELL, SettingsActivity.PREF_NIGHTTIME_BELL_DEFAULT);
-            confPreferences.put(SettingsActivity.PREF_NIGHTTIME_BELL, nighttimeBellPreference);
+            put(confPreferences, SettingsActivity.PREF_CHECK_ALARM_TIME_GAP, () -> SharedPreferencesHelper.load(SettingsActivity.PREF_CHECK_ALARM_TIME_GAP, SettingsActivity.PREF_CHECK_ALARM_TIME_GAP_DEFAULT));
 
-            String nighttimeBellAtPreference = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_NIGHTTIME_BELL_AT, SettingsActivity.PREF_NIGHTTIME_BELL_AT_DEFAULT);
-            confPreferences.put(SettingsActivity.PREF_NIGHTTIME_BELL_AT, nighttimeBellAtPreference);
+            put(confPreferences, SettingsActivity.PREF_NIGHTTIME_BELL, () -> SharedPreferencesHelper.load(SettingsActivity.PREF_NIGHTTIME_BELL, SettingsActivity.PREF_NIGHTTIME_BELL_DEFAULT));
 
-            String nighttimeBellRingtonePreference = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE, SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE_DEFAULT);
-            confPreferences.put(SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE, nighttimeBellRingtonePreference);
+            put(confPreferences, SettingsActivity.PREF_NIGHTTIME_BELL_AT, () -> SharedPreferencesHelper.load(SettingsActivity.PREF_NIGHTTIME_BELL_AT, SettingsActivity.PREF_NIGHTTIME_BELL_AT_DEFAULT));
+
+            put(confPreferences, SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE, () -> SharedPreferencesHelper.load(SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE, SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE_DEFAULT));
 
             conf.put("preferences", confPreferences);
 
             // System
+
             JSONObject confSystem = new JSONObject();
 
-            confSystem.put("build_brand", Build.BRAND);
-            confSystem.put("build_device", Build.DEVICE);
-            confSystem.put("build_display", Build.DISPLAY);
-            confSystem.put("build_fingerprint", Build.FINGERPRINT);
-            confSystem.put("build_manufacturer", Build.MANUFACTURER);
-            confSystem.put("build_model", Build.MODEL);
-            confSystem.put("build_product", Build.PRODUCT);
-            confSystem.put("build_hardware", Build.HARDWARE);
-            confSystem.put("build_host", Build.HOST);
-            confSystem.put("build_id", Build.ID);
-            confSystem.put("build_user", Build.USER);
-            confSystem.put("build_board", Build.BOARD);
-            confSystem.put("build_serial", Build.SERIAL);
+            put(confSystem, "build_brand", () -> Build.BRAND);
+            put(confSystem, "build_device", () -> Build.DEVICE);
+            put(confSystem, "build_display", () -> Build.DISPLAY);
+            put(confSystem, "build_fingerprint", () -> Build.FINGERPRINT);
+            put(confSystem, "build_manufacturer", () -> Build.MANUFACTURER);
+            put(confSystem, "build_model", () -> Build.MODEL);
+            put(confSystem, "build_product", () -> Build.PRODUCT);
+            put(confSystem, "build_hardware", () -> Build.HARDWARE);
+            put(confSystem, "build_host", () -> Build.HOST);
+            put(confSystem, "build_id", () -> Build.ID);
+            put(confSystem, "build_user", () -> Build.USER);
+            put(confSystem, "build_board", () -> Build.BOARD);
+            put(confSystem, "build_serial", () -> Build.SERIAL);
 
-            confSystem.put("build_version_release", Build.VERSION.RELEASE);
-            confSystem.put("build_version_sdk_int", Build.VERSION.SDK_INT);
+            put(confSystem, "build_version_release", () -> Build.VERSION.RELEASE);
+            put(confSystem, "build_version_sdk_int", () -> Build.VERSION.SDK_INT);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                confSystem.put("build_version_base_os", Build.VERSION.BASE_OS);
+                put(confSystem, "build_version_base_os", () -> Build.VERSION.BASE_OS);
             }
 
-            confSystem.put("buildConfig_application_id", BuildConfig.APPLICATION_ID);
-            confSystem.put("buildConfig_build_type", BuildConfig.BUILD_TYPE);
-            confSystem.put("buildConfig_debug", BuildConfig.DEBUG);
-            confSystem.put("buildConfig_flavor", BuildConfig.FLAVOR);
-            confSystem.put("buildConfig_version_code", BuildConfig.VERSION_CODE);
-            confSystem.put("buildConfig_version_name", BuildConfig.VERSION_NAME);
+            put(confSystem, "buildConfig_application_id", () -> BuildConfig.APPLICATION_ID);
+            put(confSystem, "buildConfig_build_type", () -> BuildConfig.BUILD_TYPE);
+            put(confSystem, "buildConfig_debug", () -> BuildConfig.DEBUG);
+            put(confSystem, "buildConfig_flavor", () -> BuildConfig.FLAVOR);
+            put(confSystem, "buildConfig_version_code", () -> BuildConfig.VERSION_CODE);
+            put(confSystem, "buildConfig_version_name", () -> BuildConfig.VERSION_NAME);
 
-            Configuration configuration = mContext.getResources().getConfiguration();
-            confSystem.put("configuration_mcc", configuration.mcc);
-            confSystem.put("configuration_mnc", configuration.mnc);
-            confSystem.put("configuration_uiMode", configuration.uiMode);
-            confSystem.put("configuration_locale", configuration.locale);
+            final Configuration configuration = mContext.getResources().getConfiguration();
+            put(confSystem, "configuration_mcc", () -> configuration.mcc);
+            put(confSystem, "configuration_mnc", () -> configuration.mnc);
+            put(confSystem, "configuration_uiMode", () -> configuration.uiMode);
+            put(confSystem, "configuration_locale", () -> configuration.locale);
 
-            confSystem.put("settingsSystem_time_12_24", Settings.System.getString(mContext.getContentResolver(), Settings.System.TIME_12_24));
+            put(confSystem, "settingsSystem_time_12_24", () -> Settings.System.getString(mContext.getContentResolver(), Settings.System.TIME_12_24));
 
-            try {
+            put(confSystem, "google_advertising_id", () -> {
                 AdvertisingIdClient.Info idInfo = AdvertisingIdClient.getAdvertisingIdInfo(getContext());
-                confSystem.put("google_advertising_id", idInfo.getId());
-            } catch (Exception e) {
-                Log.v(TAG, "Cannot get advertising id", e);
-            }
+                return idInfo.getId();
+            });
 
-            confSystem.put("settings_secure_android_id", Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID));
-            confSystem.put("Settings.Secure.default_input_method", Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.DEFAULT_INPUT_METHOD));
+            put(confSystem, "settings_secure_android_id", () -> Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID));
+            put(confSystem, "settings_secure_default_input_method", () -> Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.DEFAULT_INPUT_METHOD));
 
-            try {
-                // The commented lines require new permissions or requires a higher API level
+            final TelephonyManager tm = (TelephonyManager) getContext().getSystemService(Context.TELEPHONY_SERVICE);
 
-                final TelephonyManager tm = (TelephonyManager) getContext().getSystemService(Context.TELEPHONY_SERVICE);
-                confSystem.put("telephonyManager_simCountryIso", tm.getSimCountryIso());
-                confSystem.put("telephonyManager_simOperator", tm.getSimOperator());
-                confSystem.put("telephonyManager_simOperatorName", tm.getSimOperatorName());
-//                confSystem.put("telephonyManager_simSerialNumber", tm.getSimSerialNumber());
+            put(confSystem, "telephonyManager_simCountryIso", tm::getSimCountryIso);
+            put(confSystem, "telephonyManager_simOperator", tm::getSimOperator);
+            put(confSystem, "telephonyManager_simOperatorName", tm::getSimOperatorName);
+            // The commented lines require new permissions or requires a higher API level
+//            put(confSystem, "telephonyManager_simSerialNumber", tm::getSimSerialNumber);
 
-                confSystem.put("telephonyManager_networkCountryIso", tm.getNetworkCountryIso());
-                confSystem.put("telephonyManager_networkOperator", tm.getNetworkOperator());
-                confSystem.put("telephonyManager_networkOperatorName", tm.getNetworkOperatorName());
-                confSystem.put("telephonyManager_networkType", tm.getNetworkType());
+            put(confSystem, "telephonyManager_networkCountryIso", tm::getNetworkCountryIso);
+            put(confSystem, "telephonyManager_networkOperator", tm::getNetworkOperator);
+            put(confSystem, "telephonyManager_networkOperatorName", tm::getNetworkOperatorName);
+            put(confSystem, "telephonyManager_networkType", tm::getNetworkType);
 
-                confSystem.put("telephonyManager_phoneType", tm.getPhoneType());
+            put(confSystem, "telephonyManager_phoneType", tm::getPhoneType);
 
-//                confSystem.put("telephonyManager_voiceMailNumber", tm.getVoiceMailNumber());
-//                confSystem.put("telephonyManager_voiceNetworkType", tm.getVoiceNetworkType());
-//                confSystem.put("telephonyManager_voiceMailAlphaTag", tm.getVoiceMailAlphaTag());
+//            put(confSystem, "telephonyManager_voiceMailNumber", tm::getVoiceMailNumber);
+//            put(confSystem, "telephonyManager_voiceNetworkType", tm::getVoiceNetworkType);
+//            put(confSystem, "telephonyManager_voiceMailAlphaTag", tm::getVoiceMailAlphaTag);
+//
+//            put(confSystem, "telephonyManager_dataEnabled", tm::isDataEnabled);
+//            put(confSystem, "telephonyManager_smsCapable", tm::isSmsCapable);
+//            put(confSystem, "telephonyManager_voiceCapable", tm::isVoiceCapable);
+//
+//            put(confSystem, "telephonyManager_deviceId", tm::getDeviceId);
+//            put(confSystem, "telephonyManager_imei", tm::getImei);
+//            put(confSystem, "telephonyManager_meid", tm::getMeid);
+//            put(confSystem, "telephonyManager_deviceSoftwareVersion", tm::getDeviceSoftwareVersion);
+//            put(confSystem, "telephonyManager_line1Number", tm::getLine1Number);
+//            put(confSystem, "telephonyManager_nai", tm::getNai);
+//            put(confSystem, "telephonyManager_subscriberId", tm::getSubscriberId);
 
-//                confSystem.put("telephonyManager_dataEnabled", tm.isDataEnabled());
-//                confSystem.put("telephonyManager_smsCapable", tm.isSmsCapable());
-//                confSystem.put("telephonyManager_voiceCapable", tm.isVoiceCapable());
-
-//                confSystem.put("telephonyManager_deviceId", tm.getDeviceId());
-//                confSystem.put("telephonyManager_imei", tm.getImei());
-//                confSystem.put("telephonyManager_meid", tm.getMeid());
-//                confSystem.put("telephonyManager_deviceSoftwareVersion", tm.getDeviceSoftwareVersion());
-//                confSystem.put("telephonyManager_line1Number", tm.getLine1Number());
-//                confSystem.put("telephonyManager_nai", tm.getNai());
-//                confSystem.put("telephonyManager_subscriberId", tm.getSubscriberId());
-            } catch (Exception e) {
-                Log.v(TAG, "Cannot get data from telephony manager", e);
-            }
-
-            try {
+            put(confSystem, "packageInfo_versionName", () -> {
                 PackageInfo pInfo = getContext().getPackageManager().getPackageInfo(this.getClass().getPackage().getName(), 0);
-                confSystem.put("packageInfo_versionName", pInfo.versionName);
-            } catch (PackageManager.NameNotFoundException e) {
-                Log.v(TAG, "Cannot get data from package info", e);
-            }
+                return pInfo.versionName;
+            });
 
             /*
             Other sources of data for analytics:
@@ -647,49 +646,52 @@ public class Analytics {
             conf.put("system", confSystem);
 
             // Locale
+
             JSONObject confLocale = new JSONObject();
 
-            Locale locale = Locale.getDefault();
-            confLocale.put("locale", locale.toString());
+            final Locale locale = Locale.getDefault();
+            put(confLocale, "locale", locale::toString);
 
-            confLocale.put("locale_Country", locale.getCountry());
-            confLocale.put("locale_Language", locale.getLanguage());
-            confLocale.put("locale_Variant", locale.getVariant());
+            put(confLocale, "locale_Country", locale::getCountry);
+            put(confLocale, "locale_Language", locale::getLanguage);
+            put(confLocale, "locale_Variant", locale::getVariant);
 
-            confLocale.put("locale_DisplayCountry", locale.getDisplayCountry());
-            confLocale.put("locale_DisplayLanguage", locale.getDisplayLanguage());
-            confLocale.put("locale_DisplayVariant", locale.getDisplayVariant());
+            put(confLocale, "locale_DisplayCountry", locale::getDisplayCountry);
+            put(confLocale, "locale_DisplayLanguage", locale::getDisplayLanguage);
+            put(confLocale, "locale_DisplayVariant", locale::getDisplayVariant);
 
-            confLocale.put("locale_DisplayName", locale.getDisplayName());
-            confLocale.put("locale_ISO3Country", locale.getISO3Country());
-            confLocale.put("locale_ISO3Language", locale.getISO3Language());
+            put(confLocale, "locale_DisplayName", locale::getDisplayName);
+            put(confLocale, "locale_ISO3Country", locale::getISO3Country);
+            put(confLocale, "locale_ISO3Language", locale::getISO3Language);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                confLocale.put("locale_Script", locale.getScript());
-                confLocale.put("locale_DisplayScript", locale.getDisplayScript());
+                put(confLocale, "locale_Script", locale::getScript);
+                put(confLocale, "locale_DisplayScript", locale::getDisplayScript);
             }
 
-            TimeZone timeZone = TimeZone.getDefault();
-            confLocale.put("timeZone_ID", timeZone.getID());
-            confLocale.put("timeZone_DisplayName", timeZone.getDisplayName());
-            confLocale.put("timeZone_RawOffset", timeZone.getRawOffset());
-            confLocale.put("timeZone_DSTSavings", timeZone.getDSTSavings());
+            final TimeZone timeZone = TimeZone.getDefault();
+            put(confLocale, "timeZone_ID", timeZone::getID);
+            put(confLocale, "timeZone_DisplayName", timeZone::getDisplayName);
+            put(confLocale, "timeZone_RawOffset", timeZone::getRawOffset);
+            put(confLocale, "timeZone_DSTSavings", timeZone::getDSTSavings);
 
             conf.put("locale", confLocale);
 
             // Calendar
+
             JSONObject confCalendar = new JSONObject();
 
             com.ibm.icu.util.Calendar cal = com.ibm.icu.util.Calendar.getInstance();
             for (int dayOfWeek : AlarmDataSource.allDaysOfWeek) {
                 String dayOfWeekText = Localization.dayOfWeekToStringShort(mContext.getResources(), dayOfWeek);
                 int dayOfWeekType = cal.getDayOfWeekType(dayOfWeek);
-                confCalendar.put(dayOfWeekText, dayOfWeekTypeToString(dayOfWeekType));
+                put(confCalendar, dayOfWeekText, () -> dayOfWeekTypeToString(dayOfWeekType));
             }
 
             conf.put("dayOfWeekType", confCalendar);
 
             // Holidays
+
             JSONObject confHoliday = new JSONObject();
 
             HolidayHelper holidayHelper = HolidayHelper.getInstance();
@@ -697,18 +699,19 @@ public class Analytics {
                 List<Holiday> holidays = holidayHelper.listHolidays();
 
                 for (Holiday h : holidays) {
-                    confHoliday.put(String.valueOf(h.getDate()), h.getDescription());
+                    put(confHoliday, String.valueOf(h.getDate()), h::getDescription);
                 }
             }
 
             conf.put("holiday", confHoliday);
 
             // Permissions
+
             JSONObject confPermissions = new JSONObject();
 
             for (String permission : Wizard.allPermissions) {
                 int permissionCheck = ContextCompat.checkSelfPermission(getContext(), permission);
-                confPermissions.put(permission, permissionCheckToString(permissionCheck));
+                put(confPermissions, permission, () -> permissionCheckToString(permissionCheck));
             }
 
             conf.put("permission", confPermissions);
