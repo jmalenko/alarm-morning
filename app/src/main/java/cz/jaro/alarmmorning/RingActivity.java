@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
-import android.hardware.Camera;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.Ringtone;
@@ -20,8 +19,6 @@ import android.os.Handler;
 import android.os.Vibrator;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
@@ -91,10 +88,18 @@ public class RingActivity extends Activity implements RingInterface {
     private boolean isVibrating;
     private static final long[] VIBRATOR_PATTERN = {0, 500, 1000};
 
+    private FlashlightBlinker flashlightBlinker;
     private boolean isFlashlight;
-    private Camera camera;
-    private SurfaceHolder mHolder;
-    final private Handler flashlightBlinkHandler = new Handler();
+    private static final long[] FLASHLIGHT_PATTERN = {
+            0, // No delay
+            100, 900, // Second 1
+            100, 100, 100, 700, // Second 2
+            100, 100, 100, 100, 100, 500, // Second 3
+            100, 100, // Repeat from here
+            100, 100,
+            400, 200
+    }; // Round to whole second
+    private static final int FLASHLIGHT_REPEAT = 13;
 
     private TextView mutedTextView;
     private boolean isMuted;
@@ -988,101 +993,30 @@ public class RingActivity extends Activity implements RingInterface {
         isFlashlight = false;
 
         if (flashPreference) {
-            boolean hasFlash = getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH);
-            if (hasFlash) {
-                int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
-                if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-                    // Initialize - on some devices (including my Samsung Galaxy S9) the preview must be shown for flashlight to work.
-                    // Source: https://stackoverflow.com/a/9379765/5726150
+            int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
+            if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
+                flashlightBlinker = new FlashlightBlinker(this);
 
-                    try {
-                        SurfaceView preview = findViewById(R.id.cameraPreview);
-                        mHolder = preview.getHolder();
-                        mHolder.addCallback(new SurfaceHolder.Callback() {
-                            @Override
-                            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-                                // Nothing
-                            }
-
-                            @Override
-                            public void surfaceCreated(SurfaceHolder holder) {
-                                mHolder = holder;
-                                try {
-                                    camera.setPreviewDisplay(mHolder);
-                                } catch (IOException e) {
-                                    Log.e(TAG, "Cannot set preview display", e);
-                                }
-                            }
-
-                            @Override
-                            public void surfaceDestroyed(SurfaceHolder holder) {
-                                camera.stopPreview();
-                                mHolder = null;
-                            }
-                        });
-
-                        camera = Camera.open();
-                        camera.setPreviewDisplay(mHolder);
-                    } catch (IOException e) {
-                        Log.e(TAG, "Cannot set preview display", e);
-                        return;
-                    }
+                if (flashlightBlinker.hasFlashlightBlinker()) {
+                    flashlightBlinker.blink(FLASHLIGHT_PATTERN, FLASHLIGHT_REPEAT, findViewById(R.id.cameraPreview));
 
                     isFlashlight = true;
-
-                    camera.startPreview();
-
-                    // Start blinking
-                    turnFlashlightOpposite();
                 } else {
-                    Log.w(TAG, "The CAMERA permission is not granted");
-                    // It doesn't make sense to ask for permission while ringing
-                    // TODO Ask for permission when user changes the settings (or in calendar)
+                    Log.w(TAG, "The device doesn't have a flashlight blinker");
                 }
             } else {
-                Log.w(TAG, "The device cannot flash");
+                Log.w(TAG, "The CAMERA permission is not granted");
+                // It doesn't make sense to ask for permission while ringing
+                // TODO Ask for permission when user changes the settings (or in calendar)
             }
         }
-    }
-
-    private void turnFlashlightOn() {
-        Camera.Parameters params = camera.getParameters();
-        params.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-        camera.setParameters(params);
-    }
-
-    private void turnFlashlightOff() {
-        Camera.Parameters params = camera.getParameters();
-        params.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
-        camera.setParameters(params);
-    }
-
-    private void turnFlashlightOpposite() {
-        Camera.Parameters params = camera.getParameters();
-        boolean isFlashlightOn = params.getFlashMode().equals(Camera.Parameters.FLASH_MODE_TORCH);
-
-        int delay;
-        if (isFlashlightOn) {
-            turnFlashlightOff();
-            delay = 500;
-        } else {
-            turnFlashlightOn();
-            delay = 200;
-        }
-        flashlightBlinkHandler.postDelayed(this::turnFlashlightOpposite, delay);
     }
 
     private void stopFlashlight() {
         Log.d(TAG, "stopFlashlight()");
 
         if (isFlashlight) {
-            Camera.Parameters params = camera.getParameters();
-            boolean isFlashlightOn = params.getFlashMode().equals(Camera.Parameters.FLASH_MODE_TORCH);
-            if (isFlashlightOn)
-                turnFlashlightOff();
-
-            camera.stopPreview();
-            camera.release();
+            flashlightBlinker.cancel();
 
             isFlashlight = false;
         }
