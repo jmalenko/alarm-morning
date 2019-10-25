@@ -16,6 +16,10 @@
     <string name="pref_summaryoff_vibrate">Don\'t vibrate when ringing</string>
     <string name="pref_summaryon_vibrate">Vibrate when ringing</string>
 
+    <string name="pref_title_flash">Blink flashlight</string>
+    <string name="pref_summaryoff_flash">Don\'t blink flashlight when ringing</string>
+    <string name="pref_summaryon_flash">Blink flashlight when ringing</string>
+
     <string name="pref_title_snooze_time">Snooze time</string>
 
     <string name="pref_title_auto_snooze">Auto snooze alarm</string>

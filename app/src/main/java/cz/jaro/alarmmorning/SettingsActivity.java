@@ -53,6 +53,11 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     public static final String PREF_VIBRATE = "pref_vibrate";
 
     /**
+     * Flash.
+     */
+    public static final String PREF_FLASH = "pref_flash";
+
+    /**
      * Value is in minutes.
      */
     public static final String PREF_SNOOZE_TIME = "pref_snooze_time";
@@ -115,6 +120,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     public static final int PREF_VOLUME_DEFAULT = 8;
     public static final boolean PREF_VOLUME_INCREASING_DEFAULT = true;
     public static final boolean PREF_VIBRATE_DEFAULT = true;
+    public static final boolean PREF_FLASH_DEFAULT = false;
     public static final int PREF_SNOOZE_TIME_DEFAULT = 10;
     public static final boolean PREF_AUTO_SNOOZE_DEFAULT = true;
     public static final int PREF_AUTO_SNOOZE_TIME_DEFAULT = 5;
@@ -158,6 +164,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         bindPreferenceSummaryToValue(findPreference(PREF_VOLUME));
         bindPreferenceChangeListener(findPreference(PREF_VOLUME_INCREASING));
         bindPreferenceChangeListener(findPreference(PREF_VIBRATE));
+        bindPreferenceChangeListener(findPreference(PREF_FLASH));
         bindPreferenceSummaryToValue(findPreference(PREF_SNOOZE_TIME));
         bindPreferenceSummaryToValue(findPreference(PREF_AUTO_SNOOZE_TIME));
         bindPreferenceSummaryToValue(findPreference(PREF_AUTO_DISMISS_TIME));

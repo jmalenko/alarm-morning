@@ -75,6 +75,7 @@
 <p><b>WRITE_EXTERNAL_STORAGE</b> – pro instalaci nového zvuku (přednastavený zvuk “Kostelní zvon” zní při večerce)</p>
 <p><b>ACCESS_FINE_LOCATION</b> – pro zjištění polohy (podle polohy se určí svátky platné ve vaší zemi)</p>
 <p><b>INTERNET</b> – pro použití sítě (aktualizace seznamu svátků)</p>
+<p><b>CAMERA</b> – pro blikání blesem při zvonění</p>
 ]]></string>
 
     <string name="wizard_done_title">Vše je hotovo</string>

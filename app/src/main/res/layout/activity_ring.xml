@@ -141,6 +141,11 @@
                 android:gravity="center"
                 tools:text="Next appointment: 8:00 Dentist" />
 
+            <SurfaceView
+                android:id="@+id/cameraPreview"
+                android:layout_width="1dip"
+                android:layout_height="1dip" />
+
             <Space
                 android:layout_width="match_parent"
                 android:layout_height="0dip"

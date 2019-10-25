@@ -35,6 +35,7 @@ public class Wizard extends AppIntro {
             Manifest.permission.READ_CALENDAR,
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.CAMERA,
             Manifest.permission.INTERNET
     };
 

@@ -1,11 +1,14 @@
 package cz.jaro.alarmmorning;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.hardware.Camera;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.Ringtone;
@@ -17,6 +20,8 @@ import android.os.Handler;
 import android.os.Vibrator;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
@@ -27,6 +32,7 @@ import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Set;
 
+import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import cz.jaro.alarmmorning.calendar.CalendarEvent;
 import cz.jaro.alarmmorning.calendar.CalendarHelper;
@@ -84,6 +90,11 @@ public class RingActivity extends Activity implements RingInterface {
     private Vibrator vibrator;
     private boolean isVibrating;
     private static final long[] VIBRATOR_PATTERN = {0, 500, 1000};
+
+    private boolean isFlashlight;
+    private Camera camera;
+    private SurfaceHolder mHolder;
+    final private Handler flashlightBlinkHandler = new Handler();
 
     private TextView mutedTextView;
     private boolean isMuted;
@@ -504,6 +515,7 @@ public class RingActivity extends Activity implements RingInterface {
 
             startSound();
             startVibrate();
+            startFlashlight();
 
             initMute();
             startSensors();
@@ -528,6 +540,7 @@ public class RingActivity extends Activity implements RingInterface {
             stopSensors();
             stopMute();
 
+            stopFlashlight();
             stopVibrate();
             stopSound();
 
@@ -964,6 +977,114 @@ public class RingActivity extends Activity implements RingInterface {
             // To continue vibrating when screen goes off
             IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
             registerReceiver(vibrateReceiver, filter);
+        }
+    }
+
+    private void startFlashlight() {
+        Log.d(TAG, "startFlashlight()");
+
+        boolean flashPreference = (boolean) SharedPreferencesHelper.load(SettingsActivity.PREF_FLASH, SettingsActivity.PREF_FLASH_DEFAULT);
+
+        isFlashlight = false;
+
+        if (flashPreference) {
+            boolean hasFlash = getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH);
+            if (hasFlash) {
+                int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
+                if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
+                    // Initialize - on some devices (including my Samsung Galaxy S9) the preview must be shown for flashlight to work.
+                    // Source: https://stackoverflow.com/a/9379765/5726150
+
+                    try {
+                        SurfaceView preview = findViewById(R.id.cameraPreview);
+                        mHolder = preview.getHolder();
+                        mHolder.addCallback(new SurfaceHolder.Callback() {
+                            @Override
+                            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+                                // Nothing
+                            }
+
+                            @Override
+                            public void surfaceCreated(SurfaceHolder holder) {
+                                mHolder = holder;
+                                try {
+                                    camera.setPreviewDisplay(mHolder);
+                                } catch (IOException e) {
+                                    Log.e(TAG, "Cannot set preview display", e);
+                                }
+                            }
+
+                            @Override
+                            public void surfaceDestroyed(SurfaceHolder holder) {
+                                camera.stopPreview();
+                                mHolder = null;
+                            }
+                        });
+
+                        camera = Camera.open();
+                        camera.setPreviewDisplay(mHolder);
+                    } catch (IOException e) {
+                        Log.e(TAG, "Cannot set preview display", e);
+                        return;
+                    }
+
+                    isFlashlight = true;
+
+                    camera.startPreview();
+
+                    // Start blinking
+                    turnFlashlightOpposite();
+                } else {
+                    Log.w(TAG, "The CAMERA permission is not granted");
+                    // It doesn't make sense to ask for permission while ringing
+                    // TODO Ask for permission when user changes the settings (or in calendar)
+                }
+            } else {
+                Log.w(TAG, "The device cannot flash");
+            }
+        }
+    }
+
+    private void turnFlashlightOn() {
+        Camera.Parameters params = camera.getParameters();
+        params.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+        camera.setParameters(params);
+    }
+
+    private void turnFlashlightOff() {
+        Camera.Parameters params = camera.getParameters();
+        params.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+        camera.setParameters(params);
+    }
+
+    private void turnFlashlightOpposite() {
+        Camera.Parameters params = camera.getParameters();
+        boolean isFlashlightOn = params.getFlashMode().equals(Camera.Parameters.FLASH_MODE_TORCH);
+
+        int delay;
+        if (isFlashlightOn) {
+            turnFlashlightOff();
+            delay = 500;
+        } else {
+            turnFlashlightOn();
+            delay = 200;
+        }
+        flashlightBlinkHandler.postDelayed(this::turnFlashlightOpposite, delay);
+    }
+
+    private void stopFlashlight() {
+        Log.d(TAG, "stopFlashlight()");
+
+        if (isFlashlight) {
+            Camera.Parameters params = camera.getParameters();
+            boolean isFlashlightOn = params.getFlashMode().equals(Camera.Parameters.FLASH_MODE_TORCH);
+            if (isFlashlightOn)
+                turnFlashlightOff();
+
+            camera.stopPreview();
+            camera.release();
+
+            isFlashlight = false;
         }
     }
 

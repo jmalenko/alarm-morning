@@ -32,6 +32,13 @@
             android:summaryOff="@string/pref_summaryoff_vibrate"
             android:summaryOn="@string/pref_summaryon_vibrate"/>
 
+        <CheckBoxPreference
+            android:key="pref_flash"
+            android:title="@string/pref_title_flash"
+            android:defaultValue="false"
+            android:summaryOff="@string/pref_summaryoff_flash"
+            android:summaryOn="@string/pref_summaryon_flash" />
+
         <cz.jaro.alarmmorning.graphics.IntegerPreference
             android:key="pref_snooze_time"
             android:title="@string/pref_title_snooze_time"

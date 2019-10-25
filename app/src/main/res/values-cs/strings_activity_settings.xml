@@ -16,6 +16,10 @@
     <string name="pref_summaryoff_vibrate">Nevibruje</string>
     <string name="pref_summaryon_vibrate">Vibruje</string>
 
+    <string name="pref_title_flash">Blikání bleskem</string>
+    <string name="pref_summaryoff_flash">Bliká</string>
+    <string name="pref_summaryon_flash">Nebliká</string>
+
     <string name="pref_title_snooze_time">Délka odložení</string>
 
     <string name="pref_title_auto_snooze">Automaticky odložit budík</string>

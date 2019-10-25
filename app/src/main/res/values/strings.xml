@@ -74,6 +74,7 @@
 <p><b>WRITE_EXTERNAL_STORAGE</b> – to install new ringtone (the “Church bell” ringtone is used as default sound for nighttime bell)</p>
 <p><b>ACCESS_FINE_LOCATION</b> – to get the location (the location determines the holidays in your region)</p>
 <p><b>INTERNET</b> – to use network (to update the list of holidays)</p>
+<p><b>CAMERA</b> – to blink the flashlight when ringing</p>
 ]]></string>
 
     <string name="wizard_done_title">You are all set</string>
