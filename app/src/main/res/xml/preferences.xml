@@ -33,7 +33,7 @@
             android:summaryOn="@string/pref_summaryon_vibrate"/>
 
         <CheckBoxPreference
-            android:key="pref_flash"
+            android:key="pref_flashlight"
             android:title="@string/pref_title_flash"
             android:defaultValue="false"
             android:summaryOff="@string/pref_summaryoff_flash"

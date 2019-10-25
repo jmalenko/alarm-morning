@@ -988,7 +988,7 @@ public class RingActivity extends Activity implements RingInterface {
     private void startFlashlight() {
         Log.d(TAG, "startFlashlight()");
 
-        boolean flashPreference = (boolean) SharedPreferencesHelper.load(SettingsActivity.PREF_FLASH, SettingsActivity.PREF_FLASH_DEFAULT);
+        boolean flashPreference = (boolean) SharedPreferencesHelper.load(SettingsActivity.PREF_FLASHLIGHT, SettingsActivity.PREF_FLASHLIGHT_DEFAULT);
 
         isFlashlight = false;
 
