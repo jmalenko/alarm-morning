@@ -8,6 +8,10 @@
     <string name="menu_day_header">Budík v <xliff:g example="07:00" id="time">%1$s</xliff:g> dne <xliff:g example="Sat" id="dayOfWeek">%2$s</xliff:g>, <xliff:g example="23/12" id="date">%3$s</xliff:g></string>
     <string name="menu_day_header_disabled">Budík je vypnutý dne <xliff:g example="Sat" id="dayOfWeek">%1$s</xliff:g>, <xliff:g example="23/12" id="date">%2$s</xliff:g></string>
 
+    <string name="permission_missing_title">Chybí oprávnění</string>
+    <string name="permission_missing_message">Funakce \"blikání blesekm při zvonění\" je zapnutá, ale aplikace nemá odpovídající oprávnění systému Android. Přidělte toto oprátnění v následujícím dialogu.</string>
+    <string name="permission_missing_button">OK</string>
+
     <!-- Default activity -->
     <string name="title_activity_defaults">Pravidla pro dny</string>
 

@@ -8,6 +8,10 @@
     <string name="menu_day_header">Alarm at <xliff:g example="07:00" id="time">%1$s</xliff:g> on <xliff:g example="Sat" id="dayOfWeek">%2$s</xliff:g>, <xliff:g example="23/12" id="date">%3$s</xliff:g></string>
     <string name="menu_day_header_disabled">Alarm disabled on <xliff:g example="Sat" id="dayOfWeek">%1$s</xliff:g>, <xliff:g example="23/12" id="date">%2$s</xliff:g></string>
 
+    <string name="permission_missing_title">Missing permission</string>
+    <string name="permission_missing_message">You enabled the \"blink flashlight\" feature in the settings, but the corresponding Android permission is not granted. Grant the permission in the next dialogue.</string>
+    <string name="permission_missing_button">OK</string>
+
     <!-- Default activity -->
     <string name="title_activity_defaults">Default alarms</string>
 

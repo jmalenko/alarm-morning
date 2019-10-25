@@ -1007,7 +1007,6 @@ public class RingActivity extends Activity implements RingInterface {
             } else {
                 Log.w(TAG, "The CAMERA permission is not granted");
                 // It doesn't make sense to ask for permission while ringing
-                // TODO Ask for permission when user changes the settings (or in calendar)
             }
         }
     }

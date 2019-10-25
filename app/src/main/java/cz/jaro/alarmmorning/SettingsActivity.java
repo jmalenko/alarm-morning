@@ -1,13 +1,16 @@
 package cz.jaro.alarmmorning;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.RingtonePreference;
 import android.text.TextUtils;
@@ -19,7 +22,9 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NavUtils;
+import androidx.core.content.ContextCompat;
 import cz.jaro.alarmmorning.checkalarmtime.CheckAlarmTime;
 import cz.jaro.alarmmorning.graphics.AppCompatPreferenceActivity;
 import cz.jaro.alarmmorning.graphics.RelativeTimePreference;
@@ -151,6 +156,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     private static final int REQUEST_CODE_WIZARD = 1;
 
     private RingtonePreference ringtonePreference;
+    private final static int MY_PERMISSIONS_REQUEST_CAMERA = 1;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -164,7 +170,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         bindPreferenceSummaryToValue(findPreference(PREF_VOLUME));
         bindPreferenceChangeListener(findPreference(PREF_VOLUME_INCREASING));
         bindPreferenceChangeListener(findPreference(PREF_VIBRATE));
-        bindPreferenceChangeListener(findPreference(PREF_FLASHLIGHT));
+        bindPreferenceSummaryToValue(findPreference(PREF_FLASHLIGHT));
         bindPreferenceSummaryToValue(findPreference(PREF_SNOOZE_TIME));
         bindPreferenceSummaryToValue(findPreference(PREF_AUTO_SNOOZE_TIME));
         bindPreferenceSummaryToValue(findPreference(PREF_AUTO_DISMISS_TIME));
@@ -242,6 +248,15 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         prefNighttimeBellRingtone.setOnPreferenceClickListener(preference -> {
             ringtonePreference = (RingtonePreference) preference;
             return false;
+        });
+
+        Preference prefFlashlight = findPreference(PREF_FLASHLIGHT);
+        prefFlashlight.setOnPreferenceClickListener(preference -> {
+            int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
+            if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, MY_PERMISSIONS_REQUEST_CAMERA);
+            }
+            return true;
         });
     }
 
@@ -430,6 +445,24 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         }
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_CAMERA: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Permission was granted
+                } else {
+                    // Permission denied
+
+                    // Revert the value to false
+                    ((CheckBoxPreference) findPreference(PREF_FLASHLIGHT)).setChecked(false);
+                }
+                return;
+            }
+        }
+    }
+
     /**
      * Binds a preference's summary to its value. More specifically, when the preference's value is changed, its summary (line of text below the preference
      * title) is updated to reflect the value. The summary is also immediately updated upon calling this method. The exact display format is dependent on the
@@ -450,6 +483,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 break;
             case PREF_VOLUME:
                 newValue = SharedPreferencesHelper.load(preference.getKey(), PREF_VOLUME_DEFAULT);
+                break;
+            case PREF_FLASHLIGHT:
+                newValue = SharedPreferencesHelper.load(preference.getKey(), PREF_FLASHLIGHT_DEFAULT);
                 break;
             case PREF_SNOOZE_TIME:
                 newValue = SharedPreferencesHelper.load(preference.getKey(), PREF_SNOOZE_TIME_DEFAULT);

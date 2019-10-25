@@ -1,8 +1,11 @@
 package cz.jaro.alarmmorning;
 
+import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Fragment;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
@@ -27,6 +30,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -97,6 +102,8 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         registerForContextMenu(recyclerView);
 
         loadItems();
+
+        checkPermissions();
 
         return rootView;
     }
@@ -1006,6 +1013,22 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
                 break;
         }
         return super.onContextItemSelected(item);
+    }
+
+    private void checkPermissions() {
+        final int MY_PERMISSIONS_REQUEST_CAMERA = 1;
+
+        int permissionCheck = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA);
+        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+            AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();
+            alertDialog.setTitle(getString(R.string.permission_missing_title));
+            alertDialog.setMessage(getString(R.string.permission_missing_message));
+            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.permission_missing_button), (dialog, which) -> {
+                dialog.dismiss();
+                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA}, MY_PERMISSIONS_REQUEST_CAMERA);
+            });
+            alertDialog.show();
+        }
     }
 
 }
