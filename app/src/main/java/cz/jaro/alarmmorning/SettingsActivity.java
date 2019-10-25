@@ -155,7 +155,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
     private static final int REQUEST_CODE_WIZARD = 1;
 
-    private RingtonePreference ringtonePreference;
     private final static int MY_PERMISSIONS_REQUEST_CAMERA = 1;
 
     @Override
@@ -168,8 +167,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
         bindPreferenceSummaryToValue(findPreference(PREF_RINGTONE));
         bindPreferenceSummaryToValue(findPreference(PREF_VOLUME));
-        bindPreferenceChangeListener(findPreference(PREF_VOLUME_INCREASING));
-        bindPreferenceChangeListener(findPreference(PREF_VIBRATE));
+        bindPreferenceSummaryToValue(findPreference(PREF_VOLUME_INCREASING));
+        bindPreferenceSummaryToValue(findPreference(PREF_VIBRATE));
         bindPreferenceSummaryToValue(findPreference(PREF_FLASHLIGHT));
         bindPreferenceSummaryToValue(findPreference(PREF_SNOOZE_TIME));
         bindPreferenceSummaryToValue(findPreference(PREF_AUTO_SNOOZE_TIME));
@@ -187,8 +186,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         bindPreferenceSummaryToValue(findPreference(PREF_NAP_TIME));
         bindPreferenceSummaryToValue(findPreference(PREF_HOLIDAY));
 
-        final Context context = this;
-
         // Start/stop services
 
         Preference prefCheckAlarmTime = findPreference(PREF_CHECK_ALARM_TIME);
@@ -196,7 +193,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             analytics(preference, newValue);
 
             boolean boolValue = (boolean) newValue;
-            CheckAlarmTime checkAlarmTime = CheckAlarmTime.getInstance(context);
+            CheckAlarmTime checkAlarmTime = CheckAlarmTime.getInstance(this);
             if (boolValue) {
                 Log.i(TAG, "Starting CheckAlarmTime");
                 checkAlarmTime.register();
@@ -212,7 +209,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             analytics(preference, newValue);
 
             boolean boolValue = (boolean) newValue;
-            NighttimeBell nighttimeBell = NighttimeBell.getInstance(context);
+            NighttimeBell nighttimeBell = NighttimeBell.getInstance(this);
             if (boolValue) {
                 Log.i(TAG, "Starting NighttimeBell");
                 nighttimeBell.register();
@@ -232,22 +229,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             analytics.set(Analytics.Param.Target, Analytics.TARGET_WIZARD);
             analytics.save();
 
-            Intent intent = new Intent(context, Wizard.class);
+            Intent intent = new Intent(this, Wizard.class);
             startActivityForResult(intent, REQUEST_CODE_WIZARD);
 
             return true;
-        });
-
-        Preference prefRingtone = findPreference(PREF_RINGTONE);
-        prefRingtone.setOnPreferenceClickListener(preference -> {
-            ringtonePreference = (RingtonePreference) preference;
-            return false;
-        });
-
-        Preference prefNighttimeBellRingtone = findPreference(PREF_NIGHTTIME_BELL_RINGTONE);
-        prefNighttimeBellRingtone.setOnPreferenceClickListener(preference -> {
-            ringtonePreference = (RingtonePreference) preference;
-            return false;
         });
 
         Preference prefFlashlight = findPreference(PREF_FLASHLIGHT);
@@ -258,6 +243,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             }
             return true;
         });
+
+        // Change handlers are handled in sBindPreferenceSummaryToValueListener.action(...)
     }
 
     /**
@@ -307,12 +294,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         if (requestCode == REQUEST_CODE_WIZARD) {
             if (resultCode == RESULT_OK) {
                 finish();
-            }
-        } else {
-            // Propagate to RingtonePreference
-            if (ringtonePreference != null) {
-                ringtonePreference.onActivityResult(requestCode, resultCode, data);
-                ringtonePreference = null;
             }
         }
     }
@@ -483,6 +464,12 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 break;
             case PREF_VOLUME:
                 newValue = SharedPreferencesHelper.load(preference.getKey(), PREF_VOLUME_DEFAULT);
+                break;
+            case PREF_VOLUME_INCREASING:
+                newValue = SharedPreferencesHelper.load(preference.getKey(), PREF_VOLUME_INCREASING_DEFAULT);
+                break;
+            case PREF_VIBRATE:
+                newValue = SharedPreferencesHelper.load(preference.getKey(), PREF_VIBRATE_DEFAULT);
                 break;
             case PREF_FLASHLIGHT:
                 newValue = SharedPreferencesHelper.load(preference.getKey(), PREF_FLASHLIGHT_DEFAULT);
