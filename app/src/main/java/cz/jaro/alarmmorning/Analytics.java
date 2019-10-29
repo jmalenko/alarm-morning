@@ -755,7 +755,7 @@ public class Analytics {
 
         if (mFirebaseAnalytics == null) throw new IllegalStateException("Analytics is null");
 
-        if (!locationTask.isComplete()) {
+        if (locationTask != null && !locationTask.isComplete()) {
             Log.v(TAG, "Saving postponed until the location is acquired");
             shouldSave = true;
             return;
