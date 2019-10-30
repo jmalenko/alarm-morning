@@ -34,7 +34,7 @@ public class TimeChangedReceiver extends BroadcastReceiver {
         CheckAlarmTime checkAlarmTime = CheckAlarmTime.getInstance(context);
         checkAlarmTime.checkAndRegister();
 
-        Log.i(TAG, "Satting NighttimeBell on time change");
+        Log.i(TAG, "Setting NighttimeBell on time change");
         NighttimeBell nighttimeBell = NighttimeBell.getInstance(context);
         nighttimeBell.checkAndRegister();
 
