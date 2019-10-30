@@ -3,6 +3,7 @@ package cz.jaro.alarmmorning;
 import android.content.res.Resources;
 import android.graphics.Rect;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.TouchDelegate;
 import android.view.View;
@@ -194,7 +195,8 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
             });
 
             viewHolder.getTextName().setOnEditorActionListener((v, actionId, event) -> {
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                if (actionId == EditorInfo.IME_ACTION_DONE
+                        || (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) {
                     fragment.onEditNameEnd();
 
                     return true;
