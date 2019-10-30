@@ -22,6 +22,8 @@ import cz.jaro.alarmmorning.receivers.NotificationReceiver;
 
 import static cz.jaro.alarmmorning.GlobalManager.PERSIST_ALARM_ID;
 import static cz.jaro.alarmmorning.GlobalManager.PERSIST_ALARM_TYPE;
+import static cz.jaro.alarmmorning.GlobalManager.getNearFutureTime;
+import static cz.jaro.alarmmorning.GlobalManager.useNearFutureTime;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.onTheSameDate;
 
 /**
@@ -141,7 +143,7 @@ public class SystemNotification {
         showNotification(mBuilder, appAlarm);
     }
 
-    public void onDismissBeforeRinging(AppAlarm appAlarm) {
+    void onDismissBeforeRinging(AppAlarm appAlarm) {
         Log.d(TAG, "onDismissBeforeRinging(appAlarm=" + appAlarm + ")");
 
         if (currentlyDisplayedNotificationIsAbout(appAlarm)) {
@@ -213,13 +215,13 @@ public class SystemNotification {
         showNotification(mBuilder, appAlarm);
     }
 
-    public void onDismiss(AppAlarm appAlarm) {
+    void onDismiss(AppAlarm appAlarm) {
         Log.d(TAG, "onDismiss(appAlarm=" + appAlarm + ")");
 
         hideNotification();
     }
 
-    public void onSnooze(AppAlarm appAlarm, Calendar ringAfterSnoozeTime) {
+    void onSnooze(AppAlarm appAlarm, Calendar ringAfterSnoozeTime) {
         Log.d(TAG, "onSnooze(appAlarm=" + appAlarm + ")");
 
         NotificationCompat.Builder mBuilder = buildNotification(appAlarm);
@@ -247,7 +249,7 @@ public class SystemNotification {
         showNotification(mBuilder, appAlarm);
     }
 
-    public void onAlarmCancel(AppAlarm appAlarm) {
+    void onAlarmCancel(AppAlarm appAlarm) {
         Log.d(TAG, "onAlarmCancel(appAlarm=" + appAlarm + ")");
 
         hideNotification();
@@ -258,7 +260,7 @@ public class SystemNotification {
      * ===================================
      */
 
-    public void onDeleteOneTimeAlarm(OneTimeAlarm oneTimeAlarm) {
+    void onDeleteOneTimeAlarm(OneTimeAlarm oneTimeAlarm) {
         Log.d(TAG, "onDismissBeforeRinging(appAlarm=" + oneTimeAlarm + ")");
 
         if (currentlyDisplayedNotificationIsAbout(oneTimeAlarm)) {
@@ -273,8 +275,8 @@ public class SystemNotification {
 
                 Calendar alarmTime = nextAlarm.getDateTime();
 
-                if (SystemAlarm.useNearFutureTime()) {
-                    Calendar nearFutureTime = SystemAlarm.getNearFutureTime(alarmTime);
+                if (useNearFutureTime()) {
+                    Calendar nearFutureTime = getNearFutureTime(alarmTime);
 
                     if (nearFutureTime.before(now)) {
                         onNearFuture(nextAlarm);
@@ -284,7 +286,7 @@ public class SystemNotification {
         }
     }
 
-    public void onModifyOneTimeAlarmDateTime(OneTimeAlarm oneTimeAlarm) {
+    void onModifyOneTimeAlarmDateTime(OneTimeAlarm oneTimeAlarm) {
         Log.d(TAG, "onModifyOneTimeAlarmDateTime(oneTimeAlarm = " + oneTimeAlarm + ")");
 
         if (currentlyDisplayedNotificationIsAbout(oneTimeAlarm)) {
@@ -296,7 +298,7 @@ public class SystemNotification {
         }
     }
 
-    public void onModifyOneTimeAlarmName(OneTimeAlarm oneTimeAlarm) {
+    void onModifyOneTimeAlarmName(OneTimeAlarm oneTimeAlarm) {
         Log.d(TAG, "onModifyOneTimeAlarmName(oneTimeAlarm = " + oneTimeAlarm + ")");
 
         if (currentlyDisplayedNotificationIsAbout(oneTimeAlarm)) {
@@ -308,12 +310,12 @@ public class SystemNotification {
             Calendar now = clock.now();
 
             Calendar alarmTime = oneTimeAlarm.getDateTime();
-            Calendar nearFutureTime = SystemAlarm.getNearFutureTime(alarmTime);
+            Calendar nearFutureTime = getNearFutureTime(alarmTime);
 
             if (now.before(nearFutureTime)) {
                 // Nothing
             } else if (now.before(alarmTime)) {
-                if (SystemAlarm.useNearFutureTime()) {
+                if (useNearFutureTime()) {
                     onNearFuture(oneTimeAlarm);
                 }
             } else {
@@ -336,7 +338,7 @@ public class SystemNotification {
      * =====
      */
 
-    public void notifyCancelledAlarm(AppAlarm appAlarm) {
+    void notifyCancelledAlarm(AppAlarm appAlarm) {
         Log.d(TAG, "notifyCancelledAlarm(appAlarm=" + appAlarm + ")");
 
         NotificationCompat.Builder mBuilder = buildNotification(appAlarm); // TODO The title shows just the time. Task: On mignight, after the notification was displayed, update the notification such that the title includes both time and date
@@ -361,7 +363,7 @@ public class SystemNotification {
      *
      * @param skippedAlarms The count of skipped alarm times.
      */
-    public void notifySkippedAlarms(List<AppAlarm> skippedAlarms) {
+    void notifySkippedAlarms(List<AppAlarm> skippedAlarms) {
         Log.d(TAG, "notifySkippedAlarms()");
 
         Resources res = context.getResources();

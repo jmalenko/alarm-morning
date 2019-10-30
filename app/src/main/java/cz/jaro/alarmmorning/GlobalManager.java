@@ -42,6 +42,7 @@ import static cz.jaro.alarmmorning.calendar.CalendarUtils.addDay;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.addMilliSecondsClone;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.addMinutesClone;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.beginningOfToday;
+import static cz.jaro.alarmmorning.calendar.CalendarUtils.beginningOfTomorrow;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.onTheSameDate;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.roundDown;
 
@@ -205,9 +206,28 @@ public class GlobalManager {
         return state == STATE_RINGING;
     }
 
-    public boolean isDismissedAny() {
+    private boolean isDismissedAny() {
         int state = getState();
         return state == STATE_DISMISSED || state == STATE_DISMISSED_BEFORE_RINGING;
+    }
+
+    public static Calendar getResetTime(Calendar now) {
+        return beginningOfTomorrow(now);
+    }
+
+    public static boolean useNearFutureTime() {
+        int nearFutureMinutes = (int) SharedPreferencesHelper.load(SettingsActivity.PREF_NEAR_FUTURE_TIME, SettingsActivity.PREF_NEAR_FUTURE_TIME_DEFAULT);
+
+        return 0 < nearFutureMinutes;
+    }
+
+    public static Calendar getNearFutureTime(Calendar alarmTime) {
+        int nearFutureMinutes = (int) SharedPreferencesHelper.load(SettingsActivity.PREF_NEAR_FUTURE_TIME, SettingsActivity.PREF_NEAR_FUTURE_TIME_DEFAULT);
+
+        Calendar nearFutureTime = (Calendar) alarmTime.clone();
+        nearFutureTime.add(Calendar.MINUTE, -nearFutureMinutes);
+
+        return nearFutureTime;
     }
 
     private boolean afterBeginningOfNearFuturePeriod() {
@@ -219,17 +239,17 @@ public class GlobalManager {
         }
     }
 
-    public boolean afterBeginningOfNearFuturePeriod(Calendar alarmTime) {
+    boolean afterBeginningOfNearFuturePeriod(Calendar alarmTime) {
         Calendar now = clock().now();
 
-        Calendar nearFutureTime = SystemAlarm.getNearFutureTime(alarmTime);
+        Calendar nearFutureTime = getNearFutureTime(alarmTime);
         return now.after(nearFutureTime);
     }
 
-    public boolean inNearFuturePeriod(Calendar alarmTime) {
+    boolean inNearFuturePeriod(Calendar alarmTime) {
         Calendar now = clock().now();
 
-        Calendar nearFutureTime = SystemAlarm.getNearFutureTime(alarmTime);
+        Calendar nearFutureTime = getNearFutureTime(alarmTime);
         return now.after(nearFutureTime) && now.before(alarmTime);
     }
 
@@ -269,7 +289,7 @@ public class GlobalManager {
     // Persisted next action
     // =====================
 
-    public NextAction getNextAction() throws IllegalArgumentException {
+    NextAction getNextAction() throws IllegalArgumentException {
         Log.v(TAG, "getNextAction()");
 
         try {
@@ -293,7 +313,7 @@ public class GlobalManager {
         }
     }
 
-    public void setNextAction(NextAction nextAction) {
+    void setNextAction(NextAction nextAction) {
         Log.v(TAG, "setNextAction(action=" + nextAction.action + ", time=" + nextAction.time.getTime() + ", appAlarm=" + nextAction.appAlarm + ")");
 
         SharedPreferencesHelper.save(PERSIST_ACTION, nextAction.action);
@@ -453,7 +473,7 @@ public class GlobalManager {
         void modify(Set<AppAlarm> dismissedAlarms);
     }
 
-    public static <T extends Comparable<? super T>> List<T> asSortedList(Collection<T> c) {
+    private static <T extends Comparable<? super T>> List<T> asSortedList(Collection<T> c) {
         List<T> list = new ArrayList<>(c);
         java.util.Collections.sort(list);
         return list;
@@ -674,7 +694,7 @@ public class GlobalManager {
         if (isRingingOrSnoozed()) {
             Log.w(TAG, "Previous alarm is still ringing");
 
-            if (inRecentPast(getRingingAlarm().getDateTime(), RECENT_PERIOD)) {
+            if (inRecentPast(getRingingAlarm().getDateTime())) {
                 Log.i(TAG, "Resuming ringing as the previous alarm is recent");
 
                 onRing(getRingingAlarm());
@@ -687,7 +707,7 @@ public class GlobalManager {
 
         // Resume if the last alarm (e.g. the one that was scheduled as last) is recent.
         // This covers the case then the device was off at the alarm time, but the device (and app) started shortly afterwards
-        if (lastAlarmTime != null && inRecentPast(lastAlarmTime, RECENT_PERIOD)) {
+        if (lastAlarmTime != null && inRecentPast(lastAlarmTime)) {
             Log.i(TAG, "Resuming ringing as the last alarm is recent");
 
             onRing(getRingingAlarm());
@@ -698,7 +718,7 @@ public class GlobalManager {
         onAlarmSetNew(systemAlarm);
     }
 
-    public void onDateChange() {
+    void onDateChange() {
         Log.d(TAG, "onDateChanged()");
 
         Context context = AlarmMorningApplication.getAppContext();
@@ -708,16 +728,15 @@ public class GlobalManager {
     }
 
     /**
-     * Check if the time is in past minutes minutes.
+     * Check if the time is in past {@code minutes} minutes.
      *
      * @param time    time
-     * @param minutes minutes
      * @return true if the time is in the period &lt;now - minutes ; now&gt;
      */
-    public boolean inRecentPast(Calendar time, int minutes) {
+    private boolean inRecentPast(Calendar time) {
         Calendar now = clock().now();
 
-        Calendar from = addMinutesClone(now, -minutes);
+        Calendar from = addMinutesClone(now, -GlobalManager.RECENT_PERIOD);
 
         return time.after(from) && time.before(now);
     }
@@ -750,7 +769,7 @@ public class GlobalManager {
      * @param id Id of the one-time alarm
      * @return Return one-time alarm with the given Id.
      */
-    public OneTimeAlarm loadOneTimeAlarm(Long id) {
+    private OneTimeAlarm loadOneTimeAlarm(Long id) {
         return dataSource.loadOneTimeAlarm(id);
     }
 
@@ -856,7 +875,7 @@ public class GlobalManager {
                 // nothing
                 break;
             case SystemAlarm.ACTION_RING:
-                if (SystemAlarm.useNearFutureTime()) {
+                if (useNearFutureTime()) {
                     onNearFuture(nextAction.appAlarm, false, true);
                 }
                 break;
@@ -1354,7 +1373,7 @@ public class GlobalManager {
         return getRingAfterSnoozeTime(clock, snoozeTime);
     }
 
-    public Calendar getRingAfterSnoozeTime(Clock clock, int minutes) {
+    private Calendar getRingAfterSnoozeTime(Clock clock, int minutes) {
         Log.d(TAG, "getRingAfterSnoozeTime(minutes=" + minutes + ")");
 
         Calendar ringAfterSnoozeTime = addMinutesClone(clock.now(), minutes);
@@ -1605,7 +1624,7 @@ public class GlobalManager {
         }
     }
 
-    static public String stateToString(int state) {
+    private static String stateToString(int state) {
         switch (state) {
             case STATE_UNDEFINED:
                 return STRING_STATE_UNDEFINED;
@@ -1662,7 +1681,7 @@ public class GlobalManager {
      *
      * @return Content of the database.
      */
-    public String dumpDB() {
+    String dumpDB() {
         return dataSource.dumpDB();
     }
 

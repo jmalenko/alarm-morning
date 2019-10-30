@@ -19,7 +19,9 @@ import static cz.jaro.alarmmorning.GlobalManager.PERSIST_ALARM_ID;
 import static cz.jaro.alarmmorning.GlobalManager.PERSIST_ALARM_TYPE;
 import static cz.jaro.alarmmorning.GlobalManager.STATE_DISMISSED;
 import static cz.jaro.alarmmorning.GlobalManager.STATE_DISMISSED_BEFORE_RINGING;
-import static cz.jaro.alarmmorning.calendar.CalendarUtils.beginningOfTomorrow;
+import static cz.jaro.alarmmorning.GlobalManager.getNearFutureTime;
+import static cz.jaro.alarmmorning.GlobalManager.getResetTime;
+import static cz.jaro.alarmmorning.GlobalManager.useNearFutureTime;
 
 /**
  * The SystemAlarm handles the "waking up of the app at a specified time to perform an action".
@@ -252,25 +254,6 @@ public class SystemAlarm {
         }
     }
 
-    public static Calendar getResetTime(Calendar now) {
-        return beginningOfTomorrow(now);
-    }
-
-    public static boolean useNearFutureTime() {
-        int nearFutureMinutes = (int) SharedPreferencesHelper.load(SettingsActivity.PREF_NEAR_FUTURE_TIME, SettingsActivity.PREF_NEAR_FUTURE_TIME_DEFAULT);
-
-        return 0 < nearFutureMinutes;
-    }
-
-    public static Calendar getNearFutureTime(Calendar alarmTime) {
-        int nearFutureMinutes = (int) SharedPreferencesHelper.load(SettingsActivity.PREF_NEAR_FUTURE_TIME, SettingsActivity.PREF_NEAR_FUTURE_TIME_DEFAULT);
-
-        Calendar nearFutureTime = (Calendar) alarmTime.clone();
-        nearFutureTime.add(Calendar.MINUTE, -nearFutureMinutes);
-
-        return nearFutureTime;
-    }
-
     public void onSystemAlarm(Intent intent) {
         String action = intent.getAction();
 
@@ -306,37 +289,37 @@ public class SystemAlarm {
      * ======
      */
 
-    public void onAlarmSet() {
+    void onAlarmSet() {
         Log.d(TAG, "onAlarmSet()");
 
         reset();
     }
 
-    public void onNearFuture(AppAlarm appAlarm) {
+    void onNearFuture(AppAlarm appAlarm) {
         Log.d(TAG, "onNearFuture()");
 
         registerSystemAlarm(ACTION_RING, appAlarm.getDateTime(), appAlarm);
     }
 
-    public void onDismissBeforeRinging() {
+    void onDismissBeforeRinging() {
         Log.d(TAG, "onDismissBeforeRinging()");
 
         reset();
     }
 
-    public void onAlarmTimeOfEarlyDismissedAlarm() {
+    void onAlarmTimeOfEarlyDismissedAlarm() {
         Log.d(TAG, "onAlarmTimeOfEarlyDismissedAlarm()");
 
         register();
     }
 
-    public void onRing() {
+    void onRing() {
         Log.d(TAG, "onRing()");
 
         register();
     }
 
-    public void onSnooze(Calendar ringAfterSnoozeTime) {
+    void onSnooze(Calendar ringAfterSnoozeTime) {
         Log.d(TAG, "onSnooze()");
 
         cancel();
@@ -347,7 +330,7 @@ public class SystemAlarm {
         registerSystemAlarm(ACTION_RING, ringAfterSnoozeTime, ringingAlarm);
     }
 
-    public void onDateChange() {
+    void onDateChange() {
         Log.d(TAG, "onDateChanged()");
 
         register();
@@ -360,7 +343,7 @@ class NextAction {
     final Calendar time;
     final AppAlarm appAlarm;
 
-    public NextAction(String action, Calendar time, AppAlarm appAlarm) {
+    NextAction(String action, Calendar time, AppAlarm appAlarm) {
         this.action = action;
         this.time = time;
         this.appAlarm = appAlarm;

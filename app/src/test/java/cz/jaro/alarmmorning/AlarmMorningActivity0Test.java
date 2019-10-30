@@ -24,6 +24,7 @@ import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.model.AlarmDataSource;
 import cz.jaro.alarmmorning.receivers.AlarmReceiver;
 
+import static cz.jaro.alarmmorning.GlobalManager.getResetTime;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.addDaysClone;
 import static cz.jaro.alarmmorning.model.DayTest.DAY;
 import static cz.jaro.alarmmorning.model.DayTest.MONTH;
@@ -115,7 +116,7 @@ public class AlarmMorningActivity0Test extends FixedTimeTest {
         // time
         Clock clock = globalManager.clock();
         Calendar now = clock.now();
-        Calendar expectedResetTime = SystemAlarm.getResetTime(now);
+        Calendar expectedResetTime = getResetTime(now);
 
         assertThat(scheduledAlarm.triggerAtTime).isEqualTo(expectedResetTime.getTimeInMillis());
 

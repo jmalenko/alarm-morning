@@ -46,31 +46,36 @@ public class SystemAlarmClock {
      * ======
      */
 
-    public void onAlarmSet() {
+    void onAlarmSet() {
         Log.d(TAG, "onAlarmSet()");
 
         reset();
     }
 
-    public void onDismissBeforeRinging() {
+    void onDismissBeforeRinging() {
         Log.d(TAG, "onDismissBeforeRinging()");
 
         reset();
     }
 
-    public void onRing() {
+    void onRing() {
         Log.d(TAG, "onRing()");
 
         reset();
     }
 
-    public void onAlarmCancel() {
+    void onAlarmCancel() {
         Log.d(TAG, "onAlarmCancel()");
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             cancel();
         }
     }
+
+    /*
+     * Other
+     * =====
+     */
 
     private void reset() {
         Log.v(TAG, "reset()");
