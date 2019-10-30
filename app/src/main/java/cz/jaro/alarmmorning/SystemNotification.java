@@ -10,6 +10,7 @@ import android.os.Build;
 import android.util.Log;
 
 import java.util.Calendar;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import androidx.core.app.NotificationCompat;
@@ -360,12 +361,15 @@ public class SystemNotification {
      *
      * @param skippedAlarms The count of skipped alarm times.
      */
-    public void notifySkippedAlarms(int skippedAlarms) {
+    public void notifySkippedAlarms(List<AppAlarm> skippedAlarms) {
         Log.d(TAG, "notifySkippedAlarms()");
 
         Resources res = context.getResources();
         String contentTitle = res.getString(R.string.app_name);
-        String contentText = res.getString(R.string.notification_text_skipped, skippedAlarms);
+        String contentText = res.getString(R.string.notification_text_skipped,
+                res.getString(R.string.notification_text_skipped_count, skippedAlarms.size()),
+                Localization.appAlarmsToString(skippedAlarms, context));
+        Log.v(TAG, contentText);
 
         createNotificationChannel(context);
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context, CHANNEL_ID)

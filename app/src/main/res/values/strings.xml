@@ -104,7 +104,8 @@
 
     <string name="notification_text_cancelled">Alarm cancelled</string>
 
-    <string name="notification_text_skipped">There were <xliff:g example="3" id="skippedAlarmsCount">%1$d</xliff:g> skipped alarms while the device was off</string>
+    <string name="notification_text_skipped_count">There were <xliff:g example="3" id="skippedAlarmsCount">%1$d</xliff:g> skipped alarms while the device was off</string>
+    <string name="notification_text_skipped">%1$s: %2$s</string>
 
     <!-- Widget -->
     <string name="widget_alarm_text_none">No alarm</string>
@@ -189,6 +190,7 @@
     <string name="list_separator_last">" and "</string>
 
     <string name="datetime_format"><xliff:g example="07:00" id="time">%1$s</xliff:g> on <xliff:g example="23/12" id="date">%2$s</xliff:g></string>
+    <string name="datetime_with_name_format"><xliff:g example="07:00 on 23/12" id="datetime">%1$s</xliff:g> (<xliff:g example="Dentist" id="name">%2$s</xliff:g>)</string>
 
     <!-- Menu (left drawer) -->
     <string name="menu_calendar_title">Scheduled alarms</string>

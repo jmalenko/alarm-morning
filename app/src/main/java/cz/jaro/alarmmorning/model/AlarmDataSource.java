@@ -187,22 +187,39 @@ public class AlarmDataSource {
     /**
      * Retrieve a set of {@code OneTimeAlarm}s objects from the database.
      *
-     * @param from If not null, then only the objects with alarm time on or after {@code from} are retrieved.
+     * @param from If not null, then only one-time alarms with alarm time on or after {@code from} are returned.
+     * @param to   If not null, then only one-time alarms with alarm time before {@code to} are returned.
      * @return The list of retrieved objects
      */
-    public List<OneTimeAlarm> loadOneTimeAlarms(Calendar from) {
+    public List<OneTimeAlarm> loadOneTimeAlarms(Calendar from, Calendar to) {
         List<OneTimeAlarm> oneTimeAlarms = new ArrayList<>();
 
         String selection;
         String[] selectionArgs;
         if (from == null) {
-            selection = null;
-            selectionArgs = null;
-        } else {
-            long fromMS = calendarToMilliseconds(from);
+            if (to == null) {
+                selection = null;
+                selectionArgs = null;
+            } else {
+                long toMS = calendarToMilliseconds(to);
 
-            selection = "? <= " + AlarmDbHelper.COLUMN_ONETIMEALARM_ALARM_TIME;
-            selectionArgs = new String[]{String.valueOf(fromMS)};
+                selection = "? > " + AlarmDbHelper.COLUMN_ONETIMEALARM_ALARM_TIME;
+                selectionArgs = new String[]{String.valueOf(toMS)};
+            }
+        } else {
+            if (to == null) {
+                long fromMS = calendarToMilliseconds(from);
+
+                selection = "? <= " + AlarmDbHelper.COLUMN_ONETIMEALARM_ALARM_TIME;
+                selectionArgs = new String[]{String.valueOf(fromMS)};
+            } else {
+                long fromMS = calendarToMilliseconds(from);
+                long toMS = calendarToMilliseconds(to);
+
+                selection = "? <= " + AlarmDbHelper.COLUMN_ONETIMEALARM_ALARM_TIME +
+                        " AND " + AlarmDbHelper.COLUMN_ONETIMEALARM_ALARM_TIME + " < ?";
+                selectionArgs = new String[]{String.valueOf(fromMS), String.valueOf(toMS)};
+            }
         }
 
         Cursor cursor = database.query(AlarmDbHelper.TABLE_ONETIMEALARM, allColumnsOneTimeAlarm, selection, selectionArgs, null, null, null);
@@ -221,7 +238,7 @@ public class AlarmDataSource {
      * @return The list of all retrieved objects
      */
     public List<OneTimeAlarm> loadOneTimeAlarms() {
-        return loadOneTimeAlarms(null);
+        return loadOneTimeAlarms(null, null);
     }
 
     /**

@@ -127,7 +127,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
         // Add one time alarms
         Calendar beginningOfToday = beginningOfToday(now);
-        List<OneTimeAlarm> oneTimeAlarms = globalManager.loadOneTimeAlarms(beginningOfToday);
+        List<OneTimeAlarm> oneTimeAlarms = globalManager.loadOneTimeAlarms(beginningOfToday, null);
         items.addAll(oneTimeAlarms);
 
         Collections.sort(items);

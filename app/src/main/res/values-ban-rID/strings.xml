@@ -65,7 +65,8 @@
   <string name="notification_text_ringing">Berdering</string>
   <string name="notification_text_snoozed">Ditunda sampai <xliff:g example="07:00" id="time">%1$s</xliff:g></string>
   <string name="notification_text_cancelled">Alarm dibatalkan</string>
-  <string name="notification_text_skipped">Ada <xliff:g example="3" id="skippedAlarmsCount">%1$d</xliff:g> alarm yang terlewatkan saat perangkat dimatikan</string>
+  <string name="notification_text_skipped_count">Ada <xliff:g example="3" id="skippedAlarmsCount">%1$d</xliff:g> alarm yang terlewatkan saat perangkat dimatikan</string>
+  <string name="notification_text_skipped">%1$s: %2$s</string>
   <!-- Widget -->
   <string name="widget_alarm_text_none">Tidak ada alarm</string>
   <string name="widget_alarm_text_later"><xliff:g example="Mon, Tue" id="list">%1$s</xliff:g>, <xliff:g example="Sat" id="dayOfWeek">%2$s</xliff:g></string>
@@ -128,6 +129,7 @@
   <string name="list_separator">", "</string>
   <string name="list_separator_last">" dan "</string>
   <string name="datetime_format"><xliff:g example="07:00" id="time">%1$s</xliff:g> on <xliff:g example="23/12" id="date">%2$s</xliff:g></string>
+  <string name="datetime_with_name_format"><xliff:g example="07:00 on 23/12" id="datetime">%1$s</xliff:g> (<xliff:g example="Dentist" id="name">%2$s</xliff:g>)</string>
   <!-- Menu (left drawer) -->
   <string name="menu_calendar_title">Jadwal alarm</string>
   <string name="menu_defaults_title">Alarm standar</string>

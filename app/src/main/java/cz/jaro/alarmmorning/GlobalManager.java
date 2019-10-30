@@ -629,31 +629,42 @@ public class GlobalManager {
                         ", appAlarm=" + nextAction.appAlarm);
                 // e.g. because it was being upgraded or the device was off
 
-                List<Calendar> skippedAlarmTimes = new ArrayList<>();
+                List<AppAlarm> skippedAlarms = new ArrayList<>();
 
                 if (!isDismissedAny() && getRingingAlarm() != null) {
-                    skippedAlarmTimes.add(getRingingAlarm().getDateTime());
+                    skippedAlarms.add(getRingingAlarm());
                 }
 
                 if (nextActionPersisted.appAlarm != null) {
                     // Notification about skipped alarms
                     Calendar from = addMilliSecondsClone(nextActionPersisted.appAlarm.getDateTime(), 1);
+                    skippedAlarms.addAll(getAlarmsInPeriod(from, clock().now()));
 
-                    List<Calendar> alarmTimes = getAlarmsInPeriod(from, clock().now());
+                    if (!skippedAlarms.isEmpty()) {
+                        Log.i(TAG, "There were " + skippedAlarms.size() + " skipped alarms");
 
-                    skippedAlarmTimes.addAll(alarmTimes);
-
-                    if (!skippedAlarmTimes.isEmpty()) {
-                        Log.i(TAG, "  The following alarm times were skipped: " + Localization.dateTimesToString(skippedAlarmTimes, context));
-
+                        JSONArray skippedAlarmsJSON = new JSONArray();
+                        for (AppAlarm skippedAlarm : skippedAlarms) {
+                            try {
+                                JSONObject conf = new JSONObject();
+                                conf.put("alarmTime", skippedAlarm.getDateTime().getTime().toString());
+                                if (skippedAlarm instanceof OneTimeAlarm) {
+                                    OneTimeAlarm oneTimeAlarm = (OneTimeAlarm) skippedAlarm;
+                                    conf.put("name", oneTimeAlarm.getName());
+                                }
+                                skippedAlarmsJSON.put(conf);
+                            } catch (JSONException e) {
+                                skippedAlarmsJSON.put("Error: " + e.getMessage());
+                            }
+                        }
                         Analytics analytics = new Analytics(context, Analytics.Event.Skipped_alarm, Analytics.Channel.Time, Analytics.ChannelName.Alarm);
-                        analytics.set(Analytics.Param.Skipped_alarm_times, calendarsToReadableString(skippedAlarmTimes));
+                        analytics.set(Analytics.Param.Skipped_alarm_times, skippedAlarmsJSON.toString());
                         analytics.save();
 
                         SystemNotification systemNotification = SystemNotification.getInstance(context);
-                        systemNotification.notifySkippedAlarms(skippedAlarmTimes.size()); // TODO include names of skipped one-time alarms
+                        systemNotification.notifySkippedAlarms(skippedAlarms);
 
-                        lastAlarmTime = skippedAlarmTimes.get(skippedAlarmTimes.size() - 1);
+                        lastAlarmTime = skippedAlarms.get(skippedAlarms.size() - 1).getDateTime();
                     }
                 }
             }
@@ -694,23 +705,6 @@ public class GlobalManager {
 
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
         systemAlarm.onDateChange();
-    }
-
-    /**
-     * Formats skipped alarm list to a string which can be used in the Analytics.
-     *
-     * @param calendars List of skipped alarm times
-     * @return String to use in the Analytics
-     */
-    private String calendarsToReadableString(List<Calendar> calendars) {
-        StringBuilder str = new StringBuilder();
-        int i = 0;
-        for (Calendar calendar : calendars) {
-            if (0 < i++)
-                str.append("; ");
-            str.append(calendar.getTime().toString());
-        }
-        return str.toString();
     }
 
     /**
@@ -772,11 +766,12 @@ public class GlobalManager {
     /**
      * Returns the list of one-time alarms.
      *
-     * @param from If not null, then only one-time alarms with alarm time on of after from are returned.
+     * @param from If not null, then only one-time alarms with alarm time on or after {@code from} are returned.
+     * @param to   If not null, then only one-time alarms with alarm time before {@code to} are returned.
      * @return List of one-time alarms.
      */
-    public List<OneTimeAlarm> loadOneTimeAlarms(Calendar from) {
-        return dataSource.loadOneTimeAlarms(from);
+    public List<OneTimeAlarm> loadOneTimeAlarms(Calendar from, Calendar to) {
+        return dataSource.loadOneTimeAlarms(from, to);
     }
 
     private void save(OneTimeAlarm oneTimeAlarm, Analytics analytics) {
@@ -1536,7 +1531,7 @@ public class GlobalManager {
         OneTimeAlarm nextOneTimeAlarm = null;
 
         Calendar now = clock.now();
-        List<OneTimeAlarm> oneTimeAlarms = loadOneTimeAlarms(now);
+        List<OneTimeAlarm> oneTimeAlarms = loadOneTimeAlarms(now, null);
 
         for (OneTimeAlarm oneTimeAlarm : oneTimeAlarms) {
             if (oneTimeAlarm.isPassed(clock)) {
@@ -1568,10 +1563,12 @@ public class GlobalManager {
      * @param to   end of the period
      * @return alarm times, including the borders
      */
-    public List<Calendar> getAlarmsInPeriod(Calendar from, Calendar to) {
+    public List<AppAlarm> getAlarmsInPeriod(Calendar from, Calendar to) {
         Log.d(TAG, "getAlarmsInPeriod(from=" + from.getTime() + ", to=" + to.getTime() + ")");
 
-        List<Calendar> alarmTimes = new ArrayList<>();
+        List<AppAlarm> appAlarms = new ArrayList<>();
+
+        // Add day alarms
 
         for (Calendar date = (Calendar) from.clone(); date.before(to); addDay(date)) {
             Day day = loadDay(date);
@@ -1580,22 +1577,21 @@ public class GlobalManager {
                 continue;
             }
 
-            // handle the alarmTimes on the first (alarmTimes before beginning of period) and last day (after the end of period)
+            // Handle the alarm times on the first (alarm time before beginning of period) and last day (after the end of period)
             Calendar alarmTime = day.getDateTime();
             if (alarmTime.before(from))
                 continue;
             if (to.before(alarmTime))
                 continue;
 
-            alarmTimes.add(alarmTime);
+            appAlarms.add(day);
         }
 
-        Log.d(TAG, "   There are " + alarmTimes.size() + " alarmTimes");
-        for (Calendar alarmTime : alarmTimes) {
-            Log.d(TAG, "   " + alarmTime.getTime());
-        }
+        // Add one-time alarms
+        List<OneTimeAlarm> oneTimeAlarms = loadOneTimeAlarms(from, to);
+        appAlarms.addAll(oneTimeAlarms);
 
-        return alarmTimes;
+        return appAlarms;
     }
 
     public AppAlarm load(String alarmType, String alarmId) throws IllegalArgumentException {

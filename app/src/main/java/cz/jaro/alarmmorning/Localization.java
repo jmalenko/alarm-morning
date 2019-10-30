@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Locale;
 
 import cz.jaro.alarmmorning.calendar.CalendarUtils;
+import cz.jaro.alarmmorning.model.AppAlarm;
+import cz.jaro.alarmmorning.model.OneTimeAlarm;
 
 /**
  * This class contains all the localization related features.
@@ -325,28 +327,39 @@ public class Localization {
     }
 
     /**
-     * Converts the list of datetimes to string.
+     * Converts the list of appAlarms to string.
      *
-     * @param dateTimes list of datetimes
+     * @param appAlarms list of appAlarms
      * @param context   context
-     * @return string with the datetimes. The can be simply inserted into a sentence.
+     * @return string with the datetimes and names of one-time alarms. This can be simply inserted into a sentence.
      */
-    public static String dateTimesToString(List<Calendar> dateTimes, Context context) {
+    public static String appAlarmsToString(List<AppAlarm> appAlarms, Context context) {
         Resources resources = context.getResources();
 
-        StringBuilder dateTimesText = new StringBuilder();
+        StringBuilder text = new StringBuilder();
 
-        for (int index = 0; index < dateTimes.size(); index++) {
+        for (int index = 0; index < appAlarms.size(); index++) {
             if (0 < index) {
-                dateTimesText.append(index < dateTimes.size() - 1 ?
+                text.append(index < appAlarms.size() - 1 ?
                         resources.getString(R.string.list_separator) :
                         resources.getString(R.string.list_separator_last));
             }
-            Calendar dateTime = dateTimes.get(index);
-            dateTimesText.append(Localization.dateTimeToString(dateTime, context));
+            AppAlarm appAlarm = appAlarms.get(index);
+            String dateTimeString = Localization.dateTimeToString(appAlarm.getDateTime(), context);
+            if (appAlarm instanceof OneTimeAlarm) {
+                OneTimeAlarm oneTimeAlarm = (OneTimeAlarm) appAlarm;
+                if (oneTimeAlarm.getName() != null && !oneTimeAlarm.getName().isEmpty()) {
+                    String dateTimeNameString = resources.getString(R.string.datetime_with_name_format, dateTimeString, oneTimeAlarm.getName());
+                    text.append(dateTimeNameString);
+                } else {
+                    text.append(dateTimeString);
+                }
+            } else {
+                text.append(dateTimeString);
+            }
         }
 
-        return dateTimesText.toString();
+        return text.toString();
     }
 
     /**
