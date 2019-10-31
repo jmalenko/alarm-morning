@@ -41,7 +41,7 @@ public class JoyButton extends AppCompatImageButton {
 
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                Log.w(TAG, "onTouch() action=" + motionEvent.getAction() + ", x,y=[" + motionEvent.getX() + ", " + motionEvent.getX() + "]");
+                Log.v(TAG, "onTouch() action=" + motionEvent.getAction() + ", x,y=[" + motionEvent.getX() + ", " + motionEvent.getX() + "]");
 
                 switch (motionEvent.getAction()) {
                     case MotionEvent.ACTION_DOWN:
