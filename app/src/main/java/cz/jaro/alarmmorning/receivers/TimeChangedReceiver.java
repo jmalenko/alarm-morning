@@ -23,6 +23,7 @@ public class TimeChangedReceiver extends BroadcastReceiver {
         WakeLocker.acquire(context);
 
         Log.v(TAG, "onReceive(action=" + intent.getAction() + ")");
+        Log.i(TAG, "Starting after time changed");
 
         new Analytics(context, Analytics.Event.Start, Analytics.Channel.External, Analytics.ChannelName.TimeChange).setConfigurationInfo().save();
 

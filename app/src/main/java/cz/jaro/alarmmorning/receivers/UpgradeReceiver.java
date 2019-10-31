@@ -44,12 +44,14 @@ public class UpgradeReceiver extends BroadcastReceiver {
         Log.v(TAG, "onReceive(action=" + action + ")");
 
         if (action.equals(Intent.ACTION_MY_PACKAGE_REPLACED)) {
+            Log.i(TAG, "Starting after upgrade");
+
             new Analytics(context, Analytics.Event.Start, Analytics.Channel.External, Analytics.ChannelName.Upgrade).setConfigurationInfo().save();
 
             // Update default values of preferences
             PreferenceManager.setDefaultValues(context, R.xml.preferences, false);
 
-            Log.i(TAG, "Update preferences");
+            Log.i(TAG, "Updating preferences");
             updateData(context);
 
             Log.i(TAG, "Setting alarm on update");

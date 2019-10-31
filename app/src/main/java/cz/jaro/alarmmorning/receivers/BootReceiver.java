@@ -22,8 +22,11 @@ public class BootReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         WakeLocker.acquire(context);
 
-        if (intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)) {
-            Log.v(TAG, "onReceive()");
+        String action = intent.getAction();
+        Log.v(TAG, "onReceive(action=" + action + ")");
+
+        if (action.equals(Intent.ACTION_BOOT_COMPLETED)) {
+            Log.i(TAG, "Starting after boot");
 
             new Analytics(context, Analytics.Event.Start, Analytics.Channel.External, Analytics.ChannelName.Boot).setConfigurationInfo().save();
 
