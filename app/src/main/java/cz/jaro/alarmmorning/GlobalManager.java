@@ -364,7 +364,7 @@ public class GlobalManager {
     }
 
     private void setState(int state, AppAlarm appAlarm) {
-        Log.v(TAG, "setState(state=" + state + "(" + stateToString(state) + "}, appAlarm=" + appAlarm + ")");
+        Log.v(TAG, "setState(state=" + state + " (" + stateToString(state) + "), appAlarm=" + appAlarm + ")");
 
         SharedPreferencesHelper.save(PERSIST_LAST_STATE, state);
         SharedPreferencesHelper.save(PERSIST_LAST_ALARM_TYPE, appAlarm.getClass().getSimpleName());
