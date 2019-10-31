@@ -54,7 +54,7 @@ public class UpgradeReceiver extends BroadcastReceiver {
 
             Log.i(TAG, "Setting alarm on update");
             GlobalManager globalManager = GlobalManager.getInstance();
-            globalManager.forceSetAlarm();
+            globalManager.firstSetAlarm();
 
             Log.i(TAG, "Starting CheckAlarmTime on update");
             CheckAlarmTime checkAlarmTime = CheckAlarmTime.getInstance(context);

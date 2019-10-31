@@ -28,7 +28,7 @@ public class TimeChangedReceiver extends BroadcastReceiver {
 
         Log.i(TAG, "Setting alarm on time change");
         GlobalManager globalManager = GlobalManager.getInstance();
-        globalManager.forceSetAlarm();
+        globalManager.firstSetAlarm();
 
         Log.i(TAG, "Setting CheckAlarmTime on time change");
         CheckAlarmTime checkAlarmTime = CheckAlarmTime.getInstance(context);

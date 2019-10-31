@@ -622,8 +622,8 @@ public class GlobalManager {
      * <p/>
      * This method should NOT be called when user sets the alarm time. Instead, call {@link #onAlarmSet()}.
      */
-    public void forceSetAlarm() {
-        Log.d(TAG, "forceSetAlarm()");
+    public void firstSetAlarm() {
+        Log.d(TAG, "firstSetAlarm()");
 
         Context context = AlarmMorningApplication.getAppContext();
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);

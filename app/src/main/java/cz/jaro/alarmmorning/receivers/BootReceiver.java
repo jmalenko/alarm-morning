@@ -29,7 +29,7 @@ public class BootReceiver extends BroadcastReceiver {
 
             Log.i(TAG, "Setting alarm on boot");
             GlobalManager globalManager = GlobalManager.getInstance();
-            globalManager.forceSetAlarm();
+            globalManager.firstSetAlarm();
 
             Log.i(TAG, "Starting CheckAlarmTime on boot");
             CheckAlarmTime checkAlarmTime = CheckAlarmTime.getInstance(context);
