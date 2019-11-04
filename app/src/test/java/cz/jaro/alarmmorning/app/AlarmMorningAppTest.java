@@ -395,15 +395,15 @@ public class AlarmMorningAppTest extends FixedTimeTest {
             Notification.Action actionButton = notification.actions[index];
             assertThat("Notification action title", actionButton.title, is(title));
 
-            PendingIntent intent1 = actionButton.actionIntent;
-            ShadowPendingIntent shadowIntent1 = Shadows.shadowOf(intent1);
+            PendingIntent intent = actionButton.actionIntent;
+            ShadowPendingIntent shadowIntent = Shadows.shadowOf(intent);
 
             Intent expectedIntent = new Intent(context, expectedIntentClass);
 
-            assertThat("Broadcast", shadowIntent1.isBroadcastIntent(), is(true));
-            assertThat("Intent count", shadowIntent1.getSavedIntents().length, is(1));
-            assertThat("Class", shadowIntent1.getSavedIntents()[0].getComponent(), is(expectedIntent.getComponent()));
-            assertThat("Action", shadowIntent1.getSavedIntents()[0].getAction(), is(actionString));
+            assertThat("Broadcast", shadowIntent.isBroadcastIntent(), is(true));
+            assertThat("Intent count", shadowIntent.getSavedIntents().length, is(1));
+            assertThat("Class", shadowIntent.getSavedIntents()[0].getComponent(), is(expectedIntent.getComponent()));
+            assertThat("Action", shadowIntent.getSavedIntents()[0].getAction(), is(actionString));
         }
     }
 
