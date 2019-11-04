@@ -417,7 +417,7 @@ public class BootReceiver2Test extends FixedTimeTest {
     }
 
     private void checkNoActivity() {
-        CalendarWithOneTimeAlarmTest.checkNoActivity();
+        CalendarWithOneTimeAlarmTest.checkActivity(context, null);
     }
 
     private void checkSkippedNotification(int count) {

@@ -1699,20 +1699,14 @@ public class CalendarWithOneTimeAlarmTest extends AlarmMorningAppTest {
         Activity activity = Robolectric.setupActivity(Activity.class);
         ShadowActivity shadowActivity = Shadows.shadowOf(activity);
 
-        Intent intentNext = shadowActivity.peekNextStartedActivity();
-        Intent expectedIntentNext = new Intent(context, cls);
+        Intent intent = shadowActivity.peekNextStartedActivity();
 
-        assertThat("Intent component", intentNext.getComponent(), is(expectedIntentNext.getComponent()));
-    }
-
-    public static void checkNoActivity() {
-        // Check that ringing started
-        Activity activity = Robolectric.setupActivity(Activity.class);
-        ShadowActivity shadowActivity = Shadows.shadowOf(activity);
-
-        Intent intentNext = shadowActivity.peekNextStartedActivity();
-
-        assertNull("Intent component", intentNext);
+        if (cls == null) {
+            assertNull("Intent component", intent);
+        } else {
+            Intent expectedIntent = new Intent(context, cls);
+            assertThat("Intent component", intent.getComponent(), is(expectedIntent.getComponent()));
+        }
     }
 
     public static void consumeActivity() {

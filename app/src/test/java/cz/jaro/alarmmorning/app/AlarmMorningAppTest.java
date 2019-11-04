@@ -327,27 +327,25 @@ public class AlarmMorningAppTest extends FixedTimeTest {
             assertThat("Millisecond", time.get(Calendar.MILLISECOND), is(0));
 
             // Show intent
-            PendingIntent showIntent = alarmClockInfo.getShowIntent();
-            ShadowPendingIntent shadowShowIntent = Shadows.shadowOf(showIntent);
-
-            Intent expectedShowIntent = new Intent(context, AlarmMorningActivity.class);
-
-            assertThat("Broadcast", shadowShowIntent.isBroadcastIntent(), is(true));
-            assertThat("Intent count", shadowShowIntent.getSavedIntents().length, is(1));
-            assertThat("Class", shadowShowIntent.getSavedIntents()[0].getComponent(), is(expectedShowIntent.getComponent()));
-            assertNull("Action", shadowShowIntent.getSavedIntent().getAction());
+            assertIntent(context, alarmClockInfo.getShowIntent(), AlarmMorningActivity.class, null);
 
             // Operation intent
-            PendingIntent operation = shadowAlarmManager.getNextScheduledAlarm().operation;
-            ShadowPendingIntent shadowIntent = Shadows.shadowOf(operation);
-
-            Intent expectedIntent = new Intent(context, VoidReceiver.class);
-
-            assertThat("Broadcast", shadowIntent.isBroadcastIntent(), is(true));
-            assertThat("Intent count", shadowIntent.getSavedIntents().length, is(1));
-            assertThat("Class", shadowIntent.getSavedIntents()[0].getComponent(), is(expectedIntent.getComponent()));
-            assertNull("Action", shadowIntent.getSavedIntent().getAction());
+            assertIntent(context, shadowAlarmManager.getNextScheduledAlarm().operation, VoidReceiver.class, null);
         }
+    }
+
+    private static void assertIntent(Context context, PendingIntent intent, Class<?> cls, String action) {
+        ShadowPendingIntent shadowIntent = Shadows.shadowOf(intent);
+
+        Intent expectedIntent = new Intent(context, cls);
+
+        assertThat("Broadcast", shadowIntent.isBroadcastIntent(), is(true));
+        assertThat("Intent count", shadowIntent.getSavedIntents().length, is(1));
+        assertThat("Class", shadowIntent.getSavedIntents()[0].getComponent(), is(expectedIntent.getComponent()));
+        if (action == null)
+            assertNull("Action", shadowIntent.getSavedIntent().getAction());
+        else
+            assertThat("Action", shadowIntent.getSavedIntents()[0].getAction(), is(action));
     }
 
     void assertSystemAlarmClockNone() {
@@ -395,15 +393,7 @@ public class AlarmMorningAppTest extends FixedTimeTest {
             Notification.Action actionButton = notification.actions[index];
             assertThat("Notification action title", actionButton.title, is(title));
 
-            PendingIntent intent = actionButton.actionIntent;
-            ShadowPendingIntent shadowIntent = Shadows.shadowOf(intent);
-
-            Intent expectedIntent = new Intent(context, expectedIntentClass);
-
-            assertThat("Broadcast", shadowIntent.isBroadcastIntent(), is(true));
-            assertThat("Intent count", shadowIntent.getSavedIntents().length, is(1));
-            assertThat("Class", shadowIntent.getSavedIntents()[0].getComponent(), is(expectedIntent.getComponent()));
-            assertThat("Action", shadowIntent.getSavedIntents()[0].getAction(), is(actionString));
+            assertIntent(context, actionButton.actionIntent, expectedIntentClass, actionString);
         }
     }
 
