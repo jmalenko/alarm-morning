@@ -39,7 +39,7 @@ import static cz.jaro.alarmmorning.SystemAlarm.ACTION_ALARM_TIME_OF_EARLY_DISMIS
 import static cz.jaro.alarmmorning.SystemAlarm.ACTION_RING_IN_NEAR_FUTURE;
 import static cz.jaro.alarmmorning.SystemAlarm.ACTION_SET_SYSTEM_ALARM;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.addDay;
-import static cz.jaro.alarmmorning.calendar.CalendarUtils.addMilliSecondsClone;
+import static cz.jaro.alarmmorning.calendar.CalendarUtils.addMilliSeconds;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.addMinutesClone;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.beginningOfToday;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.beginningOfTomorrow;
@@ -641,7 +641,9 @@ public class GlobalManager {
 
         if (nextActionPersisted != null && nextActionPersisted.appAlarm != null) {
             // Show notification about skipped alarms
-            Calendar from = addMilliSecondsClone(nextActionPersisted.appAlarm.getDateTime(), 1);
+            Calendar from = (Calendar) nextActionPersisted.appAlarm.getDateTime().clone();
+            if (nextActionPersisted.action.equals(SystemAlarm.ACTION_RING))
+                addMilliSeconds(from, 1);
             List<AppAlarm> alarmsInPeriod = getAlarmsInPeriod(from, now);
 
             if (!alarmsInPeriod.isEmpty()) { // Only if there are some other skipped alarms besides the ringing one

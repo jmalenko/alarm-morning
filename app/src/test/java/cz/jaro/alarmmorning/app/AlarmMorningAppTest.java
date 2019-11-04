@@ -50,6 +50,7 @@ import java.util.GregorianCalendar;
 import androidx.recyclerview.widget.RecyclerView;
 import cz.jaro.alarmmorning.AlarmMorningActivity;
 import cz.jaro.alarmmorning.AlarmMorningActivityTest;
+import cz.jaro.alarmmorning.BootReceiverTest;
 import cz.jaro.alarmmorning.CalendarFragment;
 import cz.jaro.alarmmorning.DatePickerFragment;
 import cz.jaro.alarmmorning.FixedTimeTest;
@@ -290,42 +291,12 @@ public class AlarmMorningAppTest extends FixedTimeTest {
     }
 
     void consumeNextScheduledAlarm() {
-        consumeNextScheduledAlarm(shadowAlarmManager);
+        BootReceiverTest.consumeSystemAlarm(shadowAlarmManager);
     }
 
-    public static void consumeNextScheduledAlarm(ShadowAlarmManager shadowAlarmManager) {
-        assertThat("There is a scheduled alarm", 0 < shadowAlarmManager.getScheduledAlarms().size(), is(true));
-        shadowAlarmManager.getNextScheduledAlarm();
-    }
-
-    void assertSystemAlarm(int year, int month, int day, int hour, int minute, String action) {
-        assertSystemAlarm(context, shadowAlarmManager, year, month, day, hour, minute, action);
-    }
-
-    public static void assertSystemAlarm(Context context, ShadowAlarmManager shadowAlarmManager, int year, int month, int day, int hour, int minute, String action) {
-        ShadowAlarmManager.ScheduledAlarm nextScheduledAlarm = shadowAlarmManager.getNextScheduledAlarm();
-
-        assertThat("Type", nextScheduledAlarm.type, is(AlarmManager.RTC_WAKEUP));
-
-        Calendar time = GregorianCalendar.getInstance();
-        time.setTimeInMillis(nextScheduledAlarm.triggerAtTime);
-        assertThat("Year", time.get(Calendar.YEAR), is(year));
-        assertThat("Month", time.get(Calendar.MONTH), is(month));
-        assertThat("Date", time.get(Calendar.DAY_OF_MONTH), is(day));
-        assertThat("Hour", time.get(Calendar.HOUR_OF_DAY), is(hour));
-        assertThat("Minute", time.get(Calendar.MINUTE), is(minute));
-        assertThat("Second", time.get(Calendar.SECOND), is(0));
-        assertThat("Millisecond", time.get(Calendar.MILLISECOND), is(0));
-
-        PendingIntent operation = nextScheduledAlarm.operation;
-        ShadowPendingIntent shadowOperation = Shadows.shadowOf(operation);
-
-        Intent expectedIntent = new Intent(context, AlarmReceiver.class);
-
-        assertThat("Broadcast", shadowOperation.isBroadcastIntent(), is(true));
-        assertThat("Intent count", shadowOperation.getSavedIntents().length, is(1));
-        assertThat("Class", shadowOperation.getSavedIntents()[0].getComponent(), is(expectedIntent.getComponent()));
-        assertThat("Action", shadowOperation.getSavedIntent().getAction(), is(action));
+    void assertAndConsumeSystemAlarm(int year, int month, int day, int hour, int minute, String action) {
+        BootReceiverTest.assertSystemAlarm(context, shadowAlarmManager, year, month, day, hour, minute, AlarmReceiver.class, action);
+        BootReceiverTest.consumeSystemAlarm(shadowAlarmManager);
     }
 
     void assertSystemAlarmCount(int count) {

@@ -89,7 +89,7 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
 
         // Check system alarm
         assertSystemAlarmCount(2);
-        assertSystemAlarm(YEAR, MONTH, DAY, HOUR + 1, 1, SystemAlarm.ACTION_RING);
+        assertAndConsumeSystemAlarm(YEAR, MONTH, DAY, HOUR + 1, 1, SystemAlarm.ACTION_RING);
         assertSystemAlarmClock(YEAR, MONTH, DAY, HOUR + 1, 1);
 
         // Check notification
@@ -145,7 +145,7 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
 
         // Check system alarm
         assertSystemAlarmCount(2);
-        assertSystemAlarm(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR - 2, ONE_TIME_ALARM_MINUTE + 1, SystemAlarm.ACTION_RING_IN_NEAR_FUTURE);
+        assertAndConsumeSystemAlarm(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR - 2, ONE_TIME_ALARM_MINUTE + 1, SystemAlarm.ACTION_RING_IN_NEAR_FUTURE);
         assertSystemAlarmClock(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE + 1);
 
         // Check notification
@@ -207,7 +207,7 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
 
         // Check system alarm
         assertSystemAlarmCount(2);
-        assertSystemAlarm(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR - 2, ONE_TIME_ALARM_MINUTE, SystemAlarm.ACTION_RING_IN_NEAR_FUTURE);
+        assertAndConsumeSystemAlarm(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR - 2, ONE_TIME_ALARM_MINUTE, SystemAlarm.ACTION_RING_IN_NEAR_FUTURE);
         assertSystemAlarmClock(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE);
 
         // Check notification
@@ -238,7 +238,7 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
 
         // Check system alarm
         assertSystemAlarmCount(2);
-        assertSystemAlarm(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR - 2, ONE_TIME_ALARM_MINUTE, SystemAlarm.ACTION_RING_IN_NEAR_FUTURE);
+        assertAndConsumeSystemAlarm(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR - 2, ONE_TIME_ALARM_MINUTE, SystemAlarm.ACTION_RING_IN_NEAR_FUTURE);
         assertSystemAlarmClock(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE);
 
         // Check notification
@@ -258,7 +258,7 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
 
         // Check system alarm
         assertSystemAlarmCount(1);
-        assertSystemAlarm(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE + 1, SystemAlarm.ACTION_ALARM_TIME_OF_EARLY_DISMISSED_ALARM);
+        assertAndConsumeSystemAlarm(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE + 1, SystemAlarm.ACTION_ALARM_TIME_OF_EARLY_DISMISSED_ALARM);
         assertSystemAlarmClockNone();
 
         // Check notification
@@ -291,7 +291,7 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
 
         // Check system alarm
         assertSystemAlarmCount(2);
-        assertSystemAlarm(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR - 2, ONE_TIME_ALARM_MINUTE + 2, SystemAlarm.ACTION_RING_IN_NEAR_FUTURE);
+        assertAndConsumeSystemAlarm(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR - 2, ONE_TIME_ALARM_MINUTE + 2, SystemAlarm.ACTION_RING_IN_NEAR_FUTURE);
         assertSystemAlarmClock(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE + 2);
 
         // Check notification
@@ -335,7 +335,7 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
 
         // Check system alarm
         assertSystemAlarmCount(2);
-        assertSystemAlarm(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR - 2, ONE_TIME_ALARM_MINUTE + 1, SystemAlarm.ACTION_RING_IN_NEAR_FUTURE);
+        assertAndConsumeSystemAlarm(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR - 2, ONE_TIME_ALARM_MINUTE + 1, SystemAlarm.ACTION_RING_IN_NEAR_FUTURE);
         assertSystemAlarmClock(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE + 1);
 
         // Check notification
@@ -366,7 +366,7 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
 
         // Check system alarm
         assertSystemAlarmCount(1);
-        assertSystemAlarm(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE, SystemAlarm.ACTION_ALARM_TIME_OF_EARLY_DISMISSED_ALARM);
+        assertAndConsumeSystemAlarm(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE, SystemAlarm.ACTION_ALARM_TIME_OF_EARLY_DISMISSED_ALARM);
         assertSystemAlarmClockNone();
 
         // Check notification
@@ -404,7 +404,7 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
 
         // Check system alarm
         assertSystemAlarmCount(2);
-        assertSystemAlarm(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR - 2, ONE_TIME_ALARM_MINUTE, SystemAlarm.ACTION_RING_IN_NEAR_FUTURE);
+        assertAndConsumeSystemAlarm(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR - 2, ONE_TIME_ALARM_MINUTE, SystemAlarm.ACTION_RING_IN_NEAR_FUTURE);
         assertSystemAlarmClock(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE);
 
         // Check notification
@@ -451,7 +451,7 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
 
         // Check system alarm
         assertSystemAlarmCount(2);
-        assertSystemAlarm(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR - 2, ONE_TIME_ALARM_MINUTE, SystemAlarm.ACTION_RING_IN_NEAR_FUTURE);
+        assertAndConsumeSystemAlarm(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR - 2, ONE_TIME_ALARM_MINUTE, SystemAlarm.ACTION_RING_IN_NEAR_FUTURE);
         assertSystemAlarmClock(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE);
 
         // Check notification
@@ -482,7 +482,7 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
 
         // Check system alarm
         assertSystemAlarmCount(1);
-        assertSystemAlarm(YEAR, MONTH, DAY, HOUR + 1, 1, SystemAlarm.ACTION_ALARM_TIME_OF_EARLY_DISMISSED_ALARM);
+        assertAndConsumeSystemAlarm(YEAR, MONTH, DAY, HOUR + 1, 1, SystemAlarm.ACTION_ALARM_TIME_OF_EARLY_DISMISSED_ALARM);
         assertSystemAlarmClockNone();
 
         // Check notification
@@ -515,7 +515,7 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
 
         // Check system alarm
         assertSystemAlarmCount(2);
-        assertSystemAlarm(YEAR, MONTH, DAY, HOUR + 1, 1, SystemAlarm.ACTION_ALARM_TIME_OF_EARLY_DISMISSED_ALARM);
+        assertAndConsumeSystemAlarm(YEAR, MONTH, DAY, HOUR + 1, 1, SystemAlarm.ACTION_ALARM_TIME_OF_EARLY_DISMISSED_ALARM);
         assertSystemAlarmClock(YEAR, MONTH, DAY, HOUR + 1, 2);
 
         // Check notification
@@ -564,7 +564,7 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
 
         // Check system alarm
         assertSystemAlarmCount(2);
-        assertSystemAlarm(YEAR, MONTH, DAY, HOUR + 1, 1, SystemAlarm.ACTION_RING);
+        assertAndConsumeSystemAlarm(YEAR, MONTH, DAY, HOUR + 1, 1, SystemAlarm.ACTION_RING);
         assertSystemAlarmClock(YEAR, MONTH, DAY, HOUR + 1, 1);
 
         // Check notification
@@ -618,13 +618,7 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
         // ----------------------------------------------------
 
         // Check that ringing started
-        Activity activity = Robolectric.setupActivity(Activity.class);
-        ShadowActivity shadowActivity = Shadows.shadowOf(activity);
-
-        Intent intentNext = shadowActivity.peekNextStartedActivity();
-        Intent expectedIntentNext = new Intent(context, RingActivity.class);
-
-        assertThat("Intent component", intentNext.getComponent(), is(expectedIntentNext.getComponent()));
+        checkActivity(RingActivity.class);
 
         // Check ring activity
         startActivityRing(globalManager.loadOneTimeAlarms().get(0));
@@ -650,7 +644,7 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
 
         // Check system alarm
         assertSystemAlarmCount(2);
-        assertSystemAlarm(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE + 2, SystemAlarm.ACTION_RING);
+        assertAndConsumeSystemAlarm(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE + 2, SystemAlarm.ACTION_RING);
         assertSystemAlarmClock(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE + 2);
 
         // Check notification
@@ -719,7 +713,7 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
 
         // Check system alarm
         assertSystemAlarmCount(1);
-        assertSystemAlarm(YEAR, MONTH, DAY + 1, 0, 0, SystemAlarm.ACTION_SET_SYSTEM_ALARM);
+        assertAndConsumeSystemAlarm(YEAR, MONTH, DAY + 1, 0, 0, SystemAlarm.ACTION_SET_SYSTEM_ALARM);
         assertSystemAlarmClockNone();
 
         // Check notification
@@ -801,13 +795,7 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
         // ----------------------------------------------------
 
         // Check that ringing started
-        Activity activity = Robolectric.setupActivity(Activity.class);
-        ShadowActivity shadowActivity = Shadows.shadowOf(activity);
-
-        Intent intentNext = shadowActivity.peekNextStartedActivity();
-        Intent expectedIntentNext = new Intent(context, RingActivity.class);
-
-        assertThat("Intent component", intentNext.getComponent(), is(expectedIntentNext.getComponent()));
+        checkActivity(RingActivity.class);
 
         // Check calendar
         startActivityCalendar();
@@ -834,7 +822,7 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
 
         // Check system alarm
         assertSystemAlarmCount(1);
-        assertSystemAlarm(YEAR, MONTH, DAY + 1, 0, 0, SystemAlarm.ACTION_SET_SYSTEM_ALARM);
+        assertAndConsumeSystemAlarm(YEAR, MONTH, DAY + 1, 0, 0, SystemAlarm.ACTION_SET_SYSTEM_ALARM);
         assertSystemAlarmClockNone();
 
         // Check notification
@@ -897,6 +885,10 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
         Analytics analytics = new Analytics(Analytics.Channel.Test, Analytics.ChannelName.Calendar);
 
         globalManager.createOneTimeAlarm(oneTimeAlarm, analytics);
+    }
+
+    private void checkActivity(Class<RingActivity> cls) {
+        CalendarWithOneTimeAlarmTest.checkActivity(context, cls);
     }
 
 }

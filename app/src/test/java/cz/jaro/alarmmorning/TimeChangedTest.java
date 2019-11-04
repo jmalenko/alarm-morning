@@ -21,6 +21,7 @@ import cz.jaro.alarmmorning.clock.FixedClock;
 import cz.jaro.alarmmorning.model.AlarmDataSource;
 import cz.jaro.alarmmorning.model.DayTest;
 import cz.jaro.alarmmorning.model.Defaults;
+import cz.jaro.alarmmorning.receivers.AlarmReceiver;
 import cz.jaro.alarmmorning.receivers.TimeChangedReceiver;
 import cz.jaro.alarmmorning.shadows.ShadowGlobalManager;
 import cz.jaro.alarmmorning.wizard.Wizard;
@@ -62,7 +63,8 @@ public class TimeChangedTest extends FixedTimeTest {
         shadowAlarmManager = Shadows.shadowOf(alarmManager);
 
         // Consume the alarm with action ACTION_SET_SYSTEM_ALARM
-        consumeNextScheduledAlarm();
+        assertThat(shadowAlarmManager.getScheduledAlarms().size(), is(1));
+        BootReceiverTest.consumeSystemAlarm(shadowAlarmManager);
 
         CalendarWithDayAlarmTest.setNearFuturePeriodPreferenceToZero(context);
 
@@ -93,7 +95,7 @@ public class TimeChangedTest extends FixedTimeTest {
         assertEquals(MINUTE, 0);
 
         // Check system alarm
-        CalendarWithDayAlarmTest.assertSystemAlarm(context, shadowAlarmManager, YEAR, MONTH, DAY, 4, 1, SystemAlarm.ACTION_RING);
+        assertAndConsumeSystemAlarm(YEAR, MONTH, DAY, 4, 1, SystemAlarm.ACTION_RING);
     }
 
     @Test
@@ -107,7 +109,7 @@ public class TimeChangedTest extends FixedTimeTest {
         timeChangedReceiver.onReceive(context, intent);
 
         // Check system alarm
-        CalendarWithDayAlarmTest.assertSystemAlarm(context, shadowAlarmManager, YEAR, MONTH, DAY, 4, 1, SystemAlarm.ACTION_RING);
+        assertAndConsumeSystemAlarm(YEAR, MONTH, DAY, 4, 1, SystemAlarm.ACTION_RING);
     }
 
     @Test
@@ -121,7 +123,7 @@ public class TimeChangedTest extends FixedTimeTest {
         timeChangedReceiver.onReceive(context, intent);
 
         // Check system alarm
-        CalendarWithDayAlarmTest.assertSystemAlarm(context, shadowAlarmManager, YEAR, MONTH - 1, 31, 10, 7, SystemAlarm.ACTION_RING);
+        assertAndConsumeSystemAlarm(YEAR, MONTH - 1, 31, 10, 7, SystemAlarm.ACTION_RING);
     }
 
     @Test
@@ -135,7 +137,7 @@ public class TimeChangedTest extends FixedTimeTest {
         timeChangedReceiver.onReceive(context, intent);
 
         // Check system alarm
-        CalendarWithDayAlarmTest.assertSystemAlarm(context, shadowAlarmManager, YEAR, MONTH, DAY, 4, 1, SystemAlarm.ACTION_RING);
+        assertAndConsumeSystemAlarm(YEAR, MONTH, DAY, 4, 1, SystemAlarm.ACTION_RING);
     }
 
     @Test
@@ -149,7 +151,7 @@ public class TimeChangedTest extends FixedTimeTest {
         timeChangedReceiver.onReceive(context, intent);
 
         // Check system alarm
-        CalendarWithDayAlarmTest.assertSystemAlarm(context, shadowAlarmManager, YEAR, MONTH, DAY, 4, 1, SystemAlarm.ACTION_RING);
+        assertAndConsumeSystemAlarm(YEAR, MONTH, DAY, 4, 1, SystemAlarm.ACTION_RING);
     }
 
     @Test
@@ -163,7 +165,7 @@ public class TimeChangedTest extends FixedTimeTest {
         timeChangedReceiver.onReceive(context, intent);
 
         // Check system alarm
-        CalendarWithDayAlarmTest.assertSystemAlarm(context, shadowAlarmManager, YEAR, MONTH, DAY + 1, 5, 2, SystemAlarm.ACTION_RING);
+        assertAndConsumeSystemAlarm(YEAR, MONTH, DAY + 1, 5, 2, SystemAlarm.ACTION_RING);
     }
 
     @Test
@@ -177,7 +179,7 @@ public class TimeChangedTest extends FixedTimeTest {
         timeChangedReceiver.onReceive(context, intent);
 
         // Check system alarm
-        CalendarWithDayAlarmTest.assertSystemAlarm(context, shadowAlarmManager, YEAR, MONTH - 1, 30, 9, 6, SystemAlarm.ACTION_RING);
+        assertAndConsumeSystemAlarm(YEAR, MONTH - 1, 30, 9, 6, SystemAlarm.ACTION_RING);
     }
 
     @Test
@@ -191,12 +193,12 @@ public class TimeChangedTest extends FixedTimeTest {
         timeChangedReceiver.onReceive(context, intent);
 
         // Check system alarm
-        CalendarWithDayAlarmTest.assertSystemAlarm(context, shadowAlarmManager, YEAR, MONTH, DAY + 2, 6, 3, SystemAlarm.ACTION_RING);
+        assertAndConsumeSystemAlarm(YEAR, MONTH, DAY + 2, 6, 3, SystemAlarm.ACTION_RING);
     }
 
-    private void consumeNextScheduledAlarm() {
-        assertThat(shadowAlarmManager.getScheduledAlarms().size(), is(1));
-        shadowAlarmManager.getNextScheduledAlarm();
+    private void assertAndConsumeSystemAlarm(int year, int month, int day, int hour, int minute, String action) {
+        BootReceiverTest.assertSystemAlarm(context, shadowAlarmManager, year, month, day, hour, minute, AlarmReceiver.class, action);
+        BootReceiverTest.consumeSystemAlarm(shadowAlarmManager);
     }
 
 }

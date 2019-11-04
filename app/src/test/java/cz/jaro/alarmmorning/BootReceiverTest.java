@@ -50,10 +50,7 @@ public class BootReceiverTest extends FixedTimeTest {
         AlarmManager alarmManager = (AlarmManager) RuntimeEnvironment.application.getSystemService(Context.ALARM_SERVICE);
         shadowAlarmManager = Shadows.shadowOf(alarmManager);
 
-        // Initialize same as after booting
-        BroadcastReceiver receiver = new BootReceiver();
-        Intent intent = new Intent(Intent.ACTION_BOOT_COMPLETED);
-        receiver.onReceive(context, intent);
+        reboot();
     }
 
     @Test
@@ -61,19 +58,32 @@ public class BootReceiverTest extends FixedTimeTest {
         assertThat("Alarm count", shadowAlarmManager.getScheduledAlarms().size(), is(3));
 
         // System alarm for Check alarm time
-        assertSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY, 22, 0, CheckAlarmTimeAlarmReceiver.class, CheckAlarmTime.ACTION_CHECK_ALARM_TIME);
-        shadowAlarmManager.getNextScheduledAlarm();
+        assertAndConsumeSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY, 22, 0, CheckAlarmTimeAlarmReceiver.class, CheckAlarmTime.ACTION_CHECK_ALARM_TIME);
 
         // System alarm for Nighttime bell
-        assertSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY, 22, 0, NighttimeBellAlarmReceiver.class, NighttimeBell.ACTION_PLAY);
-        shadowAlarmManager.getNextScheduledAlarm();
+        assertAndConsumeSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY, 22, 0, NighttimeBellAlarmReceiver.class, NighttimeBell.ACTION_PLAY);
 
         // System alarm for Alarm
-        assertSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY + 1, 0, 0, AlarmReceiver.class, SystemAlarm.ACTION_SET_SYSTEM_ALARM);
-        shadowAlarmManager.getNextScheduledAlarm();
+        assertAndConsumeSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY + 1, 0, 0, AlarmReceiver.class, SystemAlarm.ACTION_SET_SYSTEM_ALARM);
     }
 
-    private void assertSystemAlarm(int year, int month, int day, int hour, int minute, Class<?> cls, String action) {
+    public void reboot() {
+        reboot(context);
+    }
+
+    public static void reboot(Context context) {
+        // Initialize same as after booting
+        BroadcastReceiver receiver = new BootReceiver();
+        Intent intent = new Intent(Intent.ACTION_BOOT_COMPLETED);
+        receiver.onReceive(context, intent);
+    }
+
+    private void assertAndConsumeSystemAlarm(int year, int month, int day, int hour, int minute, Class<?> cls, String action) {
+        assertSystemAlarm(context, shadowAlarmManager, year, month, day, hour, minute, cls, action);
+        consumeSystemAlarm(shadowAlarmManager);
+    }
+
+    public static void assertSystemAlarm(Context context, ShadowAlarmManager shadowAlarmManager, int year, int month, int day, int hour, int minute, Class<?> cls, String action) {
         ShadowAlarmManager.ScheduledAlarm nextScheduledAlarm = shadowAlarmManager.peekNextScheduledAlarm();
 
         assertThat("Type", nextScheduledAlarm.type, is(AlarmManager.RTC_WAKEUP));
@@ -97,6 +107,29 @@ public class BootReceiverTest extends FixedTimeTest {
         assertThat("Intent count", shadowPendingIntent.getSavedIntents().length, is(1));
         assertThat("Class", shadowPendingIntent.getSavedIntents()[0].getComponent(), is(expectedIntent.getComponent()));
         assertThat("Action", shadowPendingIntent.getSavedIntent().getAction(), is(action));
+
+        // Alternative implementation - string comparison that "compares everythhing" (usefull for debugging)
+//        assertThat("Year",
+//                time.get(Calendar.YEAR) + "-" +
+//                        time.get(Calendar.MONTH) + "-" +
+//                        time.get(Calendar.DAY_OF_MONTH) + " " +
+//                        time.get(Calendar.HOUR_OF_DAY) + "-" +
+//                        time.get(Calendar.MINUTE) + " " +
+//                        expectedIntent.getComponent().toString() + "-" +
+//                        action
+//                , is(
+//                        year + "-" +
+//                                month + "-" +
+//                                day + " " +
+//                                hour + "-" +
+//                                minute + " " +
+//                                shadowPendingIntent.getSavedIntents()[0].getComponent().toString() + "-" +
+//                                shadowPendingIntent.getSavedIntent().getAction()
+//                ));
     }
 
+    public static void consumeSystemAlarm(ShadowAlarmManager shadowAlarmManager) {
+        assertThat("There is a scheduled alarm", 0 < shadowAlarmManager.getScheduledAlarms().size(), is(true));
+        shadowAlarmManager.getNextScheduledAlarm();
+    }
 }
