@@ -683,25 +683,27 @@ public class GlobalManager {
         // This covers the case when the device restarts while alarm is ringing.
         if (skippedAlarms.isEmpty()) {
             if (isRingingOrSnoozed()) {
-                if (isRinging()) {
-                    Log.i(TAG, "Resuming ringing the ringing alarm");
-                    onRing(getRingingAlarm(), true);
-                } else { // is snoozed
-                    Calendar ringAfterSnoozeTime = loadRingAfterSnoozeTime();
-                    if (ringAfterSnoozeTime.before(now)) {
-                        Log.i(TAG, "Resuming ringing the snoozed alarm as it's after the snooze time");
+                if (!RingActivity.doAutoDismiss(getRingingAlarm())) {
+                    if (isRinging()) {
+                        Log.i(TAG, "Resuming ringing the ringing alarm");
                         onRing(getRingingAlarm(), true);
-                    } else {
-                        Log.i(TAG, "Resuming: The snoozed alarm will ring after the snooze time");
+                    } else { // is snoozed
+                        Calendar ringAfterSnoozeTime = loadRingAfterSnoozeTime();
+                        if (ringAfterSnoozeTime.before(now)) {
+                            Log.i(TAG, "Resuming ringing the snoozed alarm as it's after the snooze time");
+                            onRing(getRingingAlarm(), true);
+                        } else {
+                            Log.i(TAG, "Resuming: The snoozed alarm will ring after the snooze time");
 
-                        systemAlarm.onSnooze(ringAfterSnoozeTime);
+                            systemAlarm.onSnooze(ringAfterSnoozeTime);
 
-                        AppAlarm nextAlarmToRing = getNextAlarmToRing();
-                        SystemNotification systemNotification = SystemNotification.getInstance(context);
-                        systemNotification.onSnooze(nextAlarmToRing, ringAfterSnoozeTime);
+                            AppAlarm nextAlarmToRing = getNextAlarmToRing();
+                            SystemNotification systemNotification = SystemNotification.getInstance(context);
+                            systemNotification.onSnooze(nextAlarmToRing, ringAfterSnoozeTime);
+                        }
                     }
+                    return;
                 }
-                return;
             }
         } else {
             // Resume if the last alarm (e.g. the one that was scheduled as last) is recent.

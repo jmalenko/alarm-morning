@@ -646,10 +646,32 @@ public class RingActivity extends Activity implements RingInterface {
      */
     private boolean checkAutoActions() {
         Log.v(TAG, "checkAutoActions()");
-        GlobalManager globalManager = GlobalManager.getInstance();
-        Calendar now = globalManager.clock().now();
 
         // Note: Do auto-dismiss before auto-snooze
+
+        // Check auto dismiss
+        boolean doAutoDismiss = doAutoDismiss(appAlarm);
+        if (doAutoDismiss) {
+            Log.d(TAG, "Auto-dismiss");
+            doDismiss(true);
+            return true;
+        }
+
+        // Check auto snooze
+        boolean doAutoSnooze = doAutoSnooze();
+        if (doAutoSnooze) {
+            Log.d(TAG, "Auto-snooze");
+            doSnooze(true);
+            return true;
+        }
+
+        return false;
+    }
+
+    public static boolean doAutoDismiss(AppAlarm appAlarm) {
+        Log.v(TAG, "doAutoDismiss()");
+        GlobalManager globalManager = GlobalManager.getInstance();
+        Calendar now = globalManager.clock().now();
 
         // Check auto dismiss
         boolean autoDismiss = (boolean) SharedPreferencesHelper.load(SettingsActivity.PREF_AUTO_DISMISS, SettingsActivity.PREF_AUTO_DISMISS_DEFAULT);
@@ -664,14 +686,16 @@ public class RingActivity extends Activity implements RingInterface {
 
             Log.v(TAG, "Auto-dismiss check " + doAutoDismiss + ": auto-dismiss time (" + autoDismissTime + " min) <= time since the alarm time (" + diffFromAlarmTime + " min)");
 
-            if (doAutoDismiss) {
-                Log.d(TAG, "Auto-dismiss");
-                doDismiss(true);
-                return true;
-            }
+            return doAutoDismiss;
         }
+        return false;
+    }
 
-        // Check auto snooze
+    private boolean doAutoSnooze() {
+        Log.v(TAG, "doAutoSnooze()");
+        GlobalManager globalManager = GlobalManager.getInstance();
+        Calendar now = globalManager.clock().now();
+
         boolean autoSnooze = (boolean) SharedPreferencesHelper.load(SettingsActivity.PREF_AUTO_SNOOZE, SettingsActivity.PREF_AUTO_SNOOZE_DEFAULT);
         if (autoSnooze) {
             long autoSnoozeTime = (int) SharedPreferencesHelper.load(SettingsActivity.PREF_AUTO_SNOOZE_TIME, SettingsActivity.PREF_AUTO_SNOOZE_TIME_DEFAULT);
@@ -682,13 +706,8 @@ public class RingActivity extends Activity implements RingInterface {
 
             Log.v(TAG, "Auto-snooze check " + doAutoSnooze + ": auto-snooze time (" + autoSnoozeTime + " min) <= time since the start of this ringing (" + diffFromLastRingingStartTime + " min)");
 
-            if (doAutoSnooze) {
-                Log.d(TAG, "Auto-snooze");
-                doSnooze(true);
-                return true;
-            }
+            return doAutoSnooze;
         }
-
         return false;
     }
 

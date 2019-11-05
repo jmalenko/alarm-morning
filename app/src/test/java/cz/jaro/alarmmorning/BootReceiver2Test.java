@@ -1,7 +1,11 @@
 package cz.jaro.alarmmorning;
 
+import android.app.Activity;
 import android.app.AlarmManager;
 import android.content.Context;
+import android.content.Intent;
+import android.view.View;
+import android.widget.TextView;
 
 import org.junit.Before;
 import org.junit.FixMethodOrder;
@@ -12,13 +16,16 @@ import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowAlarmManager;
 
+import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import cz.jaro.alarmmorning.app.AlarmMorningAppTest;
 import cz.jaro.alarmmorning.app.CalendarWithOneTimeAlarmTest;
 import cz.jaro.alarmmorning.checkalarmtime.CheckAlarmTime;
 import cz.jaro.alarmmorning.checkalarmtime.CheckAlarmTimeAlarmReceiver;
+import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.clock.FixedClock;
+import cz.jaro.alarmmorning.model.AppAlarm;
 import cz.jaro.alarmmorning.model.DayTest;
 import cz.jaro.alarmmorning.model.OneTimeAlarm;
 import cz.jaro.alarmmorning.nighttimebell.NighttimeBell;
@@ -32,6 +39,9 @@ import static cz.jaro.alarmmorning.app.CalendarWithOneTimeAlarmTest.ONE_TIME_ALA
 import static cz.jaro.alarmmorning.model.DayTest.DAY;
 import static cz.jaro.alarmmorning.model.DayTest.MONTH;
 import static cz.jaro.alarmmorning.model.DayTest.YEAR;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
+import static org.robolectric.Robolectric.buildActivity;
 
 /**
  * Tests of Boot Receiver, specifically proper resuming.
@@ -43,8 +53,10 @@ public class BootReceiver2Test extends FixedTimeTest {
     private Context context;
     private ShadowAlarmManager shadowAlarmManager;
     private CalendarWithOneTimeAlarmTest test;
+    private Clock clock;
 
     private OneTimeAlarm alarm1;
+    private OneTimeAlarm alarm2;
 
     private static final int ONE_TIME_ALARM_HOUR2 = 10;
 
@@ -72,14 +84,14 @@ public class BootReceiver2Test extends FixedTimeTest {
         assertAndConsumeSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE, VoidReceiver.class, null);
 
         // Add alarm 2
-        test.setAlarm(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR2, ONE_TIME_ALARM_MINUTE));
+        alarm2 = test.setAlarm(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR2, ONE_TIME_ALARM_MINUTE));
 
         assertSystemAlarmCount(0);
     }
 
     @Test
     public void t100_farBefore1stAlarm() {
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR - 3, ONE_TIME_ALARM_MINUTE, 0)));
+        setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR - 3, ONE_TIME_ALARM_MINUTE, 0)));
         reboot();
 
         assertSystemAlarmCount(4);
@@ -94,7 +106,7 @@ public class BootReceiver2Test extends FixedTimeTest {
 
     @Test
     public void t110_justBefore1stAlarm() {
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE - 1, 0)));
+        setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE - 1, 0)));
         reboot();
 
         assertSystemAlarmCount(4);
@@ -109,7 +121,7 @@ public class BootReceiver2Test extends FixedTimeTest {
 
     @Test
     public void t120_justAfter1stAlarm() {
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE + 1, 0)));
+        setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE + 1, 0)));
         reboot();
 
         assertSystemAlarmCount(4);
@@ -121,12 +133,12 @@ public class BootReceiver2Test extends FixedTimeTest {
 
         checkSkippedNotification(1);
 
-        checkRingingActivity();
+        checkRingingActivity(alarm1);
     }
 
     @Test
     public void t130_farAfter1stAlarm() {
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE + 31, 0)));
+        setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE + 31, 0)));
         reboot();
 
         assertSystemAlarmCount(4);
@@ -143,7 +155,7 @@ public class BootReceiver2Test extends FixedTimeTest {
 
     @Test
     public void t140_justBefore2ndAlarm() {
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR2, ONE_TIME_ALARM_MINUTE - 1, 0)));
+        setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR2, ONE_TIME_ALARM_MINUTE - 1, 0)));
         reboot();
 
         assertSystemAlarmCount(4);
@@ -160,7 +172,7 @@ public class BootReceiver2Test extends FixedTimeTest {
 
     @Test
     public void t150_justAfter2ndAlarm() {
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR2, ONE_TIME_ALARM_MINUTE + 1, 0)));
+        setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR2, ONE_TIME_ALARM_MINUTE + 1, 0)));
         reboot();
 
         assertSystemAlarmCount(3);
@@ -171,12 +183,12 @@ public class BootReceiver2Test extends FixedTimeTest {
 
         checkSkippedNotification(2);
 
-        checkRingingActivity();
+        checkRingingActivity(alarm2);
     }
 
     @Test
     public void t160_farAfter2ndAlarm() {
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR2, ONE_TIME_ALARM_MINUTE + 31, 0)));
+        setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR2, ONE_TIME_ALARM_MINUTE + 31, 0)));
         reboot();
 
         assertSystemAlarmCount(3);
@@ -193,7 +205,7 @@ public class BootReceiver2Test extends FixedTimeTest {
     @Test
     public void t200_ringing_justBefore2ndAlarm() {
         t120_justAfter1stAlarm();
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR2, ONE_TIME_ALARM_MINUTE - 1, 0)));
+        setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR2, ONE_TIME_ALARM_MINUTE - 1, 0)));
         reboot();
 
         assertSystemAlarmCount(4);
@@ -205,13 +217,13 @@ public class BootReceiver2Test extends FixedTimeTest {
 
         checkSkippedNotification(0);
 
-        checkRingingActivity();
+        checkNoActivity();
     }
 
     @Test
     public void t210_ringing_justAfter2ndAlarm() {
         t120_justAfter1stAlarm();
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR2, ONE_TIME_ALARM_MINUTE + 1, 0)));
+        setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR2, ONE_TIME_ALARM_MINUTE + 1, 0)));
         reboot();
 
         assertSystemAlarmCount(3);
@@ -221,13 +233,13 @@ public class BootReceiver2Test extends FixedTimeTest {
         assertAndConsumeSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY + 1, 0, 0, AlarmReceiver.class, SystemAlarm.ACTION_SET_SYSTEM_ALARM);
         checkSkippedNotification(2);
 
-        checkRingingActivity();
+        checkRingingActivity(alarm2);
     }
 
     @Test
     public void t220_ringing_farAfter2ndAlarm() {
         t120_justAfter1stAlarm();
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR2, ONE_TIME_ALARM_MINUTE + 31, 0)));
+        setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR2, ONE_TIME_ALARM_MINUTE + 31, 0)));
         reboot();
 
         assertSystemAlarmCount(3);
@@ -246,7 +258,7 @@ public class BootReceiver2Test extends FixedTimeTest {
         t120_justAfter1stAlarm();
         snooze();
 
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE + 2, 0)));
+        setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE + 2, 0)));
         reboot();
 
         assertSystemAlarmCount(3);
@@ -265,18 +277,19 @@ public class BootReceiver2Test extends FixedTimeTest {
         t120_justAfter1stAlarm();
         snooze();
 
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR2, ONE_TIME_ALARM_MINUTE - 1, 0)));
+        setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR2, ONE_TIME_ALARM_MINUTE - 1, 0)));
         reboot();
 
-        assertSystemAlarmCount(3);
+        assertSystemAlarmCount(4);
 
         assertAndConsumeSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY, ONE_TIME_ALARM_HOUR2, ONE_TIME_ALARM_MINUTE, AlarmReceiver.class, SystemAlarm.ACTION_RING);
+        assertAndConsumeSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY, ONE_TIME_ALARM_HOUR2, ONE_TIME_ALARM_MINUTE, VoidReceiver.class, null);
         assertAndConsumeSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY, 22, 0, CheckAlarmTimeAlarmReceiver.class, CheckAlarmTime.ACTION_CHECK_ALARM_TIME);
         assertAndConsumeSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY, 22, 0, NighttimeBellAlarmReceiver.class, NighttimeBell.ACTION_PLAY);
 
         checkSkippedNotification(1);
 
-        checkRingingActivity();
+        checkNoActivity();
     }
 
     @Test
@@ -284,7 +297,7 @@ public class BootReceiver2Test extends FixedTimeTest {
         t120_justAfter1stAlarm();
         snooze();
 
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR2, ONE_TIME_ALARM_MINUTE + 1, 0)));
+        setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR2, ONE_TIME_ALARM_MINUTE + 1, 0)));
         reboot();
 
         assertSystemAlarmCount(3);
@@ -295,7 +308,7 @@ public class BootReceiver2Test extends FixedTimeTest {
 
         checkSkippedNotification(2);
 
-        checkRingingActivity();
+        checkRingingActivity(alarm2);
     }
 
     @Test
@@ -303,7 +316,7 @@ public class BootReceiver2Test extends FixedTimeTest {
         t120_justAfter1stAlarm();
         snooze();
 
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR2, ONE_TIME_ALARM_MINUTE + 31, 0)));
+        setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR2, ONE_TIME_ALARM_MINUTE + 31, 0)));
         reboot();
 
         assertSystemAlarmCount(3);
@@ -323,7 +336,7 @@ public class BootReceiver2Test extends FixedTimeTest {
         t120_justAfter1stAlarm();
         dismiss();
 
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR2, ONE_TIME_ALARM_MINUTE - 1, 0)));
+        setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR2, ONE_TIME_ALARM_MINUTE - 1, 0)));
         reboot();
 
         assertSystemAlarmCount(4);
@@ -343,7 +356,7 @@ public class BootReceiver2Test extends FixedTimeTest {
         t120_justAfter1stAlarm();
         dismiss();
 
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR2, ONE_TIME_ALARM_MINUTE + 1, 0)));
+        setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR2, ONE_TIME_ALARM_MINUTE + 1, 0)));
         reboot();
 
         assertSystemAlarmCount(3);
@@ -354,7 +367,7 @@ public class BootReceiver2Test extends FixedTimeTest {
 
         checkSkippedNotification(1);
 
-        checkRingingActivity();
+        checkRingingActivity(alarm2);
     }
 
     @Test
@@ -362,7 +375,7 @@ public class BootReceiver2Test extends FixedTimeTest {
         t120_justAfter1stAlarm();
         dismiss();
 
-        shadowGlobalManager.setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR2, ONE_TIME_ALARM_MINUTE + 31, 0)));
+        setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR2, ONE_TIME_ALARM_MINUTE + 31, 0)));
         reboot();
 
         assertSystemAlarmCount(3);
@@ -391,7 +404,7 @@ public class BootReceiver2Test extends FixedTimeTest {
         // Assert
         assertSystemAlarmCount(1);
 
-        assertAndConsumeSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE + 11, AlarmReceiver.class, SystemAlarm.ACTION_RING);
+        assertAndConsumeSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE + minutes + 1, AlarmReceiver.class, SystemAlarm.ACTION_RING);
     }
 
     private void dismiss() {
@@ -401,7 +414,12 @@ public class BootReceiver2Test extends FixedTimeTest {
         globalManager.onDismiss(alarm1, analytics);
     }
 
-    void assertSystemAlarmCount(int count) {
+    private void setClock(Clock clock) {
+        this.clock = clock;
+        shadowGlobalManager.setClock(clock);
+    }
+
+    private void assertSystemAlarmCount(int count) {
         AlarmMorningAppTest.assertSystemAlarmCount(shadowAlarmManager, count);
     }
 
@@ -410,10 +428,33 @@ public class BootReceiver2Test extends FixedTimeTest {
         BootReceiverTest.consumeSystemAlarm(shadowAlarmManager);
     }
 
-    private void checkRingingActivity() {
+    private void checkRingingActivity(AppAlarm appAlarm) {
         CalendarWithOneTimeAlarmTest.checkActivity(context, RingActivity.class);
         CalendarWithOneTimeAlarmTest.consumeActivity();
-        // TODO Check alarm time
+
+        // Check that the RingActivity shows correct alarm time
+        Intent ringIntent = new Intent(context, RingActivity.class);
+        ringIntent.putExtra(GlobalManager.PERSIST_ALARM_TYPE, appAlarm.getClass().getSimpleName());
+        ringIntent.putExtra(GlobalManager.PERSIST_ALARM_ID, appAlarm.getPersistenceId());
+
+        Activity activity = buildActivity(RingActivity.class, ringIntent).setup().get();
+
+        TextView textTime = activity.findViewById(R.id.time);
+        TextView textAlarmTime = activity.findViewById(R.id.alarmTime);
+
+        String timeStr = Localization.timeToString(appAlarm.getDateTime().getTime(), context);
+        Calendar now = clock.now();
+        if (appAlarm.getHour() == now.get(Calendar.HOUR_OF_DAY) && appAlarm.getMinute() == now.get(Calendar.MINUTE)) {
+            assertThat("Time", textTime.getText(), is(timeStr));
+
+            assertThat("Alarm time", textAlarmTime.getVisibility(), is(View.INVISIBLE));
+        } else {
+            String clockStr = Localization.timeToString(now.getTime(), context);
+            assertThat("Time", textTime.getText(), is(clockStr));
+
+            assertThat("Alarm time", textAlarmTime.getVisibility(), is(View.VISIBLE));
+            assertThat("Alarm time", textAlarmTime.getText(), is("Alarm was set to " + timeStr));
+        }
     }
 
     private void checkNoActivity() {
