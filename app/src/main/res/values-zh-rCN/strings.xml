@@ -104,19 +104,15 @@
   <string name="tomorrow">明天</string>
   <string name="holiday">假期</string>
   <plurals name="time_second">
-    <item quantity="one">%d 秒</item>
     <item quantity="other">%d 秒</item>
   </plurals>
   <plurals name="time_minute">
-    <item quantity="one">%d 分钟</item>
     <item quantity="other">%d 分钟</item>
   </plurals>
   <plurals name="time_hour">
-    <item quantity="one">%d 小时和</item>
     <item quantity="other">%d 小时和</item>
   </plurals>
   <plurals name="time_day">
-    <item quantity="one">%d 天</item>
     <item quantity="other">%d 天</item>
   </plurals>
   <string name="time_day_hour_min">%1$s、 %2$s %3$s</string>
