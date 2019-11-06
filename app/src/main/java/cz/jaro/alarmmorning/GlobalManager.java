@@ -625,91 +625,104 @@ public class GlobalManager {
     public void firstSetAlarm() {
         Log.d(TAG, "firstSetAlarm()");
 
-        List<AppAlarm> skippedAlarms = new ArrayList<>();
-
         Context context = AlarmMorningApplication.getAppContext();
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
         Calendar now = clock().now();
 
-        // Find skipped alarms
-        NextAction nextActionPersisted;
+        // Step 1: Do all the logic
+
+        AppAlarm ringingAlarm = getRingingAlarm();
+        boolean isRingingOrSnoozed = ringingAlarm != null && isRingingOrSnoozed();
+        boolean isSnoozed = !isRinging();
+
+        List<AppAlarm> alarmsInPeriod; // between current alarm (excluding it) and now (including it)
         try {
-            nextActionPersisted = getNextAction();
-        } catch (IllegalArgumentException e) {
-            nextActionPersisted = null;
-        }
+            NextAction nextActionPersisted = getNextAction();
 
-        if (nextActionPersisted != null && nextActionPersisted.appAlarm != null) {
-            // Show notification about skipped alarms
             Calendar from = (Calendar) nextActionPersisted.appAlarm.getDateTime().clone();
-            if (nextActionPersisted.action.equals(SystemAlarm.ACTION_RING))
+            if (nextActionPersisted.action.equals(SystemAlarm.ACTION_RING)) // If the current alarm is ringing then it is handled in the ringingAlarm varible above. Here we want to include the "ring in near future" alarm.
                 addMilliSeconds(from, 1);
-            List<AppAlarm> alarmsInPeriod = getAlarmsInPeriod(from, now);
 
-            if (!alarmsInPeriod.isEmpty()) { // Only if there are some other skipped alarms besides the ringing one
-                // First, add the ringing alarm
-                if (getRingingAlarm() != null && !isDismissedAny()) {
-                    skippedAlarms.add(getRingingAlarm());
-                }
-                // Second, add the other alarms
-                skippedAlarms.addAll(alarmsInPeriod);
-
-                Log.i(TAG, "There were " + skippedAlarms.size() + " skipped alarms");
-
-                JSONArray skippedAlarmsJSON = new JSONArray();
-                for (AppAlarm skippedAlarm : skippedAlarms) {
-                    try {
-                        JSONObject conf = new JSONObject();
-                        conf.put("alarmTime", skippedAlarm.getDateTime().getTime().toString());
-                        if (skippedAlarm instanceof OneTimeAlarm) {
-                            OneTimeAlarm oneTimeAlarm = (OneTimeAlarm) skippedAlarm;
-                            conf.put("name", oneTimeAlarm.getName());
-                        }
-                        skippedAlarmsJSON.put(conf);
-                    } catch (JSONException e) {
-                        skippedAlarmsJSON.put("Error: " + e.getMessage());
-                    }
-                }
-                Analytics analytics = new Analytics(context, Analytics.Event.Skipped_alarm, Analytics.Channel.Time, Analytics.ChannelName.Alarm);
-                analytics.set(Analytics.Param.Skipped_alarm_times, skippedAlarmsJSON.toString());
-                analytics.save();
-
-                SystemNotification systemNotification = SystemNotification.getInstance(context);
-                systemNotification.notifySkippedAlarms(skippedAlarms);
-            }
+            alarmsInPeriod = getAlarmsInPeriod(from, now);
+        } catch (IllegalArgumentException | NullPointerException e) {
+            alarmsInPeriod = new ArrayList<>();
         }
 
-        // Resume if the last ringing alarm is still active (ringing or snoozed).
-        // This covers the case when the device restarts while alarm is ringing.
-        if (skippedAlarms.isEmpty()) {
-            if (isRingingOrSnoozed()) {
-                if (!RingActivity.doAutoDismiss(getRingingAlarm())) {
-                    if (isRinging()) {
-                        Log.i(TAG, "Resuming ringing the ringing alarm");
-                        onRing(getRingingAlarm(), true);
-                    } else { // is snoozed
-                        Calendar ringAfterSnoozeTime = loadRingAfterSnoozeTime();
-                        if (ringAfterSnoozeTime.before(now)) {
-                            Log.i(TAG, "Resuming ringing the snoozed alarm as it's after the snooze time");
-                            onRing(getRingingAlarm(), true);
-                        } else {
-                            Log.i(TAG, "Resuming: The snoozed alarm will ring after the snooze time");
+        boolean beforeAutoDismissTime = alarmsInPeriod.isEmpty()
+                && isRingingOrSnoozed
+                && !RingActivity.doAutoDismiss(ringingAlarm);
+        boolean ringingAlarmWillNormallyResumeAfterSnoozing = beforeAutoDismissTime
+                && isSnoozed
+                && now.before(loadRingAfterSnoozeTime());
+        boolean isRingingAlarmSkipped = isRingingOrSnoozed && !ringingAlarmWillNormallyResumeAfterSnoozing;
 
-                            systemAlarm.onSnooze(ringAfterSnoozeTime);
+        // Step 2: Show notification
+        boolean sbowNotification = isRingingAlarmSkipped || !alarmsInPeriod.isEmpty();
+        if (sbowNotification) {
+            List<AppAlarm> notificationAlarms = new ArrayList<>();
+            if (isRingingAlarmSkipped)
+                notificationAlarms.add(ringingAlarm);
+            notificationAlarms.addAll(alarmsInPeriod);
 
-                            AppAlarm nextAlarmToRing = getNextAlarmToRing();
-                            SystemNotification systemNotification = SystemNotification.getInstance(context);
-                            systemNotification.onSnooze(nextAlarmToRing, ringAfterSnoozeTime);
-                        }
+            Log.i(TAG, "There were " + notificationAlarms.size() + " skipped alarms");
+
+            JSONArray skippedAlarmsJSON = new JSONArray();
+            for (AppAlarm skippedAlarm : notificationAlarms) {
+                try {
+                    JSONObject conf = new JSONObject();
+                    conf.put("alarmTime", skippedAlarm.getDateTime().getTime().toString());
+                    if (skippedAlarm instanceof OneTimeAlarm) {
+                        OneTimeAlarm oneTimeAlarm = (OneTimeAlarm) skippedAlarm;
+                        conf.put("name", oneTimeAlarm.getName());
                     }
-                    return;
+                    skippedAlarmsJSON.put(conf);
+                } catch (JSONException e) {
+                    skippedAlarmsJSON.put("Error: " + e.getMessage());
                 }
             }
-        } else {
-            // Resume if the last alarm (e.g. the one that was scheduled as last) is recent.
-            // This covers the case then the device was off at the alarm time, but the device (and app) started shortly afterwards.
-            AppAlarm lastAlarm = skippedAlarms.get(skippedAlarms.size() - 1);
-            if (inRecentPast(lastAlarm.getDateTime())) {
+            Analytics analytics = new Analytics(context, Analytics.Event.Skipped_alarm, Analytics.Channel.Time, Analytics.ChannelName.Alarm);
+            analytics.set(Analytics.Param.Skipped_alarm_times, skippedAlarmsJSON.toString());
+            analytics.save();
+
+            SystemNotification systemNotification = SystemNotification.getInstance(context);
+            systemNotification.notifySkippedAlarms(notificationAlarms);
+        }
+
+        // Step 3: Resume ringing, schedule system alarm
+
+        // Resume if the ringing alarm is still active (ringing or snoozed).
+        // This covers the case when the device restarts while alarm is ringing.
+        boolean resumeRingingAlarm = alarmsInPeriod.isEmpty() && beforeAutoDismissTime;
+        if (resumeRingingAlarm) {
+            if (isRinging()) {
+                Log.i(TAG, "Resuming ringing the ringing alarm");
+                onRing(ringingAlarm, true);
+            } else { // is snoozed
+                if (!ringingAlarmWillNormallyResumeAfterSnoozing) {
+                    Log.i(TAG, "Resuming ringing the snoozed alarm as it's after the snooze time");
+                    onRing(ringingAlarm, true);
+                } else {
+                    Log.i(TAG, "Resuming: The snoozed alarm will ring after the snooze time");
+
+                    Calendar ringAfterSnoozeTime = loadRingAfterSnoozeTime();
+
+                    systemAlarm.onSnooze(ringAfterSnoozeTime);
+
+                    AppAlarm nextAlarmToRing = getNextAlarmToRing();
+                    SystemNotification systemNotification = SystemNotification.getInstance(context);
+                    systemNotification.onSnooze(nextAlarmToRing, ringAfterSnoozeTime);
+                }
+            }
+            return;
+        }
+
+        // Resume if the last alarm (e.g. the one that was scheduled as last) is recent.
+        // This covers the case then the device was off at the alarm time, but the device (and app) started shortly afterwards.
+        boolean resumeLastAlarm = !alarmsInPeriod.isEmpty();
+        if (resumeLastAlarm) {
+            AppAlarm lastAlarm = alarmsInPeriod.get(alarmsInPeriod.size() - 1);
+            boolean lastAlarmIsRecent = inRecentPast(lastAlarm.getDateTime());
+            if (lastAlarmIsRecent) {
                 Log.i(TAG, "Resuming ringing as the last alarm is recent");
 
                 onRing(lastAlarm);
@@ -718,7 +731,7 @@ public class GlobalManager {
             }
         }
 
-        // Set next alarm
+        // Set next (future) alarm
         Log.i(TAG, "Resuming: setting next alarm");
         onAlarmSetNew(systemAlarm);
     }

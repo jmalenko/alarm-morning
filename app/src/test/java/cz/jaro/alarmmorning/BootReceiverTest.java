@@ -109,27 +109,33 @@ public class BootReceiverTest extends FixedTimeTest {
         assertThat("Action", shadowPendingIntent.getSavedIntent().getAction(), is(action));
 
         // Alternative implementation - string comparison that "compares everythhing" (usefull for debugging)
-//        assertThat("Year",
+//        assertThat("Everything",
 //                time.get(Calendar.YEAR) + "-" +
 //                        time.get(Calendar.MONTH) + "-" +
 //                        time.get(Calendar.DAY_OF_MONTH) + " " +
 //                        time.get(Calendar.HOUR_OF_DAY) + "-" +
 //                        time.get(Calendar.MINUTE) + " " +
-//                        expectedIntent.getComponent().toString() + "-" +
-//                        action
+//                        shadowPendingIntent.getSavedIntents()[0].getComponent().toString() + "-" +
+//                        shadowPendingIntent.getSavedIntent().getAction()
 //                , is(
 //                        year + "-" +
 //                                month + "-" +
 //                                day + " " +
 //                                hour + "-" +
 //                                minute + " " +
-//                                shadowPendingIntent.getSavedIntents()[0].getComponent().toString() + "-" +
-//                                shadowPendingIntent.getSavedIntent().getAction()
+//                                expectedIntent.getComponent().toString() + "-" +
+//                                action
 //                ));
     }
 
     public static void consumeSystemAlarm(ShadowAlarmManager shadowAlarmManager) {
         assertThat("There is a scheduled alarm", 0 < shadowAlarmManager.getScheduledAlarms().size(), is(true));
         shadowAlarmManager.getNextScheduledAlarm();
+    }
+
+    public static void consumeSystemAlarms(ShadowAlarmManager shadowAlarmManager) {
+        ShadowAlarmManager.ScheduledAlarm scheduledAlarm = shadowAlarmManager.getNextScheduledAlarm();
+        while (scheduledAlarm != null)
+            scheduledAlarm = shadowAlarmManager.getNextScheduledAlarm();
     }
 }

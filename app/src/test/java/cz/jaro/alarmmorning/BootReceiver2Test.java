@@ -2,6 +2,8 @@ package cz.jaro.alarmmorning;
 
 import android.app.Activity;
 import android.app.AlarmManager;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.view.View;
@@ -15,6 +17,7 @@ import org.robolectric.RuntimeEnvironment;
 import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowAlarmManager;
+import org.robolectric.shadows.ShadowNotificationManager;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -34,6 +37,8 @@ import cz.jaro.alarmmorning.receivers.AlarmReceiver;
 import cz.jaro.alarmmorning.receivers.VoidReceiver;
 import cz.jaro.alarmmorning.shadows.ShadowGlobalManager;
 
+import static cz.jaro.alarmmorning.app.AlarmMorningAppTest.assertNotification;
+import static cz.jaro.alarmmorning.app.AlarmMorningAppTest.assertNotificationCount;
 import static cz.jaro.alarmmorning.app.CalendarWithOneTimeAlarmTest.ONE_TIME_ALARM_HOUR;
 import static cz.jaro.alarmmorning.app.CalendarWithOneTimeAlarmTest.ONE_TIME_ALARM_MINUTE;
 import static cz.jaro.alarmmorning.model.DayTest.DAY;
@@ -52,6 +57,10 @@ public class BootReceiver2Test extends FixedTimeTest {
 
     private Context context;
     private ShadowAlarmManager shadowAlarmManager;
+
+    private NotificationManager notificationManager;
+    private ShadowNotificationManager shadowNotificationManager;
+
     private CalendarWithOneTimeAlarmTest test;
     private Clock clock;
 
@@ -68,6 +77,9 @@ public class BootReceiver2Test extends FixedTimeTest {
 
         AlarmManager alarmManager = (AlarmManager) RuntimeEnvironment.application.getSystemService(Context.ALARM_SERVICE);
         shadowAlarmManager = Shadows.shadowOf(alarmManager);
+
+        notificationManager = (NotificationManager) RuntimeEnvironment.application.getSystemService(Context.NOTIFICATION_SERVICE);
+        shadowNotificationManager = Shadows.shadowOf(notificationManager);
 
         // Prepare dependency on another test (and consume the system alarms)
         test = new CalendarWithOneTimeAlarmTest();
@@ -102,6 +114,8 @@ public class BootReceiver2Test extends FixedTimeTest {
         assertAndConsumeSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY, 22, 0, NighttimeBellAlarmReceiver.class, NighttimeBell.ACTION_PLAY);
 
         checkNoActivity();
+
+        assertNotificationCount(shadowNotificationManager, 0);
     }
 
     @Test
@@ -117,12 +131,16 @@ public class BootReceiver2Test extends FixedTimeTest {
         assertAndConsumeSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY, 22, 0, NighttimeBellAlarmReceiver.class, NighttimeBell.ACTION_PLAY);
 
         checkNoActivity();
+
+        assertNotificationCount(shadowNotificationManager, 1);
+
+        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
+        assertNotification(notification, "Alarm at 4:30 AM", "Touch to view all alarms");
     }
 
     @Test
     public void t120_justAfter1stAlarm() {
-        setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE + 1, 0)));
-        reboot();
+        ringWithoutCleanup();
 
         assertSystemAlarmCount(4);
 
@@ -131,9 +149,15 @@ public class BootReceiver2Test extends FixedTimeTest {
         assertAndConsumeSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY, 22, 0, CheckAlarmTimeAlarmReceiver.class, CheckAlarmTime.ACTION_CHECK_ALARM_TIME);
         assertAndConsumeSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY, 22, 0, NighttimeBellAlarmReceiver.class, NighttimeBell.ACTION_PLAY);
 
-        checkSkippedNotification(1);
-
         checkRingingActivity(alarm1);
+
+        assertNotificationCount(shadowNotificationManager, 2);
+
+        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
+        assertNotification(notification, "Alarm at 4:30 AM", "Ringing");
+        notification = shadowNotificationManager.getAllNotifications().get(1);
+        assertNotification(notification, "Alarm Morning", "There were 1 skipped alarms while the device was off: 4:30 AM"); // XXX Multiple tense
+        notificationManager.cancelAll();
     }
 
     @Test
@@ -148,9 +172,12 @@ public class BootReceiver2Test extends FixedTimeTest {
         assertAndConsumeSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY, 22, 0, CheckAlarmTimeAlarmReceiver.class, CheckAlarmTime.ACTION_CHECK_ALARM_TIME);
         assertAndConsumeSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY, 22, 0, NighttimeBellAlarmReceiver.class, NighttimeBell.ACTION_PLAY);
 
-        checkSkippedNotification(1);
-
         checkNoActivity();
+
+        assertNotificationCount(shadowNotificationManager, 1);
+
+        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
+        assertNotification(notification, "Alarm Morning", "There were 1 skipped alarms while the device was off: 4:30 AM");
     }
 
     @Test
@@ -165,9 +192,14 @@ public class BootReceiver2Test extends FixedTimeTest {
         assertAndConsumeSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY, 22, 0, CheckAlarmTimeAlarmReceiver.class, CheckAlarmTime.ACTION_CHECK_ALARM_TIME);
         assertAndConsumeSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY, 22, 0, NighttimeBellAlarmReceiver.class, NighttimeBell.ACTION_PLAY);
 
-        checkSkippedNotification(1);
-
         checkNoActivity();
+
+        assertNotificationCount(shadowNotificationManager, 2);
+
+        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
+        assertNotification(notification, "Alarm at 10:30 AM", "Touch to view all alarms");
+        notification = shadowNotificationManager.getAllNotifications().get(1);
+        assertNotification(notification, "Alarm Morning", "There were 1 skipped alarms while the device was off: 4:30 AM");
     }
 
     @Test
@@ -181,9 +213,14 @@ public class BootReceiver2Test extends FixedTimeTest {
         assertAndConsumeSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY, 22, 0, NighttimeBellAlarmReceiver.class, NighttimeBell.ACTION_PLAY);
         assertAndConsumeSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY + 1, 0, 0, AlarmReceiver.class, SystemAlarm.ACTION_SET_SYSTEM_ALARM);
 
-        checkSkippedNotification(2);
-
         checkRingingActivity(alarm2);
+
+        assertNotificationCount(shadowNotificationManager, 2);
+
+        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
+        assertNotification(notification, "Alarm at 10:30 AM", "Ringing");
+        notification = shadowNotificationManager.getAllNotifications().get(1);
+        assertNotification(notification, "Alarm Morning", "There were 2 skipped alarms while the device was off: 4:30 AM and 10:30 AM");
     }
 
     @Test
@@ -197,14 +234,18 @@ public class BootReceiver2Test extends FixedTimeTest {
         assertAndConsumeSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY, 22, 0, NighttimeBellAlarmReceiver.class, NighttimeBell.ACTION_PLAY);
         assertAndConsumeSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY + 1, 0, 0, AlarmReceiver.class, SystemAlarm.ACTION_SET_SYSTEM_ALARM);
 
-        checkSkippedNotification(2);
-
         checkNoActivity();
+
+        assertNotificationCount(shadowNotificationManager, 1);
+
+        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
+        assertNotification(notification, "Alarm Morning", "There were 2 skipped alarms while the device was off: 4:30 AM and 10:30 AM");
     }
 
     @Test
     public void t200_ringing_justBefore2ndAlarm() {
-        t120_justAfter1stAlarm();
+        ring();
+
         setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR2, ONE_TIME_ALARM_MINUTE - 1, 0)));
         reboot();
 
@@ -215,14 +256,19 @@ public class BootReceiver2Test extends FixedTimeTest {
         assertAndConsumeSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY, 22, 0, CheckAlarmTimeAlarmReceiver.class, CheckAlarmTime.ACTION_CHECK_ALARM_TIME);
         assertAndConsumeSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY, 22, 0, NighttimeBellAlarmReceiver.class, NighttimeBell.ACTION_PLAY);
 
-        checkSkippedNotification(0);
-
         checkNoActivity();
+
+        assertNotificationCount(shadowNotificationManager, 2);
+
+        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
+        assertNotification(notification, "Alarm Morning", "There were 1 skipped alarms while the device was off: 4:30 AM");
+        notification = shadowNotificationManager.getAllNotifications().get(1);
+        assertNotification(notification, "Alarm at 10:30 AM", "Touch to view all alarms");
     }
 
     @Test
     public void t210_ringing_justAfter2ndAlarm() {
-        t120_justAfter1stAlarm();
+        ring();
         setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR2, ONE_TIME_ALARM_MINUTE + 1, 0)));
         reboot();
 
@@ -231,14 +277,22 @@ public class BootReceiver2Test extends FixedTimeTest {
         assertAndConsumeSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY, 22, 0, CheckAlarmTimeAlarmReceiver.class, CheckAlarmTime.ACTION_CHECK_ALARM_TIME);
         assertAndConsumeSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY, 22, 0, NighttimeBellAlarmReceiver.class, NighttimeBell.ACTION_PLAY);
         assertAndConsumeSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY + 1, 0, 0, AlarmReceiver.class, SystemAlarm.ACTION_SET_SYSTEM_ALARM);
-        checkSkippedNotification(2);
 
         checkRingingActivity(alarm2);
+
+        assertNotificationCount(shadowNotificationManager, 3);
+
+        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
+        assertNotification(notification, "Alarm Morning", "There were 2 skipped alarms while the device was off: 4:30 AM and 10:30 AM");
+        notification = shadowNotificationManager.getAllNotifications().get(1);
+        assertNotification(notification, "Alarm at 4:30 AM", "Alarm cancelled"); // XXX Remove
+        notification = shadowNotificationManager.getAllNotifications().get(2);
+        assertNotification(notification, "Alarm at 10:30 AM", "Ringing");
     }
 
     @Test
     public void t220_ringing_farAfter2ndAlarm() {
-        t120_justAfter1stAlarm();
+        ring();
         setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR2, ONE_TIME_ALARM_MINUTE + 31, 0)));
         reboot();
 
@@ -248,14 +302,16 @@ public class BootReceiver2Test extends FixedTimeTest {
         assertAndConsumeSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY, 22, 0, NighttimeBellAlarmReceiver.class, NighttimeBell.ACTION_PLAY);
         assertAndConsumeSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY + 1, 0, 0, AlarmReceiver.class, SystemAlarm.ACTION_SET_SYSTEM_ALARM);
 
-        checkSkippedNotification(2);
-
         checkNoActivity();
+
+        assertNotificationCount(shadowNotificationManager, 1);
+
+        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
+        assertNotification(notification, "Alarm Morning", "There were 2 skipped alarms while the device was off: 4:30 AM and 10:30 AM");
     }
 
     @Test
     public void t300_snoozed_inOneMinute() {
-        t120_justAfter1stAlarm();
         snooze();
 
         setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE + 2, 0)));
@@ -267,14 +323,16 @@ public class BootReceiver2Test extends FixedTimeTest {
         assertAndConsumeSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY, 22, 0, CheckAlarmTimeAlarmReceiver.class, CheckAlarmTime.ACTION_CHECK_ALARM_TIME);
         assertAndConsumeSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY, 22, 0, NighttimeBellAlarmReceiver.class, NighttimeBell.ACTION_PLAY);
 
-        checkSkippedNotification(1);
-
         checkNoActivity();
+
+        assertNotificationCount(shadowNotificationManager, 1);
+
+        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
+        assertNotification(notification, "Alarm at 4:30 AM", "Snoozed until 4:41 AM");
     }
 
     @Test
     public void t310_snoozed_justBefore2ndAlarm() {
-        t120_justAfter1stAlarm();
         snooze();
 
         setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR2, ONE_TIME_ALARM_MINUTE - 1, 0)));
@@ -287,14 +345,18 @@ public class BootReceiver2Test extends FixedTimeTest {
         assertAndConsumeSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY, 22, 0, CheckAlarmTimeAlarmReceiver.class, CheckAlarmTime.ACTION_CHECK_ALARM_TIME);
         assertAndConsumeSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY, 22, 0, NighttimeBellAlarmReceiver.class, NighttimeBell.ACTION_PLAY);
 
-        checkSkippedNotification(1);
-
         checkNoActivity();
+
+        assertNotificationCount(shadowNotificationManager, 2);
+
+        Notification notification = shadowNotificationManager.getAllNotifications().get(0); // XXX Order of notifications depends on how the tests are run (run all tests in the entire class vs run just this test/method)
+        assertNotification(notification, "Alarm Morning", "There were 1 skipped alarms while the device was off: 4:30 AM");
+        notification = shadowNotificationManager.getAllNotifications().get(1);
+        assertNotification(notification, "Alarm at 10:30 AM", "Touch to view all alarms");
     }
 
     @Test
     public void t320_snoozed_justAfter2ndAlarm() {
-        t120_justAfter1stAlarm();
         snooze();
 
         setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR2, ONE_TIME_ALARM_MINUTE + 1, 0)));
@@ -306,14 +368,18 @@ public class BootReceiver2Test extends FixedTimeTest {
         assertAndConsumeSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY, 22, 0, NighttimeBellAlarmReceiver.class, NighttimeBell.ACTION_PLAY);
         assertAndConsumeSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY + 1, 0, 0, AlarmReceiver.class, SystemAlarm.ACTION_SET_SYSTEM_ALARM);
 
-        checkSkippedNotification(2);
-
         checkRingingActivity(alarm2);
+
+        assertNotificationCount(shadowNotificationManager, 2);
+
+        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
+        assertNotification(notification, "Alarm at 10:30 AM", "Ringing");
+        notification = shadowNotificationManager.getAllNotifications().get(1);
+        assertNotification(notification, "Alarm Morning", "There were 2 skipped alarms while the device was off: 4:30 AM and 10:30 AM");
     }
 
     @Test
     public void t330_snoozed_farAfter2ndAlarm() {
-        t120_justAfter1stAlarm();
         snooze();
 
         setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR2, ONE_TIME_ALARM_MINUTE + 31, 0)));
@@ -325,16 +391,21 @@ public class BootReceiver2Test extends FixedTimeTest {
         assertAndConsumeSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY, 22, 0, NighttimeBellAlarmReceiver.class, NighttimeBell.ACTION_PLAY);
         assertAndConsumeSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY + 1, 0, 0, AlarmReceiver.class, SystemAlarm.ACTION_SET_SYSTEM_ALARM);
 
-        checkSkippedNotification(1);
-
         checkNoActivity();
+
+        assertNotificationCount(shadowNotificationManager, 1);
+
+        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
+        assertNotification(notification, "Alarm Morning", "There were 2 skipped alarms while the device was off: 4:30 AM and 10:30 AM");
     }
 
 
     @Test
     public void t400_dismissed_justBefore2ndAlarm() {
-        t120_justAfter1stAlarm();
         dismiss();
+
+        assertSystemAlarmCount(0);
+        assertNotificationCount(shadowNotificationManager, 0);
 
         setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR2, ONE_TIME_ALARM_MINUTE - 1, 0)));
         reboot();
@@ -346,14 +417,16 @@ public class BootReceiver2Test extends FixedTimeTest {
         assertAndConsumeSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY, 22, 0, CheckAlarmTimeAlarmReceiver.class, CheckAlarmTime.ACTION_CHECK_ALARM_TIME);
         assertAndConsumeSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY, 22, 0, NighttimeBellAlarmReceiver.class, NighttimeBell.ACTION_PLAY);
 
-        checkSkippedNotification(1);
-
         checkNoActivity();
+
+        assertNotificationCount(shadowNotificationManager, 1);
+
+        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
+        assertNotification(notification, "Alarm at 10:30 AM", "Touch to view all alarms");
     }
 
     @Test
     public void t410_dismissed_justAfter2ndAlarm() {
-        t120_justAfter1stAlarm();
         dismiss();
 
         setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR2, ONE_TIME_ALARM_MINUTE + 1, 0)));
@@ -365,14 +438,18 @@ public class BootReceiver2Test extends FixedTimeTest {
         assertAndConsumeSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY, 22, 0, NighttimeBellAlarmReceiver.class, NighttimeBell.ACTION_PLAY);
         assertAndConsumeSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY + 1, 0, 0, AlarmReceiver.class, SystemAlarm.ACTION_SET_SYSTEM_ALARM);
 
-        checkSkippedNotification(1);
-
         checkRingingActivity(alarm2);
+
+        assertNotificationCount(shadowNotificationManager, 2);
+
+        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
+        assertNotification(notification, "Alarm at 10:30 AM", "Ringing");
+        notification = shadowNotificationManager.getAllNotifications().get(1);
+        assertNotification(notification, "Alarm Morning", "There were 1 skipped alarms while the device was off: 10:30 AM");
     }
 
     @Test
     public void t420_dismissed_farAfter2ndAlarm() {
-        t120_justAfter1stAlarm();
         dismiss();
 
         setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR2, ONE_TIME_ALARM_MINUTE + 31, 0)));
@@ -384,16 +461,35 @@ public class BootReceiver2Test extends FixedTimeTest {
         assertAndConsumeSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY, 22, 0, NighttimeBellAlarmReceiver.class, NighttimeBell.ACTION_PLAY);
         assertAndConsumeSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY + 1, 0, 0, AlarmReceiver.class, SystemAlarm.ACTION_SET_SYSTEM_ALARM);
 
-        checkSkippedNotification(1);
-
         checkNoActivity();
+
+        assertNotificationCount(shadowNotificationManager, 1);
+
+        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
+        assertNotification(notification, "Alarm Morning", "There were 1 skipped alarms while the device was off: 10:30 AM");
     }
 
     public void reboot() {
         BootReceiverTest.reboot(context);
     }
 
+    private void ringWithoutCleanup() {
+        setClock(new FixedClock(new GregorianCalendar(YEAR, MONTH, DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE + 1, 0)));
+        reboot();
+
+    }
+
+    private void ring() {
+        ringWithoutCleanup();
+
+        BootReceiverTest.consumeSystemAlarms(shadowAlarmManager);
+        CalendarWithOneTimeAlarmTest.consumeActivity();
+        notificationManager.cancelAll();
+    }
+
     private void snooze() {
+        ring();
+
         Analytics analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Ring);
 
         int minutes = (int) SharedPreferencesHelper.load(SettingsActivity.PREF_SNOOZE_TIME, SettingsActivity.PREF_SNOOZE_TIME_DEFAULT);
@@ -405,13 +501,31 @@ public class BootReceiver2Test extends FixedTimeTest {
         assertSystemAlarmCount(1);
 
         assertAndConsumeSystemAlarm(DayTest.YEAR, DayTest.MONTH, DayTest.DAY, ONE_TIME_ALARM_HOUR, ONE_TIME_ALARM_MINUTE + minutes + 1, AlarmReceiver.class, SystemAlarm.ACTION_RING);
+
+        checkNoActivity();
+
+        assertNotificationCount(shadowNotificationManager, 1);
+
+        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
+        assertNotification(notification, "Alarm at 4:30 AM", "Snoozed until 4:41 AM");
+
+        notificationManager.cancelAll();
     }
 
     private void dismiss() {
+        ring();
+
         Analytics analytics = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Ring);
 
         GlobalManager globalManager = GlobalManager.getInstance();
         globalManager.onDismiss(alarm1, analytics);
+
+        // Assert
+        assertSystemAlarmCount(0);
+
+        checkNoActivity();
+
+        assertNotificationCount(shadowNotificationManager, 0);
     }
 
     private void setClock(Clock clock) {
@@ -461,7 +575,4 @@ public class BootReceiver2Test extends FixedTimeTest {
         CalendarWithOneTimeAlarmTest.checkActivity(context, null);
     }
 
-    private void checkSkippedNotification(int count) {
-        // TODO Implement
-    }
 }

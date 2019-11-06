@@ -366,11 +366,15 @@ public class SystemNotification {
     void notifySkippedAlarms(List<AppAlarm> skippedAlarms) {
         Log.d(TAG, "notifySkippedAlarms()");
 
+        GlobalManager globalManager = GlobalManager.getInstance();
+        Clock clock = globalManager.clock();
+        Calendar now = clock.now();
+
         Resources res = context.getResources();
         String contentTitle = res.getString(R.string.app_name);
         String contentText = res.getString(R.string.notification_text_skipped,
                 res.getString(R.string.notification_text_skipped_count, skippedAlarms.size()),
-                Localization.appAlarmsToString(skippedAlarms, context));
+                Localization.appAlarmsToString(skippedAlarms, now, context));
         Log.v(TAG, contentText);
 
         createNotificationChannel(context);

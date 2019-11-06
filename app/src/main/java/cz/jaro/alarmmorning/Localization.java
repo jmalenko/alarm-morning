@@ -327,13 +327,14 @@ public class Localization {
     }
 
     /**
-     * Converts the list of appAlarms to string.
+     * Converts the list of appAlarms to string. The alarm date is included iff the alarm is not today.
      *
      * @param appAlarms list of appAlarms
+     * @param now       current time
      * @param context   context
      * @return string with the datetimes and names of one-time alarms. This can be simply inserted into a sentence.
      */
-    public static String appAlarmsToString(List<AppAlarm> appAlarms, Context context) {
+    public static String appAlarmsToString(List<AppAlarm> appAlarms, Calendar now, Context context) {
         Resources resources = context.getResources();
 
         StringBuilder text = new StringBuilder();
@@ -345,7 +346,10 @@ public class Localization {
                         resources.getString(R.string.list_separator_last));
             }
             AppAlarm appAlarm = appAlarms.get(index);
-            String dateTimeString = Localization.dateTimeToString(appAlarm.getDateTime(), context);
+            String dateTimeString = CalendarUtils.onTheSameDate(appAlarm.getDate(), now)
+                    ? Localization.timeToString(appAlarm.getDateTime().getTime(), context)
+                    : Localization.dateTimeToString(appAlarm.getDateTime(), context);
+
             if (appAlarm instanceof OneTimeAlarm) {
                 OneTimeAlarm oneTimeAlarm = (OneTimeAlarm) appAlarm;
                 if (oneTimeAlarm.getName() != null && !oneTimeAlarm.getName().isEmpty()) {
