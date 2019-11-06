@@ -341,7 +341,7 @@ public class SystemNotification {
     void notifyCancelledAlarm(AppAlarm appAlarm) {
         Log.d(TAG, "notifyCancelledAlarm(appAlarm=" + appAlarm + ")");
 
-        NotificationCompat.Builder mBuilder = buildNotification(appAlarm); // TODO The title shows just the time. Task: On mignight, after the notification was displayed, update the notification such that the title includes both time and date
+        NotificationCompat.Builder mBuilder = buildNotification(appAlarm); // TODO The title shows just the time. Task: On midnight, after the notification was displayed, update the notification such that the title includes both time and date
 
         Resources res = context.getResources();
         String contentText = res.getString(R.string.notification_text_cancelled);
@@ -374,7 +374,7 @@ public class SystemNotification {
         String contentTitle = res.getString(R.string.app_name);
         String contentText = res.getString(R.string.notification_text_skipped,
                 res.getQuantityString(R.plurals.notification_text_skipped_count, skippedAlarms.size(), skippedAlarms.size()),
-                Localization.appAlarmsToString(skippedAlarms, now, context));
+                Localization.appAlarmsToString(skippedAlarms, now, context)); // TODO The text doesn't show date if the skipped tag was today. Task: On midnight, after the notification was displayed, update the notification such that the title includes both time and date
         Log.v(TAG, contentText);
 
         createNotificationChannel(context);
