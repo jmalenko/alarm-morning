@@ -17,10 +17,14 @@ import org.robolectric.RuntimeEnvironment;
 import org.robolectric.Shadows;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowAlarmManager;
+import org.robolectric.shadows.ShadowNotification;
 import org.robolectric.shadows.ShadowNotificationManager;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import cz.jaro.alarmmorning.app.AlarmMorningAppTest;
 import cz.jaro.alarmmorning.app.CalendarWithOneTimeAlarmTest;
@@ -37,7 +41,6 @@ import cz.jaro.alarmmorning.receivers.AlarmReceiver;
 import cz.jaro.alarmmorning.receivers.VoidReceiver;
 import cz.jaro.alarmmorning.shadows.ShadowGlobalManager;
 
-import static cz.jaro.alarmmorning.app.AlarmMorningAppTest.assertNotification;
 import static cz.jaro.alarmmorning.app.AlarmMorningAppTest.assertNotificationCount;
 import static cz.jaro.alarmmorning.app.CalendarWithOneTimeAlarmTest.ONE_TIME_ALARM_HOUR;
 import static cz.jaro.alarmmorning.app.CalendarWithOneTimeAlarmTest.ONE_TIME_ALARM_MINUTE;
@@ -134,8 +137,8 @@ public class BootReceiver2Test extends FixedTimeTest {
 
         assertNotificationCount(shadowNotificationManager, 1);
 
-        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
-        assertNotification(notification, "Alarm at 4:30 AM", "Touch to view all alarms");
+        List<NotificationInfo> notificationInfos = getOrderedNotifications();
+        assertNotificationInfo(notificationInfos.get(0), "Alarm at 4:30 AM", "Touch to view all alarms");
     }
 
     @Test
@@ -153,10 +156,10 @@ public class BootReceiver2Test extends FixedTimeTest {
 
         assertNotificationCount(shadowNotificationManager, 2);
 
-        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
-        assertNotification(notification, "Alarm at 4:30 AM", "Ringing");
-        notification = shadowNotificationManager.getAllNotifications().get(1);
-        assertNotification(notification, "Alarm Morning", "There was 1 skipped alarm while the device was off: 4:30 AM");
+        List<NotificationInfo> notificationInfos = getOrderedNotifications();
+        assertNotificationInfo(notificationInfos.get(0), "Alarm Morning", "There was 1 skipped alarm while the device was off: 4:30 AM");
+        assertNotificationInfo(notificationInfos.get(1), "Alarm at 4:30 AM", "Ringing");
+
         notificationManager.cancelAll();
     }
 
@@ -176,8 +179,8 @@ public class BootReceiver2Test extends FixedTimeTest {
 
         assertNotificationCount(shadowNotificationManager, 1);
 
-        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
-        assertNotification(notification, "Alarm Morning", "There was 1 skipped alarm while the device was off: 4:30 AM");
+        List<NotificationInfo> notificationInfos = getOrderedNotifications();
+        assertNotificationInfo(notificationInfos.get(0), "Alarm Morning", "There was 1 skipped alarm while the device was off: 4:30 AM");
     }
 
     @Test
@@ -196,10 +199,9 @@ public class BootReceiver2Test extends FixedTimeTest {
 
         assertNotificationCount(shadowNotificationManager, 2);
 
-        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
-        assertNotification(notification, "Alarm at 10:30 AM", "Touch to view all alarms");
-        notification = shadowNotificationManager.getAllNotifications().get(1);
-        assertNotification(notification, "Alarm Morning", "There was 1 skipped alarm while the device was off: 4:30 AM");
+        List<NotificationInfo> notificationInfos = getOrderedNotifications();
+        assertNotificationInfo(notificationInfos.get(0), "Alarm Morning", "There was 1 skipped alarm while the device was off: 4:30 AM");
+        assertNotificationInfo(notificationInfos.get(1), "Alarm at 10:30 AM", "Touch to view all alarms");
     }
 
     @Test
@@ -217,10 +219,9 @@ public class BootReceiver2Test extends FixedTimeTest {
 
         assertNotificationCount(shadowNotificationManager, 2);
 
-        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
-        assertNotification(notification, "Alarm at 10:30 AM", "Ringing");
-        notification = shadowNotificationManager.getAllNotifications().get(1);
-        assertNotification(notification, "Alarm Morning", "There were 2 skipped alarms while the device was off: 4:30 AM and 10:30 AM");
+        List<NotificationInfo> notificationInfos = getOrderedNotifications();
+        assertNotificationInfo(notificationInfos.get(0), "Alarm Morning", "There were 2 skipped alarms while the device was off: 4:30 AM and 10:30 AM");
+        assertNotificationInfo(notificationInfos.get(1), "Alarm at 10:30 AM", "Ringing");
     }
 
     @Test
@@ -238,8 +239,8 @@ public class BootReceiver2Test extends FixedTimeTest {
 
         assertNotificationCount(shadowNotificationManager, 1);
 
-        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
-        assertNotification(notification, "Alarm Morning", "There were 2 skipped alarms while the device was off: 4:30 AM and 10:30 AM");
+        List<NotificationInfo> notificationInfos = getOrderedNotifications();
+        assertNotificationInfo(notificationInfos.get(0), "Alarm Morning", "There were 2 skipped alarms while the device was off: 4:30 AM and 10:30 AM");
     }
 
     @Test
@@ -260,10 +261,9 @@ public class BootReceiver2Test extends FixedTimeTest {
 
         assertNotificationCount(shadowNotificationManager, 2);
 
-        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
-        assertNotification(notification, "Alarm Morning", "There was 1 skipped alarm while the device was off: 4:30 AM");
-        notification = shadowNotificationManager.getAllNotifications().get(1);
-        assertNotification(notification, "Alarm at 10:30 AM", "Touch to view all alarms");
+        List<NotificationInfo> notificationInfos = getOrderedNotifications();
+        assertNotificationInfo(notificationInfos.get(0), "Alarm Morning", "There was 1 skipped alarm while the device was off: 4:30 AM");
+        assertNotificationInfo(notificationInfos.get(1), "Alarm at 10:30 AM", "Touch to view all alarms");
     }
 
     @Test
@@ -282,10 +282,9 @@ public class BootReceiver2Test extends FixedTimeTest {
 
         assertNotificationCount(shadowNotificationManager, 2);
 
-        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
-        assertNotification(notification, "Alarm Morning", "There were 2 skipped alarms while the device was off: 4:30 AM and 10:30 AM");
-        notification = shadowNotificationManager.getAllNotifications().get(1);
-        assertNotification(notification, "Alarm at 10:30 AM", "Ringing");
+        List<NotificationInfo> notificationInfos = getOrderedNotifications();
+        assertNotificationInfo(notificationInfos.get(0), "Alarm Morning", "There were 2 skipped alarms while the device was off: 4:30 AM and 10:30 AM");
+        assertNotificationInfo(notificationInfos.get(1), "Alarm at 10:30 AM", "Ringing");
     }
 
     @Test
@@ -304,8 +303,8 @@ public class BootReceiver2Test extends FixedTimeTest {
 
         assertNotificationCount(shadowNotificationManager, 1);
 
-        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
-        assertNotification(notification, "Alarm Morning", "There were 2 skipped alarms while the device was off: 4:30 AM and 10:30 AM");
+        List<NotificationInfo> notificationInfos = getOrderedNotifications();
+        assertNotificationInfo(notificationInfos.get(0), "Alarm Morning", "There were 2 skipped alarms while the device was off: 4:30 AM and 10:30 AM");
     }
 
     @Test
@@ -325,8 +324,8 @@ public class BootReceiver2Test extends FixedTimeTest {
 
         assertNotificationCount(shadowNotificationManager, 1);
 
-        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
-        assertNotification(notification, "Alarm at 4:30 AM", "Snoozed until 4:41 AM");
+        List<NotificationInfo> notificationInfos = getOrderedNotifications();
+        assertNotificationInfo(notificationInfos.get(0), "Alarm at 4:30 AM", "Snoozed until 4:41 AM");
     }
 
     @Test
@@ -347,10 +346,9 @@ public class BootReceiver2Test extends FixedTimeTest {
 
         assertNotificationCount(shadowNotificationManager, 2);
 
-        Notification notification = shadowNotificationManager.getAllNotifications().get(0); // XXX Order of notifications depends on how the tests are run (run all tests in the entire class vs run just this test/method)
-        assertNotification(notification, "Alarm Morning", "There was 1 skipped alarm while the device was off: 4:30 AM");
-        notification = shadowNotificationManager.getAllNotifications().get(1);
-        assertNotification(notification, "Alarm at 10:30 AM", "Touch to view all alarms");
+        List<NotificationInfo> notificationInfos = getOrderedNotifications();
+        assertNotificationInfo(notificationInfos.get(0), "Alarm Morning", "There was 1 skipped alarm while the device was off: 4:30 AM");
+        assertNotificationInfo(notificationInfos.get(1), "Alarm at 10:30 AM", "Touch to view all alarms");
     }
 
     @Test
@@ -370,10 +368,9 @@ public class BootReceiver2Test extends FixedTimeTest {
 
         assertNotificationCount(shadowNotificationManager, 2);
 
-        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
-        assertNotification(notification, "Alarm Morning", "There were 2 skipped alarms while the device was off: 4:30 AM and 10:30 AM");
-        notification = shadowNotificationManager.getAllNotifications().get(1);
-        assertNotification(notification, "Alarm at 10:30 AM", "Ringing");
+        List<NotificationInfo> notificationInfos = getOrderedNotifications();
+        assertNotificationInfo(notificationInfos.get(0), "Alarm Morning", "There were 2 skipped alarms while the device was off: 4:30 AM and 10:30 AM");
+        assertNotificationInfo(notificationInfos.get(1), "Alarm at 10:30 AM", "Ringing");
     }
 
     @Test
@@ -393,8 +390,8 @@ public class BootReceiver2Test extends FixedTimeTest {
 
         assertNotificationCount(shadowNotificationManager, 1);
 
-        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
-        assertNotification(notification, "Alarm Morning", "There were 2 skipped alarms while the device was off: 4:30 AM and 10:30 AM");
+        List<NotificationInfo> notificationInfos = getOrderedNotifications();
+        assertNotificationInfo(notificationInfos.get(0), "Alarm Morning", "There were 2 skipped alarms while the device was off: 4:30 AM and 10:30 AM");
     }
 
 
@@ -419,8 +416,8 @@ public class BootReceiver2Test extends FixedTimeTest {
 
         assertNotificationCount(shadowNotificationManager, 1);
 
-        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
-        assertNotification(notification, "Alarm at 10:30 AM", "Touch to view all alarms");
+        List<NotificationInfo> notificationInfos = getOrderedNotifications();
+        assertNotificationInfo(notificationInfos.get(0), "Alarm at 10:30 AM", "Touch to view all alarms");
     }
 
     @Test
@@ -440,10 +437,9 @@ public class BootReceiver2Test extends FixedTimeTest {
 
         assertNotificationCount(shadowNotificationManager, 2);
 
-        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
-        assertNotification(notification, "Alarm at 10:30 AM", "Ringing");
-        notification = shadowNotificationManager.getAllNotifications().get(1);
-        assertNotification(notification, "Alarm Morning", "There was 1 skipped alarm while the device was off: 10:30 AM");
+        List<NotificationInfo> notificationInfos = getOrderedNotifications();
+        assertNotificationInfo(notificationInfos.get(0), "Alarm Morning", "There was 1 skipped alarm while the device was off: 10:30 AM");
+        assertNotificationInfo(notificationInfos.get(1), "Alarm at 10:30 AM", "Ringing");
     }
 
     @Test
@@ -463,8 +459,8 @@ public class BootReceiver2Test extends FixedTimeTest {
 
         assertNotificationCount(shadowNotificationManager, 1);
 
-        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
-        assertNotification(notification, "Alarm Morning", "There was 1 skipped alarm while the device was off: 10:30 AM");
+        List<NotificationInfo> notificationInfos = getOrderedNotifications();
+        assertNotificationInfo(notificationInfos.get(0), "Alarm Morning", "There was 1 skipped alarm while the device was off: 10:30 AM");
     }
 
     public void reboot() {
@@ -504,8 +500,8 @@ public class BootReceiver2Test extends FixedTimeTest {
 
         assertNotificationCount(shadowNotificationManager, 1);
 
-        Notification notification = shadowNotificationManager.getAllNotifications().get(0);
-        assertNotification(notification, "Alarm at 4:30 AM", "Snoozed until 4:41 AM");
+        List<NotificationInfo> notificationInfos = getOrderedNotifications();
+        assertNotificationInfo(notificationInfos.get(0), "Alarm at 4:30 AM", "Snoozed until 4:41 AM");
 
         notificationManager.cancelAll();
     }
@@ -573,4 +569,44 @@ public class BootReceiver2Test extends FixedTimeTest {
         CalendarWithOneTimeAlarmTest.checkActivity(context, null);
     }
 
+    private List<NotificationInfo> getOrderedNotifications() {
+        return getOrderedNotifications(shadowNotificationManager);
+    }
+
+    public static List<NotificationInfo> getOrderedNotifications(ShadowNotificationManager shadowNotificationManager) {
+        List<Notification> notifications = shadowNotificationManager.getAllNotifications();
+
+        List<NotificationInfo> notificationInfos = new ArrayList<>();
+        for (Notification notification : notifications) {
+            ShadowNotification shadowNotification = Shadows.shadowOf(notification);
+
+            NotificationInfo notificationInfo = new NotificationInfo();
+            notificationInfo.title = shadowNotification.getContentTitle().toString();
+            notificationInfo.text = shadowNotification.getContentText().toString();
+
+            notificationInfos.add(notificationInfo);
+        }
+
+        Collections.sort(notificationInfos);
+
+        return notificationInfos;
+    }
+
+    public static void assertNotificationInfo(NotificationInfo notificationInfo, String title, String text) {
+        assertThat("Notification title", notificationInfo.title, is(title));
+        assertThat("Notification text", notificationInfo.text, is(text));
+    }
+}
+
+class NotificationInfo implements Comparable<NotificationInfo> {
+    String title;
+    String text;
+
+    @Override
+    public int compareTo(NotificationInfo o) {
+        String separator = "---";
+        String a = title + separator + text;
+        String b = o.title + separator + o.text;
+        return a.compareTo(b);
+    }
 }
