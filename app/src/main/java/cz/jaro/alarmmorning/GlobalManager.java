@@ -725,7 +725,7 @@ public class GlobalManager {
             if (lastAlarmIsRecent) {
                 Log.i(TAG, "Resuming ringing as the last alarm is recent");
 
-                onRing(lastAlarm);
+                onRing(lastAlarm, true);
 
                 return;
             }

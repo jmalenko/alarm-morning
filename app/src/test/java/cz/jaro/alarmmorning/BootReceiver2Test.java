@@ -280,13 +280,11 @@ public class BootReceiver2Test extends FixedTimeTest {
 
         checkRingingActivity(alarm2);
 
-        assertNotificationCount(shadowNotificationManager, 3);
+        assertNotificationCount(shadowNotificationManager, 2);
 
         Notification notification = shadowNotificationManager.getAllNotifications().get(0);
         assertNotification(notification, "Alarm Morning", "There were 2 skipped alarms while the device was off: 4:30 AM and 10:30 AM");
         notification = shadowNotificationManager.getAllNotifications().get(1);
-        assertNotification(notification, "Alarm at 4:30 AM", "Alarm cancelled"); // XXX Remove
-        notification = shadowNotificationManager.getAllNotifications().get(2);
         assertNotification(notification, "Alarm at 10:30 AM", "Ringing");
     }
 
@@ -373,9 +371,9 @@ public class BootReceiver2Test extends FixedTimeTest {
         assertNotificationCount(shadowNotificationManager, 2);
 
         Notification notification = shadowNotificationManager.getAllNotifications().get(0);
-        assertNotification(notification, "Alarm at 10:30 AM", "Ringing");
-        notification = shadowNotificationManager.getAllNotifications().get(1);
         assertNotification(notification, "Alarm Morning", "There were 2 skipped alarms while the device was off: 4:30 AM and 10:30 AM");
+        notification = shadowNotificationManager.getAllNotifications().get(1);
+        assertNotification(notification, "Alarm at 10:30 AM", "Ringing");
     }
 
     @Test
@@ -445,7 +443,7 @@ public class BootReceiver2Test extends FixedTimeTest {
         Notification notification = shadowNotificationManager.getAllNotifications().get(0);
         assertNotification(notification, "Alarm at 10:30 AM", "Ringing");
         notification = shadowNotificationManager.getAllNotifications().get(1);
-        assertNotification(notification, "Alarm Morning", "There were 1 skipped alarms while the device was off: 10:30 AM");
+        assertNotification(notification, "Alarm Morning", "There was 1 skipped alarm while the device was off: 10:30 AM");
     }
 
     @Test
@@ -466,7 +464,7 @@ public class BootReceiver2Test extends FixedTimeTest {
         assertNotificationCount(shadowNotificationManager, 1);
 
         Notification notification = shadowNotificationManager.getAllNotifications().get(0);
-        assertNotification(notification, "Alarm Morning", "There were 1 skipped alarms while the device was off: 10:30 AM");
+        assertNotification(notification, "Alarm Morning", "There was 1 skipped alarm while the device was off: 10:30 AM");
     }
 
     public void reboot() {
