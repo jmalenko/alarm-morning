@@ -156,7 +156,7 @@ public class BootReceiver2Test extends FixedTimeTest {
         Notification notification = shadowNotificationManager.getAllNotifications().get(0);
         assertNotification(notification, "Alarm at 4:30 AM", "Ringing");
         notification = shadowNotificationManager.getAllNotifications().get(1);
-        assertNotification(notification, "Alarm Morning", "There were 1 skipped alarms while the device was off: 4:30 AM"); // XXX Multiple tense
+        assertNotification(notification, "Alarm Morning", "There was 1 skipped alarm while the device was off: 4:30 AM");
         notificationManager.cancelAll();
     }
 
@@ -177,7 +177,7 @@ public class BootReceiver2Test extends FixedTimeTest {
         assertNotificationCount(shadowNotificationManager, 1);
 
         Notification notification = shadowNotificationManager.getAllNotifications().get(0);
-        assertNotification(notification, "Alarm Morning", "There were 1 skipped alarms while the device was off: 4:30 AM");
+        assertNotification(notification, "Alarm Morning", "There was 1 skipped alarm while the device was off: 4:30 AM");
     }
 
     @Test
@@ -199,7 +199,7 @@ public class BootReceiver2Test extends FixedTimeTest {
         Notification notification = shadowNotificationManager.getAllNotifications().get(0);
         assertNotification(notification, "Alarm at 10:30 AM", "Touch to view all alarms");
         notification = shadowNotificationManager.getAllNotifications().get(1);
-        assertNotification(notification, "Alarm Morning", "There were 1 skipped alarms while the device was off: 4:30 AM");
+        assertNotification(notification, "Alarm Morning", "There was 1 skipped alarm while the device was off: 4:30 AM");
     }
 
     @Test
@@ -261,7 +261,7 @@ public class BootReceiver2Test extends FixedTimeTest {
         assertNotificationCount(shadowNotificationManager, 2);
 
         Notification notification = shadowNotificationManager.getAllNotifications().get(0);
-        assertNotification(notification, "Alarm Morning", "There were 1 skipped alarms while the device was off: 4:30 AM");
+        assertNotification(notification, "Alarm Morning", "There was 1 skipped alarm while the device was off: 4:30 AM");
         notification = shadowNotificationManager.getAllNotifications().get(1);
         assertNotification(notification, "Alarm at 10:30 AM", "Touch to view all alarms");
     }
@@ -350,7 +350,7 @@ public class BootReceiver2Test extends FixedTimeTest {
         assertNotificationCount(shadowNotificationManager, 2);
 
         Notification notification = shadowNotificationManager.getAllNotifications().get(0); // XXX Order of notifications depends on how the tests are run (run all tests in the entire class vs run just this test/method)
-        assertNotification(notification, "Alarm Morning", "There were 1 skipped alarms while the device was off: 4:30 AM");
+        assertNotification(notification, "Alarm Morning", "There was 1 skipped alarm while the device was off: 4:30 AM");
         notification = shadowNotificationManager.getAllNotifications().get(1);
         assertNotification(notification, "Alarm at 10:30 AM", "Touch to view all alarms");
     }

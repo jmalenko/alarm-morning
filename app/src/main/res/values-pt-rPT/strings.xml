@@ -65,8 +65,11 @@
   <string name="notification_text_ringing">Tocando</string>
   <string name="notification_text_snoozed">Dormiu até<xliff:g example="07:00" id="time">%1$s</xliff:g></string>
   <string name="notification_text_cancelled">Alarme cancelado</string>
-    <string name="notification_text_skipped_count">Não houve alarmes <xliff:g example="3" id="skippedAlarmsCount">%1$d </xliff:g> ignorada enquanto o dispositivo foi desligado</string>
-    <string name="notification_text_skipped">%1$s: %2$s</string>
+  <plurals name="notification_text_skipped_count">
+    <item quantity="one">Não houve alarmes %d ignorada enquanto o dispositivo foi desligado</item>
+    <item quantity="other">Não houve alarmes %d ignorada enquanto o dispositivo foi desligado</item>
+  </plurals>
+  <string name="notification_text_skipped">%1$s: %2$s</string>
   <!-- Widget -->
   <string name="widget_alarm_text_none">Sem alarme</string>
   <string name="widget_alarm_text_later"><xliff:g example="Mon, Tue" id="list">%1$s</xliff:g>, <xliff:g example="Sat" id="dayOfWeek">%2$s</xliff:g></string>

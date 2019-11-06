@@ -104,7 +104,10 @@
 
     <string name="notification_text_cancelled">Alarm cancelled</string>
 
-    <string name="notification_text_skipped_count">There were <xliff:g example="3" id="skippedAlarmsCount">%1$d</xliff:g> skipped alarms while the device was off</string>
+    <plurals name="notification_text_skipped_count">
+        <item quantity="one">There was %d skipped alarm while the device was off</item>
+        <item quantity="other">There were %d skipped alarms while the device was off</item>
+    </plurals>
     <string name="notification_text_skipped">%1$s: %2$s</string>
 
     <!-- Widget -->

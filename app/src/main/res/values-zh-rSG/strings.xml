@@ -61,8 +61,10 @@
   <string name="notification_text_ringing">響鬧中</string>
   <string name="notification_text_snoozed">打瞌睡直到 <xliff:g example="07:00" id="time">%1$s</xliff:g></string>
   <string name="notification_text_cancelled">鬧鐘已取消</string>
-    <string name="notification_text_skipped_count">設備關閉時, 有 <xliff:g example="3" id="skippedAlarmsCount">%1$d</xliff:g>次跳過了響鬧</string>
-    <string name="notification_text_skipped">%1$s: %2$s</string>
+  <plurals name="notification_text_skipped_count">
+    <item quantity="other">設備關閉時, 有 %d次跳過了響鬧</item>
+  </plurals>
+  <string name="notification_text_skipped">%1$s: %2$s</string>
   <!-- Widget -->
   <string name="widget_alarm_text_none">未設定響鬧</string>
   <string name="widget_alarm_text_later"><xliff:g example="Mon, Tue" id="list">%1$s </xliff:g>, <xliff:g example="Sat" id="dayOfWeek">%2$s</xliff:g></string>

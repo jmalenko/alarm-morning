@@ -64,8 +64,12 @@
   <string name="notification_text_ringing">Sună</string>
   <string name="notification_text_snoozed">Amânare până <xliff:g example="07:00" id="time">%1$s</xliff:g></string>
   <string name="notification_text_cancelled">Alarmă anulată</string>
-    <string name="notification_text_skipped_count">Au fost <xliff:g example="3" id="skippedAlarmsCount">%1$d</xliff:g> alarme sărite în timp ce aparatul a fost oprit</string>
-    <string name="notification_text_skipped">%1$s: %2$s</string>
+  <plurals name="notification_text_skipped_count">
+    <item quantity="one">Au fost %d alarme sărite în timp ce aparatul a fost oprit</item>
+    <item quantity="few">Au fost %d alarme sărite în timp ce aparatul a fost oprit</item>
+    <item quantity="other">Au fost %d alarme sărite în timp ce aparatul a fost oprit</item>
+  </plurals>
+  <string name="notification_text_skipped">%1$s: %2$s</string>
   <!-- Widget -->
   <string name="widget_alarm_text_none">Nici o alarmă</string>
   <string name="widget_alarm_text_later"><xliff:g example="Mon, Tue" id="list">%1$s</xliff:g>, <xliff:g example="Sat" id="dayOfWeek">%2$s</xliff:g></string>

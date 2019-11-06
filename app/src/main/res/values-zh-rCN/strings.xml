@@ -65,7 +65,9 @@
   <string name="notification_text_ringing">响铃中</string>
   <string name="notification_text_snoozed">打瞌睡直到 <xliff:g example="07:00" id="time">%1$s </xliff:g></string>
   <string name="notification_text_cancelled">已取消警报</string>
-  <string name="notification_text_skipped_count">设备关闭时, 有 <xliff:g example="3" id="skippedAlarmsCount">%1$d </xliff:g> 跳过了警报</string>
+  <plurals name="notification_text_skipped_count">
+    <item quantity="other">设备关闭时, 有 %d 跳过了警报</item>
+  </plurals>
   <string name="notification_text_skipped">%1$s: %2$s</string>
   <!-- Widget -->
   <string name="widget_alarm_text_none">无报警</string>

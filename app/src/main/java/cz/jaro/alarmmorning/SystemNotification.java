@@ -373,7 +373,7 @@ public class SystemNotification {
         Resources res = context.getResources();
         String contentTitle = res.getString(R.string.app_name);
         String contentText = res.getString(R.string.notification_text_skipped,
-                res.getString(R.string.notification_text_skipped_count, skippedAlarms.size()),
+                res.getQuantityString(R.plurals.notification_text_skipped_count, skippedAlarms.size(), skippedAlarms.size()),
                 Localization.appAlarmsToString(skippedAlarms, now, context));
         Log.v(TAG, contentText);
 

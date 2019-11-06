@@ -105,7 +105,11 @@
 
     <string name="notification_text_cancelled">Budík zrušen</string>
 
-    <string name="notification_text_skipped_count">Nezvonilo <xliff:g example="3" id="skippedAlarmsCount">%1$d</xliff:g> budíků, protože zařízení bylo vypnuté</string>
+    <plurals name="notification_text_skipped_count">
+        <item quantity="one">Nezvonil %d budík, protože zařízení bylo vypnuté</item>
+        <item quantity="few">Nezvonily %d budíky, protože zařízení bylo vypnuté</item>
+        <item quantity="other">Nezvonilo %d budíků, protože zařízení bylo vypnuté</item>
+    </plurals>
     <string name="notification_text_skipped">%1$s: %2$s</string>
 
     <!-- Widget -->
