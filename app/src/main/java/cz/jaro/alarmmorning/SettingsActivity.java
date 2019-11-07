@@ -295,6 +295,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             if (resultCode == RESULT_OK) {
                 finish();
             }
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
         }
     }
 

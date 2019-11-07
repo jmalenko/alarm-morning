@@ -726,7 +726,7 @@ public class RingActivity extends Activity implements RingInterface {
 
     private boolean playSound() {
         Uri ringtoneUri = getRingtoneUri();
-        return ringtoneUri != null;
+        return ringtoneUri != null && !ringtoneUri.toString().isEmpty();
     }
 
     private void startSound() {
@@ -761,7 +761,7 @@ public class RingActivity extends Activity implements RingInterface {
 
             if (soundMethod == 0) Log.e(TAG, "Unable to play ringtone");
         } else {
-            Log.w(TAG, "Sound is intentionally not playing");
+            Log.w(TAG, "Sound is intentionally not playing (disabled in settings)");
         }
     }
 
