@@ -1609,6 +1609,9 @@ public class GlobalManager {
 
         List<AppAlarm> appAlarms = new ArrayList<>();
 
+        if (!from.before(to))
+            return appAlarms;
+
         // Add day alarms
 
         for (Calendar date = (Calendar) from.clone(); date.before(to); addDay(date)) {
