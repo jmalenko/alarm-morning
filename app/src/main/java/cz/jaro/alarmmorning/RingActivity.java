@@ -64,6 +64,8 @@ public class RingActivity extends Activity implements RingInterface {
 
     public static final String ACTION_HIDE_ACTIVITY = "cz.jaro.alarmmorning.intent.action.HIDE_ACTIVITY";
 
+    private static final int ALARM_MANAGER_STREAM = AudioManager.STREAM_ALARM;
+
     private AppAlarm appAlarm;
 
     private static final String LAST_RINGING_START_TIME = "last_ringing_start_time";
@@ -790,11 +792,10 @@ public class RingActivity extends Activity implements RingInterface {
         Log.d(TAG, "startSoundAsMedia()");
 
         mediaPlayer = new MediaPlayer();
+        mediaPlayer.setAudioStreamType(ALARM_MANAGER_STREAM);
         mediaPlayer.setDataSource(this, ringtoneUri);
-
-        mediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
-        mediaPlayer.setLooping(true); // repeat sound
         mediaPlayer.prepare();
+        mediaPlayer.setLooping(true);
         mediaPlayer.start();
     }
 
@@ -871,11 +872,11 @@ public class RingActivity extends Activity implements RingInterface {
             Log.w(TAG, "Volume is set to 0");
 
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_ALARM);
 
-        previousVolume = audioManager.getStreamVolume(AudioManager.STREAM_ALARM);
+        previousVolume = audioManager.getStreamVolume(ALARM_MANAGER_STREAM);
         Log.v(TAG, "previous volume= " + previousVolume);
 
+        maxVolume = audioManager.getStreamMaxVolume(ALARM_MANAGER_STREAM);
         volume = SettingsActivity.getRealVolume(volumePreference, maxVolume);
 
         Log.v(TAG, "preference volume = " + volumePreference);
@@ -888,7 +889,7 @@ public class RingActivity extends Activity implements RingInterface {
             increasingVolumePercentage = 0;
             runnableVolume.run();
         } else {
-            audioManager.setStreamVolume(AudioManager.STREAM_ALARM, volume, 0);
+            audioManager.setStreamVolume(ALARM_MANAGER_STREAM, volume, 0);
         }
     }
 
@@ -909,10 +910,10 @@ public class RingActivity extends Activity implements RingInterface {
 
         if (volume <= tempVolume) {
             Log.v(TAG, "reached final volume");
-            audioManager.setStreamVolume(AudioManager.STREAM_ALARM, volume, 0);
+            audioManager.setStreamVolume(ALARM_MANAGER_STREAM, volume, 0);
             return true;
         } else {
-            audioManager.setStreamVolume(AudioManager.STREAM_ALARM, tempVolume, 0);
+            audioManager.setStreamVolume(ALARM_MANAGER_STREAM, tempVolume, 0);
             return false;
         }
     }
@@ -936,7 +937,7 @@ public class RingActivity extends Activity implements RingInterface {
             handlerVolume.removeCallbacks(runnableVolume);
         }
 
-        audioManager.setStreamVolume(AudioManager.STREAM_ALARM, previousVolume, 0);
+        audioManager.setStreamVolume(ALARM_MANAGER_STREAM, previousVolume, 0);
     }
 
     private void startVibrate() {
