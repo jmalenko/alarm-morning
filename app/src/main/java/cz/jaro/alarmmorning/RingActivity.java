@@ -873,6 +873,13 @@ public class RingActivity extends Activity implements RingInterface {
 
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
+        // My observations:
+        // Without this line, with the wired headphones connected, the alarm sounds from the device.
+        // Without this line, with the Bluetooth headphones connected, the alarm sounds from the headphones.
+        // With this line, with the wired headphones connected, the alarm sounds from the device.
+        // With this line, with the Bluetooth headphones connected, the alarm sounds from the device.
+        audioManager.setSpeakerphoneOn(true); // Always use loudspeaker
+
         previousVolume = audioManager.getStreamVolume(ALARM_MANAGER_STREAM);
         Log.v(TAG, "previous volume= " + previousVolume);
 
