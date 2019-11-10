@@ -1,5 +1,7 @@
 package cz.jaro.alarmmorning.model;
 
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -8,7 +10,6 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import androidx.test.ext.junit.runners.AndroidJUnit4;
 import cz.jaro.alarmmorning.Analytics;
 import cz.jaro.alarmmorning.GlobalManager;
 
@@ -58,38 +59,38 @@ public class AlarmDataSource3Test {
     public void getAlarmsInPeriod_empty() {
         Calendar from = new GregorianCalendar(YEAR, MONTH - 1, DAY);
         Calendar to = new GregorianCalendar(YEAR, MONTH - 1, DAY + 10);
-        List<Calendar> alarmTimes = globalManager.getAlarmsInPeriod(from, to);
+        List<AppAlarm> appAlarms = globalManager.getAlarmsInPeriod(from, to);
 
-        assertTrue(alarmTimes.isEmpty());
+        assertTrue(appAlarms.isEmpty());
     }
 
     @Test
     public void getAlarmsInPeriod_empty2() {
         Calendar from = new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DAY - 2, MINUTE_DAY);
         Calendar to = new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DAY - 1, MINUTE_DAY);
-        List<Calendar> alarmTimes = globalManager.getAlarmsInPeriod(from, to);
+        List<AppAlarm> appAlarms = globalManager.getAlarmsInPeriod(from, to);
 
-        assertTrue(alarmTimes.isEmpty());
+        assertTrue(appAlarms.isEmpty());
     }
 
     @Test
     public void getAlarmsInPeriod_empty3() {
         Calendar from = new GregorianCalendar(YEAR, MONTH, DAY - 1, 0, 0);
         Calendar to = new GregorianCalendar(YEAR, MONTH, DAY, 0, 0);
-        List<Calendar> alarmTimes = globalManager.getAlarmsInPeriod(from, to);
+        List<AppAlarm> appAlarms = globalManager.getAlarmsInPeriod(from, to);
 
-        assertTrue(alarmTimes.isEmpty());
+        assertTrue(appAlarms.isEmpty());
     }
 
     @Test
     public void getAlarmsInPeriod_one_day() {
         Calendar from = new GregorianCalendar(YEAR, MONTH, DAY, 0, 0);
         Calendar to = new GregorianCalendar(YEAR, MONTH, DAY + 1, 0, 0);
-        List<Calendar> alarmTimes = globalManager.getAlarmsInPeriod(from, to);
+        List<AppAlarm> appAlarms = globalManager.getAlarmsInPeriod(from, to);
 
-        assertEquals(alarmTimes.size(), 1);
+        assertEquals(appAlarms.size(), 1);
 
-        Calendar nextAlarm = alarmTimes.get(0);
+        Calendar nextAlarm = appAlarms.get(0).getDateTime();
         assertEquals(YEAR, nextAlarm.get(Calendar.YEAR));
         assertEquals(MONTH, nextAlarm.get(Calendar.MONTH));
         assertEquals(DAY, nextAlarm.get(Calendar.DAY_OF_MONTH));
@@ -103,11 +104,11 @@ public class AlarmDataSource3Test {
     public void getAlarmsInPeriod_one_minute() {
         Calendar from = new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DAY, MINUTE_DAY - 1);
         Calendar to = new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DAY, MINUTE_DAY + 1);
-        List<Calendar> alarmTimes = globalManager.getAlarmsInPeriod(from, to);
+        List<AppAlarm> appAlarms = globalManager.getAlarmsInPeriod(from, to);
 
-        assertEquals(alarmTimes.size(), 1);
+        assertEquals(appAlarms.size(), 1);
 
-        Calendar nextAlarm = alarmTimes.get(0);
+        Calendar nextAlarm = appAlarms.get(0).getDateTime();
         assertEquals(YEAR, nextAlarm.get(Calendar.YEAR));
         assertEquals(MONTH, nextAlarm.get(Calendar.MONTH));
         assertEquals(DAY, nextAlarm.get(Calendar.DAY_OF_MONTH));
@@ -121,11 +122,11 @@ public class AlarmDataSource3Test {
     public void getAlarmsInPeriod_one_leftBorder() {
         Calendar from = new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DAY, MINUTE_DAY);
         Calendar to = new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DAY, MINUTE_DAY + 1);
-        List<Calendar> alarmTimes = globalManager.getAlarmsInPeriod(from, to);
+        List<AppAlarm> appAlarms = globalManager.getAlarmsInPeriod(from, to);
 
-        assertEquals(alarmTimes.size(), 1);
+        assertEquals(appAlarms.size(), 1);
 
-        Calendar nextAlarm = alarmTimes.get(0);
+        Calendar nextAlarm = appAlarms.get(0).getDateTime();
         assertEquals(YEAR, nextAlarm.get(Calendar.YEAR));
         assertEquals(MONTH, nextAlarm.get(Calendar.MONTH));
         assertEquals(DAY, nextAlarm.get(Calendar.DAY_OF_MONTH));
@@ -139,11 +140,11 @@ public class AlarmDataSource3Test {
     public void getAlarmsInPeriod_one_rightBorder() {
         Calendar from = new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DAY, MINUTE_DAY - 1);
         Calendar to = new GregorianCalendar(YEAR, MONTH, DAY, HOUR_DAY, MINUTE_DAY);
-        List<Calendar> alarmTimes = globalManager.getAlarmsInPeriod(from, to);
+        List<AppAlarm> appAlarms = globalManager.getAlarmsInPeriod(from, to);
 
-        assertEquals(alarmTimes.size(), 1);
+        assertEquals(appAlarms.size(), 1);
 
-        Calendar nextAlarm = alarmTimes.get(0);
+        Calendar nextAlarm = appAlarms.get(0).getDateTime();
         assertEquals(YEAR, nextAlarm.get(Calendar.YEAR));
         assertEquals(MONTH, nextAlarm.get(Calendar.MONTH));
         assertEquals(DAY, nextAlarm.get(Calendar.DAY_OF_MONTH));
@@ -157,11 +158,11 @@ public class AlarmDataSource3Test {
     public void getAlarmsInPeriod_two_day() {
         Calendar from = new GregorianCalendar(YEAR, MONTH, DAY, 0, 0);
         Calendar to = new GregorianCalendar(YEAR, MONTH, DAY + 2, 0, 0);
-        List<Calendar> alarmTimes = globalManager.getAlarmsInPeriod(from, to);
+        List<AppAlarm> appAlarms = globalManager.getAlarmsInPeriod(from, to);
 
-        assertEquals(alarmTimes.size(), 2);
+        assertEquals(appAlarms.size(), 2);
 
-        Calendar nextAlarm = alarmTimes.get(0);
+        Calendar nextAlarm = appAlarms.get(0).getDateTime();
         assertEquals(YEAR, nextAlarm.get(Calendar.YEAR));
         assertEquals(MONTH, nextAlarm.get(Calendar.MONTH));
         assertEquals(DAY, nextAlarm.get(Calendar.DAY_OF_MONTH));
@@ -170,7 +171,7 @@ public class AlarmDataSource3Test {
         assertEquals(0, nextAlarm.get(Calendar.SECOND));
         assertEquals(0, nextAlarm.get(Calendar.MILLISECOND));
 
-        Calendar nextAlarm2 = alarmTimes.get(1);
+        Calendar nextAlarm2 = appAlarms.get(1).getDateTime();
         assertEquals(YEAR, nextAlarm2.get(Calendar.YEAR));
         assertEquals(MONTH, nextAlarm2.get(Calendar.MONTH));
         assertEquals(DAY + 1, nextAlarm2.get(Calendar.DAY_OF_MONTH));
@@ -184,11 +185,11 @@ public class AlarmDataSource3Test {
     public void getAlarmsInPeriod_three_day() {
         Calendar from = new GregorianCalendar(YEAR, MONTH, DAY, 0, 0);
         Calendar to = new GregorianCalendar(YEAR, MONTH, DAY + 3, 0, 0);
-        List<Calendar> alarmTimes = globalManager.getAlarmsInPeriod(from, to);
+        List<AppAlarm> appAlarms = globalManager.getAlarmsInPeriod(from, to);
 
-        assertEquals(alarmTimes.size(), 3);
+        assertEquals(appAlarms.size(), 3);
 
-        Calendar nextAlarm = alarmTimes.get(0);
+        Calendar nextAlarm = appAlarms.get(0).getDateTime();
         assertEquals(YEAR, nextAlarm.get(Calendar.YEAR));
         assertEquals(MONTH, nextAlarm.get(Calendar.MONTH));
         assertEquals(DAY, nextAlarm.get(Calendar.DAY_OF_MONTH));
@@ -197,7 +198,7 @@ public class AlarmDataSource3Test {
         assertEquals(0, nextAlarm.get(Calendar.SECOND));
         assertEquals(0, nextAlarm.get(Calendar.MILLISECOND));
 
-        Calendar nextAlarm2 = alarmTimes.get(1);
+        Calendar nextAlarm2 = appAlarms.get(1).getDateTime();
         assertEquals(YEAR, nextAlarm2.get(Calendar.YEAR));
         assertEquals(MONTH, nextAlarm2.get(Calendar.MONTH));
         assertEquals(DAY + 1, nextAlarm2.get(Calendar.DAY_OF_MONTH));
@@ -206,7 +207,7 @@ public class AlarmDataSource3Test {
         assertEquals(0, nextAlarm2.get(Calendar.SECOND));
         assertEquals(0, nextAlarm2.get(Calendar.MILLISECOND));
 
-        Calendar nextAlarm3 = alarmTimes.get(2);
+        Calendar nextAlarm3 = appAlarms.get(2).getDateTime();
         assertEquals(YEAR, nextAlarm3.get(Calendar.YEAR));
         assertEquals(MONTH, nextAlarm3.get(Calendar.MONTH));
         assertEquals(DAY + 2, nextAlarm3.get(Calendar.DAY_OF_MONTH));
@@ -220,12 +221,12 @@ public class AlarmDataSource3Test {
     public void getAlarmsInPeriod_all() {
         Calendar from = new GregorianCalendar(YEAR - 1, MONTH, DAY);
         Calendar to = new GregorianCalendar(YEAR + 1, MONTH, DAY);
-        List<Calendar> alarmTimes = globalManager.getAlarmsInPeriod(from, to);
+        List<AppAlarm> appAlarms = globalManager.getAlarmsInPeriod(from, to);
 
-        assertEquals(alarmTimes.size(), DAYS);
+        assertEquals(appAlarms.size(), DAYS);
 
         for (int i = 0; i < DAYS; i++) {
-            Calendar nextAlarm = alarmTimes.get(i);
+            Calendar nextAlarm = appAlarms.get(i).getDateTime();
             assertEquals(YEAR, nextAlarm.get(Calendar.YEAR));
             assertEquals(MONTH, nextAlarm.get(Calendar.MONTH));
             assertEquals(DAY + i, nextAlarm.get(Calendar.DAY_OF_MONTH));

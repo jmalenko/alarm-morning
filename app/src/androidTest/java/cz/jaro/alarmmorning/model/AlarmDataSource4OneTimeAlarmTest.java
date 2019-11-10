@@ -2,6 +2,8 @@ package cz.jaro.alarmmorning.model;
 
 import android.content.Context;
 
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -9,7 +11,6 @@ import org.junit.runner.RunWith;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import androidx.test.ext.junit.runners.AndroidJUnit4;
 import cz.jaro.alarmmorning.AlarmMorningApplication;
 
 import static cz.jaro.alarmmorning.model.AlarmDataSource1Test.DAY;
@@ -40,7 +41,7 @@ public class AlarmDataSource4OneTimeAlarmTest {
 
     @Test
     public void oneTimeAlarm_0_empty() {
-        List<OneTimeAlarm> oneTimeAlarms = dataSource.loadOneTimeAlarms(null);
+        List<OneTimeAlarm> oneTimeAlarms = dataSource.loadOneTimeAlarms();
 
         assertEquals(oneTimeAlarms.size(), 0);
     }
@@ -58,7 +59,7 @@ public class AlarmDataSource4OneTimeAlarmTest {
 
         // Check
 
-        List<OneTimeAlarm> oneTimeAlarms = dataSource.loadOneTimeAlarms(null);
+        List<OneTimeAlarm> oneTimeAlarms = dataSource.loadOneTimeAlarms();
 
         assertEquals(oneTimeAlarms.size(), 1);
 
@@ -84,7 +85,7 @@ public class AlarmDataSource4OneTimeAlarmTest {
 
         // Load
 
-        List<OneTimeAlarm> oneTimeAlarms = dataSource.loadOneTimeAlarms(null);
+        List<OneTimeAlarm> oneTimeAlarms = dataSource.loadOneTimeAlarms();
         oneTimeAlarm1 = oneTimeAlarms.get(0);
 
         // 2nd add (= change)
@@ -97,7 +98,7 @@ public class AlarmDataSource4OneTimeAlarmTest {
 
         // Check
 
-        List<OneTimeAlarm> oneTimeAlarms2 = dataSource.loadOneTimeAlarms(null);
+        List<OneTimeAlarm> oneTimeAlarms2 = dataSource.loadOneTimeAlarms();
 
         assertEquals(oneTimeAlarms2.size(), 1);
 
@@ -123,14 +124,14 @@ public class AlarmDataSource4OneTimeAlarmTest {
 
         // Remove
 
-        List<OneTimeAlarm> oneTimeAlarms = dataSource.loadOneTimeAlarms(null);
+        List<OneTimeAlarm> oneTimeAlarms = dataSource.loadOneTimeAlarms();
         OneTimeAlarm oneTimeAlarm1b = oneTimeAlarms.get(0);
 
         dataSource.deleteOneTimeAlarm(oneTimeAlarm1b);
 
         // Check
 
-        List<OneTimeAlarm> oneTimeAlarms2 = dataSource.loadOneTimeAlarms(null);
+        List<OneTimeAlarm> oneTimeAlarms2 = dataSource.loadOneTimeAlarms();
 
         assertEquals(oneTimeAlarms2.size(), 0);
     }
@@ -157,7 +158,7 @@ public class AlarmDataSource4OneTimeAlarmTest {
 
         // Check
 
-        List<OneTimeAlarm> oneTimeAlarms = dataSource.loadOneTimeAlarms(null);
+        List<OneTimeAlarm> oneTimeAlarms = dataSource.loadOneTimeAlarms();
 
         assertEquals(oneTimeAlarms.size(), 2);
 
