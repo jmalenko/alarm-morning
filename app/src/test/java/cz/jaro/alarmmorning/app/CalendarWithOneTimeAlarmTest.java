@@ -1,12 +1,13 @@
 package cz.jaro.alarmmorning.app;
 
-import android.app.Activity;
 import android.app.Notification;
 import android.content.Context;
 import android.content.Intent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -908,7 +909,7 @@ public class CalendarWithOneTimeAlarmTest extends AlarmMorningAppTest {
         prepareUntilRing();
 
         // Check that ringing started
-        Activity activity = Robolectric.setupActivity(Activity.class);
+        AppCompatActivity activity = Robolectric.setupActivity(AppCompatActivity.class);
         ShadowActivity shadowActivity = Shadows.shadowOf(activity);
 
         Intent intentNext = shadowActivity.peekNextStartedActivity();
@@ -1696,7 +1697,7 @@ public class CalendarWithOneTimeAlarmTest extends AlarmMorningAppTest {
     }
 
     public static void checkActivity(Context context, Class<RingActivity> cls) {
-        Activity activity = Robolectric.setupActivity(Activity.class);
+        AppCompatActivity activity = Robolectric.setupActivity(AppCompatActivity.class);
         ShadowActivity shadowActivity = Shadows.shadowOf(activity);
 
         Intent intent = shadowActivity.peekNextStartedActivity();
@@ -1710,7 +1711,7 @@ public class CalendarWithOneTimeAlarmTest extends AlarmMorningAppTest {
     }
 
     public static void consumeActivity() {
-        Activity activity = Robolectric.setupActivity(Activity.class);
+        AppCompatActivity activity = Robolectric.setupActivity(AppCompatActivity.class);
         ShadowActivity shadowActivity = Shadows.shadowOf(activity);
 
         shadowActivity.getNextStartedActivity();

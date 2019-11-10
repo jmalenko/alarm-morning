@@ -1,9 +1,10 @@
 package cz.jaro.alarmmorning.app;
 
-import android.app.Activity;
 import android.app.Notification;
 import android.content.Intent;
 import android.view.View;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -681,7 +682,7 @@ public class CalendarWithTwoAlarmsTest extends AlarmMorningAppTest {
         // ----------------------------------------------------
 
         // Check that ringing started
-        Activity activity2 = Robolectric.setupActivity(Activity.class);
+        AppCompatActivity activity2 = Robolectric.setupActivity(AppCompatActivity.class);
         ShadowActivity shadowActivity2 = Shadows.shadowOf(activity2);
 
         Intent intentNext2 = shadowActivity2.peekNextStartedActivity();

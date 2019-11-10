@@ -1,7 +1,6 @@
 package cz.jaro.alarmmorning;
 
 import android.app.Dialog;
-import android.app.DialogFragment;
 import android.os.Bundle;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
@@ -9,6 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
+
 import cz.jaro.alarmmorning.graphics.TimePickerDialogWithDisable;
 
 /**

@@ -1,11 +1,12 @@
 package cz.jaro.alarmmorning.voice;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.AlarmClock;
 import android.util.Log;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.Calendar;
 import java.util.TimeZone;
@@ -61,7 +62,7 @@ import static cz.jaro.alarmmorning.model.OneTimeAlarm.UTC;
  * <li>Set a repeating alarm at [time] for [days]</li>
  * </ul>
  */
-public class SetAlarmByVoiceActivity extends Activity {
+public class SetAlarmByVoiceActivity extends AppCompatActivity {
 
     private static final String TAG = GlobalManager.createLogTag(SetAlarmByVoiceActivity.class);
 

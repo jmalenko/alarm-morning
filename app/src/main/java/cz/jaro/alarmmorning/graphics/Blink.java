@@ -1,9 +1,10 @@
 package cz.jaro.alarmmorning.graphics;
 
-import android.app.Activity;
 import android.os.Handler;
 import android.view.View;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import cz.jaro.alarmmorning.R;
 
@@ -13,12 +14,12 @@ import cz.jaro.alarmmorning.R;
 public class Blink {
     private static final int DELAY_MILLIS = 500;
 
-    private final Activity activity;
+    private final AppCompatActivity activity;
 
     private TextView messageText;
     private TextView timeText;
 
-    public Blink(Activity activity) {
+    public Blink(AppCompatActivity activity) {
         this.activity = activity;
         init();
     }

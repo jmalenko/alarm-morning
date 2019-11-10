@@ -1,6 +1,5 @@
 package cz.jaro.alarmmorning;
 
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -8,6 +7,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.view.View;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import org.junit.Before;
 import org.junit.FixMethodOrder;
@@ -545,7 +546,7 @@ public class BootReceiver2Test extends FixedTimeTest {
         ringIntent.putExtra(GlobalManager.PERSIST_ALARM_TYPE, appAlarm.getClass().getSimpleName());
         ringIntent.putExtra(GlobalManager.PERSIST_ALARM_ID, appAlarm.getPersistenceId());
 
-        Activity activity = buildActivity(RingActivity.class, ringIntent).setup().get();
+        AppCompatActivity activity = buildActivity(RingActivity.class, ringIntent).setup().get();
 
         TextView textTime = activity.findViewById(R.id.time);
         TextView textAlarmTime = activity.findViewById(R.id.alarmTime);

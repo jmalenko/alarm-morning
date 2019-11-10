@@ -1,9 +1,10 @@
 package cz.jaro.alarmmorning.voice;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.provider.AlarmClock;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import org.junit.Before;
 import org.junit.FixMethodOrder;
@@ -44,7 +45,7 @@ public class SetAlarmByVoiceActivityTest extends FixedTimeTest {
 
     GlobalManager globalManager;
 
-    Activity activity;
+    AppCompatActivity activity;
     ShadowActivity shadowActivity;
 
     @Before

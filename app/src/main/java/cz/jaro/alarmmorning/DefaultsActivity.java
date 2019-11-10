@@ -12,17 +12,18 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TimePicker;
 
-import com.google.android.material.snackbar.Snackbar;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SimpleItemAnimator;
+
+import com.google.android.material.snackbar.Snackbar;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import cz.jaro.alarmmorning.graphics.RecyclerViewWithContextMenu;
 import cz.jaro.alarmmorning.graphics.SimpleDividerItemDecoration;
 import cz.jaro.alarmmorning.graphics.TimePickerDialogWithDisable;
@@ -129,7 +130,7 @@ public class DefaultsActivity extends AppCompatActivity implements View.OnCreate
         bundle.putInt(TimePickerFragment.MINUTES, defaults.getMinute());
         fragment.setArguments(bundle);
 
-        fragment.show(getFragmentManager(), "timePicker");
+        fragment.show(getSupportFragmentManager(), "timePicker");
     }
 
     @Override

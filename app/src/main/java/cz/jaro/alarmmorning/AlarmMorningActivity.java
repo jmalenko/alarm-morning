@@ -18,7 +18,6 @@
 package cz.jaro.alarmmorning;
 
 import android.app.Activity;
-import android.app.Fragment;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -36,6 +35,14 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
@@ -43,12 +50,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import cz.jaro.alarmmorning.model.AppAlarm;
 import cz.jaro.alarmmorning.model.Day;
 import cz.jaro.alarmmorning.model.OneTimeAlarm;
@@ -291,7 +292,7 @@ public class AlarmMorningActivity extends AppCompatActivity {
 
         if (savedInstanceState == null) {
             mFragment = new CalendarFragment();
-            getFragmentManager().beginTransaction().replace(R.id.content_frame, mFragment).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, mFragment).commit();
 
             // Highlight the menu item
             MenuItem calendarMenu = mNavigationView.getMenu().findItem(R.id.navigation_calendar);

@@ -1,8 +1,6 @@
 package cz.jaro.alarmmorning.app;
 
-import android.app.Activity;
 import android.app.AlarmManager;
-import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -21,6 +19,11 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
 
 import org.junit.After;
 import org.junit.Before;
@@ -47,7 +50,6 @@ import org.robolectric.shadows.ShadowViewGroup;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-import androidx.recyclerview.widget.RecyclerView;
 import cz.jaro.alarmmorning.AlarmMorningActivity;
 import cz.jaro.alarmmorning.AlarmMorningActivityTest;
 import cz.jaro.alarmmorning.BootReceiverTest;
@@ -93,7 +95,7 @@ public class AlarmMorningAppTest extends FixedTimeTest {
     AppWidgetManager appWidgetManager;
     ShadowAppWidgetManager shadowAppWidgetManager;
 
-    Activity activity;
+    AppCompatActivity activity;
     ShadowActivity shadowActivity;
 
     // Items in CalendarFragment of AlarmMorningActivity
@@ -250,13 +252,13 @@ public class AlarmMorningAppTest extends FixedTimeTest {
 
         // Select the context menu item
         ShadowViewGroup shadowViewGroup = Shadows.shadowOf(recyclerView);
-        android.app.Fragment calendarFragment = (CalendarFragment) shadowViewGroup.getOnCreateContextMenuListener();
+        Fragment calendarFragment = (CalendarFragment) shadowViewGroup.getOnCreateContextMenuListener();
         calendarFragment.onContextItemSelected(contextMenuItem);
     }
 
     void picker_setTime(int hourCheck, int minuteCheck, int hour, int minute) {
         // Time picker
-        TimePickerFragment timePickerFragment = (TimePickerFragment) activity.getFragmentManager().findFragmentByTag("timePicker");
+        TimePickerFragment timePickerFragment = (TimePickerFragment) activity.getSupportFragmentManager().findFragmentByTag("timePicker");
 
         TimePickerDialog dialog = (TimePickerDialog) timePickerFragment.getDialog();
         ShadowTimePickerDialog shadowDialog = Shadows.shadowOf(dialog);
@@ -421,7 +423,7 @@ public class AlarmMorningAppTest extends FixedTimeTest {
     }
 
     private void picker_setDate(int yearCheck, int monthCheck, int dayCheck, int year, int month, int day) {
-        DatePickerFragment datePickerFragment = (DatePickerFragment) activity.getFragmentManager().findFragmentByTag("datePicker");
+        DatePickerFragment datePickerFragment = (DatePickerFragment) activity.getSupportFragmentManager().findFragmentByTag("datePicker");
 
         DatePickerDialog dialog = (DatePickerDialog) datePickerFragment.getDialog();
         ShadowDatePickerDialog shadowDialog = Shadows.shadowOf(dialog);

@@ -1,7 +1,6 @@
 package cz.jaro.alarmmorning;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -23,14 +22,16 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
 import java.io.IOException;
 import java.security.InvalidParameterException;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Set;
 
-import androidx.core.content.ContextCompat;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import cz.jaro.alarmmorning.calendar.CalendarEvent;
 import cz.jaro.alarmmorning.calendar.CalendarHelper;
 import cz.jaro.alarmmorning.calendar.CalendarUtils;
@@ -58,7 +59,7 @@ import static cz.jaro.alarmmorning.calendar.CalendarUtils.onTheSameMinute;
  * <p>
  * Activity must be started with {@link GlobalManager#PERSIST_ALARM_TYPE} and {@link GlobalManager#PERSIST_ALARM_ID} extras that define the alarm.
  */
-public class RingActivity extends Activity implements RingInterface {
+public class RingActivity extends AppCompatActivity implements RingInterface {
 
     private static final String TAG = GlobalManager.createLogTag(RingActivity.class);
 

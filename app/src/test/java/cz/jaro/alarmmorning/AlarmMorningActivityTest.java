@@ -1,7 +1,6 @@
 package cz.jaro.alarmmorning;
 
 import android.app.Application;
-import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -9,6 +8,9 @@ import android.content.res.Resources;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.navigation.NavigationView;
 
@@ -23,7 +25,6 @@ import org.robolectric.shadows.ShadowActivity;
 import java.util.Calendar;
 import java.util.Locale;
 
-import androidx.recyclerview.widget.RecyclerView;
 import cz.jaro.alarmmorning.app.AlarmMorningAppTest;
 import cz.jaro.alarmmorning.model.AlarmDataSource;
 import cz.jaro.alarmmorning.model.Defaults;
@@ -78,7 +79,7 @@ public class AlarmMorningActivityTest extends FixedTimeTest {
 
         AlarmMorningActivity activity = Robolectric.setupActivity(AlarmMorningActivity.class);
 
-        Fragment fragment = activity.getFragmentManager().findFragmentById(R.id.content_frame);
+        Fragment fragment = activity.getSupportFragmentManager().findFragmentById(R.id.content_frame);
         assertTrue(fragment instanceof CalendarFragment);
     }
 

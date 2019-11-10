@@ -7,12 +7,6 @@
         <item name="colorAccent">@color/accent</item>
 
         <item name="android:navigationBarColor">@color/primary</item>
-
-        <item name="android:timePickerDialogTheme">@style/MyDialogTheme</item>
-    </style>
-
-    <style name="MyDialogTheme" parent="android:Theme.Material.Dialog">
-        <item name="android:colorAccent">@color/accent</item>
     </style>
 
     <!-- Hack for removing the top margin -->
