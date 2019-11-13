@@ -10,7 +10,6 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.CheckBoxPreference;
 import android.preference.Preference;
 import android.preference.RingtonePreference;
 import android.text.TextUtils;
@@ -25,6 +24,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NavUtils;
 import androidx.core.content.ContextCompat;
+
 import cz.jaro.alarmmorning.checkalarmtime.CheckAlarmTime;
 import cz.jaro.alarmmorning.graphics.AppCompatPreferenceActivity;
 import cz.jaro.alarmmorning.graphics.RelativeTimePreference;
@@ -178,11 +178,14 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         bindPreferenceSummaryToValue(findPreference(PREF_ACTION_ON_FLIP));
         bindPreferenceSummaryToValue(findPreference(PREF_ACTION_ON_SHAKE));
         bindPreferenceSummaryToValue(findPreference(PREF_ACTION_ON_PROXIMITY));
+        bindPreferenceSummaryToValue(findPreference(PREF_CHECK_ALARM_TIME));
         bindPreferenceSummaryToValue(findPreference(PREF_CHECK_ALARM_TIME_AT));
         bindPreferenceSummaryToValue(findPreference(PREF_CHECK_ALARM_TIME_GAP));
+        bindPreferenceSummaryToValue(findPreference(PREF_NIGHTTIME_BELL));
         bindPreferenceSummaryToValue(findPreference(PREF_NIGHTTIME_BELL_AT));
         bindPreferenceSummaryToValue(findPreference(PREF_NIGHTTIME_BELL_RINGTONE));
         bindPreferenceSummaryToValue(findPreference(PREF_NEAR_FUTURE_TIME));
+        bindPreferenceSummaryToValue(findPreference(PREF_NAP_ENABLED));
         bindPreferenceSummaryToValue(findPreference(PREF_NAP_TIME));
         bindPreferenceSummaryToValue(findPreference(PREF_HOLIDAY));
 
@@ -492,11 +495,17 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             case PREF_ACTION_ON_PROXIMITY:
                 newValue = SharedPreferencesHelper.load(preference.getKey(), PREF_ACTION_DEFAULT);
                 break;
+            case PREF_CHECK_ALARM_TIME:
+                newValue = SharedPreferencesHelper.load(preference.getKey(), PREF_CHECK_ALARM_TIME_DEFAULT);
+                break;
             case PREF_CHECK_ALARM_TIME_AT:
                 newValue = SharedPreferencesHelper.load(preference.getKey(), PREF_CHECK_ALARM_TIME_AT_DEFAULT);
                 break;
             case PREF_CHECK_ALARM_TIME_GAP:
                 newValue = SharedPreferencesHelper.load(preference.getKey(), PREF_CHECK_ALARM_TIME_GAP_DEFAULT);
+                break;
+            case PREF_NIGHTTIME_BELL:
+                newValue = SharedPreferencesHelper.load(preference.getKey(), PREF_NIGHTTIME_BELL_DEFAULT);
                 break;
             case PREF_NIGHTTIME_BELL_AT:
                 newValue = SharedPreferencesHelper.load(preference.getKey(), PREF_NIGHTTIME_BELL_AT_DEFAULT);
@@ -506,6 +515,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 break;
             case PREF_NEAR_FUTURE_TIME:
                 newValue = SharedPreferencesHelper.load(preference.getKey(), PREF_NEAR_FUTURE_TIME_DEFAULT);
+                break;
+            case PREF_NAP_ENABLED:
+                newValue = SharedPreferencesHelper.load(preference.getKey(), PREF_NAP_ENABLED_DEFAULT);
                 break;
             case PREF_NAP_TIME:
                 newValue = SharedPreferencesHelper.load(preference.getKey(), PREF_NAP_TIME_DEFAULT);
