@@ -13,6 +13,9 @@ import android.provider.Settings;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
+
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -36,8 +39,6 @@ import java.util.Random;
 import java.util.TimeZone;
 import java.util.concurrent.Callable;
 
-import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import cz.jaro.alarmmorning.calendar.CalendarUtils;
 import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.clock.SystemClock;
@@ -515,22 +516,22 @@ public class Analytics {
             });
 
             put(confPreferences, SettingsActivity.PREF_ACTION_ON_MOVE, () -> {
-                String moveActionPreference = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_ACTION_ON_BUTTON, SettingsActivity.PREF_ACTION_DEFAULT);
+                String moveActionPreference = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_ACTION_ON_MOVE, SettingsActivity.PREF_ACTION_DEFAULT);
                 return SettingsActivity.actionCodeToString(moveActionPreference);
             });
 
             put(confPreferences, SettingsActivity.PREF_ACTION_ON_FLIP, () -> {
-                String flipActionPreference = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_ACTION_ON_BUTTON, SettingsActivity.PREF_ACTION_DEFAULT);
+                String flipActionPreference = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_ACTION_ON_FLIP, SettingsActivity.PREF_ACTION_DEFAULT);
                 return SettingsActivity.actionCodeToString(flipActionPreference);
             });
 
             put(confPreferences, SettingsActivity.PREF_ACTION_ON_SHAKE, () -> {
-                String shakeActionPreference = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_ACTION_ON_BUTTON, SettingsActivity.PREF_ACTION_DEFAULT);
+                String shakeActionPreference = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_ACTION_ON_SHAKE, SettingsActivity.PREF_ACTION_DEFAULT);
                 return SettingsActivity.actionCodeToString(shakeActionPreference);
             });
 
             put(confPreferences, SettingsActivity.PREF_ACTION_ON_PROXIMITY, () -> {
-                String proximityActionPreference = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_ACTION_ON_BUTTON, SettingsActivity.PREF_ACTION_DEFAULT);
+                String proximityActionPreference = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_ACTION_ON_PROXIMITY, SettingsActivity.PREF_ACTION_DEFAULT);
                 return SettingsActivity.actionCodeToString(proximityActionPreference);
             });
 
