@@ -16,7 +16,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Vibrator;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
@@ -60,8 +59,6 @@ import static cz.jaro.alarmmorning.calendar.CalendarUtils.onTheSameMinute;
  * Activity must be started with {@link GlobalManager#PERSIST_ALARM_TYPE} and {@link GlobalManager#PERSIST_ALARM_ID} extras that define the alarm.
  */
 public class RingActivity extends AppCompatActivity implements RingInterface {
-
-    private static final String TAG = GlobalManager.createLogTag(RingActivity.class);
 
     public static final String ACTION_HIDE_ACTIVITY = "cz.jaro.alarmmorning.intent.action.HIDE_ACTIVITY";
 
@@ -132,7 +129,7 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            Log.d(TAG, "onReceive() action=" + action);
+            MyLog.d("onReceive() action=" + action);
 
             if (action.equals(ACTION_HIDE_ACTIVITY)) {
                 if (blink == null) { // The action (snooze, dismiss) was NOT started by this activity
@@ -144,7 +141,7 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.d(TAG, "onCreate()");
+        MyLog.d("onCreate()");
         super.onCreate(savedInstanceState);
 
         // skip keyguard
@@ -204,7 +201,7 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
         snoozeButton.setOnJoyClickListener(new JoyButton.OnJoyClickListener() {
             @Override
             public void onDown(View v) {
-                Log.v(TAG, "onDown()");
+                MyLog.v("onDown()");
                 snoozeTimeTextView.setVisibility(View.VISIBLE);
 
                 int minutes = calcSnoozeMinutes(0, 0, true);
@@ -213,14 +210,14 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
 
             @Override
             public void onMove(View v, float dx, float dy, boolean click) {
-                Log.v(TAG, "onMove(dx=" + dx + ", dy=" + dy + ", click=" + click + ")");
+                MyLog.v("onMove(dx=" + dx + ", dy=" + dy + ", click=" + click + ")");
                 int minutes = calcSnoozeMinutes(dx, dy, click);
                 snoozeTimeTextView.setText(getResources().getQuantityString(R.plurals.snooze_time_text, minutes, minutes));
             }
 
             @Override
             public void onUp(View v, float dx, float dy, boolean click) {
-                Log.v(TAG, "onUp(dx=" + dx + ", dy=" + dy + ", click=" + click + ")");
+                MyLog.v("onUp(dx=" + dx + ", dy=" + dy + ", click=" + click + ")");
                 snoozeTimeTextView.setVisibility(View.INVISIBLE);
 
                 int minutes = calcSnoozeMinutes(dx, dy, click);
@@ -229,7 +226,7 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
 
             @Override
             public void onCancel(View v) {
-                Log.v(TAG, "onCancel()");
+                MyLog.v("onCancel()");
                 snoozeTimeTextView.setVisibility(View.INVISIBLE);
             }
         });
@@ -319,7 +316,7 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
-        Log.v(TAG, "onSaveInstanceState()");
+        MyLog.v("onSaveInstanceState()");
         super.onSaveInstanceState(savedInstanceState);
 
         savedInstanceState.putString(PERSIST_ALARM_TYPE, appAlarm.getClass().getSimpleName());
@@ -329,7 +326,7 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
 
     @Override
     public void onPause() {
-        Log.v(TAG, "onPause()");
+        MyLog.v("onPause()");
 
         // Problem: When starting activity, the activity lifecycle calls are as follows: onCreate, onStart, onResume, onPause, onStop, onStart, onResume
         // Source: https://stackoverflow.com/questions/25369909/onpause-and-onstop-called-immediately-after-starting-activity
@@ -341,13 +338,13 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
 
     @Override
     protected void onStop() {
-        Log.v(TAG, "onStop()");
+        MyLog.v("onStop()");
 
         super.onStop();
 
         if (focusDuringOnPause) {
             // Normal scenario
-            Log.d(TAG, "onStop: Normal scenario");
+            MyLog.d("onStop: Normal scenario");
 
             if (!actionPerformed) {
                 doSnooze(false);
@@ -355,14 +352,14 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
         } else {
             // Activity was started when screen was off / screen was on with keyguard displayed
 
-            Log.v(TAG, "onStop: Exceptional scenario - Activity was started when screen was off / screen was on with keyguard displayed");
+            MyLog.v("onStop: Exceptional scenario - Activity was started when screen was off / screen was on with keyguard displayed");
             // Do nothing
         }
     }
 
     @Override
     protected void onDestroy() {
-        Log.v(TAG, "onDestroy()");
+        MyLog.v("onDestroy()");
         super.onDestroy();
 
         bManager.unregisterReceiver(bReceiver);
@@ -382,8 +379,8 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
     }
 
     private void doDismiss(boolean autoDismiss) {
-        Log.d(TAG, "doDismiss(autoDismiss=" + autoDismiss + ")");
-        Log.i(TAG, "Dismiss");
+        MyLog.d("doDismiss(autoDismiss=" + autoDismiss + ")");
+        MyLog.i("Dismiss");
 
         stopAll();
 
@@ -403,7 +400,7 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
     }
 
     private void doSnooze(boolean autoSnooze) {
-        Log.v(TAG, "doSnooze(autoSnooze=" + autoSnooze + ")");
+        MyLog.v("doSnooze(autoSnooze=" + autoSnooze + ")");
 
         int minutes = (int) SharedPreferencesHelper.load(SettingsActivity.PREF_SNOOZE_TIME, SettingsActivity.PREF_SNOOZE_TIME_DEFAULT);
 
@@ -411,8 +408,8 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
     }
 
     private void doSnooze(int minutes, boolean autoSnooze) {
-        Log.v(TAG, "doSnooze(minutes=" + minutes + ", autoSnooze=" + autoSnooze + ")");
-        Log.i(TAG, "Snooze for " + minutes + " minutes");
+        MyLog.v("doSnooze(minutes=" + minutes + ", autoSnooze=" + autoSnooze + ")");
+        MyLog.i("Snooze for " + minutes + " minutes");
 
         stopAll();
 
@@ -434,13 +431,13 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
     }
 
     private void doMute() {
-        Log.d(TAG, "doMute()");
+        MyLog.d("doMute()");
 
         if (muteAvailable()) {
-            Log.i(TAG, "Mute");
+            MyLog.i("Mute");
             startMute();
         } else {
-            Log.d(TAG, "Not muting because it had been not muted");
+            MyLog.d("Not muting because it had been not muted");
         }
     }
 
@@ -451,12 +448,12 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
     }
 
     private boolean muteAvailable() {
-        Log.d(TAG, "muteAvailable()");
+        MyLog.d("muteAvailable()");
         return !mutedInPast;
     }
 
     private void startMute() {
-        Log.d(TAG, "startMute()");
+        MyLog.d("startMute()");
 
         isMuted = true;
         mutedInPast = true;
@@ -475,7 +472,7 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
     private final Runnable runnableMute = new Runnable() {
         @Override
         public void run() {
-            Log.d(TAG, "run()");
+            MyLog.d("run()");
 
             mutedSecondsLeft--;
             if (mutedSecondsLeft > 0) {
@@ -489,7 +486,7 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
     };
 
     private void updateMute() {
-        Log.d(TAG, "updateMute()");
+        MyLog.d("updateMute()");
 
         Resources res = getResources();
         String muteText = res.getString(R.string.muted, mutedSecondsLeft);
@@ -498,10 +495,10 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
     }
 
     private void stopMute() {
-        Log.d(TAG, "stopMute()");
+        MyLog.d("stopMute()");
 
         if (isMuted) {
-            Log.i(TAG, "Unmute");
+            MyLog.i("Unmute");
             isMuted = false;
 
             unmuteVibrate();
@@ -514,10 +511,10 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
     }
 
     private void startAll() {
-        Log.d(TAG, "startAll()");
+        MyLog.d("startAll()");
 
         if (!isRinging) {
-            Log.i(TAG, "Start ringing");
+            MyLog.i("Start ringing");
 
             isRinging = true;
 
@@ -536,10 +533,10 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
      * The wake lock that was acquired on system notification in {@link AlarmReceiver#onReceive(Context, Intent)} must be released.
      */
     private void stopAll() {
-        Log.d(TAG, "stopAll()");
+        MyLog.d("stopAll()");
 
         if (isRinging) {
-            Log.i(TAG, "Stop ringing");
+            MyLog.i("Stop ringing");
 
             isRinging = false;
 
@@ -558,7 +555,7 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
     }
 
     private void startContent() {
-        Log.d(TAG, "startContent()");
+        MyLog.d("startContent()");
 
         handlerContent.start();
     }
@@ -566,13 +563,13 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
     private final HandlerOnClockChange handlerContent = new HandlerOnClockChange(this::updateContent, Calendar.MINUTE);
 
     private void stopContent() {
-        Log.d(TAG, "stopContent()");
+        MyLog.d("stopContent()");
 
         handlerContent.stop();
     }
 
     private void updateContent() {
-        Log.d(TAG, "updateContent()");
+        MyLog.d("updateContent()");
 
         if (checkAutoActions())
             return;
@@ -648,14 +645,14 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
      * @return True when an auto action is triggered.
      */
     private boolean checkAutoActions() {
-        Log.v(TAG, "checkAutoActions()");
+        MyLog.v("checkAutoActions()");
 
         // Note: Do auto-dismiss before auto-snooze
 
         // Check auto dismiss
         boolean doAutoDismiss = doAutoDismiss(appAlarm);
         if (doAutoDismiss) {
-            Log.d(TAG, "Auto-dismiss");
+            MyLog.d("Auto-dismiss");
             doDismiss(true);
             return true;
         }
@@ -663,7 +660,7 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
         // Check auto snooze
         boolean doAutoSnooze = doAutoSnooze();
         if (doAutoSnooze) {
-            Log.d(TAG, "Auto-snooze");
+            MyLog.d("Auto-snooze");
             doSnooze(true);
             return true;
         }
@@ -672,7 +669,7 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
     }
 
     public static boolean doAutoDismiss(AppAlarm appAlarm) {
-        Log.v(TAG, "doAutoDismiss()");
+        MyLog.v("doAutoDismiss()");
         GlobalManager globalManager = GlobalManager.getInstance();
         Calendar now = globalManager.clock().now();
 
@@ -687,7 +684,7 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
 
             boolean doAutoDismiss = autoDismissTime <= diffFromAlarmTime;
 
-            Log.v(TAG, "Auto-dismiss check " + doAutoDismiss + ": auto-dismiss time (" + autoDismissTime + " min) <= time since the alarm time (" + diffFromAlarmTime + " min)");
+            MyLog.v("Auto-dismiss check " + doAutoDismiss + ": auto-dismiss time (" + autoDismissTime + " min) <= time since the alarm time (" + diffFromAlarmTime + " min)");
 
             return doAutoDismiss;
         }
@@ -695,7 +692,7 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
     }
 
     private boolean doAutoSnooze() {
-        Log.v(TAG, "doAutoSnooze()");
+        MyLog.v("doAutoSnooze()");
         GlobalManager globalManager = GlobalManager.getInstance();
         Calendar now = globalManager.clock().now();
 
@@ -707,7 +704,7 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
 
             boolean doAutoSnooze = autoSnoozeTime <= diffFromLastRingingStartTime;
 
-            Log.v(TAG, "Auto-snooze check " + doAutoSnooze + ": auto-snooze time (" + autoSnoozeTime + " min) <= time since the start of this ringing (" + diffFromLastRingingStartTime + " min)");
+            MyLog.v("Auto-snooze check " + doAutoSnooze + ": auto-snooze time (" + autoSnoozeTime + " min) <= time since the start of this ringing (" + diffFromLastRingingStartTime + " min)");
 
             return doAutoSnooze;
         }
@@ -733,7 +730,7 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
     }
 
     private void startSound() {
-        Log.d(TAG, "startSound()");
+        MyLog.d("startSound()");
 
         isPlaying = false;
 
@@ -750,7 +747,7 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
                 startSoundAsMedia(ringtoneUri);
                 soundMethod = 1;
             } catch (Exception e) {
-                Log.d(TAG, "Unable to play ringtone as media", e);
+                MyLog.d("Unable to play ringtone as media", e);
             }
 
             if (soundMethod == 0) {
@@ -758,39 +755,39 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
                     startSoundAsRingtone(ringtoneUri);
                     soundMethod = 2;
                 } catch (Exception e) {
-                    Log.d(TAG, "Unable to play ringtone as ringtone", e);
+                    MyLog.d("Unable to play ringtone as ringtone", e);
                 }
             }
 
-            if (soundMethod == 0) Log.e(TAG, "Unable to play ringtone");
+            if (soundMethod == 0) MyLog.e("Unable to play ringtone");
         } else {
-            Log.w(TAG, "Sound is intentionally not playing (disabled in settings)");
+            MyLog.w("Sound is intentionally not playing (disabled in settings)");
         }
     }
 
     private void startSoundAsRingtone(Uri ringtoneUri) {
-        Log.d(TAG, "startSoundAsRingtone()");
+        MyLog.d("startSoundAsRingtone()");
         ringtone = RingtoneManager.getRingtone(getApplicationContext(), ringtoneUri);
         ringtone.play();
     }
 
     private void stopSoundAsRingtone() {
-        Log.d(TAG, "stopSoundAsRingtone()");
+        MyLog.d("stopSoundAsRingtone()");
         ringtone.stop();
     }
 
     private void pauseSoundAsRingtone() {
-        Log.d(TAG, "pauseSoundAsRingtone()");
+        MyLog.d("pauseSoundAsRingtone()");
         ringtone.stop();
     }
 
     private void resumeSoundAsRingtone() {
-        Log.d(TAG, "resumeSoundAsRingtone()");
+        MyLog.d("resumeSoundAsRingtone()");
         ringtone.play();
     }
 
     private void startSoundAsMedia(Uri ringtoneUri) throws IOException {
-        Log.d(TAG, "startSoundAsMedia()");
+        MyLog.d("startSoundAsMedia()");
 
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setAudioStreamType(ALARM_MANAGER_STREAM);
@@ -801,22 +798,22 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
     }
 
     private void stopSoundAsMedia() {
-        Log.d(TAG, "stopSoundAsMedia()");
+        MyLog.d("stopSoundAsMedia()");
         mediaPlayer.stop();
     }
 
     private void pauseSoundAsMedia() {
-        Log.d(TAG, "pauseSoundAsMedia()");
+        MyLog.d("pauseSoundAsMedia()");
         mediaPlayer.pause();
     }
 
     private void resumeSoundAsMedia() {
-        Log.d(TAG, "resumeSoundAsMedia()");
+        MyLog.d("resumeSoundAsMedia()");
         mediaPlayer.start();
     }
 
     private void stopSound() {
-        Log.d(TAG, "stopSound()");
+        MyLog.d("stopSound()");
 
         if (isPlaying) {
             isPlaying = false;
@@ -835,7 +832,7 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
     }
 
     private void muteSound() {
-        Log.d(TAG, "muteSound()");
+        MyLog.d("muteSound()");
 
         if (isPlaying) {
             switch (soundMethod) {
@@ -850,7 +847,7 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
     }
 
     private void unmuteSound() {
-        Log.d(TAG, "unmuteSound()");
+        MyLog.d("unmuteSound()");
 
         if (isPlaying) {
             switch (soundMethod) {
@@ -865,12 +862,12 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
     }
 
     private void startVolume() {
-        Log.d(TAG, "startVolume()");
+        MyLog.d("startVolume()");
 
         int volumePreference = (int) SharedPreferencesHelper.load(SettingsActivity.PREF_VOLUME, SettingsActivity.PREF_VOLUME_DEFAULT);
 
         if (volumePreference == 0)
-            Log.w(TAG, "Volume is set to 0");
+            MyLog.w("Volume is set to 0");
 
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
@@ -882,14 +879,14 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
         audioManager.setSpeakerphoneOn(true); // Always use loudspeaker
 
         previousVolume = audioManager.getStreamVolume(ALARM_MANAGER_STREAM);
-        Log.v(TAG, "previous volume= " + previousVolume);
+        MyLog.v("previous volume= " + previousVolume);
 
         maxVolume = audioManager.getStreamMaxVolume(ALARM_MANAGER_STREAM);
         volume = SettingsActivity.getRealVolume(volumePreference, maxVolume);
 
-        Log.v(TAG, "preference volume = " + volumePreference);
-        Log.v(TAG, "max volume= " + maxVolume);
-        Log.v(TAG, "volume = " + volume);
+        MyLog.v("preference volume = " + volumePreference);
+        MyLog.v("max volume= " + maxVolume);
+        MyLog.v("volume = " + volume);
 
         increasing = (boolean) SharedPreferencesHelper.load(SettingsActivity.PREF_VOLUME_INCREASING, SettingsActivity.PREF_VOLUME_INCREASING_DEFAULT);
 
@@ -905,19 +902,19 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
      * @return Whether the increasing reached the final volume.
      */
     private boolean updateIncreasingVolume() {
-        Log.v(TAG, "updateIncreasingVolume");
+        MyLog.v("updateIncreasingVolume");
 
         if (isMuted)
             return false;
 
         increasingVolumePercentage++;
-        Log.v(TAG, "   volume percentage = " + increasingVolumePercentage);
+        MyLog.v("   volume percentage = " + increasingVolumePercentage);
         float ratio = (float) increasingVolumePercentage / 100;
         int tempVolume = (int) Math.ceil(ratio * maxVolume);
-        Log.v(TAG, "   current volume = " + tempVolume);
+        MyLog.v("   current volume = " + tempVolume);
 
         if (volume <= tempVolume) {
-            Log.v(TAG, "reached final volume");
+            MyLog.v("reached final volume");
             audioManager.setStreamVolume(ALARM_MANAGER_STREAM, volume, 0);
             return true;
         } else {
@@ -939,7 +936,7 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
     };
 
     private void stopVolume() {
-        Log.d(TAG, "stopVolume()");
+        MyLog.d("stopVolume()");
 
         if (increasing) {
             handlerVolume.removeCallbacks(runnableVolume);
@@ -949,7 +946,7 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
     }
 
     private void startVibrate() {
-        Log.d(TAG, "startVibrate()");
+        MyLog.d("startVibrate()");
 
         boolean vibratePreference = (boolean) SharedPreferencesHelper.load(SettingsActivity.PREF_VIBRATE, SettingsActivity.PREF_VIBRATE_DEFAULT);
 
@@ -967,7 +964,7 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
                 IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
                 registerReceiver(vibrateReceiver, filter);
             } else {
-                Log.w(TAG, "The device cannot vibrate");
+                MyLog.w("The device cannot vibrate");
             }
         }
     }
@@ -982,7 +979,7 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
     };
 
     private void stopVibrate() {
-        Log.d(TAG, "stopVibrate()");
+        MyLog.d("stopVibrate()");
 
         if (isVibrating) {
             vibrator.cancel();
@@ -992,7 +989,7 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
     }
 
     private void muteVibrate() {
-        Log.d(TAG, "muteVibrate()");
+        MyLog.d("muteVibrate()");
 
         if (isVibrating) {
             vibrator.cancel();
@@ -1002,7 +999,7 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
     }
 
     private void unmuteVibrate() {
-        Log.d(TAG, "unmuteVibrate()");
+        MyLog.d("unmuteVibrate()");
 
         if (isVibrating) {
             vibrator.vibrate(VIBRATOR_PATTERN, 0);
@@ -1014,7 +1011,7 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
     }
 
     private void startFlashlight() {
-        Log.d(TAG, "startFlashlight()");
+        MyLog.d("startFlashlight()");
 
         boolean flashPreference = (boolean) SharedPreferencesHelper.load(SettingsActivity.PREF_FLASHLIGHT, SettingsActivity.PREF_FLASHLIGHT_DEFAULT);
 
@@ -1030,17 +1027,17 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
 
                     isFlashlight = true;
                 } else {
-                    Log.w(TAG, "The device doesn't have a flashlight blinker");
+                    MyLog.w("The device doesn't have a flashlight blinker");
                 }
             } else {
-                Log.w(TAG, "The CAMERA permission is not granted");
+                MyLog.w("The CAMERA permission is not granted");
                 // It doesn't make sense to ask for permission while ringing
             }
         }
     }
 
     private void stopFlashlight() {
-        Log.d(TAG, "stopFlashlight()");
+        MyLog.d("stopFlashlight()");
 
         if (isFlashlight) {
             flashlightBlinker.cancel();
@@ -1051,16 +1048,16 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
 
     @Override
     public boolean onKeyDown(int keycode, KeyEvent e) {
-        Log.d(TAG, "onKeyDown(keycode=" + keycode + ")");
+        MyLog.d("onKeyDown(keycode=" + keycode + ")");
 
         String buttonActionPreference = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_ACTION_ON_BUTTON, SettingsActivity.PREF_ACTION_DEFAULT);
 
         if (SettingsActivity.PREF_ACTION_DEFAULT.equals(buttonActionPreference)) {
             if (keycode == KeyEvent.KEYCODE_BACK) {
-                Log.d(TAG, "Doing nothing on back key.");
+                MyLog.d("Doing nothing on back key.");
                 return true;
             } else {
-                Log.d(TAG, "Doing nothing. Let the operating system handles tke key.");
+                MyLog.d("Doing nothing. Let the operating system handles tke key.");
                 return super.onKeyDown(keycode, e);
             }
         } else {
@@ -1070,7 +1067,7 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
     }
 
     private void startSensors() {
-        Log.d(TAG, "startSensors()");
+        MyLog.d("startSensors()");
         sensorEventDetectors = new HashSet<>();
 
         sensorEventDetectors.add(new Flip(this));
@@ -1084,7 +1081,7 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
     }
 
     private void stopSensors() {
-        Log.d(TAG, "stopSensors()");
+        MyLog.d("stopSensors()");
 
         for (SensorEventDetector sensorEventDetector : sensorEventDetectors) {
             sensorEventDetector.stop();
@@ -1098,10 +1095,10 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
 
     @Override
     public void actOnEvent(String action) {
-        Log.v(TAG, "actOnEvent(action=" + action + ")");
+        MyLog.v("actOnEvent(action=" + action + ")");
         switch (action) {
             case SettingsActivity.PREF_ACTION_DEFAULT:
-                Log.d(TAG, "Doing nothing");
+                MyLog.d("Doing nothing");
                 return;
 
             case SettingsActivity.PREF_ACTION_MUTE:

@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
@@ -56,8 +55,6 @@ import static cz.jaro.alarmmorning.calendar.CalendarUtils.onTheSameDate;
  * Fragment that appears in the "content_frame".
  */
 public class CalendarFragment extends Fragment implements View.OnClickListener, TimePickerDialogWithDisable.OnTimeSetWithDisableListener, DatePickerDialog.OnDateSetListener {
-
-    private static final String TAG = GlobalManager.createLogTag(CalendarFragment.class);
 
     private CalendarAdapter adapter;
 
@@ -163,12 +160,12 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
      */
 
     public void onAlarmSet(AppAlarm appAlarm) {
-        Log.d(TAG, "onAlarmSet(appAparm = " + appAlarm + ")");
+        MyLog.d("onAlarmSet(appAparm = " + appAlarm + ")");
         updatePositionOfNextAlarm();
     }
 
     public void onDismissBeforeRinging(AppAlarm appAlarm) {
-        Log.d(TAG, "onDismissBeforeRinging(appAparm = " + appAlarm + ")");
+        MyLog.d("onDismissBeforeRinging(appAparm = " + appAlarm + ")");
 
         // Note: the dismissed alarm may not be the next alarm to ring (but may be)
         int pos = getPosition(appAlarm);
@@ -178,29 +175,29 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     }
 
     public void onAlarmTimeOfEarlyDismissedAlarm(AppAlarm appAlarm) {
-        Log.d(TAG, "onAlarmTimeOfEarlyDismissedAlarm(appAparm = " + appAlarm + ")");
+        MyLog.d("onAlarmTimeOfEarlyDismissedAlarm(appAparm = " + appAlarm + ")");
 
         int pos = getPosition(appAlarm);
         adapter.notifyItemChanged(pos);
     }
 
     public void onRing(AppAlarm appAlarm) {
-        Log.d(TAG, "onRing(appAparm = " + appAlarm + ")");
+        MyLog.d("onRing(appAparm = " + appAlarm + ")");
         // Nothing
     }
 
     public void onDismiss(AppAlarm appAlarm) {
-        Log.d(TAG, "onDismiss(appAparm = " + appAlarm + ")");
+        MyLog.d("onDismiss(appAparm = " + appAlarm + ")");
         updatePositionOfNextAlarm();
     }
 
     public void onSnooze(AppAlarm appAlarm) {
-        Log.d(TAG, "onSnooze(appAparm = " + appAlarm + ")");
+        MyLog.d("onSnooze(appAparm = " + appAlarm + ")");
         updatePositionOfNextAlarm();
     }
 
     public void onCancel(AppAlarm appAlarm) {
-        Log.d(TAG, "onCancel(appAparm = " + appAlarm + ")");
+        MyLog.d("onCancel(appAparm = " + appAlarm + ")");
         updatePositionOfNextAlarm();
     }
 
@@ -210,7 +207,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
      */
 
     public void onModifyDayAlarm(Day day) {
-        Log.d(TAG, "modifyDayAlarm(day = " + day + ")");
+        MyLog.d("modifyDayAlarm(day = " + day + ")");
 
         // Update this alarm
         int pos = getPosition(day);
@@ -225,7 +222,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     }
 
     public void onCreateOneTimeAlarm(OneTimeAlarm oneTimeAlarm) {
-        Log.d(TAG, "onCreateOneTimeAlarm(oneTimeAlarm = " + oneTimeAlarm + ")");
+        MyLog.d("onCreateOneTimeAlarm(oneTimeAlarm = " + oneTimeAlarm + ")");
 
         // Get the target position
         int pos = findPosition(oneTimeAlarm);
@@ -252,7 +249,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     }
 
     public void onDeleteOneTimeAlarm(long oneTimeAlarmId) {
-        Log.d(TAG, "onDeleteOneTimeAlarm(oneTimeAlarmId = " + oneTimeAlarmId + ")");
+        MyLog.d("onDeleteOneTimeAlarm(oneTimeAlarmId = " + oneTimeAlarmId + ")");
 
         // Get the OneTimeAlarm object
         OneTimeAlarm oneTimeAlarm = null;
@@ -265,14 +262,14 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         }
 
         if (oneTimeAlarm == null) {
-            Log.w(TAG, "Cannot find the alarm to delete" + oneTimeAlarmId);
+            MyLog.w("Cannot find the alarm to delete" + oneTimeAlarmId);
             throw new IllegalArgumentException("Cannot find the alarm to delete " + oneTimeAlarmId);
         }
 
         // Update the fragment
         int pos = getPosition(oneTimeAlarm);
         if (pos < 0) {
-            Log.e(TAG, "Cannot get alarm position");
+            MyLog.e("Cannot get alarm position");
             throw new IllegalArgumentException("Cannot get alarm position");
         }
 
@@ -284,7 +281,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     }
 
     public void onModifyOneTimeAlarmDateTime(OneTimeAlarm oneTimeAlarm) {
-        Log.d(TAG, "onModifyOneTimeAlarmDateTime(oneTimeAlarm = " + oneTimeAlarm + ")");
+        MyLog.d("onModifyOneTimeAlarmDateTime(oneTimeAlarm = " + oneTimeAlarm + ")");
 
         changePosition(oneTimeAlarm);
     }
@@ -346,7 +343,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     }
 
     public void onModifyOneTimeAlarmName(OneTimeAlarm oneTimeAlarm) {
-        Log.d(TAG, "onModifyOneTimeAlarmName(oneTimeAlarm = " + oneTimeAlarm + ")");
+        MyLog.d("onModifyOneTimeAlarmName(oneTimeAlarm = " + oneTimeAlarm + ")");
 
         // Note: Deviation from the "act when notified from GlobalManager" pattern.
         // 1. The name can be only changed in the CalendarFragment.
@@ -356,7 +353,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         int pos = getPosition(oneTimeAlarm);
 
         if (pos == -1) {
-            Log.w(TAG, "Alarm name changed of an non-existent alarm");
+            MyLog.w("Alarm name changed of an non-existent alarm");
             return;
         }
 
@@ -374,7 +371,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
      */
 
     public void onTimeOrTimeZoneChange() {
-        Log.d(TAG, "onTimeOrTimeZoneChange()");
+        MyLog.d("onTimeOrTimeZoneChange()");
 
         loadItems();
         today = getToday(clock());
@@ -383,7 +380,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     }
 
     private void onSystemTimeChange() {
-        Log.v(TAG, "onSystemTimeChange()");
+        MyLog.v("onSystemTimeChange()");
 
         // Update time to next alarm
         LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
@@ -468,7 +465,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
         // Get and update new items
         Set<Integer> newPositionNextAlarm = calcPositionNextAlarm();
-        Log.d(TAG, "Next alarm is at positionAction " + newPositionNextAlarm);
+        MyLog.d("Next alarm is at positionAction " + newPositionNextAlarm);
 
         for (int pos : newPositionNextAlarm) {
             if (!positionNextAlarm.contains(pos)) { // Optimization: if an item is both in positionNextAlarm and newPositionNextAlarm then call this item's notifyItemChanged() only once
@@ -648,7 +645,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     @Override
     public void onClick(View view) {
         positionAction = recyclerView.getChildAdapterPosition(view);
-        Log.d(TAG, "Clicked item on positionAction " + positionAction);
+        MyLog.d("Clicked item on positionAction " + positionAction);
 
         menuAction = R.id.action_day_set_time;
         showTimePicker();
@@ -764,7 +761,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
     public void onSetDate(View view) {
         positionAction = recyclerView.getChildAdapterPosition(view);
-        Log.d(TAG, "Set date for item on positionAction " + positionAction);
+        MyLog.d("Set date for item on positionAction " + positionAction);
 
         showDatePicker();
     }
@@ -826,7 +823,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
     void onNameSet(CalendarAdapter.CalendarViewHolder viewHolder) {
         positionAction = recyclerView.getChildAdapterPosition(viewHolder.itemView);
-        Log.d(TAG, "Set name for item on positionAction " + positionAction);
+        MyLog.d("Set name for item on positionAction " + positionAction);
 
         // Save
 
@@ -866,7 +863,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         positionAction = ((RecyclerViewWithContextMenu.RecyclerViewContextMenuInfo) menuInfo).position;
-        Log.d(TAG, "Long clicked item on positionAction " + positionAction);
+        MyLog.d("Long clicked item on positionAction " + positionAction);
 
         MenuInflater inflater = getActivity().getMenuInflater();
         inflater.inflate(R.menu.day_context_menu, menu);
@@ -979,7 +976,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
                 break;
 
             case R.id.action_day_disable:
-                Log.d(TAG, "Disable");
+                MyLog.d("Disable");
                 if (appAlarmAtPosition instanceof Day) {
                     day.setState(Day.STATE_DISABLED);
                     modifyDayAlarm(day);
@@ -989,7 +986,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
                 break;
 
             case R.id.action_day_revert:
-                Log.i(TAG, "Revert");
+                MyLog.i("Revert");
                 if (appAlarmAtPosition instanceof Day) {
                     day.setState(Day.STATE_RULE);
                     modifyDayAlarm(day);
@@ -997,7 +994,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
                 break;
 
             case R.id.action_day_dismiss:
-                Log.i(TAG, "Dismiss");
+                MyLog.i("Dismiss");
 
                 Analytics analytics1 = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
 
@@ -1007,7 +1004,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
                 break;
 
             case R.id.action_day_snooze:
-                Log.i(TAG, "Snooze");
+                MyLog.i("Snooze");
 
                 Analytics analytics2 = new Analytics(Analytics.Channel.Activity, Analytics.ChannelName.Calendar);
 

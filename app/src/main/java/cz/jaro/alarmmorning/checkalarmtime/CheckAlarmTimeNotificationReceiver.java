@@ -3,13 +3,12 @@ package cz.jaro.alarmmorning.checkalarmtime;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import java.util.Calendar;
 
 import cz.jaro.alarmmorning.AlarmMorningActivity;
 import cz.jaro.alarmmorning.Analytics;
-import cz.jaro.alarmmorning.GlobalManager;
+import cz.jaro.alarmmorning.MyLog;
 import cz.jaro.alarmmorning.SharedPreferencesHelper;
 import cz.jaro.alarmmorning.calendar.CalendarUtils;
 
@@ -23,8 +22,6 @@ import static cz.jaro.alarmmorning.model.Day.VALUE_UNSET;
  */
 public class CheckAlarmTimeNotificationReceiver extends BroadcastReceiver {
 
-    private static final String TAG = GlobalManager.createLogTag(CheckAlarmTimeNotificationReceiver.class);
-
     public static final String ACTION_CHECK_ALARM_TIME_CLICK = "cz.jaro.alarmmorning.intent.action.CLICK";
     public static final String ACTION_CHECK_ALARM_TIME_DELETE = "cz.jaro.alarmmorning.intent.action.DELETE";
     public static final String ACTION_CHECK_ALARM_TIME_SET_TO = "cz.jaro.alarmmorning.intent.action.SET_TO";
@@ -37,7 +34,7 @@ public class CheckAlarmTimeNotificationReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
 
-        Log.v(TAG, "onReceive() action=" + action);
+        MyLog.v("onReceive() action=" + action);
 
         switch (action) {
             case ACTION_CHECK_ALARM_TIME_CLICK:
@@ -61,7 +58,7 @@ public class CheckAlarmTimeNotificationReceiver extends BroadcastReceiver {
 
                 Calendar newAlarmTime = CalendarUtils.newGregorianCalendar(newAlarmTimeLong);
 
-                Log.i(TAG, "Set alarm time to " + newAlarmTime.getTime());
+                MyLog.i("Set alarm time to " + newAlarmTime.getTime());
                 Analytics analytics = new Analytics(Analytics.Channel.Notification, Analytics.ChannelName.Check_alarm_time).set(Analytics.Param.Check_alarm_time_method, CHECK_ALARM_TIME_METHOD__QUICK);
 
                 SetTimeActivity.updateDay(context, newAlarmTime, analytics);
@@ -78,7 +75,7 @@ public class CheckAlarmTimeNotificationReceiver extends BroadcastReceiver {
 
                 Calendar dayDate = CalendarUtils.newGregorianCalendar(dayDateLong);
 
-                Log.i(TAG, "Disabling alarm on " + dayDate.getTime());
+                MyLog.i("Disabling alarm on " + dayDate.getTime());
                 Analytics analytics = new Analytics(Analytics.Channel.Notification, Analytics.ChannelName.Check_alarm_time).set(Analytics.Param.Check_alarm_time_method, CHECK_ALARM_TIME_METHOD__QUICK);
 
                 SetTimeActivity.updateDay(context, true, dayDate, analytics, true);
@@ -93,7 +90,7 @@ public class CheckAlarmTimeNotificationReceiver extends BroadcastReceiver {
                     throw new IllegalArgumentException("The " + EXTRA_NEW_ALARM_TIME + " extra must be set");
                 }
 
-                Log.i(TAG, "Show dialog to set alarm time");
+                MyLog.i("Show dialog to set alarm time");
 
                 // Start activity
                 Intent dialogIntent = new Intent(context, SetTimeActivity.class);

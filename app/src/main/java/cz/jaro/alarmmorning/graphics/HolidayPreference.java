@@ -6,7 +6,6 @@ import android.preference.DialogPreference;
 import android.util.AttributeSet;
 import android.view.View;
 
-import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.SettingsActivity;
 import de.galgtonold.jollydayandroid.HolidayCalendar;
 
@@ -20,8 +19,6 @@ import de.galgtonold.jollydayandroid.HolidayCalendar;
  * Bavaria – Munich".
  */
 public class HolidayPreference extends DialogPreference {
-
-    private static final String TAG = GlobalManager.createLogTag(HolidayPreference.class);
 
     private HolidaySelector mHolidaySelector;
 

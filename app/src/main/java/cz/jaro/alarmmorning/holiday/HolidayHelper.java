@@ -2,7 +2,6 @@ package cz.jaro.alarmmorning.holiday;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.util.Log;
 
 import org.joda.time.LocalDate;
 
@@ -19,6 +18,7 @@ import java.util.Set;
 
 import cz.jaro.alarmmorning.AlarmMorningApplication;
 import cz.jaro.alarmmorning.GlobalManager;
+import cz.jaro.alarmmorning.MyLog;
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.SettingsActivity;
 import de.galgtonold.jollydayandroid.CalendarHierarchy;
@@ -34,8 +34,6 @@ import static cz.jaro.alarmmorning.holiday.HolidayHelper.PATH_TOP;
  * Helper class to work with Holidays.
  */
 public class HolidayHelper {
-
-    private static final String TAG = GlobalManager.createLogTag(HolidayHelper.class);
 
     public static final String PATH_TOP = "";
     public static final String PATH_SEPARATOR = ".";
@@ -280,11 +278,11 @@ public class HolidayHelper {
      * @return number of levels in the path
      */
     public int pathLength(String path) {
-        Log.v(TAG, "pathLength(parentPath=" + path + ")");
+        MyLog.v("pathLength(parentPath=" + path + ")");
         int length;
         if (path.isEmpty()) length = 0;
         else length = path.split("\\.").length;
-        Log.v(TAG, "pathLength=" + length);
+        MyLog.v("pathLength=" + length);
         return length;
     }
 
@@ -296,9 +294,9 @@ public class HolidayHelper {
      * @return id of the super-region
      */
     public String pathPart(String path, int index) {
-        Log.d(TAG, "pathPart(parentPath=" + path + ", index=" + index + ")");
+        MyLog.v("pathPart(parentPath=" + path + ", index=" + index + ")");
         String part = path.split("\\.")[index - 1];
-        Log.v(TAG, "pathPart=" + part);
+        MyLog.v("pathPart=" + part);
         return part;
     }
 
@@ -310,10 +308,10 @@ public class HolidayHelper {
      * @return path identifying a region
      */
     public String pathPrefix(String path, int level) {
-        Log.d(TAG, "pathPrefix(parentPath=" + path + ", level=" + level + ")");
+        MyLog.v("pathPrefix(parentPath=" + path + ", level=" + level + ")");
 
         if (level == 0) {
-            Log.v(TAG, "pathPrefix=\"\"");
+            MyLog.v("pathPrefix=\"\"");
             return PATH_TOP;
         }
 
@@ -323,12 +321,12 @@ public class HolidayHelper {
             counter++;
             if (counter == level) {
                 String prefix = path.substring(0, pos);
-                Log.v(TAG, "pathPrefix=" + prefix);
+                MyLog.v("pathPrefix=" + prefix);
                 return prefix;
             }
         }
 
-        Log.v(TAG, "pathPrefix=" + path);
+        MyLog.v("pathPrefix=" + path);
         return path;
     }
 
@@ -373,7 +371,7 @@ public class HolidayHelper {
      * @return list of regions
      */
     public List<Region> list(String path) {
-        Log.v(TAG, "List region " + path);
+        MyLog.v("List region " + path);
         List<Region> list;
 
         if (path.equals(PATH_TOP)) {
@@ -411,13 +409,13 @@ public class HolidayHelper {
      * @throws IllegalStateException if the path doesn't exist
      */
     private Map<String, CalendarHierarchy> pathInfo(String path) {
-        Log.d(TAG, "pathInfo(path=" + path + ")");
+        MyLog.v("pathInfo(path=" + path + ")");
         ResourceUtil resourceUtil = new ResourceUtil();
 
         String[] ids = path.split("\\.");
 
         String id = ids[0];
-        Log.v(TAG, " " + id + " " + resourceUtil.getCountryDescription(id));
+        MyLog.v(" " + id + " " + resourceUtil.getCountryDescription(id));
 
         HolidayManager holidayManager;
 
@@ -440,7 +438,7 @@ public class HolidayHelper {
                 throw new IllegalStateException("Prefix " + prefix + " has no id " + id + " in path " + path);
             }
 
-            Log.v(TAG, " " + id + " " + child.getDescription());
+            MyLog.v(" " + id + " " + child.getDescription());
 
             children = child.getChildren();
         }
@@ -457,7 +455,7 @@ public class HolidayHelper {
             String key = entry.getKey();
             CalendarHierarchy value = entry.getValue();
 
-            Log.v(TAG, "  " + key + " " + value.getDescription());
+            MyLog.v("  " + key + " " + value.getDescription());
 
             Region region = new Region();
             region.parentPath = path;

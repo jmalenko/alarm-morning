@@ -28,7 +28,6 @@ import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -60,8 +59,6 @@ import static cz.jaro.alarmmorning.GlobalManager.PERSIST_ALARM_ID;
 import static cz.jaro.alarmmorning.GlobalManager.PERSIST_ALARM_TYPE;
 
 public class AlarmMorningActivity extends AppCompatActivity {
-
-    private static final String TAG = GlobalManager.createLogTag(AlarmMorningActivity.class);
 
     public static final String ACTION_ALARM_SET = "ALARM_SET";
     public static final String ACTION_DISMISS_BEFORE_RINGING = "DISMISS_BEFORE_RINGING";
@@ -235,7 +232,7 @@ public class AlarmMorningActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.v(TAG, "onCreate()");
+        MyLog.v("onCreate()");
         super.onCreate(savedInstanceState);
 
         // Possibly run the wizard
@@ -252,7 +249,7 @@ public class AlarmMorningActivity extends AppCompatActivity {
         FirebaseAnalytics mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         Bundle payload = new Bundle();
-        payload.putString(FirebaseAnalytics.Param.VALUE, TAG);
+        payload.putString(FirebaseAnalytics.Param.SOURCE, AlarmMorningActivity.class.getName());
         mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.APP_OPEN, payload);
 
         setContentView(R.layout.activity_calendar);
@@ -329,7 +326,7 @@ public class AlarmMorningActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.v(TAG, "onActivityResult(requestCode=" + requestCode + ", resultCode=" + resultCode + ")");
+        MyLog.v("onActivityResult(requestCode=" + requestCode + ", resultCode=" + resultCode + ")");
         if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_CODE_WIZARD) {
             if (mFragment instanceof CalendarFragment) {
                 CalendarFragment calendarFragment = (CalendarFragment) mFragment;
@@ -340,7 +337,7 @@ public class AlarmMorningActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        Log.v(TAG, "onResume()");
+        MyLog.v("onResume()");
         super.onResume();
 
         // Redirect to ring activity if ringing
@@ -593,16 +590,16 @@ public class AlarmMorningActivity extends AppCompatActivity {
         try {
             Intent rateIntent = rateIntentForUrl("market://details?id=");
             startActivity(rateIntent);
-            Log.d(TAG, "Started rating in Google Play app");
+            MyLog.d("Started rating in Google Play app");
         } catch (ActivityNotFoundException e) {
             try {
                 Intent rateIntent = rateIntentForUrl("amzn://apps/android?p=");
                 startActivity(rateIntent);
-                Log.d(TAG, "Started rating in Amazon app");
+                MyLog.d("Started rating in Amazon app");
             } catch (ActivityNotFoundException e2) {
                 Intent rateIntent = rateIntentForUrl("https://play.google.com/store/apps/details?id=");
                 startActivity(rateIntent);
-                Log.d(TAG, "Started rating in Google Play website");
+                MyLog.d("Started rating in Google Play website");
             }
         }
     }

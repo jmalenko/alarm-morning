@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.os.Looper;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,8 +17,8 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
 
-import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.Localization;
+import cz.jaro.alarmmorning.MyLog;
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.holiday.HolidayAdapter;
 import cz.jaro.alarmmorning.holiday.HolidayHelper;
@@ -39,8 +38,6 @@ import de.galgtonold.jollydayandroid.Holiday;
  * Realized as three spinners (only the relevant are visible) and and text with list of nearest holidays.
  */
 public class HolidaySelector extends LinearLayout implements AdapterView.OnItemSelectedListener, RegionDetector.OnRegionChangeListener {
-
-    private static final String TAG = GlobalManager.createLogTag(HolidaySelector.class);
 
     private final LinearLayout recommendation;
     private final LinearLayout recommendationContainer;
@@ -106,7 +103,7 @@ public class HolidaySelector extends LinearLayout implements AdapterView.OnItemS
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         int spinnerId = parent == spinner1 ? 1 : (parent == spinner2 ? 2 : 3);
-        Log.v(TAG, "onItemSelected(spinnerId=" + spinnerId + ")");
+        MyLog.v("onItemSelected(spinnerId=" + spinnerId + ")");
 
         // Hack for problem: an undesirable onItemSelected() is triggered whilst the Spinner is initializing. This means that code which is intended to
         // execute ONLY when a user physically makes a selection is prematurely executed.
@@ -129,13 +126,13 @@ public class HolidaySelector extends LinearLayout implements AdapterView.OnItemS
     }
 
     private void updateView(String path) {
-        Log.d(TAG, "updateView(path=" + path + ")");
+        MyLog.d("updateView(path=" + path + ")");
 
         HolidayHelper holidayHelper = HolidayHelper.getInstance();
         int pathLength = holidayHelper.pathLength(path);
         boolean hasSubregions = holidayHelper.hasSubregions(path);
 
-        Log.v(TAG, "pathLength=" + pathLength + ", hasSubregions=" + hasSubregions);
+        MyLog.v("pathLength=" + pathLength + ", hasSubregions=" + hasSubregions);
 
         for (int level = 1; level <= 3; level++) {
             HolidayAdapter adapter;
@@ -205,7 +202,7 @@ public class HolidaySelector extends LinearLayout implements AdapterView.OnItemS
     }
 
     private void updateListOfHolidays(String path) {
-        Log.v(TAG, "updateListOfHolidays(path=" + path + ")");
+        MyLog.v("updateListOfHolidays(path=" + path + ")");
 
         Resources res = getContext().getResources();
 
@@ -294,7 +291,7 @@ public class HolidaySelector extends LinearLayout implements AdapterView.OnItemS
 
     @Override
     public boolean onRegionChange(RegionDetector regionDetector, String countryCode, Object region) {
-        Log.d(TAG, "onRegionChange(regionDetector=" + regionDetector.getClass().getSimpleName() + ", countryCode=" + countryCode + ")");
+        MyLog.d("onRegionChange(regionDetector=" + regionDetector.getClass().getSimpleName() + ", countryCode=" + countryCode + ")");
 
         // Smart fix of country codes
         if (countryCode.equals("GB"))
@@ -328,7 +325,7 @@ public class HolidaySelector extends LinearLayout implements AdapterView.OnItemS
                 });
 
                 int index = findTargetIndex(quality);
-                Log.v(TAG, "Adding " + finalCountryCode + " at index " + index);
+                MyLog.v("Adding " + finalCountryCode + " at index " + index);
                 recommendationContainer.addView(button, index);
 
                 // Show...
@@ -352,7 +349,7 @@ public class HolidaySelector extends LinearLayout implements AdapterView.OnItemS
                 recommendationContainer.removeView(button);
 
                 int index = findTargetIndex(quality);
-                Log.v(TAG, "Moving " + finalCountryCode + " to index " + index);
+                MyLog.v("Moving " + finalCountryCode + " to index " + index);
                 recommendationContainer.addView(button, index);
             }
         });

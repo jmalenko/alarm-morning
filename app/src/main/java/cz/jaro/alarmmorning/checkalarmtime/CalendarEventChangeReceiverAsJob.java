@@ -10,19 +10,16 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.CalendarContract;
-import android.util.Log;
 
-import cz.jaro.alarmmorning.GlobalManager;
+import cz.jaro.alarmmorning.MyLog;
 
 @TargetApi(Build.VERSION_CODES.N)
 public class CalendarEventChangeReceiverAsJob extends JobService {
 
-    private static final String TAG = GlobalManager.createLogTag(CalendarEventChangeReceiverAsJob.class);
-
     private static final int JOB_ID = 100;
 
     static void schedule(Context context) {
-        Log.v(TAG, "schedule()");
+        MyLog.v("schedule()");
 
         final Uri CALENDAR_URI = Uri.parse("content://" + CalendarContract.AUTHORITY + "/");
 
@@ -36,7 +33,7 @@ public class CalendarEventChangeReceiverAsJob extends JobService {
 
     @Override
     public boolean onStartJob(JobParameters params) {
-        Log.v(TAG, "onStartJob(...)");
+        MyLog.v("onStartJob(...)");
 
         // Reschedule to receive future changes
         schedule(this);
@@ -50,7 +47,7 @@ public class CalendarEventChangeReceiverAsJob extends JobService {
 
     @Override
     synchronized public boolean onStopJob(JobParameters params) {
-        Log.v(TAG, "onStopJob(...)");
+        MyLog.v("onStopJob(...)");
         return false;
     }
 }

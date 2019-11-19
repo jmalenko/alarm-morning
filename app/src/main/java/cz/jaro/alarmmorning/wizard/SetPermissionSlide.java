@@ -2,20 +2,18 @@ package cz.jaro.alarmmorning.wizard;
 
 import android.os.Bundle;
 import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
-import cz.jaro.alarmmorning.GlobalManager;
+
+import cz.jaro.alarmmorning.MyLog;
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.nighttimebell.CustomAlarmTone;
 
 public class SetPermissionSlide extends BaseFragment {
-
-    private static final String TAG = GlobalManager.createLogTag(SetPermissionSlide.class);
 
     @Nullable
     @Override
@@ -30,7 +28,7 @@ public class SetPermissionSlide extends BaseFragment {
 
     @Override
     public void onSlideDeselected() {
-        Log.i(TAG, "Installing files");
+        MyLog.i("Installing files");
         CustomAlarmTone customAlarmTone = new CustomAlarmTone(getContext());
         customAlarmTone.install();
 

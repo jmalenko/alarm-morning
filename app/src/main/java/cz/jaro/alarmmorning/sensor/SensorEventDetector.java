@@ -5,11 +5,10 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.util.Log;
 
 import java.util.Arrays;
 
-import cz.jaro.alarmmorning.GlobalManager;
+import cz.jaro.alarmmorning.MyLog;
 import cz.jaro.alarmmorning.RingInterface;
 import cz.jaro.alarmmorning.SettingsActivity;
 import cz.jaro.alarmmorning.SharedPreferencesHelper;
@@ -18,8 +17,6 @@ import cz.jaro.alarmmorning.SharedPreferencesHelper;
  * SensorEventDetector implements sensor handling. Contains common features of all sensors.
  */
 public abstract class SensorEventDetector implements SensorEventListener {
-
-    private static final String TAG = GlobalManager.createLogTag(SensorEventDetector.class);
 
     private final RingInterface ringInterface;
     private final String name;
@@ -45,7 +42,7 @@ public abstract class SensorEventDetector implements SensorEventListener {
      * @return true if the detector started properly
      */
     public boolean start() {
-        Log.v(TAG, "start()");
+        MyLog.v("start()");
 
         isUsed = use();
         if (isUsed) {
@@ -55,21 +52,21 @@ public abstract class SensorEventDetector implements SensorEventListener {
 
             isAvailable = mSensor != null;
             if (isAvailable) {
-                Log.i(TAG, "Sensor " + name + " is used");
+                MyLog.i("Sensor " + name + " is used");
                 mSensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
                 isFiringSet = false;
                 return true;
             } else {
-                Log.d(TAG, "Sensor " + name + " is not available");
+                MyLog.d("Sensor " + name + " is not available");
             }
         } else {
-            Log.d(TAG, "Sensor " + name + " is not used");
+            MyLog.d("Sensor " + name + " is not used");
         }
         return false;
     }
 
     public void stop() {
-        Log.v(TAG, "stop()");
+        MyLog.v("stop()");
 
         if (isUsed && isAvailable) {
             isUsed = false;
@@ -79,7 +76,7 @@ public abstract class SensorEventDetector implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        Log.v(TAG, "onSensorChanged(event.values=" + Arrays.toString(event.values) + ") sensor=" + name);
+        MyLog.v("onSensorChanged(event.values=" + Arrays.toString(event.values) + ") sensor=" + name);
 
         if (isAccurate(event.accuracy)) {
             boolean isFiringNew = isFiring(event);
@@ -93,7 +90,7 @@ public abstract class SensorEventDetector implements SensorEventListener {
             isFiring = isFiringNew;
             isFiringSet = true;
         } else {
-            Log.d(TAG, "Ignoring because sensor " + name + " is not accurate");
+            MyLog.d("Ignoring because sensor " + name + " is not accurate");
         }
     }
 
@@ -107,19 +104,19 @@ public abstract class SensorEventDetector implements SensorEventListener {
     }
 
     private String getActionFromPreference() {
-        Log.v(TAG, "getActionFromPreference()");
+        MyLog.v("getActionFromPreference()");
         return (String) SharedPreferencesHelper.load(preferenceName, SettingsActivity.PREF_ACTION_DEFAULT);
     }
 
     private boolean use() {
-        Log.v(TAG, "use()");
+        MyLog.v("use()");
         String action = getActionFromPreference();
 
         return !action.equals(SettingsActivity.PREF_ACTION_NOTHING);
     }
 
     private void onFire() {
-        Log.v(TAG, "onFire()");
+        MyLog.v("onFire()");
 
         String action = getActionFromPreference();
 

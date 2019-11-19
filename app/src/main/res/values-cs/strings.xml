@@ -76,7 +76,7 @@
     <string name="wizard_set_permissions_explanation"><![CDATA[
 <p>Budík poskytuje nejlepší uživatelský zážitek s následujícími oprávněními:</p>
 <p><b>READ_CALENDAR</b> – pro čtení událostí v kalendáři (informace o následující schůzce je zobrazena když budík zvoní)</p>
-<p><b>WRITE_EXTERNAL_STORAGE</b> – pro instalaci nového zvuku (přednastavený zvuk “Kostelní zvon” zní při večerce)</p>
+<p><b>WRITE_EXTERNAL_STORAGE</b> – pro instalaci nového zvuku (přednastavený zvuk “Kostelní zvon” zní při večerce) a log soubor</p>
 <p><b>ACCESS_FINE_LOCATION</b> – pro zjištění polohy (podle polohy se určí svátky platné ve vaší zemi)</p>
 <p><b>INTERNET</b> – pro použití sítě (aktualizace seznamu svátků)</p>
 <p><b>CAMERA</b> – pro blikání blesem při zvonění</p>

@@ -6,13 +6,14 @@ import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.format.DateFormat;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TimePicker;
+
+import androidx.annotation.Nullable;
 
 import com.ibm.icu.util.Calendar;
 
@@ -21,9 +22,9 @@ import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import androidx.annotation.Nullable;
 import cz.jaro.alarmmorning.Analytics;
 import cz.jaro.alarmmorning.GlobalManager;
+import cz.jaro.alarmmorning.MyLog;
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.SettingsActivity;
 import cz.jaro.alarmmorning.calendar.CalendarEvent;
@@ -54,8 +55,6 @@ import static cz.jaro.alarmmorning.calendar.CalendarUtils.endOfToday;
  * Alternatives to concider: Get all alarms saved in the alarm application.
  */
 public class SetTimeSlide extends BaseFragment implements TimePicker.OnTimeChangedListener {
-
-    private static final String TAG = GlobalManager.createLogTag(SetTimeSlide.class);
 
     private int hourOfDay;
     private int minute;
@@ -104,7 +103,7 @@ public class SetTimeSlide extends BaseFragment implements TimePicker.OnTimeChang
         } else {
             presetTimeFromConstants();
         }
-        Log.v(TAG, "Preset time " + hourOfDay + ":" + minute);
+        MyLog.v("Preset time " + hourOfDay + ":" + minute);
     }
 
     private boolean presetTimeFromDefaults() {
@@ -171,7 +170,7 @@ public class SetTimeSlide extends BaseFragment implements TimePicker.OnTimeChang
             int minute = RelativeTimePreference.valueToMinute(time);
             str.append(hour).append(":").append(minute);
         }
-        Log.d(TAG, message + ": " + str);
+        MyLog.d(message + ": " + str);
     }
 
     private boolean presetTimeFromSystemAlarmClock() {

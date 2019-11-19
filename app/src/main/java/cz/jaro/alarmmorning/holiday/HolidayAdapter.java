@@ -2,12 +2,11 @@ package cz.jaro.alarmmorning.holiday;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.util.Log;
 import android.widget.ArrayAdapter;
 
 import java.util.List;
 
-import cz.jaro.alarmmorning.GlobalManager;
+import cz.jaro.alarmmorning.MyLog;
 import cz.jaro.alarmmorning.R;
 
 
@@ -15,8 +14,6 @@ import cz.jaro.alarmmorning.R;
  * An adapter to show the "none" item and a list of countries (that matches an enum).
  */
 public class HolidayAdapter extends ArrayAdapter<String> {
-
-    private static final String TAG = GlobalManager.createLogTag(HolidayAdapter.class);
 
     private String parentPath;
 
@@ -46,7 +43,7 @@ public class HolidayAdapter extends ArrayAdapter<String> {
     }
 
     public String positionToPreferenceString(int position) {
-        Log.v(TAG, "positionToPreferenceString(position=" + position + ")");
+        MyLog.v("positionToPreferenceString(position=" + position + ")");
         String preferenceString;
         if (position == 0) {
             preferenceString = parentPath;
@@ -55,7 +52,7 @@ public class HolidayAdapter extends ArrayAdapter<String> {
             Region region = regions.get(position - 1);
             preferenceString = region.getFullPath();
         }
-        Log.v(TAG, "positionToPreferenceString=" + preferenceString);
+        MyLog.v("positionToPreferenceString=" + preferenceString);
         return preferenceString;
     }
 

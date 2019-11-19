@@ -3,16 +3,17 @@ package cz.jaro.alarmmorning.checkalarmtime;
 import android.content.Context;
 import android.os.Bundle;
 import android.text.format.DateFormat;
-import android.util.Log;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import java.util.Calendar;
 
-import androidx.appcompat.app.AppCompatActivity;
 import cz.jaro.alarmmorning.Analytics;
 import cz.jaro.alarmmorning.CalendarFragment;
 import cz.jaro.alarmmorning.GlobalManager;
+import cz.jaro.alarmmorning.MyLog;
 import cz.jaro.alarmmorning.SharedPreferencesHelper;
 import cz.jaro.alarmmorning.calendar.CalendarUtils;
 import cz.jaro.alarmmorning.graphics.TimePickerDialogWithDisable;
@@ -29,15 +30,13 @@ import static cz.jaro.alarmmorning.model.Day.VALUE_UNSET;
  */
 public class SetTimeActivity extends AppCompatActivity implements TimePickerDialogWithDisable.OnTimeSetWithDisableListener {
 
-    private static final String TAG = GlobalManager.createLogTag(SetTimeActivity.class);
-
     private static final String ALARM_TIME = "ALARM_TIME";
 
     private Calendar newAlarmTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.v(TAG, "onCreate()");
+        MyLog.v("onCreate()");
         super.onCreate(savedInstanceState);
 
         // Read parameters from extra
@@ -57,7 +56,7 @@ public class SetTimeActivity extends AppCompatActivity implements TimePickerDial
 
     @Override
     protected void onResume() {
-        Log.v(TAG, "onResume()");
+        MyLog.v("onResume()");
         super.onResume();
 
         int hourOfDay = newAlarmTime.get(Calendar.HOUR_OF_DAY);
@@ -71,7 +70,7 @@ public class SetTimeActivity extends AppCompatActivity implements TimePickerDial
     @Override
     public void onTimeSetWithDisable(TimePicker view, boolean disable, int hourOfDay, int minute) {
         if (view.isShown()) {
-            Log.v(TAG, "onTimeSetWithDisable()");
+            MyLog.v("onTimeSetWithDisable()");
             Analytics analytics = new Analytics().set(Analytics.Param.Check_alarm_time_method, CHECK_ALARM_TIME_METHOD__DIALOG);
             analytics.setChannel(Analytics.Channel.Notification);
             analytics.setChannelName(Analytics.ChannelName.Check_alarm_time);
@@ -127,7 +126,7 @@ public class SetTimeActivity extends AppCompatActivity implements TimePickerDial
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
-        Log.v(TAG, "onSaveInstanceState()");
+        MyLog.v("onSaveInstanceState()");
         super.onSaveInstanceState(savedInstanceState);
 
         savedInstanceState.putSerializable(ALARM_TIME, newAlarmTime);

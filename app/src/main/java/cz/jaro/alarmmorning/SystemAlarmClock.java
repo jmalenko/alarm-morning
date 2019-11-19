@@ -6,7 +6,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import android.util.Log;
 
 import java.util.Calendar;
 
@@ -18,8 +17,6 @@ import cz.jaro.alarmmorning.receivers.VoidReceiver;
  * The SystemAlarmClock handles the Android Alarm Clock features.
  */
 public class SystemAlarmClock {
-
-    private static final String TAG = GlobalManager.createLogTag(SystemAlarmClock.class);
 
     private static final int REQUEST_CODE_INTENT_ACTION = 1;
     private static final int REQUEST_CODE_INTENT_SHOW = 2;
@@ -47,25 +44,25 @@ public class SystemAlarmClock {
      */
 
     void onAlarmSet() {
-        Log.d(TAG, "onAlarmSet()");
+        MyLog.d("onAlarmSet()");
 
         reset();
     }
 
     void onDismissBeforeRinging() {
-        Log.d(TAG, "onDismissBeforeRinging()");
+        MyLog.d("onDismissBeforeRinging()");
 
         reset();
     }
 
     void onRing() {
-        Log.d(TAG, "onRing()");
+        MyLog.d("onRing()");
 
         reset();
     }
 
     void onAlarmCancel() {
-        Log.d(TAG, "onAlarmCancel()");
+        MyLog.d("onAlarmCancel()");
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             cancel();
@@ -78,7 +75,7 @@ public class SystemAlarmClock {
      */
 
     private void reset() {
-        Log.v(TAG, "reset()");
+        MyLog.v("reset()");
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             cancel();
@@ -87,12 +84,12 @@ public class SystemAlarmClock {
 
             print();
         } else {
-            Log.d(TAG, "The system alarm clock is not supported on this Android version");
+            MyLog.d("The system alarm clock is not supported on this Android version");
         }
     }
 
     private void cancel() {
-        Log.v(TAG, "cancel()");
+        MyLog.v("cancel()");
 
         Intent intent = new Intent(context, VoidReceiver.class);
         PendingIntent operation = PendingIntent.getBroadcast(context, REQUEST_CODE_INTENT_ACTION, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -102,7 +99,7 @@ public class SystemAlarmClock {
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     private void register() {
-        Log.v(TAG, "register()");
+        MyLog.v("register()");
 
         GlobalManager globalManager = GlobalManager.getInstance();
         AppAlarm nextAlarm = globalManager.getNextAlarm();
@@ -119,7 +116,7 @@ public class SystemAlarmClock {
             AlarmManager.AlarmClockInfo alarmClockInfo = new AlarmManager.AlarmClockInfo(alarmTime.getTimeInMillis(), showOperation);
             alarmManager.setAlarmClock(alarmClockInfo, operation);
         } else {
-            Log.v(TAG, "   no next alarm");
+            MyLog.v("   no next alarm");
         }
     }
 
@@ -127,10 +124,10 @@ public class SystemAlarmClock {
     private void print() {
         AlarmManager.AlarmClockInfo alarmClockInfo = alarmManager.getNextAlarmClock();
         if (alarmClockInfo == null) {
-            Log.v(TAG, "   system alarm clock is not set");
+            MyLog.v("   system alarm clock is not set");
         } else {
             Calendar t = CalendarUtils.newGregorianCalendar(alarmClockInfo.getTriggerTime());
-            Log.v(TAG, "   system alarm clock is at " + t.getTime());
+            MyLog.v("   system alarm clock is at " + t.getTime());
         }
     }
 }

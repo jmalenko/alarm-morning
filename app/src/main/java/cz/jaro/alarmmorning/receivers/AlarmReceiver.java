@@ -3,9 +3,8 @@ package cz.jaro.alarmmorning.receivers;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
-import cz.jaro.alarmmorning.GlobalManager;
+import cz.jaro.alarmmorning.MyLog;
 import cz.jaro.alarmmorning.RingActivity;
 import cz.jaro.alarmmorning.SystemAlarm;
 import cz.jaro.alarmmorning.WakeLocker;
@@ -14,8 +13,6 @@ import cz.jaro.alarmmorning.WakeLocker;
  * This receiver is called on the system alarm.
  */
 public class AlarmReceiver extends BroadcastReceiver {
-
-    private static final String TAG = GlobalManager.createLogTag(AlarmReceiver.class);
 
     /**
      * The wake lock must be received when the used ends the RingActivity. That is done in {@link RingActivity#stopAll()}
@@ -29,7 +26,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         // Prevent device sleep
         WakeLocker.acquire(context);
 
-        Log.v(TAG, "onReceive()");
+        MyLog.v("onReceive()");
 
         SystemAlarm systemAlarm = SystemAlarm.getInstance(context);
         systemAlarm.onSystemAlarm(intent);

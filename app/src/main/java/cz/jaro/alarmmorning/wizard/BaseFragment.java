@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,22 +11,21 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import com.github.paolorotolo.appintro.ISlideBackgroundColorHolder;
-import com.github.paolorotolo.appintro.ISlideSelectionListener;
-
 import androidx.annotation.ColorInt;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import cz.jaro.alarmmorning.GlobalManager;
+
+import com.github.paolorotolo.appintro.ISlideBackgroundColorHolder;
+import com.github.paolorotolo.appintro.ISlideSelectionListener;
+
+import cz.jaro.alarmmorning.MyLog;
 import cz.jaro.alarmmorning.R;
 
 /**
  * Parent fragment for all fragments in the {@link Wizard}.
  */
 public abstract class BaseFragment extends Fragment implements ISlideSelectionListener, ISlideBackgroundColorHolder {
-
-    private static final String TAG = GlobalManager.createLogTag(BaseFragment.class);
 
     private LinearLayout mainLayout;
 
@@ -117,12 +115,12 @@ public abstract class BaseFragment extends Fragment implements ISlideSelectionLi
 
     @Override
     public void onSlideDeselected() {
-        Log.d(TAG, String.format("Slide %s has been deselected.", getTitle()));
+        MyLog.d(String.format("Slide %s has been deselected.", getTitle()));
     }
 
     @Override
     public void onSlideSelected() {
-        Log.d(TAG, String.format("Slide %s has been selected.", getTitle()));
+        MyLog.d(String.format("Slide %s has been selected.", getTitle()));
     }
 
     @Override

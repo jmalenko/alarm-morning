@@ -3,11 +3,11 @@ package cz.jaro.alarmmorning.receivers;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import cz.jaro.alarmmorning.AlarmMorningActivity;
 import cz.jaro.alarmmorning.Analytics;
 import cz.jaro.alarmmorning.GlobalManager;
+import cz.jaro.alarmmorning.MyLog;
 import cz.jaro.alarmmorning.RingActivity;
 import cz.jaro.alarmmorning.model.AppAlarm;
 
@@ -18,8 +18,6 @@ import static cz.jaro.alarmmorning.GlobalManager.PERSIST_ALARM_TYPE;
  * This receiver handles the actions with the notification.
  */
 public class NotificationReceiver extends BroadcastReceiver {
-
-    private static final String TAG = GlobalManager.createLogTag(NotificationReceiver.class);
 
     public static final String ACTION_CLICK_NOTIFICATION = "cz.jaro.alarmmorning.intent.action.CLICK_NOTIFICATION";
     public static final String ACTION_DELETE_NOTIFICATION = "cz.jaro.alarmmorning.intent.action.DELETE_NOTIFICATION";
@@ -35,7 +33,7 @@ public class NotificationReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
 
-        Log.v(TAG, "onReceive() action=" + action);
+        MyLog.v("onReceive() action=" + action);
 
         AppAlarm appAlarm = null;
         GlobalManager globalManager = GlobalManager.getInstance();
@@ -75,7 +73,7 @@ public class NotificationReceiver extends BroadcastReceiver {
                 break;
             }
             case ACTION_DISMISS_BEFORE_RINGING: {
-                Log.i(TAG, "Dismiss");
+                MyLog.i("Dismiss");
 
                 Analytics analytics = new Analytics(Analytics.Channel.Notification, Analytics.ChannelName.Alarm);
 
@@ -83,7 +81,7 @@ public class NotificationReceiver extends BroadcastReceiver {
                 break;
             }
             case ACTION_DISMISS: {
-                Log.i(TAG, "Dismiss");
+                MyLog.i("Dismiss");
 
                 Analytics analytics = new Analytics(Analytics.Channel.Notification, Analytics.ChannelName.Alarm);
 
@@ -91,7 +89,7 @@ public class NotificationReceiver extends BroadcastReceiver {
                 break;
             }
             case ACTION_SNOOZE: {
-                Log.i(TAG, "Snooze");
+                MyLog.i("Snooze");
 
                 Analytics analytics = new Analytics(Analytics.Channel.Notification, Analytics.ChannelName.Alarm);
 
@@ -102,8 +100,8 @@ public class NotificationReceiver extends BroadcastReceiver {
     }
 
     private void deleteNotification() {
-        Log.v(TAG, "deleteNotification()");
-        Log.i(TAG, "Delete notification");
+        MyLog.v("deleteNotification()");
+        MyLog.i("Delete notification");
     }
 
 }

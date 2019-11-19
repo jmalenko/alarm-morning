@@ -1,21 +1,17 @@
 package cz.jaro.alarmmorning.holiday.regiondetector;
 
-import android.util.Log;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import cz.jaro.alarmmorning.GlobalManager;
+import cz.jaro.alarmmorning.MyLog;
 
 /**
  * Helper class for URLs.
  */
 public class URLHelper {
-
-    private static final String TAG = GlobalManager.createLogTag(URLHelper.class);
 
     /**
      * Tests whether an URL exists.
@@ -61,7 +57,7 @@ public class URLHelper {
             }
             in.close();
         } catch (IOException e) {
-            Log.w(TAG, "Cannot read stream", e);
+            MyLog.w("Cannot read stream", e);
             throw e;
         } finally {
             if (urlConnection != null) {
@@ -69,7 +65,7 @@ public class URLHelper {
             }
         }
 
-        Log.v(TAG, "The URL " + URLString + " returned content: " + res);
+        MyLog.v("The URL " + URLString + " returned content: " + res);
         return res.toString();
     }
 

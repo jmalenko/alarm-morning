@@ -2,11 +2,10 @@ package cz.jaro.alarmmorning.sensor;
 
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
-import android.util.Log;
 
 import java.util.Arrays;
 
-import cz.jaro.alarmmorning.GlobalManager;
+import cz.jaro.alarmmorning.MyLog;
 import cz.jaro.alarmmorning.RingInterface;
 import cz.jaro.alarmmorning.SettingsActivity;
 
@@ -14,8 +13,6 @@ import cz.jaro.alarmmorning.SettingsActivity;
  * Provides detection of proximity a near object to the device.
  */
 public class Proximity extends SensorEventDetector {
-
-    private static final String TAG = GlobalManager.createLogTag(Proximity.class);
 
     public static final double DIFF_MIN = 0.5;
 
@@ -27,7 +24,7 @@ public class Proximity extends SensorEventDetector {
     }
 
     protected boolean isFiring(SensorEvent event) {
-        Log.v(TAG, "isFiring(values=" + Arrays.toString(event.values) + ")");
+        MyLog.v("isFiring(values=" + Arrays.toString(event.values) + ")");
 
         float distance = event.values[0];
 

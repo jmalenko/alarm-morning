@@ -8,13 +8,12 @@ import android.content.res.AssetFileDescriptor;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.util.Log;
 import android.widget.Toast;
 
 import java.util.Calendar;
 
 import cz.jaro.alarmmorning.Analytics;
-import cz.jaro.alarmmorning.GlobalManager;
+import cz.jaro.alarmmorning.MyLog;
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.SettingsActivity;
 import cz.jaro.alarmmorning.SharedPreferencesHelper;
@@ -26,8 +25,6 @@ import cz.jaro.alarmmorning.checkalarmtime.CheckAlarmTime;
  * people about the time.
  */
 public class NighttimeBell {
-
-    private static final String TAG = GlobalManager.createLogTag(NighttimeBell.class);
 
     private static NighttimeBell instance;
 
@@ -54,13 +51,13 @@ public class NighttimeBell {
     }
 
     public boolean isEnabled() {
-        Log.v(TAG, "isEnabled()");
+        MyLog.v("isEnabled()");
 
         return (boolean) SharedPreferencesHelper.load(SettingsActivity.PREF_NIGHTTIME_BELL, SettingsActivity.PREF_NIGHTTIME_BELL_DEFAULT);
     }
 
     public void checkAndRegister() {
-        Log.v(TAG, "checkAndRegister()");
+        MyLog.v("checkAndRegister()");
 
         if (isEnabled()) {
             register();
@@ -68,7 +65,7 @@ public class NighttimeBell {
     }
 
     public void register() {
-        Log.d(TAG, "register()");
+        MyLog.d("register()");
 
         String nighttimeBellAtPreference = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_NIGHTTIME_BELL_AT, SettingsActivity.PREF_NIGHTTIME_BELL_AT_DEFAULT);
 
@@ -76,12 +73,12 @@ public class NighttimeBell {
     }
 
     private void register(String stringValue) {
-        Log.d(TAG, "register(stringValue=)" + stringValue);
+        MyLog.d("register(stringValue=)" + stringValue);
 
         Calendar playNighttimeBellAt = CheckAlarmTime.calcNextOccurence(stringValue);
 
         String action = ACTION_PLAY;
-        Log.i(TAG, "Setting system alarm at " + playNighttimeBellAt.getTime().toString() + " with action " + action);
+        MyLog.i("Setting system alarm at " + playNighttimeBellAt.getTime().toString() + " with action " + action);
 
         Intent intent = new Intent(context, NighttimeBellAlarmReceiver.class);
         intent.setAction(action);
@@ -92,15 +89,15 @@ public class NighttimeBell {
     }
 
     public void unregister() {
-        Log.d(TAG, "unregister()");
+        MyLog.d("unregister()");
 
         if (operation != null) {
             // Method 1: standard
-            Log.d(TAG, "Cancelling current system alarm");
+            MyLog.d("Cancelling current system alarm");
             operation.cancel();
         } else {
             // Method 2: try to recreate the operation
-            Log.d(TAG, "Recreating operation when cancelling system alarm");
+            MyLog.d("Recreating operation when cancelling system alarm");
 
             Intent intent2 = new Intent(context, NighttimeBellAlarmReceiver.class);
             intent2.setAction(ACTION_PLAY);
@@ -116,7 +113,7 @@ public class NighttimeBell {
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
 
-        Log.i(TAG, "Acting on CheckAlarmTime. action=" + action);
+        MyLog.i("Acting on CheckAlarmTime. action=" + action);
 
         if (action.equals(ACTION_PLAY)) {
             // The condition is needed for cases we are unable to unregister a system alarm.
@@ -129,7 +126,7 @@ public class NighttimeBell {
     }
 
     private void onPlay(Context context) {
-        Log.d(TAG, "onPlay()");
+        MyLog.d("onPlay()");
         new Analytics(context, Analytics.Event.Play_nighttime_bell, Analytics.Channel.Time, Analytics.ChannelName.Nighttime_bell).save();
 
         // Register for tomorrow
@@ -156,14 +153,14 @@ public class NighttimeBell {
             }
 
             mediaPlayer.setOnCompletionListener(mp -> {
-                Log.d(TAG, "onCompletion");
+                MyLog.d("onCompletion");
                 mp.release();
             });
             mediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
             mediaPlayer.prepare();
             mediaPlayer.start();
         } catch (Exception e) {
-            Log.e(TAG, "Unable to play nighttime bell ringtone as media", e);
+            MyLog.e("Unable to play nighttime bell ringtone as media", e);
         }
     }
 

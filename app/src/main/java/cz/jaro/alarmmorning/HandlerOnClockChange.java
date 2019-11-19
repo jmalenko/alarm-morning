@@ -2,7 +2,6 @@ package cz.jaro.alarmmorning;
 
 
 import android.os.Handler;
-import android.util.Log;
 
 import java.util.Calendar;
 
@@ -24,14 +23,12 @@ import static cz.jaro.alarmmorning.calendar.CalendarUtils.subField;
  */
 public class HandlerOnClockChange extends Handler {
 
-    private static final String TAG = GlobalManager.createLogTag(HandlerOnClockChange.class);
-
     private Integer unit;
 
     private Runnable runnable;
 
     private final Runnable runnableOnClockChange = () -> {
-        Log.d(TAG, "Clock (and time unit) changed");
+        MyLog.d("Clock (and time unit) changed");
 
         registerNextClockChange();
 
@@ -177,7 +174,7 @@ public class HandlerOnClockChange extends Handler {
      * Stop running the Runnable on the change of clock.
      */
     public void stop() {
-        Log.d(TAG, "Stopping");
+        MyLog.d("Stopping");
         removeCallbacks(runnableOnClockChange);
         isRunning = false;
     }
@@ -190,14 +187,14 @@ public class HandlerOnClockChange extends Handler {
     private boolean registerNextClockChange() {
         Calendar now = now();
 
-        Log.v(TAG, "                Now is " + now.getTime() + ". In ms " + now.getTimeInMillis() + ".");
+        MyLog.v("                Now is " + now.getTime() + ". In ms " + now.getTimeInMillis() + ".");
 
         Calendar cal = calcNextClockChange(now);
 
-        Log.v(TAG, "Register next event at " + cal.getTime() + ". In ms " + cal.getTimeInMillis() + ".");
+        MyLog.v("Register next event at " + cal.getTime() + ". In ms " + cal.getTimeInMillis() + ".");
 
         long delta = cal.getTimeInMillis() - now.getTimeInMillis();
-        Log.v(TAG, "                                               Delta is ms " + String.format("%13d", delta));
+        MyLog.v("                                               Delta is ms " + String.format("%13d", delta));
 
         return postDelayed(runnableOnClockChange, delta);
     }

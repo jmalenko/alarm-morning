@@ -7,19 +7,16 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.util.Log;
 
 import java.util.List;
 import java.util.Locale;
 
-import cz.jaro.alarmmorning.GlobalManager;
+import cz.jaro.alarmmorning.MyLog;
 
 /**
  * Detects the region from Location Provider.
  */
 public class LocationProviderRegionDetector extends RegionDetector {
-
-    private static final String TAG = GlobalManager.createLogTag(LocationProviderRegionDetector.class);
 
     private final String provider;
 
@@ -33,20 +30,20 @@ public class LocationProviderRegionDetector extends RegionDetector {
 
         LocationListener locationListener = new LocationListener() {
             public void onLocationChanged(Location location) {
-                Log.v(TAG, "onLocationChanged()");
+                MyLog.v("onLocationChanged()");
                 useNewLocation(location);
             }
 
             public void onStatusChanged(String provider, int status, Bundle extras) {
-                Log.v(TAG, "onStatusChanged()");
+                MyLog.v("onStatusChanged()");
             }
 
             public void onProviderEnabled(String provider) {
-                Log.v(TAG, "onProviderEnabled()");
+                MyLog.v("onProviderEnabled()");
             }
 
             public void onProviderDisabled(String provider) {
-                Log.v(TAG, "onProviderDisabled()");
+                MyLog.v("onProviderDisabled()");
             }
         };
 
@@ -58,9 +55,9 @@ public class LocationProviderRegionDetector extends RegionDetector {
 
             locationManager.requestLocationUpdates(provider, 0, 0, locationListener);
         } catch (SecurityException e) {
-            Log.w(TAG, "Location permission missing", e);
+            MyLog.w("Location permission missing", e);
         } catch (RuntimeException e) {
-            Log.w(TAG, e);
+            MyLog.w("Non-specific exception", e);
         }
     }
 
@@ -69,7 +66,7 @@ public class LocationProviderRegionDetector extends RegionDetector {
     }
 
     private void useNewLocation(Location location) {
-        Log.d(TAG, "useNewLocation()");
+        MyLog.d("useNewLocation()");
 
         double latitude = location.getLatitude();
         double longitude = location.getLongitude();
@@ -82,7 +79,7 @@ public class LocationProviderRegionDetector extends RegionDetector {
 
     String getCountryCode(double lat, double lng) {
         if (!Geocoder.isPresent()) {
-            Log.e(TAG, "Geocoder not present");
+            MyLog.e("Geocoder not present");
             return null;
         }
         Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
@@ -102,7 +99,7 @@ public class LocationProviderRegionDetector extends RegionDetector {
 
             return obj.getCountryCode();
         } catch (Exception e) {
-            Log.w(TAG, "Cannot get address from coordinates", e);
+            MyLog.w("Cannot get address from coordinates", e);
             return null;
         }
     }

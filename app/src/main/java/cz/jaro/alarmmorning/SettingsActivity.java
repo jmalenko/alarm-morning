@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.RingtonePreference;
 import android.text.TextUtils;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -34,8 +33,6 @@ import cz.jaro.alarmmorning.nighttimebell.NighttimeBell;
 import cz.jaro.alarmmorning.wizard.Wizard;
 
 public class SettingsActivity extends AppCompatPreferenceActivity {
-
-    private static final String TAG = GlobalManager.createLogTag(AppCompatPreferenceActivity.class);
 
     /**
      * Value is ringtone URI.
@@ -198,10 +195,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             boolean boolValue = (boolean) newValue;
             CheckAlarmTime checkAlarmTime = CheckAlarmTime.getInstance(this);
             if (boolValue) {
-                Log.i(TAG, "Starting CheckAlarmTime");
+                MyLog.i("Starting CheckAlarmTime");
                 checkAlarmTime.register();
             } else {
-                Log.i(TAG, "Stopping CheckAlarmTime");
+                MyLog.i("Stopping CheckAlarmTime");
                 checkAlarmTime.unregister();
             }
             return true;
@@ -214,10 +211,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             boolean boolValue = (boolean) newValue;
             NighttimeBell nighttimeBell = NighttimeBell.getInstance(this);
             if (boolValue) {
-                Log.i(TAG, "Starting NighttimeBell");
+                MyLog.i("Starting NighttimeBell");
                 nighttimeBell.register();
             } else {
-                Log.i(TAG, "Stopping NighttimeBell");
+                MyLog.i("Stopping NighttimeBell");
                 nighttimeBell.unregister();
             }
             return true;

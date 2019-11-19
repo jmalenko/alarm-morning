@@ -3,18 +3,15 @@ package cz.jaro.alarmmorning.receivers;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import cz.jaro.alarmmorning.AlarmMorningActivity;
 import cz.jaro.alarmmorning.Analytics;
-import cz.jaro.alarmmorning.GlobalManager;
+import cz.jaro.alarmmorning.MyLog;
 
 /**
  * The widget receiver.
  */
 public class WidgetReceiver extends AppWidgetProvider {
-
-    private static final String TAG = GlobalManager.createLogTag(WidgetReceiver.class);
 
     public static final String ACTION_WIDGET_CLICK = "cz.jaro.alarmmorning.intent.action.WIDGET_CLICK";
 
@@ -22,7 +19,7 @@ public class WidgetReceiver extends AppWidgetProvider {
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
 
-        Log.v(TAG, "onReceive() action=" + action);
+        MyLog.v("onReceive() action=" + action);
 
         if (action.equals(ACTION_WIDGET_CLICK)) {
             new Analytics(context, Analytics.Event.Click, Analytics.Channel.Widget, Analytics.ChannelName.Widget_alarm_time).save();

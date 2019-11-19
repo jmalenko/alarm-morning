@@ -1,16 +1,17 @@
 package cz.jaro.alarmmorning.wizard;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
+import androidx.annotation.Nullable;
+
 import java.util.List;
 
-import androidx.annotation.Nullable;
 import cz.jaro.alarmmorning.GlobalManager;
+import cz.jaro.alarmmorning.MyLog;
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.SettingsActivity;
 import cz.jaro.alarmmorning.graphics.HolidaySelector;
@@ -18,8 +19,6 @@ import cz.jaro.alarmmorning.holiday.HolidayHelper;
 import de.galgtonold.jollydayandroid.Holiday;
 
 public class SetHolidaySlide extends BaseFragment {
-
-    private static final String TAG = GlobalManager.createLogTag(SetHolidaySlide.class);
 
     private HolidaySelector holidaySelector;
     private LinearLayout recommendationContainer;
@@ -89,9 +88,9 @@ public class SetHolidaySlide extends BaseFragment {
         if (holidayHelper.useHoliday()) {
             List<Holiday> holidays = holidayHelper.listHolidays();
 
-            Log.d(TAG, "Holidays in " + holidayCalendarPreferenceString + " in next year");
+            MyLog.d("Holidays in " + holidayCalendarPreferenceString + " in next year");
             for (Holiday h : holidays) {
-                Log.v(TAG, "   " + h.toString());
+                MyLog.v("   " + h.toString());
             }
         }
     }

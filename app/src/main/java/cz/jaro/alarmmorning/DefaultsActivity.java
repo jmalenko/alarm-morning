@@ -4,7 +4,6 @@ import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -31,8 +30,6 @@ import cz.jaro.alarmmorning.model.AlarmDataSource;
 import cz.jaro.alarmmorning.model.Defaults;
 
 public class DefaultsActivity extends AppCompatActivity implements View.OnCreateContextMenuListener, TimePickerDialogWithDisable.OnTimeSetWithDisableListener, View.OnClickListener {
-
-    private static final String TAG = GlobalManager.createLogTag(DefaultsActivity.class);
 
     private DefaultsAdapter adapter;
     private RecyclerView recyclerView;
@@ -75,7 +72,7 @@ public class DefaultsActivity extends AppCompatActivity implements View.OnCreate
         firstDayOfWeek = c.getFirstDayOfWeek(); // ICU4J library encodes days as 1 = Sunday, ... , 7 = Saturday
         // This app uses 0 = Sunday, ... , 6 = Saturday
         firstDayOfWeek--;
-        Log.v(TAG, "First day of week is " + firstDayOfWeek);
+        MyLog.v("First day of week is " + firstDayOfWeek);
     }
 
     public Defaults loadPosition(int position) {
@@ -107,7 +104,7 @@ public class DefaultsActivity extends AppCompatActivity implements View.OnCreate
     @Override
     public void onClick(View view) {
         int position = recyclerView.getChildAdapterPosition(view);
-        Log.d(TAG, "Clicked item on position " + position);
+        MyLog.d("Clicked item on position " + position);
 
         defaults = loadPosition(position);
         showTimePicker();
@@ -167,7 +164,7 @@ public class DefaultsActivity extends AppCompatActivity implements View.OnCreate
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         int position = ((RecyclerViewWithContextMenu.RecyclerViewContextMenuInfo) menuInfo).position;
-        Log.d(TAG, "Long clicked item on position " + position);
+        MyLog.d("Long clicked item on position " + position);
 
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.default_context_menu, menu);
@@ -202,12 +199,12 @@ public class DefaultsActivity extends AppCompatActivity implements View.OnCreate
     public boolean onContextItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_default_set_time:
-                Log.d(TAG, "Set time");
+                MyLog.d("Set time");
                 showTimePicker();
                 break;
 
             case R.id.action_default_disable:
-                Log.d(TAG, "Disable");
+                MyLog.d("Disable");
                 saveThisAndOthers(true, defaults.getHour(), defaults.getMinute());
                 break;
         }

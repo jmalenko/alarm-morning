@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.AlarmClock;
-import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -16,6 +15,7 @@ import cz.jaro.alarmmorning.Analytics;
 import cz.jaro.alarmmorning.CalendarAdapter;
 import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.Localization;
+import cz.jaro.alarmmorning.MyLog;
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.calendar.CalendarUtils;
 import cz.jaro.alarmmorning.clock.Clock;
@@ -64,8 +64,6 @@ import static cz.jaro.alarmmorning.model.OneTimeAlarm.UTC;
  */
 public class SetAlarmByVoiceActivity extends AppCompatActivity {
 
-    private static final String TAG = GlobalManager.createLogTag(SetAlarmByVoiceActivity.class);
-
     private Calendar alarmTime;
 
     private boolean skip_ui;
@@ -88,7 +86,7 @@ public class SetAlarmByVoiceActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         if (intent == null) {
-            Log.w(TAG, "Intent is null");
+            MyLog.w("Intent is null");
             ok = false;
         } else if (AlarmClock.ACTION_SET_ALARM.equals(intent.getAction())) {
             skip_ui = intent.getBooleanExtra(AlarmClock.EXTRA_SKIP_UI, false);
@@ -120,7 +118,7 @@ public class SetAlarmByVoiceActivity extends AppCompatActivity {
             }
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (!isVoiceInteraction()) {
-                Log.w(TAG, "Not voice interaction");
+                MyLog.w("Not voice interaction");
                 ok = false;
             }
         }
@@ -184,12 +182,12 @@ public class SetAlarmByVoiceActivity extends AppCompatActivity {
             if (value != VALUE_UNSET) {
                 return value;
             } else {
-                Log.w(TAG, "Invalid extra value \"" + extraName + "\"");
+                MyLog.w("Invalid extra value \"" + extraName + "\"");
                 ok = false;
                 return VALUE_UNSET;
             }
         } else {
-            Log.w(TAG, "Extra missing: " + extraName);
+            MyLog.w("Extra missing: " + extraName);
             ok = false;
             return VALUE_UNSET;
         }

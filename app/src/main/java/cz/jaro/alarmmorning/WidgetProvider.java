@@ -6,7 +6,6 @@ import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
 
@@ -24,8 +23,6 @@ import static cz.jaro.alarmmorning.calendar.CalendarUtils.onTheSameDate;
  * The widget.
  */
 public class WidgetProvider extends AppWidgetProvider {
-
-    private static final String TAG = GlobalManager.createLogTag(WidgetProvider.class);
 
     /**
      * Hide the tomorrow's alarm time until it is nearer than this number of hours.
@@ -47,7 +44,7 @@ public class WidgetProvider extends AppWidgetProvider {
     }
 
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
-        Log.v(TAG, "onUpdate()");
+        MyLog.v("onUpdate()");
 
         // Perform this loop procedure for each App Widget that belongs to this provider
         for (int appWidgetId : appWidgetIds) {
@@ -61,7 +58,7 @@ public class WidgetProvider extends AppWidgetProvider {
     }
 
     public static void updateContent(Context context, RemoteViews views) {
-        Log.d(TAG, "updateContent()");
+        MyLog.d("updateContent()");
 
         // Launch activity
         Intent intent = new Intent(context, WidgetReceiver.class);
@@ -129,7 +126,7 @@ public class WidgetProvider extends AppWidgetProvider {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.v(TAG, "onReceive(intent=" + intent.getAction() + ")");
+        MyLog.v("onReceive(intent=" + intent.getAction() + ")");
 
         super.onReceive(context, intent);
 
@@ -140,7 +137,7 @@ public class WidgetProvider extends AppWidgetProvider {
     }
 
     private void onDateChange() {
-        Log.v(TAG, "onDateChange()");
+        MyLog.v("onDateChange()");
 
         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_layout);

@@ -1,11 +1,8 @@
 package cz.jaro.alarmmorning.wizard;
 
-import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.R;
 
 public class SetDoneSlide extends BaseFragment {
-
-    private static final String TAG = GlobalManager.createLogTag(SetDoneSlide.class);
 
     @Override
     protected String getTitle() {

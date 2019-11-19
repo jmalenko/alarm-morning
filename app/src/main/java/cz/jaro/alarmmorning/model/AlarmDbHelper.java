@@ -4,9 +4,8 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
-import cz.jaro.alarmmorning.GlobalManager;
+import cz.jaro.alarmmorning.MyLog;
 
 /**
  * Represent changes of the database model.
@@ -15,8 +14,6 @@ import cz.jaro.alarmmorning.GlobalManager;
  * Invariant: the database version V has applied exactly the patches 0..V.
  */
 public class AlarmDbHelper extends SQLiteOpenHelper {
-
-    private static final String TAG = GlobalManager.createLogTag(AlarmDbHelper.class);
 
     private static final String DATABASE_NAME = "alarms.db";
 
@@ -55,7 +52,7 @@ public class AlarmDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase database) {
-        Log.d(TAG, "Creating database");
+        MyLog.d("Creating database");
         for (Patch PATCH : PATCHES) {
             PATCH.apply(database);
         }
@@ -63,18 +60,18 @@ public class AlarmDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        Log.d(TAG, "Upgrading database from " + oldVersion + " to " + newVersion);
+        MyLog.d("Upgrading database from " + oldVersion + " to " + newVersion);
         for (int i = oldVersion; i < newVersion; i++) {
-            Log.d(TAG, "Applying patch " + i);
+            MyLog.d("Applying patch " + i);
             PATCHES[i].apply(db);
         }
     }
 
     @Override
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        Log.d(TAG, "Downgrading database from " + oldVersion + " to " + newVersion);
+        MyLog.d("Downgrading database from " + oldVersion + " to " + newVersion);
         for (int i = oldVersion; i > newVersion; i--) {
-            Log.d(TAG, "Reverting patch " + i);
+            MyLog.d("Reverting patch " + i);
             PATCHES[i - 1].revert(db);
         }
     }

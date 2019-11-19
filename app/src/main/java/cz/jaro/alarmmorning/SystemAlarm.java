@@ -5,7 +5,6 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import android.util.Log;
 
 import java.util.Calendar;
 import java.util.Objects;
@@ -27,8 +26,6 @@ import static cz.jaro.alarmmorning.GlobalManager.useNearFutureTime;
  * The SystemAlarm handles the "waking up of the app at a specified time to perform an action".
  */
 public class SystemAlarm {
-
-    private static final String TAG = GlobalManager.createLogTag(SystemAlarm.class);
 
     private static SystemAlarm instance;
 
@@ -70,7 +67,7 @@ public class SystemAlarm {
     }
 
     private void registerSystemAlarm(NextAction nextAction) {
-        Log.i(TAG, "Setting system alarm at " + nextAction.time.getTime().toString() + " with action " + nextAction.action);
+        MyLog.i("Setting system alarm at " + nextAction.time.getTime().toString() + " with action " + nextAction.action);
 
         saveNextAction(nextAction);
 
@@ -110,21 +107,21 @@ public class SystemAlarm {
     }
 
     private void saveNextAction(NextAction nextAction) {
-        Log.d(TAG, "setNextAction()");
+        MyLog.d("setNextAction()");
 
         GlobalManager globalManager = GlobalManager.getInstance();
         globalManager.setNextAction(nextAction);
     }
 
     private void cancel() {
-        Log.d(TAG, "cancel()");
+        MyLog.d("cancel()");
         if (operation != null) {
             // Method 1: standard
-            Log.d(TAG, "Cancelling current system alarm");
+            MyLog.d("Cancelling current system alarm");
             operation.cancel();
         } else {
             // Method 2: try to recreate the operation
-            Log.d(TAG, "Recreating operation when cancelling system alarm");
+            MyLog.d("Recreating operation when cancelling system alarm");
 
             try {
                 GlobalManager globalManager = GlobalManager.getInstance();
@@ -139,13 +136,13 @@ public class SystemAlarm {
                     operation.cancel();
                 }
             } catch (IllegalArgumentException e) {
-                Log.d(TAG, "Unable to get the action for cancelling", e);
+                MyLog.d("Unable to get the action for cancelling", e);
             }
         }
     }
 
     private void reset() {
-        Log.v(TAG, "reset()");
+        MyLog.v("reset()");
 
         cancel();
 
@@ -168,7 +165,7 @@ public class SystemAlarm {
      * @return the next action and system alarm
      */
     NextAction calcNextAction() {
-        Log.d(TAG, "calcNextAction()");
+        MyLog.d("calcNextAction()");
 
         GlobalManager globalManager = GlobalManager.getInstance();
         Clock clock = globalManager.clock();
@@ -182,13 +179,13 @@ public class SystemAlarm {
      * @return the next action and system alarm
      */
     private NextAction calcNextAction(Clock clock) {
-        Log.d(TAG, "calcNextAction(clock=" + clock.now().getTime().toString() + ")");
+        MyLog.d("calcNextAction(clock=" + clock.now().getTime().toString() + ")");
 
         Calendar now = clock.now();
 
         GlobalManager globalManager = GlobalManager.getInstance();
         AppAlarm nextAlarmToRingWithoutCurrent = globalManager.getNextAlarm(clock, appAlarm -> {
-            Log.v(TAG, "   checking filter condition for " + appAlarm);
+            MyLog.v("   checking filter condition for " + appAlarm);
             int state = globalManager.getState(appAlarm);
             return state != STATE_DISMISSED_BEFORE_RINGING && state != STATE_DISMISSED;
         });
@@ -240,7 +237,7 @@ public class SystemAlarm {
     }
 
     boolean nextActionShouldChange() {
-        Log.v(TAG, "nextActionShouldChange()");
+        MyLog.v("nextActionShouldChange()");
 
         NextAction nextAction = calcNextAction();
 
@@ -257,7 +254,7 @@ public class SystemAlarm {
     public void onSystemAlarm(Intent intent) {
         String action = intent.getAction();
 
-        Log.i(TAG, "Acting on system alarm. action=" + action);
+        MyLog.i("Acting on system alarm. action=" + action);
 
         AppAlarm appAlarm = null;
         GlobalManager globalManager = GlobalManager.getInstance();
@@ -290,37 +287,37 @@ public class SystemAlarm {
      */
 
     void onAlarmSet() {
-        Log.d(TAG, "onAlarmSet()");
+        MyLog.d("onAlarmSet()");
 
         reset();
     }
 
     void onNearFuture(AppAlarm appAlarm) {
-        Log.d(TAG, "onNearFuture()");
+        MyLog.d("onNearFuture()");
 
         registerSystemAlarm(ACTION_RING, appAlarm.getDateTime(), appAlarm);
     }
 
     void onDismissBeforeRinging() {
-        Log.d(TAG, "onDismissBeforeRinging()");
+        MyLog.d("onDismissBeforeRinging()");
 
         reset();
     }
 
     void onAlarmTimeOfEarlyDismissedAlarm() {
-        Log.d(TAG, "onAlarmTimeOfEarlyDismissedAlarm()");
+        MyLog.d("onAlarmTimeOfEarlyDismissedAlarm()");
 
         register();
     }
 
     void onRing() {
-        Log.d(TAG, "onRing()");
+        MyLog.d("onRing()");
 
         register();
     }
 
     void onSnooze(Calendar ringAfterSnoozeTime) {
-        Log.d(TAG, "onSnooze()");
+        MyLog.d("onSnooze()");
 
         cancel();
 
@@ -331,7 +328,7 @@ public class SystemAlarm {
     }
 
     void onDateChange() {
-        Log.d(TAG, "onDateChanged()");
+        MyLog.d("onDateChanged()");
 
         register();
     }

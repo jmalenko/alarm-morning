@@ -2,16 +2,12 @@ package cz.jaro.alarmmorning.holiday.regiondetector;
 
 import android.content.Context;
 
-import cz.jaro.alarmmorning.GlobalManager;
-
 /**
  * Detects the device location.
  * <p>
  * Currently used to detect only the country.
  */
 public abstract class RegionDetector {
-
-    private static final String TAG = GlobalManager.createLogTag(RegionDetector.class);
 
     private Context context;
     private OnRegionChangeListener onRegionChangeListener;

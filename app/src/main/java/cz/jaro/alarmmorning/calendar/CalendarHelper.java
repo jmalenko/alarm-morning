@@ -8,20 +8,18 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.CalendarContract;
-import android.util.Log;
+
+import androidx.core.content.ContextCompat;
 
 import java.util.Calendar;
 
-import androidx.core.content.ContextCompat;
-import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.Localization;
+import cz.jaro.alarmmorning.MyLog;
 
 /**
  * This class provides unifed access to calendar.
  */
 public class CalendarHelper {
-
-    private static final String TAG = GlobalManager.createLogTag(CalendarHelper.class);
 
     // Projection for calendar instances
     private static final String[] INSTANCE_PROJECTION = new String[]{
@@ -67,7 +65,7 @@ public class CalendarHelper {
      * @return calendar event
      */
     public CalendarEvent find(Calendar from, Calendar to, CalendarEventFilter filter) {
-        Log.d(TAG, "Find the earliest calendar item that starts between " + from.getTime() + " and " + to.getTime());
+        MyLog.d("Find the earliest calendar item that starts between " + from.getTime() + " and " + to.getTime());
 
         int permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission.READ_CALENDAR);
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
@@ -89,7 +87,7 @@ public class CalendarHelper {
                     CalendarEvent event = load(cur);
 
                     String timeStr = Localization.timeToString(event.begin.getTime(), context);
-                    Log.v(TAG, "   " + timeStr + " " + event.title + "    " + event.location);
+                    MyLog.v("   " + timeStr + " " + event.title + "    " + event.location);
 
                     if (!event.begin.before(from)) { // event starts on or after startOfTomorrow
                         if (filter == null || filter.match(event)) { // match filter
@@ -102,18 +100,18 @@ public class CalendarHelper {
 
                 if (eventEarliest != null) {
                     String timeStr = Localization.timeToString(eventEarliest.begin.getTime(), context);
-                    Log.d(TAG, "Found event: " + timeStr + " " + eventEarliest.getTitle());
+                    MyLog.d("Found event: " + timeStr + " " + eventEarliest.getTitle());
                     return eventEarliest;
                 }
 
                 cur.close();
 
-                Log.d(TAG, "Calendar query returned no events that match criteria");
+                MyLog.d("Calendar query returned no events that match criteria");
             } else {
-                Log.d(TAG, "Calendar query returned null");
+                MyLog.d("Calendar query returned null");
             }
         } else {
-            Log.d(TAG, "Permission to read calendar not granted");
+            MyLog.d("Permission to read calendar not granted");
         }
         return null;
     }

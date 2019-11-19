@@ -2,11 +2,10 @@ package cz.jaro.alarmmorning.sensor;
 
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
-import android.util.Log;
 
 import java.util.Arrays;
 
-import cz.jaro.alarmmorning.GlobalManager;
+import cz.jaro.alarmmorning.MyLog;
 import cz.jaro.alarmmorning.RingInterface;
 import cz.jaro.alarmmorning.SettingsActivity;
 
@@ -14,8 +13,6 @@ import cz.jaro.alarmmorning.SettingsActivity;
  * Provides detection of device shake.
  */
 public class Shake extends SensorEventDetector {
-
-    private static final String TAG = GlobalManager.createLogTag(Shake.class);
 
     private static final int FORCE_THRESHOLD = 50;
     private static final long SHAKE_DURATION = 500 * 1000000; // in nanoseconds
@@ -29,7 +26,7 @@ public class Shake extends SensorEventDetector {
     }
 
     protected boolean isFiring(SensorEvent event) {
-        Log.v(TAG, "isFiring(values=" + Arrays.toString(event.values) + ")");
+        MyLog.v("isFiring(values=" + Arrays.toString(event.values) + ")");
 
         float x = event.values[0];
         float y = event.values[1];

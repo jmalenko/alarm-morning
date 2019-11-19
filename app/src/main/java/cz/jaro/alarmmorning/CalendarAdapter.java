@@ -2,7 +2,6 @@ package cz.jaro.alarmmorning;
 
 import android.content.res.Resources;
 import android.graphics.Rect;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.TouchDelegate;
@@ -14,10 +13,11 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import java.util.Calendar;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.Calendar;
+
 import cz.jaro.alarmmorning.calendar.CalendarUtils;
 import cz.jaro.alarmmorning.model.AppAlarm;
 import cz.jaro.alarmmorning.model.Day;
@@ -27,8 +27,6 @@ import cz.jaro.alarmmorning.model.OneTimeAlarm;
  * Provide views to RecyclerView with data from mDataSet.
  */
 public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.CalendarViewHolder> {
-
-    private static final String TAG = GlobalManager.createLogTag(CalendarAdapter.class);
 
     private final CalendarFragment fragment;
 
@@ -56,7 +54,7 @@ public class CalendarAdapter extends RecyclerView.Adapter<CalendarAdapter.Calend
      */
     @Override
     public void onBindViewHolder(@NonNull CalendarViewHolder viewHolder, final int position) {
-        Log.v(TAG, "onBindViewHolder(position=" + position);
+        MyLog.v("onBindViewHolder(position=" + position);
 
         AppAlarm appAlarm = fragment.loadPosition(position);
         Day day = null;

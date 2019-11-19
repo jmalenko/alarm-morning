@@ -2,12 +2,12 @@ package cz.jaro.alarmmorning.graphics;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
 import androidx.appcompat.widget.AppCompatImageButton;
-import cz.jaro.alarmmorning.GlobalManager;
+
+import cz.jaro.alarmmorning.MyLog;
 
 /**
  * JoyStickButton is a button. Moreover, while holding the button the user can move the button. In the Alarm Morning app, the position of where the button was
@@ -24,8 +24,6 @@ public class JoyButton extends AppCompatImageButton {
 
     // TODO Provide visual feedback with the actions
 
-    private static final String TAG = GlobalManager.createLogTag(JoyButton.class);
-
     private final int distanceMin = 20;
 
     private OnJoyClickListener listener = null;
@@ -41,7 +39,7 @@ public class JoyButton extends AppCompatImageButton {
 
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                Log.v(TAG, "onTouch() action=" + motionEvent.getAction() + ", x,y=[" + motionEvent.getX() + ", " + motionEvent.getX() + "]");
+                MyLog.v("onTouch() action=" + motionEvent.getAction() + ", x,y=[" + motionEvent.getX() + ", " + motionEvent.getX() + "]");
 
                 switch (motionEvent.getAction()) {
                     case MotionEvent.ACTION_DOWN:
@@ -69,7 +67,7 @@ public class JoyButton extends AppCompatImageButton {
 
                         int distanceCancel = (view.getHeight() + view.getWidth()) / 2;
 
-                        Log.d(TAG, "delta=[" + delta_x + ", " + delta_y + "], current=[" + current_x + ", " + current_y + "], motionEvent_original=[" + motionEvent_original_x + ", " + motionEvent_original_y + "], distance=" + distance + ", distanceCancel=" + distanceCancel + ", click=" + click);
+                        MyLog.d("delta=[" + delta_x + ", " + delta_y + "], current=[" + current_x + ", " + current_y + "], motionEvent_original=[" + motionEvent_original_x + ", " + motionEvent_original_y + "], distance=" + distance + ", distanceCancel=" + distanceCancel + ", click=" + click);
 
                         if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
                             if (distance <= distanceCancel) {

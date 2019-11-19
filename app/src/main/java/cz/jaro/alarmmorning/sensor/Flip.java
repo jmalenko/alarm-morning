@@ -2,11 +2,10 @@ package cz.jaro.alarmmorning.sensor;
 
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
-import android.util.Log;
 
 import java.util.Arrays;
 
-import cz.jaro.alarmmorning.GlobalManager;
+import cz.jaro.alarmmorning.MyLog;
 import cz.jaro.alarmmorning.RingInterface;
 import cz.jaro.alarmmorning.SettingsActivity;
 
@@ -14,8 +13,6 @@ import cz.jaro.alarmmorning.SettingsActivity;
  * Provides detection of device flip.
  */
 public class Flip extends SensorEventDetector {
-
-    private static final String TAG = GlobalManager.createLogTag(Flip.class);
 
     private final static float THRESHOLD = 5; // when the device is still facing up and flips, the value goes from 9.81 do -9.81
 
@@ -27,7 +24,7 @@ public class Flip extends SensorEventDetector {
     }
 
     protected boolean isFiring(SensorEvent event) {
-        Log.v(TAG, "isFiring(values=" + Arrays.toString(event.values) + ")");
+        MyLog.v("isFiring(values=" + Arrays.toString(event.values) + ")");
 
         float z = event.values[2];
 

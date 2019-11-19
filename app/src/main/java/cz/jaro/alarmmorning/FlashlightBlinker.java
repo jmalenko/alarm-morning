@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.os.Handler;
-import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
@@ -15,8 +14,6 @@ import java.io.IOException;
  * Blink the camera flashlight
  */
 public class FlashlightBlinker {
-
-    private static final String TAG = GlobalManager.createLogTag(FlashlightBlinker.class);
 
     private final Context context;
 
@@ -75,7 +72,7 @@ public class FlashlightBlinker {
                     try {
                         camera.setPreviewDisplay(FlashlightBlinker.this.surfaceHolder);
                     } catch (IOException e) {
-                        Log.e(TAG, "Cannot set preview display", e);
+                        MyLog.e("Cannot set preview display", e);
                     }
                 }
 
@@ -90,7 +87,7 @@ public class FlashlightBlinker {
             camera.setPreviewDisplay(surfaceHolder);
             camera.startPreview();
         } catch (IOException e) {
-            Log.e(TAG, "Cannot set preview display", e);
+            MyLog.e("Cannot set preview display", e);
             return;
         }
 

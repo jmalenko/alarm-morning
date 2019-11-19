@@ -3,17 +3,14 @@ package cz.jaro.alarmmorning.nighttimebell;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
-import cz.jaro.alarmmorning.GlobalManager;
+import cz.jaro.alarmmorning.MyLog;
 import cz.jaro.alarmmorning.WakeLocker;
 
 /**
  * This receiver is called when the night time bell should be played.
  */
 public class NighttimeBellAlarmReceiver extends BroadcastReceiver {
-
-    private static final String TAG = GlobalManager.createLogTag(NighttimeBellAlarmReceiver.class);
 
     /**
      * Delegate to NighttimeBell class.
@@ -26,7 +23,7 @@ public class NighttimeBellAlarmReceiver extends BroadcastReceiver {
         // Prevent device sleep
         WakeLocker.acquire(context);
 
-        Log.v(TAG, "onReceive()");
+        MyLog.v("onReceive()");
 
         NighttimeBell nighttimeBell = NighttimeBell.getInstance(context);
         nighttimeBell.onReceive(context, intent);

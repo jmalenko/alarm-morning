@@ -5,7 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
-import android.util.Log;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -16,14 +15,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import cz.jaro.alarmmorning.GlobalManager;
+import cz.jaro.alarmmorning.MyLog;
 import cz.jaro.alarmmorning.calendar.CalendarUtils;
 
 /**
  * Store objects to a database.
  */
 public class AlarmDataSource {
-    private static final String TAG = GlobalManager.createLogTag(AlarmDataSource.class);
 
     private final SimpleDateFormat iso8601Format = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
 
@@ -311,7 +309,7 @@ public class AlarmDataSource {
             Date date = iso8601Format.parse(dateText);
             return CalendarUtils.newGregorianCalendar(date.getTime());
         } catch (ParseException e) {
-            Log.e(TAG, "Unable to parse date from string: " + dateText);
+            MyLog.e("Unable to parse date from string: " + dateText);
             throw new RuntimeException("Invalid date format", e);
         }
     }

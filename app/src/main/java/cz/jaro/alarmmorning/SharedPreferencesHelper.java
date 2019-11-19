@@ -3,17 +3,14 @@ package cz.jaro.alarmmorning;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 import java.util.NoSuchElementException;
 import java.util.Set;
 
 public class SharedPreferencesHelper {
 
-    private static final String TAG = GlobalManager.createLogTag(SharedPreferencesHelper.class);
-
     public static void save(String key, Object value) {
-        Log.v(TAG, "save(key=" + key + ", value=" + value + ")");
+        MyLog.v("save(key=" + key + ", value=" + value + ")");
 
         Context context = AlarmMorningApplication.getAppContext();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -25,7 +22,7 @@ public class SharedPreferencesHelper {
             try {
                 editor.putStringSet(key, (Set<String>) value);
             } catch (ClassCastException e) {
-                Log.e(TAG, "Cannot cast Set<?> to Set<String>");
+                MyLog.e("Cannot cast Set<?> to Set<String>");
                 throw e;
             }
         } else if (value instanceof Integer) {
@@ -42,7 +39,7 @@ public class SharedPreferencesHelper {
     }
 
     public static Object load(String key) throws NoSuchElementException {
-        Log.v(TAG, "load(key=" + key + ")");
+        MyLog.v("load(key=" + key + ")");
 
         Context context = AlarmMorningApplication.getAppContext();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -104,7 +101,7 @@ public class SharedPreferencesHelper {
     }
 
     public static void remove(String key) {
-        Log.v(TAG, "remove(key=" + key + ")");
+        MyLog.v("remove(key=" + key + ")");
 
         Context context = AlarmMorningApplication.getAppContext();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -116,7 +113,7 @@ public class SharedPreferencesHelper {
     }
 
     public static boolean contains(String key) {
-        Log.v(TAG, "contains(key=" + key + ")");
+        MyLog.v("contains(key=" + key + ")");
 
         Context context = AlarmMorningApplication.getAppContext();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -125,7 +122,7 @@ public class SharedPreferencesHelper {
     }
 
     public static void clear() {
-        Log.v(TAG, "clear()");
+        MyLog.v("clear()");
 
         Context context = AlarmMorningApplication.getAppContext();
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);

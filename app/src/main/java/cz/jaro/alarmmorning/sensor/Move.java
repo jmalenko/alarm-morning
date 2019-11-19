@@ -2,12 +2,11 @@ package cz.jaro.alarmmorning.sensor;
 
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
-import android.util.Log;
 
 import java.text.DecimalFormat;
 import java.util.Arrays;
 
-import cz.jaro.alarmmorning.GlobalManager;
+import cz.jaro.alarmmorning.MyLog;
 import cz.jaro.alarmmorning.RingInterface;
 import cz.jaro.alarmmorning.SettingsActivity;
 
@@ -16,8 +15,6 @@ import cz.jaro.alarmmorning.SettingsActivity;
  */
 public class Move extends SensorEventDetector {
 
-    private static final String TAG = GlobalManager.createLogTag(Move.class);
-
     private double[] gravity = new double[3];
 
     public Move(RingInterface ringInterface) {
@@ -25,7 +22,7 @@ public class Move extends SensorEventDetector {
     }
 
     protected boolean isFiring(SensorEvent event) {
-        Log.v(TAG, "isFiring(values=" + Arrays.toString(event.values) + ")");
+        MyLog.v("isFiring(values=" + Arrays.toString(event.values) + ")");
 
         final double alpha = 0.8;
         gravity[0] = alpha * gravity[0] + (1 - alpha) * event.values[0];
@@ -46,7 +43,7 @@ public class Move extends SensorEventDetector {
         boolean gravity_ok = gravity_size_real - delta < gravity_size && gravity_size < gravity_size_real + delta;
 
         DecimalFormat f = new DecimalFormat("#0.00");
-        Log.v(TAG, "Acceleration=" + f.format(acceleration_size) +
+        MyLog.v("Acceleration=" + f.format(acceleration_size) +
                 ", gravity_size=" + f.format(gravity_size) +
                 ", gravity=[" + f.format(gravity[0]) + ", " + f.format(gravity[1]) + ", " + f.format(gravity[2]) + "]");
 

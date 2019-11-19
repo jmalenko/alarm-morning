@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -18,6 +17,7 @@ import java.util.Set;
 import cz.jaro.alarmmorning.Analytics;
 import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.JSONSharedPreferences;
+import cz.jaro.alarmmorning.MyLog;
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.SharedPreferencesHelper;
 import cz.jaro.alarmmorning.WakeLocker;
@@ -34,39 +34,37 @@ import static cz.jaro.alarmmorning.calendar.CalendarUtils.addDay;
  */
 public class UpgradeReceiver extends BroadcastReceiver {
 
-    private static final String TAG = GlobalManager.createLogTag(UpgradeReceiver.class);
-
     @Override
     public void onReceive(Context context, Intent intent) {
         WakeLocker.acquire(context);
 
         String action = intent.getAction();
-        Log.v(TAG, "onReceive(action=" + action + ")");
+        MyLog.v("onReceive(action=" + action + ")");
 
         if (action.equals(Intent.ACTION_MY_PACKAGE_REPLACED)) {
-            Log.i(TAG, "Starting after upgrade");
+            MyLog.i("Starting after upgrade");
 
             new Analytics(context, Analytics.Event.Start, Analytics.Channel.External, Analytics.ChannelName.Upgrade).setConfigurationInfo().save();
 
             // Update default values of preferences
             PreferenceManager.setDefaultValues(context, R.xml.preferences, false);
 
-            Log.i(TAG, "Updating preferences");
+            MyLog.i("Updating preferences");
             updateData(context);
 
-            Log.i(TAG, "Setting alarm on update");
+            MyLog.i("Setting alarm on update");
             GlobalManager globalManager = GlobalManager.getInstance();
             globalManager.firstSetAlarm();
 
-            Log.i(TAG, "Starting CheckAlarmTime on update");
+            MyLog.i("Starting CheckAlarmTime on update");
             CheckAlarmTime checkAlarmTime = CheckAlarmTime.getInstance(context);
             checkAlarmTime.checkAndRegister();
 
-            Log.i(TAG, "Starting NighttimeBell on update");
+            MyLog.i("Starting NighttimeBell on update");
             NighttimeBell nighttimeBell = NighttimeBell.getInstance(context);
             nighttimeBell.checkAndRegister();
 
-            Log.i(TAG, "Installing files");
+            MyLog.i("Installing files");
             CustomAlarmTone customAlarmTone = new CustomAlarmTone(context);
             customAlarmTone.install();
         }
@@ -89,7 +87,7 @@ public class UpgradeReceiver extends BroadcastReceiver {
                     break;
             }
         } catch (PackageManager.NameNotFoundException e) {
-            Log.e(TAG, "Cannot update preferences", e);
+            MyLog.e("Cannot update preferences", e);
         }
     }
 
@@ -121,13 +119,13 @@ public class UpgradeReceiver extends BroadcastReceiver {
     private static final String PERSIST_DISMISSED_1 = "persist_dismissed";
 
     private Set<Long> getDismissedAlarms() {
-        Log.v(TAG, "getDismissedAlarm()");
+        MyLog.v("getDismissedAlarm()");
 
         try {
             JSONArray dismissedAlarmsJSON = JSONSharedPreferences.loadJSONArray(PERSIST_DISMISSED_1);
             return jsonToSet(dismissedAlarmsJSON);
         } catch (JSONException e) {
-            Log.w(TAG, "Error getting dismissed alarms", e);
+            MyLog.w("Error getting dismissed alarms", e);
             return new HashSet<>();
         }
     }

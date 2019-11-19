@@ -9,16 +9,17 @@ import android.content.res.Resources;
 import android.os.Build;
 import android.text.Html;
 import android.text.SpannableString;
-import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.core.app.NotificationCompat;
 
 import java.util.Calendar;
 import java.util.NoSuchElementException;
 
-import androidx.annotation.NonNull;
-import androidx.core.app.NotificationCompat;
 import cz.jaro.alarmmorning.Analytics;
 import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.Localization;
+import cz.jaro.alarmmorning.MyLog;
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.SettingsActivity;
 import cz.jaro.alarmmorning.SharedPreferencesHelper;
@@ -49,8 +50,6 @@ import static cz.jaro.alarmmorning.calendar.CalendarUtils.roundDown;
  * because you don't ever forget to set the alarm time even if you have the meeting in the calendar.
  */
 public class CheckAlarmTime {
-
-    private static final String TAG = GlobalManager.createLogTag(CheckAlarmTime.class);
 
     private static final int NOTIFICATION_ID = 1;
     private static final int REQUEST_CODE = 1;
@@ -100,13 +99,13 @@ public class CheckAlarmTime {
     }
 
     public boolean isEnabled() {
-        Log.v(TAG, "isEnabled()");
+        MyLog.v("isEnabled()");
 
         return (boolean) SharedPreferencesHelper.load(SettingsActivity.PREF_CHECK_ALARM_TIME, SettingsActivity.PREF_CHECK_ALARM_TIME_DEFAULT);
     }
 
     public void checkAndRegister() {
-        Log.v(TAG, "checkAndRegister()");
+        MyLog.v("checkAndRegister()");
 
         if (isEnabled()) {
             register();
@@ -114,7 +113,7 @@ public class CheckAlarmTime {
     }
 
     public void register() {
-        Log.v(TAG, "register()");
+        MyLog.v("register()");
 
         String checkAlarmTimeAtPreference = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_CHECK_ALARM_TIME_AT, SettingsActivity.PREF_CHECK_ALARM_TIME_AT_DEFAULT);
 
@@ -123,19 +122,19 @@ public class CheckAlarmTime {
         // Do the check if the time is after the check time
         boolean betweenCheckAlarmTimeAndAlarmTime = isBetweenCheckAlarmTimeAndAlarmTime();
         if (betweenCheckAlarmTimeAndAlarmTime) {
-            Log.i(TAG, "Doing the check immediately after registering");
+            MyLog.i("Doing the check immediately after registering");
             doCheckAlarmTime();
         }
     }
 
     private void register(String checkAlarmTimeAtPreference) {
-        Log.d(TAG, "register(checkAlarmTimeAtPreference=" + checkAlarmTimeAtPreference);
+        MyLog.d("register(checkAlarmTimeAtPreference=" + checkAlarmTimeAtPreference);
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
             Calendar checkAlarmTimeAt = calcNextOccurence(checkAlarmTimeAtPreference);
 
             String action = ACTION_CHECK_ALARM_TIME;
-            Log.i(TAG, "Setting system alarm at " + checkAlarmTimeAt.getTime().toString() + " with action " + action);
+            MyLog.i("Setting system alarm at " + checkAlarmTimeAt.getTime().toString() + " with action " + action);
 
             Intent intent = new Intent(context, CheckAlarmTimeAlarmReceiver.class);
             intent.setAction(action);
@@ -149,15 +148,15 @@ public class CheckAlarmTime {
     }
 
     public void unregister() {
-        Log.v(TAG, "unregister()");
+        MyLog.v("unregister()");
 
         if (operation != null) {
             // Method 1: standard
-            Log.d(TAG, "Cancelling current system alarm for Check Alarm Time");
+            MyLog.d("Cancelling current system alarm for Check Alarm Time");
             operation.cancel();
         } else {
             // Method 2: try to recreate the operation
-            Log.d(TAG, "Recreating operation when cancelling system alarm");
+            MyLog.d("Recreating operation when cancelling system alarm");
 
             Intent intent2 = new Intent(context, CheckAlarmTimeAlarmReceiver.class);
             intent2.setAction(ACTION_CHECK_ALARM_TIME);
@@ -180,10 +179,10 @@ public class CheckAlarmTime {
     }
 
     private void registerNotificationDismiss(Calendar time) {
-        Log.v(TAG, "registerNotificationDismiss()");
+        MyLog.v("registerNotificationDismiss()");
 
         String action = ACTION_AUTO_HIDE_NOTIFICATION;
-        Log.i(TAG, "Setting system alarm at " + time.getTime().toString() + " with action " + action);
+        MyLog.i("Setting system alarm at " + time.getTime().toString() + " with action " + action);
 
         Intent intentDismissNotification = new Intent(context, CheckAlarmTimeAlarmReceiver.class);
         intentDismissNotification.setAction(action);
@@ -194,15 +193,15 @@ public class CheckAlarmTime {
     }
 
     private void unregisterNotificationDismiss() {
-        Log.v(TAG, "unregisterNotificationDismiss()");
+        MyLog.v("unregisterNotificationDismiss()");
 
         if (operationDismissNotification != null) {
             // Method 1: standard
-            Log.d(TAG, "Cancelling current system alarm for notification dismiss");
+            MyLog.d("Cancelling current system alarm for notification dismiss");
             operationDismissNotification.cancel();
         } else {
             // Method 2: try to recreate the operation
-            Log.d(TAG, "Recreating operation when cancelling system alarm");
+            MyLog.d("Recreating operation when cancelling system alarm");
 
             Intent intentDismissNotification2 = new Intent(context, CheckAlarmTimeAlarmReceiver.class);
             intentDismissNotification2.setAction(ACTION_AUTO_HIDE_NOTIFICATION);
@@ -218,7 +217,7 @@ public class CheckAlarmTime {
     public void onReceive(Intent intent) {
         String action = intent.getAction();
 
-        Log.i(TAG, "Acting on CheckAlarmTime. action=" + action);
+        MyLog.i("Acting on CheckAlarmTime. action=" + action);
 
         switch (action) {
             case ACTION_CHECK_ALARM_TIME:
@@ -232,7 +231,7 @@ public class CheckAlarmTime {
                 break;
             case Intent.ACTION_PROVIDER_CHANGED:
                 onCalendarUpdated();
-                Log.v(TAG, "data = " + intent.getData());
+                MyLog.v("data = " + intent.getData());
                 break;
             default:
                 throw new IllegalArgumentException("Unexpected argument " + action);
@@ -240,7 +239,7 @@ public class CheckAlarmTime {
     }
 
     private void onCheckAlarmTime() {
-        Log.v(TAG, "onCheckAlarmTime()");
+        MyLog.v("onCheckAlarmTime()");
 
         // Register for tomorrow
         register();
@@ -258,7 +257,7 @@ public class CheckAlarmTime {
     }
 
     void doCheckAlarmTime(MorningInfo morningInfo) {
-        Log.v(TAG, "doCheckAlarmTime(morningInfo=" + morningInfo + ")");
+        MyLog.v("doCheckAlarmTime(morningInfo=" + morningInfo + ")");
         if (morningInfo.attentionNeeded) {
             showNotification(morningInfo.day, morningInfo.targetAlarmTime, morningInfo.event);
             registerNotificationDismiss(morningInfo.alarmTime);
@@ -272,7 +271,7 @@ public class CheckAlarmTime {
     }
 
     private void onAutoHideNotification() {
-        Log.v(TAG, "onAutoHideNotification()");
+        MyLog.v("onAutoHideNotification()");
 
         new Analytics(context, Analytics.Event.Hide, Analytics.Channel.Time, Analytics.ChannelName.Check_alarm_time).save();
 
@@ -286,7 +285,7 @@ public class CheckAlarmTime {
      * attributes describing what happened. Therefore all the calendar events must be checked.
      */
     void onCalendarUpdated() {
-        Log.v(TAG, "onCalendarUpdated()");
+        MyLog.v("onCalendarUpdated()");
         boolean betweenCheckAlarmTimeAndAlarmTime = isBetweenCheckAlarmTimeAndAlarmTime();
         if (betweenCheckAlarmTimeAndAlarmTime) {
             boolean notificationVisible = isNotificationVisible();
@@ -302,21 +301,21 @@ public class CheckAlarmTime {
                 notificationAction = null;
             }
 
-            Log.v(TAG, "notificationEventBegin=" + (notificationEventBegin != null ? Analytics.calendarToDatetimeStringUTC(notificationEventBegin) : "null"));
-            Log.v(TAG, "notificationAction=" + notificationAction);
+            MyLog.v("notificationEventBegin=" + (notificationEventBegin != null ? Analytics.calendarToDatetimeStringUTC(notificationEventBegin) : "null"));
+            MyLog.v("notificationAction=" + notificationAction);
 
             MorningInfo morningInfo = new MorningInfo(context);
             Calendar eventBegin = morningInfo.event != null ? morningInfo.event.getBegin() : null;
 
-            Log.v(TAG, "morningInfo=" + morningInfo);
+            MyLog.v("morningInfo=" + morningInfo);
 
             // Check for an earlier event
 
             boolean checkForAnEarlierEvent = morningInfo.attentionNeeded
                     && (notificationEventBegin == null || (!onTheSameDate(notificationEventBegin, morningInfo.day.getDate()) || (eventBegin != null && eventBegin.before(notificationEventBegin))));
-            Log.d(TAG, "Check for an earlier event = " + checkForAnEarlierEvent);
+            MyLog.d("Check for an earlier event = " + checkForAnEarlierEvent);
             if (checkForAnEarlierEvent) {
-                Log.i(TAG, "Updating notification because of an earlier event");
+                MyLog.i("Updating notification because of an earlier event");
 
                 if (notificationVisible) {
                     unregisterNotificationDismiss();
@@ -331,10 +330,10 @@ public class CheckAlarmTime {
             // Check for a deleted event (that triggered setting the alarm)
 
             boolean checkForADeletedEvent = notificationEventBegin != null && notificationAction != null && (eventBegin == null || notificationEventBegin.before(eventBegin));
-            Log.d(TAG, "Check for a deleted event (that triggered setting the alarm) = " + checkForADeletedEvent);
+            MyLog.d("Check for a deleted event (that triggered setting the alarm) = " + checkForADeletedEvent);
             if (checkForADeletedEvent) {
                 if (notificationAction.equals(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION__NOTIFICATION_DISPLAYED)) {
-                    Log.i(TAG, "Updating notification because of a deleted event");
+                    MyLog.i("Updating notification because of a deleted event");
 
                     hideNotification();
 
@@ -346,7 +345,7 @@ public class CheckAlarmTime {
                     }
                 } else if (notificationAction.equals(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION__SET_TO_CUSTOM)
                         || notificationAction.equals(PERSIST__CHECK_ALARM_TIME__NOTIFICATION_ACTION__SET_TO_DEFAULT)) {
-                    Log.i(TAG, "Showing notification because of a deleted event");
+                    MyLog.i("Showing notification because of a deleted event");
 
                     showNotification(morningInfo.day, morningInfo.targetAlarmTime, morningInfo.event, true);
                     registerNotificationDismiss(morningInfo.alarmTime);
@@ -360,9 +359,9 @@ public class CheckAlarmTime {
 
             // Otherwise hide (e.g. a meeting that triggered the notification
             boolean hide = !checkForADeletedEvent && !morningInfo.attentionNeeded && notificationVisible;
-            Log.d(TAG, "Check for hide notification =  = " + hide);
+            MyLog.d("Check for hide notification =  = " + hide);
             if (hide) {
-                Log.i(TAG, "Hiding notification");
+                MyLog.i("Hiding notification");
                 hideNotification();
             }
         }
@@ -381,7 +380,7 @@ public class CheckAlarmTime {
      * @return The date on which the alarm should be compared to the earliest event. (Note: the actual check is usually done in the evening of previous day.)
      */
     static public Calendar calcMorningDate() {
-        Log.v(TAG, "calcMorningDate()");
+        MyLog.v("calcMorningDate()");
         String checkAlarmTimeAtPreference = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_CHECK_ALARM_TIME_AT, SettingsActivity.PREF_CHECK_ALARM_TIME_AT_DEFAULT);
 
         GlobalManager globalManager = GlobalManager.getInstance();
@@ -390,22 +389,22 @@ public class CheckAlarmTime {
 
         Calendar checkAlarmTimeAtToday = calcTodaysOccurence(checkAlarmTimeAtPreference);
 
-        Log.d(TAG, "checkAlarmTimeAtToday=" + checkAlarmTimeAtToday.getTime());
+        MyLog.d("checkAlarmTimeAtToday=" + checkAlarmTimeAtToday.getTime());
 
         if (!now.before(checkAlarmTimeAtToday)) {
             Calendar beginningOfTomorrow = beginningOfTomorrow(now);
-            Log.d(TAG, "calcMorningDate returns " + beginningOfTomorrow.getTime());
+            MyLog.d("calcMorningDate returns " + beginningOfTomorrow.getTime());
             return beginningOfTomorrow;
         }
 
         Calendar todayNoon = justBeforeNoonToday(now);
         if (now.before(todayNoon)) {
             Calendar beginningOfToday = beginningOfToday(now);
-            Log.d(TAG, "calcMorningDate returns " + beginningOfToday.getTime());
+            MyLog.d("calcMorningDate returns " + beginningOfToday.getTime());
             return beginningOfToday;
         }
 
-        Log.d(TAG, "calcMorningDate returns null");
+        MyLog.d("calcMorningDate returns null");
         return null;
     }
 
@@ -421,7 +420,7 @@ public class CheckAlarmTime {
     }
 
     private void showNotification(Day day, Calendar targetAlarmTime, CalendarEvent event, boolean originalEventDeleted) {
-        Log.v(TAG, "showNotification()");
+        MyLog.v("showNotification()");
         Resources res = context.getResources();
 
         String contentTitle;
@@ -525,13 +524,13 @@ public class CheckAlarmTime {
     }
 
     private void hideNotificationOnly() {
-        Log.v(TAG, "hideNotificationOnly()");
+        MyLog.v("hideNotificationOnly()");
         NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.cancel(NOTIFICATION_ID);
     }
 
     void hideNotification() {
-        Log.d(TAG, "Hide notification");
+        MyLog.d("Hide notification");
         unregisterNotificationDismiss();
         hideNotificationOnly();
     }
@@ -609,7 +608,7 @@ public class CheckAlarmTime {
      */
 
     public void onAlarmSet() {
-        Log.v(TAG, "onAlarmSet()");
+        MyLog.v("onAlarmSet()");
 
         if (isBetweenCheckAlarmTimeAndAlarmTime()) {
             MorningInfo morningInfo = new MorningInfo(context);
@@ -634,7 +633,7 @@ public class CheckAlarmTime {
 }
 
 class MorningInfo {
-    private static final String TAG = GlobalManager.createLogTag(MorningInfo.class);
+
 
     private Context context;
 
@@ -671,7 +670,7 @@ class MorningInfo {
      * 3. Entry is not all-day
      */
     public void init() {
-        Log.v(TAG, "init()");
+        MyLog.v("init()");
 
         // Note: This is usually executed in the evening (during the regular check). But it is also executed in the morning of the day on wh:
         // 1. The user enables the check (in the Settings) between modnight nad noon
@@ -681,19 +680,19 @@ class MorningInfo {
         GlobalManager globalManager = GlobalManager.getInstance();
 
         Calendar morningStart = CheckAlarmTime.calcMorningDate();
-        Log.v(TAG, "morningStart=" + morningStart.getTime());
+        MyLog.v("morningStart=" + morningStart.getTime());
 
         Calendar morningNoon = justBeforeNoonToday(morningStart); // Note: relative to morningStart
-        Log.v(TAG, "morningNoon=" + morningNoon.getTime());
+        MyLog.v("morningNoon=" + morningNoon.getTime());
 
         // Load tomorrow's alarm time
         day = globalManager.loadDay(morningStart);
         alarmTime = day.getDateTime();
-        Log.v(TAG, "alarmTime=" + alarmTime.getTime() + ", enabled=" + day.isEnabled());
+        MyLog.v("alarmTime=" + alarmTime.getTime() + ", enabled=" + day.isEnabled());
 
         // Load gap
         checkAlarmTimeGap = (int) SharedPreferencesHelper.load(SettingsActivity.PREF_CHECK_ALARM_TIME_GAP, SettingsActivity.PREF_CHECK_ALARM_TIME_GAP_DEFAULT);
-        Log.v(TAG, "checkAlarmTimeGap=" + checkAlarmTimeGap + " minutes");
+        MyLog.v("checkAlarmTimeGap=" + checkAlarmTimeGap + " minutes");
 
         analytics = new Analytics(context, Analytics.Event.Show, Analytics.Channel.Time, Analytics.ChannelName.Check_alarm_time);
         analytics.setDay(day);
@@ -704,12 +703,12 @@ class MorningInfo {
         if (event != null) {
             targetAlarmTime = (Calendar) event.getBegin().clone();
             targetAlarmTime.add(Calendar.MINUTE, -checkAlarmTimeGap);
-            Log.v(TAG, "targetAlarmTime=" + targetAlarmTime.getTime());
+            MyLog.v("targetAlarmTime=" + targetAlarmTime.getTime());
 
             // TODO The alarm time must be on the same date. If it's before that then shift the alarm time to midnight. Task: Support alarm on the previous day.
             if (targetAlarmTime.before(morningStart)) {
                 targetAlarmTime = morningStart;
-                Log.v(TAG, "adjusted targetAlarmTime to " + targetAlarmTime.getTime());
+                MyLog.v("adjusted targetAlarmTime to " + targetAlarmTime.getTime());
             }
 
             analytics.set(Analytics.Param.Appointment_begin, Analytics.calendarToTime(event.getBegin()));
@@ -717,9 +716,9 @@ class MorningInfo {
             analytics.set(Analytics.Param.Appointment_location, event.getLocation());
 
             attentionNeeded = !day.isEnabled() || targetAlarmTime.before(alarmTime);
-            Log.v(TAG, "attentionNeeded=" + attentionNeeded);
+            MyLog.v("attentionNeeded=" + attentionNeeded);
             if (attentionNeeded) {
-                Log.d(TAG, "Appointment that needs and earlier alarm time found");
+                MyLog.d("Appointment that needs and earlier alarm time found");
                 analytics.set(Analytics.Param.Check_alarm_time_action, CHECK_ALARM_TIME_ACTION__SHOW_NOTIFICATION);
             } else {
                 analytics.set(Analytics.Param.Check_alarm_time_action, CHECK_ALARM_TIME_ACTION__DON_T_SHOW_NOTIFICATION);

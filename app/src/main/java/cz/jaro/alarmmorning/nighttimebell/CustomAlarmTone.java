@@ -9,7 +9,8 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.util.Log;
+
+import androidx.core.content.ContextCompat;
 
 import org.json.JSONObject;
 
@@ -19,9 +20,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.NoSuchElementException;
 
-import androidx.core.content.ContextCompat;
-import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.JSONSharedPreferences;
+import cz.jaro.alarmmorning.MyLog;
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.SettingsActivity;
 import cz.jaro.alarmmorning.SharedPreferencesHelper;
@@ -30,8 +30,6 @@ import cz.jaro.alarmmorning.SharedPreferencesHelper;
  * This class copies the alarm tone distributed with this app (in the APK) into the alarms directory on the device's shared storage
  */
 public class CustomAlarmTone {
-
-    private static final String TAG = GlobalManager.createLogTag(CustomAlarmTone.class);
 
     /**
      * Value true = the files were copied into the system.
@@ -54,13 +52,13 @@ public class CustomAlarmTone {
      * Copies the files to shared storage if not done yet.
      */
     public void install() {
-        Log.d(TAG, "install()");
+        MyLog.d("install()");
 
         int permissionCheck = ContextCompat.checkSelfPermission(mContext, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
             boolean filesInstalledPreference = (boolean) SharedPreferencesHelper.load(CustomAlarmTone.PREF_FILES_INSTALLED, CustomAlarmTone.PREF_FILES_INSTALLED_DEFAULT);
             if (!filesInstalledPreference) {
-                Log.i(TAG, "Copying ringtone files");
+                MyLog.i("Copying ringtone files");
 
                 // Copy the file
                 boolean status = copyRawFile(R.raw.church_clock_strikes_3, mContext.getString(R.string.alarmtone_title_church_bell), true);
@@ -70,10 +68,10 @@ public class CustomAlarmTone {
                     SharedPreferencesHelper.save(PREF_FILES_INSTALLED, true);
                 }
             } else {
-                Log.d(TAG, "Already installed");
+                MyLog.d("Already installed");
             }
         } else {
-            Log.d(TAG, "Permission to write to storage not granted");
+            MyLog.d("Permission to write to storage not granted");
         }
     }
 
@@ -160,10 +158,10 @@ public class CustomAlarmTone {
                 }
             }
 
-            Log.d(TAG, "Copied alarm tone '" + title + "' to " + outAbsPath);
-            Log.d(TAG, "URI is " + newUri.toString());
+            MyLog.d("Copied alarm tone '" + title + "' to " + outAbsPath);
+            MyLog.d("URI is " + newUri.toString());
         } catch (Exception e) {
-            Log.w(TAG, "Error writing " + filename, e);
+            MyLog.w("Error writing " + filename, e);
             isError = true;
         } finally {
             // Close the streams
@@ -176,7 +174,7 @@ public class CustomAlarmTone {
                 }
             } catch (IOException e) {
                 // Means there was an error trying to close the streams, so do nothing
-                Log.w(TAG, "Error closing stream", e);
+                MyLog.w("Error closing stream", e);
             }
         }
 

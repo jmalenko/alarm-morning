@@ -3,7 +3,6 @@ package cz.jaro.alarmmorning.wizard;
 import android.widget.CheckBox;
 
 import cz.jaro.alarmmorning.Analytics;
-import cz.jaro.alarmmorning.GlobalManager;
 import cz.jaro.alarmmorning.R;
 import cz.jaro.alarmmorning.SettingsActivity;
 import cz.jaro.alarmmorning.SharedPreferencesHelper;
@@ -12,8 +11,6 @@ import cz.jaro.alarmmorning.SharedPreferencesHelper;
  * When run repeatedly, behaves as run for the first time.
  */
 public class SetActionsSlide extends BaseFragment {
-
-    private static final String TAG = GlobalManager.createLogTag(SetActionsSlide.class);
 
     @Override
     protected int getContentLayoutId() {

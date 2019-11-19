@@ -2,7 +2,6 @@ package cz.jaro.alarmmorning;
 
 import android.app.Application;
 import android.content.Context;
-import android.util.Log;
 
 import com.crashlytics.android.Crashlytics;
 
@@ -20,13 +19,11 @@ import io.fabric.sdk.android.Fabric;
  */
 public class AlarmMorningApplication extends Application {
 
-    private static final String TAG = GlobalManager.createLogTag(AlarmMorningApplication.class);
-
     private static Context appContext;
 
     @Override
     public void onCreate() {
-        Log.v(TAG, "onCreate()");
+        MyLog.v("onCreate()");
         super.onCreate();
         appContext = this;
 
@@ -50,7 +47,7 @@ public class AlarmMorningApplication extends Application {
                 Object value = configuration.get(key);
                 Crashlytics.setString(key, value.toString());
             } catch (JSONException e) {
-                Log.w(TAG, "Cannot get value for key " + key);
+                MyLog.w("Cannot get value for key " + key);
             }
         }
     }

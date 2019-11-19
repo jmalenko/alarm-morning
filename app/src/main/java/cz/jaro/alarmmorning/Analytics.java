@@ -11,12 +11,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
-import com.google.android.gms.ads.identifier.AdvertisingIdClient;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -59,7 +57,6 @@ import static cz.jaro.alarmmorning.calendar.CalendarUtils.dayOfWeekToString;
  * For efficiency, everything is implemented as static.
  */
 public class Analytics {
-    private static final String TAG = GlobalManager.createLogTag(Analytics.class);
 
     private static final String PREF_USER_ID = "user_id";
     private static final int USER_ID_LENGTH = 12;
@@ -470,7 +467,7 @@ public class Analytics {
             Object result = callable.call();
             conf.put(key, result);
         } catch (Exception e) {
-            Log.v(TAG, "Cannot get value for " + key, e);
+            MyLog.v("Cannot get value for " + key, e);
         }
     }
 
@@ -588,10 +585,10 @@ public class Analytics {
 
             put(confSystem, "settingsSystem_time_12_24", () -> Settings.System.getString(mContext.getContentResolver(), Settings.System.TIME_12_24));
 
-            put(confSystem, "google_advertising_id", () -> {
-                AdvertisingIdClient.Info idInfo = AdvertisingIdClient.getAdvertisingIdInfo(getContext());
-                return idInfo.getId();
-            });
+//            put(confSystem, "google_advertising_id", () -> { // TODO Sometimes the following error is thrown: IllegalStateException: Calling this from your main thread can lead to deadlock
+//                AdvertisingIdClient.Info idInfo = AdvertisingIdClient.getAdvertisingIdInfo(getContext());
+//                return idInfo.getId();
+//            });
 
             put(confSystem, "settings_secure_android_id", () -> Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID));
             put(confSystem, "settings_secure_default_input_method", () -> Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.DEFAULT_INPUT_METHOD));
@@ -717,7 +714,7 @@ public class Analytics {
 
             conf.put("permission", confPermissions);
         } catch (JSONException e) {
-            Log.w(TAG, "Cannot create configuration record", e);
+            MyLog.w("Cannot create configuration record", e);
         }
         return conf;
     }
@@ -743,7 +740,7 @@ public class Analytics {
     }
 
     public void save() {
-        Log.v(TAG, "save()");
+        MyLog.v("save()");
 
         // Validity checks
         if (mPayload.getInt(Param.Version.name()) == 0) throw new IllegalStateException("Analytics record is not valid: Version is null");
@@ -757,13 +754,13 @@ public class Analytics {
         if (mFirebaseAnalytics == null) throw new IllegalStateException("Analytics is null");
 
         if (locationTask != null && !locationTask.isComplete()) {
-            Log.v(TAG, "Saving postponed until the location is acquired");
+            MyLog.v("Saving postponed until the location is acquired");
             shouldSave = true;
             return;
         }
 
         mFirebaseAnalytics.logEvent(mEvent.name(), mPayload);
-        Log.i(TAG, toString());
+        MyLog.i(toString());
     }
 
     @Override
@@ -848,7 +845,7 @@ public class Analytics {
             char[] CHARSET_AZ_09 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".toCharArray();
             userId = randomString(CHARSET_AZ_09, USER_ID_LENGTH);
 
-            Log.d(TAG, "Created user_id=" + userId);
+            MyLog.d("Created user_id=" + userId);
 
             SharedPreferencesHelper.save(PREF_USER_ID, userId);
         }
@@ -942,19 +939,19 @@ public class Analytics {
                                 if (location.hasSpeedAccuracy())
                                     set(Param.Location_speedAccuracyMetersPerSecond, location.getSpeedAccuracyMetersPerSecond());
                             }
-                            Log.d(TAG, "Location acquired: " + location.getLatitude() + ", " + location.getLongitude());
+                            MyLog.d("Location acquired: " + location.getLatitude() + ", " + location.getLongitude());
                         } else {
-                            Log.d(TAG, "The location is null.");
+                            MyLog.d("The location is null.");
                         }
                     }
                     if (shouldSave)
                         save();
                 });
             } else {
-                Log.d(TAG, "Google API not available for location acquisition. Details: " + new ConnectionResult(available));
+                MyLog.d("Google API not available for location acquisition. Details: " + new ConnectionResult(available));
             }
         } catch (Exception e) {
-            Log.w(TAG, "Exception while getting location", e);
+            MyLog.w("Exception while getting location", e);
         }
     }
 

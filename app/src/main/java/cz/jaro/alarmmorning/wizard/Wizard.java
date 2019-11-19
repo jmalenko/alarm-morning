@@ -5,23 +5,21 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.Log;
+
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 
 import com.github.paolorotolo.appintro.AppIntro;
 
 import java.util.ArrayList;
 
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
-import cz.jaro.alarmmorning.GlobalManager;
+import cz.jaro.alarmmorning.MyLog;
 import cz.jaro.alarmmorning.SharedPreferencesHelper;
 
 /**
  * Wizard contains several fragments that allow the user to quickly configure the app.
  */
 public class Wizard extends AppIntro {
-
-    private static final String TAG = GlobalManager.createLogTag(Wizard.class);
 
     /**
      * Value true = the wizard finished. Otherwise it should be presented to the user.
@@ -64,20 +62,20 @@ public class Wizard extends AppIntro {
             for (int i = 1; i < missingPermissions.length; i++) {
                 missingPermissionsStr.append(", ").append(missingPermissions[i]);
             }
-            Log.v(TAG, "Following permissions are not granted: " + missingPermissionsStr);
+            MyLog.v("Following permissions are not granted: " + missingPermissionsStr);
 
             addSlide(new SetPermissionSlide());
             askForPermissions(missingPermissions, fragments.size());
             // Note: The AppIntro library disables swiping when using askForPermissions. Source: https://github.com/PaoloRotolo/AppIntro/issues/123
         } else {
-            Log.v(TAG, "All permissions are granted. Skipping permission slide.");
+            MyLog.v("All permissions are granted. Skipping permission slide.");
         }
 
         addSlide(new SetDoneSlide());
     }
 
     private String[] calcMissingPermissions() {
-        Log.d(TAG, "calcMissingPermissions()");
+        MyLog.d("calcMissingPermissions()");
         ArrayList<String> missingPermissions = new ArrayList<>();
 
         for (String permission : allPermissions) {

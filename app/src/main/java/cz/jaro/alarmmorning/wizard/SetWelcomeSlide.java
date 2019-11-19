@@ -7,12 +7,10 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
-import cz.jaro.alarmmorning.GlobalManager;
+
 import cz.jaro.alarmmorning.R;
 
 public class SetWelcomeSlide extends BaseFragment {
-
-    private static final String TAG = GlobalManager.createLogTag(SetWelcomeSlide.class);
 
     @Nullable
     @Override

@@ -7,13 +7,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Build;
-import android.util.Log;
+
+import androidx.core.app.NotificationCompat;
 
 import java.util.Calendar;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import androidx.core.app.NotificationCompat;
 import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.model.AppAlarm;
 import cz.jaro.alarmmorning.model.Day;
@@ -30,8 +30,6 @@ import static cz.jaro.alarmmorning.calendar.CalendarUtils.onTheSameDate;
  * SystemNotification manages the notification about the alarm.
  */
 public class SystemNotification {
-
-    private static final String TAG = GlobalManager.createLogTag(SystemNotification.class);
 
     private static SystemNotification instance;
     private final Context context;
@@ -96,7 +94,7 @@ public class SystemNotification {
     }
 
     private void showNotification(NotificationCompat.Builder mBuilder, AppAlarm appAlarm) {
-        Log.d(TAG, "showNotification()");
+        MyLog.d("showNotification()");
         NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
 
@@ -104,7 +102,7 @@ public class SystemNotification {
     }
 
     private void hideNotification() {
-        Log.d(TAG, "hideNotification()");
+        MyLog.d("hideNotification()");
         NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.cancel(NOTIFICATION_ID);
 
@@ -117,7 +115,7 @@ public class SystemNotification {
      */
 
     void onNearFuture(AppAlarm appAlarm) {
-        Log.d(TAG, "onNearFuture(appAlarm=" + appAlarm + ")");
+        MyLog.d("onNearFuture(appAlarm=" + appAlarm + ")");
 
         NotificationCompat.Builder mBuilder = buildNotification(appAlarm);
 
@@ -144,7 +142,7 @@ public class SystemNotification {
     }
 
     void onDismissBeforeRinging(AppAlarm appAlarm) {
-        Log.d(TAG, "onDismissBeforeRinging(appAlarm=" + appAlarm + ")");
+        MyLog.d("onDismissBeforeRinging(appAlarm=" + appAlarm + ")");
 
         if (currentlyDisplayedNotificationIsAbout(appAlarm)) {
             hideNotification();
@@ -172,7 +170,7 @@ public class SystemNotification {
                 throw new IllegalArgumentException("Unexpected class " + appAlarm.getClass());
             }
         } catch (NoSuchElementException e) {
-            Log.v(TAG, "The persisted data is incomplete", e);
+            MyLog.v("The persisted data is incomplete", e);
             return false;
         }
 
@@ -180,7 +178,7 @@ public class SystemNotification {
     }
 
     void onRing(AppAlarm appAlarm) {
-        Log.d(TAG, "onRing(appAlarm=" + appAlarm + ")");
+        MyLog.d("onRing(appAlarm=" + appAlarm + ")");
 
         NotificationCompat.Builder mBuilder = buildNotification(appAlarm);
 
@@ -216,13 +214,13 @@ public class SystemNotification {
     }
 
     void onDismiss(AppAlarm appAlarm) {
-        Log.d(TAG, "onDismiss(appAlarm=" + appAlarm + ")");
+        MyLog.d("onDismiss(appAlarm=" + appAlarm + ")");
 
         hideNotification();
     }
 
     void onSnooze(AppAlarm appAlarm, Calendar ringAfterSnoozeTime) {
-        Log.d(TAG, "onSnooze(appAlarm=" + appAlarm + ")");
+        MyLog.d("onSnooze(appAlarm=" + appAlarm + ")");
 
         NotificationCompat.Builder mBuilder = buildNotification(appAlarm);
 
@@ -250,7 +248,7 @@ public class SystemNotification {
     }
 
     void onAlarmCancel(AppAlarm appAlarm) {
-        Log.d(TAG, "onAlarmCancel(appAlarm=" + appAlarm + ")");
+        MyLog.d("onAlarmCancel(appAlarm=" + appAlarm + ")");
 
         hideNotification();
     }
@@ -261,7 +259,7 @@ public class SystemNotification {
      */
 
     void onDeleteOneTimeAlarm(OneTimeAlarm oneTimeAlarm) {
-        Log.d(TAG, "onDismissBeforeRinging(appAlarm=" + oneTimeAlarm + ")");
+        MyLog.d("onDismissBeforeRinging(appAlarm=" + oneTimeAlarm + ")");
 
         if (currentlyDisplayedNotificationIsAbout(oneTimeAlarm)) {
             hideNotification();
@@ -287,7 +285,7 @@ public class SystemNotification {
     }
 
     void onModifyOneTimeAlarmDateTime(OneTimeAlarm oneTimeAlarm) {
-        Log.d(TAG, "onModifyOneTimeAlarmDateTime(oneTimeAlarm = " + oneTimeAlarm + ")");
+        MyLog.d("onModifyOneTimeAlarmDateTime(oneTimeAlarm = " + oneTimeAlarm + ")");
 
         if (currentlyDisplayedNotificationIsAbout(oneTimeAlarm)) {
             GlobalManager globalManager = GlobalManager.getInstance();
@@ -299,7 +297,7 @@ public class SystemNotification {
     }
 
     void onModifyOneTimeAlarmName(OneTimeAlarm oneTimeAlarm) {
-        Log.d(TAG, "onModifyOneTimeAlarmName(oneTimeAlarm = " + oneTimeAlarm + ")");
+        MyLog.d("onModifyOneTimeAlarmName(oneTimeAlarm = " + oneTimeAlarm + ")");
 
         if (currentlyDisplayedNotificationIsAbout(oneTimeAlarm)) {
             hideNotification();
@@ -339,7 +337,7 @@ public class SystemNotification {
      */
 
     void notifyCancelledAlarm(AppAlarm appAlarm) {
-        Log.d(TAG, "notifyCancelledAlarm(appAlarm=" + appAlarm + ")");
+        MyLog.d("notifyCancelledAlarm(appAlarm=" + appAlarm + ")");
 
         NotificationCompat.Builder mBuilder = buildNotification(appAlarm); // TODO The title shows just the time. Task: On midnight, after the notification was displayed, update the notification such that the title includes both time and date
 
@@ -364,7 +362,7 @@ public class SystemNotification {
      * @param skippedAlarms The count of skipped alarm times.
      */
     void notifySkippedAlarms(List<AppAlarm> skippedAlarms) {
-        Log.d(TAG, "notifySkippedAlarms()");
+        MyLog.d("notifySkippedAlarms()");
 
         GlobalManager globalManager = GlobalManager.getInstance();
         Clock clock = globalManager.clock();
@@ -375,7 +373,7 @@ public class SystemNotification {
         String contentText = res.getString(R.string.notification_text_skipped,
                 res.getQuantityString(R.plurals.notification_text_skipped_count, skippedAlarms.size(), skippedAlarms.size()),
                 Localization.appAlarmsToString(skippedAlarms, now, context)); // TODO The text doesn't show date if the skipped tag was today. Task: On midnight, after the notification was displayed, update the notification such that the title includes both time and date
-        Log.v(TAG, contentText);
+        MyLog.v(contentText);
 
         createNotificationChannel(context);
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(context, CHANNEL_ID)
@@ -392,7 +390,7 @@ public class SystemNotification {
     }
 
     private void persist(AppAlarm appAlarm) {
-        Log.v(TAG, "persist(appAlarm=" + appAlarm + ")");
+        MyLog.v("persist(appAlarm=" + appAlarm + ")");
 
         SharedPreferencesHelper.save(PERSIST_NOTIFICATION_ALARM_TYPE, appAlarm.getClass().getSimpleName());
         if (appAlarm instanceof Day) {
@@ -407,7 +405,7 @@ public class SystemNotification {
     }
 
     private void persistRemove() {
-        Log.v(TAG, "persistRemove()");
+        MyLog.v("persistRemove()");
 
         SharedPreferencesHelper.remove(PERSIST_NOTIFICATION_ALARM_TYPE);
         SharedPreferencesHelper.remove(PERSIST_NOTIFICATION_DAY_ALARM_DATE);
