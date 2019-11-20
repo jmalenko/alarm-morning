@@ -428,23 +428,27 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         }
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_CAMERA: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // Permission was granted
-                } else {
-                    // Permission denied
-
-                    // Revert the value to false
-                    ((CheckBoxPreference) findPreference(PREF_FLASHLIGHT)).setChecked(false);
-                }
-                return;
-            }
-        }
-    }
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+//        switch (requestCode) {
+//            case MY_PERMISSIONS_REQUEST_CAMERA: {
+//                // If request is cancelled, the result arrays are empty.
+//                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                    // Permission was granted
+//                } else {
+//                    // Permission denied
+//
+//                    // The "revert the setting if the users doesn't immediately grant permission" is a nice feature.
+//                    // However, it's not common in Android and we are checking for the permission on calendar start anyway.
+//                    // Therefore it's disabled.
+//
+//                    // Revert the value to false
+//                    ((CheckBoxPreference) findPreference(PREF_FLASHLIGHT)).setChecked(false);
+//                }
+//                return;
+//            }
+//        }
+//    }
 
     /**
      * Binds a preference's summary to its value. More specifically, when the preference's value is changed, its summary (line of text below the preference
