@@ -816,7 +816,7 @@ public class GlobalManager {
         analytics.setOneTimeAlarm(oneTimeAlarm);
         analytics.save();
 
-        MyLog.i("Save one-time alarm at " + oneTimeAlarm.getDateTime().getTime().toString());
+        MyLog.i("Save one-time alarm at " + oneTimeAlarm.getDateTime().getTime());
 
         dataSource.saveOneTimeAlarm(oneTimeAlarm);
 
@@ -833,7 +833,7 @@ public class GlobalManager {
         analytics.setOneTimeAlarm(oneTimeAlarm);
         analytics.save();
 
-        MyLog.i("Delete one-time alarm at " + oneTimeAlarm.getDateTime());
+        MyLog.i("Delete one-time alarm at " + oneTimeAlarm.getDateTime().getTime());
 
         dataSource.deleteOneTimeAlarm(oneTimeAlarm);
     }
