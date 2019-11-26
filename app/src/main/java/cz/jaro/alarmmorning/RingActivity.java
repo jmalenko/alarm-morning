@@ -1061,6 +1061,7 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
                 return super.onKeyDown(keycode, e);
             }
         } else {
+            MyLog.i("Act on key press detected");
             actOnEvent(buttonActionPreference);
             return true;
         }
@@ -1095,7 +1096,7 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
 
     @Override
     public void actOnEvent(String action) {
-        MyLog.v("actOnEvent(action=" + action + ")");
+        MyLog.v("actOnEvent(action=" + SettingsActivity.actionCodeToString(action) + ")");
         switch (action) {
             case SettingsActivity.PREF_ACTION_DEFAULT:
                 MyLog.d("Doing nothing");

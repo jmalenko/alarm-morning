@@ -118,8 +118,8 @@ public abstract class SensorEventDetector implements SensorEventListener {
     private void onFire() {
         MyLog.v("onFire()");
 
+        MyLog.i("Sensor " + name + " fired");
         String action = getActionFromPreference();
-
         ringInterface.actOnEvent(action);
     }
 
