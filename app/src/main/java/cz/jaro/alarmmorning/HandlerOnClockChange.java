@@ -194,7 +194,7 @@ public class HandlerOnClockChange extends Handler {
         MyLog.v("Register next event at " + cal.getTime() + ". In ms " + cal.getTimeInMillis() + ".");
 
         long delta = cal.getTimeInMillis() - now.getTimeInMillis();
-        MyLog.v("                                               Delta is ms " + String.format("%13d", delta));
+        MyLog.v("                                                     Delta is ms " + String.format("%13d", delta) + ".");
 
         return postDelayed(runnableOnClockChange, delta);
     }
