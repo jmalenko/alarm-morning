@@ -35,7 +35,7 @@ public class AlarmMorningApplication extends Application {
         GlobalManager globalManager = GlobalManager.getInstance();
         Crashlytics.setString("database_dump", globalManager.dumpDB());
 
-        // Analytics
+        // Setup data for Crashlytics
         Analytics analytics = new Analytics();
         analytics.setContext(appContext);
         JSONObject configuration = analytics.createConfiguration();
