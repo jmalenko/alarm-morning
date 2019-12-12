@@ -330,7 +330,9 @@ public class AlarmMorningActivity extends AppCompatActivity {
         if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_CODE_WIZARD) {
             if (mFragment instanceof CalendarFragment) {
                 CalendarFragment calendarFragment = (CalendarFragment) mFragment;
-                calendarFragment.refresh();
+                calendarFragment.onResume();
+            } else {
+                throw new IllegalStateException("Unsupported fragment " + (mFragment != null ? mFragment.getClass() : mFragment));
             }
         }
     }
@@ -345,11 +347,6 @@ public class AlarmMorningActivity extends AppCompatActivity {
         if (globalManager.isRinging()) {
             globalManager.startRingingActivity(this);
             return;
-        }
-
-        if (mFragment instanceof CalendarFragment) {
-            CalendarFragment calendarFragment = (CalendarFragment) mFragment;
-            calendarFragment.refresh();
         }
     }
 

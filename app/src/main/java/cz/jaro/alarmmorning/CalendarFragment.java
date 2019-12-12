@@ -138,6 +138,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         super.onResume();
 
         today = getToday(clock());
+        loadItems();
         positionNextAlarm = calcPositionNextAlarm();
 
         // Refresh all the alarm times. Solves scenario: Given displayed calendar, when set alarm by voice, then the calendar must refresh.
@@ -620,15 +621,6 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
     public static Calendar getToday(Clock clock) {
         Calendar now = clock.now();
         return beginningOfToday(now);
-    }
-
-    /**
-     * Update all the calendar items.
-     */
-    public void refresh() {
-        loadItems();
-        positionNextAlarm = calcPositionNextAlarm();
-        adapter.notifyDataSetChanged();
     }
 
     public void onAddOneTimeAlarm() {
