@@ -2,7 +2,6 @@ package cz.jaro.alarmmorning;
 
 import android.Manifest;
 import android.app.DatePickerDialog;
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -962,7 +961,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         switch (item.getItemId()) {
             case R.id.action_day_set_time:
             case R.id.action_day_add_alarm:
-                Log.d(TAG, "Set time");
+                MyLog.d("Set time");
                 menuAction = item.getItemId();
                 showTimePicker();
                 break;
