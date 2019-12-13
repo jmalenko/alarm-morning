@@ -296,7 +296,7 @@ public class AlarmMorningActivity extends AppCompatActivity {
             highlightMenuItem(calendarMenu);
         }
 
-        // Show Translate menu item only if the user language is not translatedLanguageAndCountry
+        // Show Translate menu item only if the user language is not translated yet
         Resources resources = getResources();
         MenuItem translateMenuItem = mNavigationView.getMenu().findItem(R.id.navigation_translate);
 
