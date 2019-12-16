@@ -25,10 +25,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import net.mabboud.android_tone_player.ContinuousBuzzer;
+
 import java.io.IOException;
 import java.security.InvalidParameterException;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import cz.jaro.alarmmorning.calendar.CalendarEvent;
@@ -51,6 +57,7 @@ import static cz.jaro.alarmmorning.GlobalManager.PERSIST_ALARM_TYPE;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.endOfToday;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.onTheSameDate;
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.onTheSameMinute;
+import static java.lang.System.currentTimeMillis;
 
 
 /**
@@ -63,6 +70,20 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
     public static final String ACTION_HIDE_ACTIVITY = "cz.jaro.alarmmorning.intent.action.HIDE_ACTIVITY";
 
     private static final int ALARM_MANAGER_STREAM = AudioManager.STREAM_ALARM;
+
+    public static final int SOUND_METER_DELAY_MILLIS = 100; // Get the sound volume every 100 ms [in milliseconds]. Note that Android provides 1. the amplitude of the intensity and 2. "the maximum volume in the entire previous period" is returned by system call rather than just "the current volume".
+
+    // The silence is detected when
+    public static final long SOUND_METER_SILENCE_DURATION = 10000; // in the last 10 seconds [in milliseconds]
+    public static final long SOUND_METER_SILENCE_START_AFTER = 5000; // that start 5 seconds [in milliseconds] after the ringing started (if there alarm is not increasing) or once the alarm volume reacheed the target volume
+    public static final double SOUND_METER_SILENCE_PERCENTAGE_LIMIT = 0.1; // there is less than 10% [range 0..1] of
+    public static final int SOUND_METER_SILENCE_LIMIT = 10; // "loud intervals" i.e. interval with (maximum) volume above 15 dB [in dB]
+
+    // The clap is detected when
+    public static final int SOUND_METER_CLAP_PERIODS = 10; // in the last 10 intervals (of length SOUND_METER_DELAY_MILLIS),
+    public static final int SOUND_METER_CLAP_MIN_COUNT = 2; // at least 2 of the intervals are exceptionally loud; The exceptionally loud intervals may not be adjacent.
+    public static final int SOUND_METER_CLAP_MIN_DIFFERENCE = 5; // The exceptionally loud volume must be at least 5 dB louder than mean.
+    public static final int SOUND_METER_CLAP_MIN_ABS = 10; // The exceptionally loud volume must be at least 10 dB loud.
 
     private AppAlarm appAlarm;
 
@@ -100,6 +121,12 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
             400, 200
     }; // Round to whole second
     private static final int FLASHLIGHT_REPEAT = 13;
+
+    private boolean isSoundMeter;
+    private SoundMeter soundMeter;
+    private Handler soundMeterHandler;
+    private RecentList<SoundMeterRecord> soundMeterHistory = new RecentList<>(SoundMeterRecord.class);
+    private ContinuousBuzzer tonePlayer;
 
     private TextView mutedTextView;
     private boolean isMuted;
@@ -156,11 +183,11 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
         // This work only for android 4.4+
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             final int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                    | View.SYSTEM_UI_FLAG_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+                              | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                              | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                              | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                              | View.SYSTEM_UI_FLAG_FULLSCREEN
+                              | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
             getWindow().getDecorView().setSystemUiVisibility(flags);
 
             // Code below is to handle presses of Volume up or Volume down.
@@ -305,11 +332,11 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
         // The settings must be reset after the user interacts with UI
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && hasFocus) {
             final int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                    | View.SYSTEM_UI_FLAG_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+                              | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                              | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                              | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                              | View.SYSTEM_UI_FLAG_FULLSCREEN
+                              | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
             getWindow().getDecorView().setSystemUiVisibility(flags);
         }
     }
@@ -524,6 +551,7 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
 
             initMute();
             startSensors();
+            startSoundMeter();
 
             startContent();
         }
@@ -542,6 +570,7 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
 
             stopContent();
 
+            stopSoundMeter();
             stopSensors();
             stopMute();
 
@@ -1046,6 +1075,293 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
         }
     }
 
+    private void startSoundMeter() {
+        MyLog.d("startSoundMeter()");
+
+        boolean enableSoundMeter = enableSoundMeter();
+        if (enableSoundMeter) {
+            int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO);
+            if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
+                try {
+                    MyLog.i("Sensor soundMeter is used");
+
+                    soundMeter = new SoundMeter();
+                    soundMeter.start();
+
+                    soundMeterHandler = new Handler();
+                    soundMeterHandler.postDelayed(this::updateSoundMeter, SOUND_METER_DELAY_MILLIS);
+
+                    isSoundMeter = true;
+                    return;
+                } catch (RuntimeException | IOException e) {
+                    MyLog.w("Cannot start sound meter", e);
+                }
+            } else {
+                MyLog.w("The RECORD_AUDIO permission is not granted");
+                // It doesn't make sense to ask for permission while ringing
+            }
+        }
+
+        MyLog.d("Sensor soundMeter is not used");
+    }
+
+    private void stopSoundMeter() {
+        MyLog.d("stopSoundMeter()");
+
+        if (isSoundMeter) {
+            soundMeterHandler.removeCallbacks(this::updateSoundMeter);
+
+            try {
+                soundMeter.stop();
+            } catch (RuntimeException e) {
+                MyLog.w("Cannot stop sound meter", e);
+            }
+
+            if (tonePlayer != null)
+                stopSoundBuzzer();
+
+            isSoundMeter = false;
+        }
+    }
+
+    private void updateSoundMeter() {
+        MyLog.v("updateSoundMeter()");
+
+        // Store measurement
+        long currentTimeMillis = currentTimeMillis();
+
+        double amplitude = soundMeter.getMaxAmplitude();
+        double dB = amplitudeToDecibel(amplitude);
+        MyLog.e("Amplitude=" + amplitude + " = " + dB + " dB");
+        if (amplitude == 0) // Sometimes, first few measures have 0 amplitude (= -infinity dB). Skip these.
+            return;
+
+        SoundMeterRecord soundMeterRecord = new SoundMeterRecord(currentTimeMillis, dB);
+        soundMeterHistory.add(soundMeterRecord);
+
+        // Delete old records from history
+        long maxLength = Math.max(
+                SOUND_METER_SILENCE_DURATION / SOUND_METER_DELAY_MILLIS, // silence detection
+                SOUND_METER_CLAP_PERIODS // clap detection
+        );
+        while (maxLength < soundMeterHistory.size())
+            soundMeterHistory.removeFirst();
+
+        // Check actions
+
+        if (isReliabilityCheckEnabled())
+            checkSilence();
+
+        if (onClapActionEnabled())
+            checkClapGesture();
+
+        soundMeterHandler.postDelayed(this::updateSoundMeter, SOUND_METER_DELAY_MILLIS);
+    }
+
+    /**
+     * Detect silence, typically because the ringtone doesn't play (due to various reasons).
+     *
+     * @return True if silence detected.
+     */
+    private boolean checkSilence() {
+        MyLog.v("checkSilence()");
+
+        long detectSoundStartMS = lastRingingStartTime.getTimeInMillis(); // In milliseconds, start of applying this logics, from activity start adjusted for the initial silent period
+        MyLog.v("detectSoundStartMS=" + detectSoundStartMS + " ms = " + lastRingingStartTime.getTime());
+        if (increasing) {
+            int volumePreference = (int) SharedPreferencesHelper.load(SettingsActivity.PREF_VOLUME, SettingsActivity.PREF_VOLUME_DEFAULT);
+            // volumePreference range is 0 .. SettingsActivity.PREF_VOLUME_MAX
+            // skip (add appropriate number of seconds) the period during which the alarm volume is increasing
+            detectSoundStartMS += volumePreference * 10 * 1000;
+            MyLog.v("adding " + volumePreference + " * 10 * 1000 ms because the alarm is increasing");
+            MyLog.v("detectSoundStartMS=" + detectSoundStartMS);
+        }
+        detectSoundStartMS += SOUND_METER_SILENCE_START_AFTER; // Always add few seconds
+        MyLog.v("adding " + SOUND_METER_SILENCE_START_AFTER + " ms");
+
+        Calendar detectSoundStart = Calendar.getInstance();
+        detectSoundStart.setTimeInMillis(detectSoundStartMS);
+        MyLog.v("detectSoundStartMS=" + detectSoundStartMS + " ms = " + detectSoundStart.getTime());
+
+        long currentTimeMillis = currentTimeMillis();
+
+        if (detectSoundStartMS < currentTimeMillis - SOUND_METER_SILENCE_DURATION) {
+            int count_above_limit = 0;
+            int count_total = 0;
+
+            for (SoundMeterRecord soundMeterRecord : soundMeterHistory) {
+                if (detectSoundStartMS < soundMeterRecord.timestamp) {
+                    if (currentTimeMillis - SOUND_METER_SILENCE_DURATION < soundMeterRecord.timestamp) {
+                        if (SOUND_METER_SILENCE_LIMIT < soundMeterRecord.dB) {
+                            MyLog.v("  " + soundMeterRecord.dB + "   is above limit");
+                            count_above_limit++;
+                        } else {
+                            MyLog.v("  " + soundMeterRecord.dB);
+                        }
+                        count_total++;
+                    }
+                }
+            }
+
+            double ratio = count_above_limit / (float) count_total;
+            boolean isSilence = ratio < SOUND_METER_SILENCE_PERCENTAGE_LIMIT;
+
+            MyLog.d(String.format(Locale.US, "Silence: %s, ratio=%f < %f, %d/%d above limit of %d dB", isSilence ? "yes" : "no", ratio, SOUND_METER_SILENCE_PERCENTAGE_LIMIT, count_above_limit, count_total, SOUND_METER_SILENCE_LIMIT));
+
+            if (isSilence) {
+                doSilenceDetected();
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void doSilenceDetected() {
+        MyLog.i("Silence detected");
+
+        // Show the message
+        TextView silenceDetectedView = findViewById(R.id.silenceDetected);
+        silenceDetectedView.setVisibility(View.VISIBLE);
+
+        // Do panic
+
+        // Let the standard ringtone keep ringing, but adjust it...
+        // Stop increasing
+        handlerVolume.removeCallbacks(runnableVolume);
+        // Set volume to maximum
+        if (audioManager != null)
+            audioManager.setStreamVolume(ALARM_MANAGER_STREAM, maxVolume, 0); // Set volume to max
+
+        if (!isFlashlight)
+            startFlashlight();
+
+        if (!isVibrating)
+            startVibrate();
+
+        startSoundBuzzer();
+    }
+
+    private void startSoundBuzzer() {
+        MyLog.v("startSoundBuzzer()");
+
+        // Play tone
+        // Source: https://stackoverflow.com/questions/2413426/playing-an-arbitrary-tone-with-android/3731075
+        tonePlayer = new ContinuousBuzzer();
+        tonePlayer.setPausePeriodSeconds(1);
+        tonePlayer.setPauseTimeInMs(350);
+        tonePlayer.setVolume(100); // volume values are from 0-100
+        tonePlayer.setToneFreqInHz(800);
+        tonePlayer.play();
+    }
+
+    private void stopSoundBuzzer() {
+        MyLog.v("stopSoundBuzzer()");
+
+        tonePlayer.stop();
+    }
+
+    /**
+     * Detect the loud sound, typically clapping by hands.
+     *
+     * @return True if loud sound (clapping, whistling) detected.
+     */
+    private boolean checkClapGesture() {
+        MyLog.v("checkClapGesture()");
+
+        if (SOUND_METER_CLAP_PERIODS <= soundMeterHistory.size()) {
+
+            // Get samples
+
+            MyLog.v("All measurements");
+            List<Double> values = new ArrayList<>();
+            for (int i = 0; i < SOUND_METER_CLAP_PERIODS; i++) {
+                double dB = soundMeterHistory.get(soundMeterHistory.size() - 1 - i).dB;
+                MyLog.v("  " + dB);
+                values.add(dB);
+            }
+
+            Collections.sort(values);
+
+            // Remove SOUND_METER_CLAP_MIN_COUNT biggest values
+            MyLog.v("Removing " + SOUND_METER_CLAP_MIN_COUNT + " biggest measurements");
+            for (int i = values.size() - SOUND_METER_CLAP_MIN_COUNT; i < values.size(); i++) {
+                MyLog.v("  " + values.get(i));
+            }
+
+            // Get statistic description
+
+            double[] valuesForStatistics = new double[SOUND_METER_CLAP_PERIODS - SOUND_METER_CLAP_MIN_COUNT];
+
+            MyLog.v("Remaining measurements (ordered)");
+            for (int i = 0; i < valuesForStatistics.length; i++) {
+                MyLog.v("  " + values.get(i));
+                valuesForStatistics[i] = values.get(i);
+            }
+
+            double mean = Statistics.mean(valuesForStatistics);
+            double stdDev = Statistics.stdDev(valuesForStatistics);
+
+            // Count the intervals with volume above limit
+
+            double limit = Math.max(mean + Math.max(3 * stdDev, SOUND_METER_CLAP_MIN_DIFFERENCE), SOUND_METER_CLAP_MIN_ABS);
+
+            for (int i = 0; i < SOUND_METER_CLAP_PERIODS; i++) { // Restore values
+                double dB = soundMeterHistory.get(soundMeterHistory.size() - 1 - i).dB;
+                values.set(i, dB);
+            }
+
+            int count = 0;
+            boolean isPreviousOutlier = false;
+            for (double dB : values) {
+                boolean isCurrentOutlier = limit < dB;
+                if (isCurrentOutlier && !isPreviousOutlier)
+                    count++;
+                isPreviousOutlier = isCurrentOutlier;
+            }
+
+            boolean clapDetected = SOUND_METER_CLAP_MIN_COUNT <= count;
+
+            MyLog.d(String.format("Clap: %s, %d/%d outliers, limit=%f, mean=%f, stdDev=%f", clapDetected ? "yes" : "no", count, SOUND_METER_CLAP_MIN_COUNT, limit, mean, stdDev));
+
+            if (clapDetected) {
+                doClapDetected();
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void doClapDetected() {
+        MyLog.i("Clap (loud sound) detected");
+        String action = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_ACTION_ON_CLAP, SettingsActivity.PREF_ACTION_DEFAULT);
+        actOnEvent(action);
+    }
+
+    /**
+     * Convert the amplitute to decibels. Empirically, this is equals to the reality; however, in practice the hardware used on Android phones has low quality and is not exact.
+     *
+     * @return Intensity of a sound, in decibels.
+     */
+    public double amplitudeToDecibel(double amplitude) {
+        // About the amplitude interpretation and relation to decibels: https://stackoverflow.com/questions/10655703/what-does-androids-getmaxamplitude-function-for-the-mediarecorder-actually-gi
+        return 20 * Math.log10(amplitude / 2700.0);
+    }
+
+    public static boolean enableSoundMeter() {
+        return isReliabilityCheckEnabled() || onClapActionEnabled();
+    }
+
+    private static boolean isReliabilityCheckEnabled() {
+        return (boolean) SharedPreferencesHelper.load(SettingsActivity.PREF_RELIABILITY_CHECK_ENABLED, SettingsActivity.PREF_RELIABILITY_CHECK_ENABLED_DEFAULT);
+    }
+
+    private static boolean onClapActionEnabled() {
+        String onClapAction = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_ACTION_ON_CLAP, SettingsActivity.PREF_ACTION_DEFAULT);
+        return !onClapAction.equals(SettingsActivity.PREF_ACTION_NOTHING);
+    }
+
     @Override
     public boolean onKeyDown(int keycode, KeyEvent e) {
         MyLog.d("onKeyDown(keycode=" + keycode + ")");
@@ -1117,5 +1433,15 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
             default:
                 throw new IllegalArgumentException("Unexpected argument " + action);
         }
+    }
+}
+
+class SoundMeterRecord {
+    long timestamp; // in milliseconds
+    double dB;
+
+    SoundMeterRecord(long timestamp, double dB) {
+        this.timestamp = timestamp;
+        this.dB = dB;
     }
 }

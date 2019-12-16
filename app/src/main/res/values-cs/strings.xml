@@ -9,7 +9,10 @@
     <string name="menu_day_header_disabled">Budík je vypnutý dne <xliff:g example="Sat" id="dayOfWeek">%1$s</xliff:g>, <xliff:g example="23/12" id="date">%2$s</xliff:g></string>
 
     <string name="permission_missing_title">Chybí oprávnění</string>
-    <string name="permission_missing_message">Funakce \"blikání blesekm při zvonění\" je zapnutá, ale aplikace nemá odpovídající oprávnění systému Android. Přidělte toto oprátnění v následujícím dialogu.</string>
+    <string name="permission_missing_message_detail__camera">Funkce \"blikání blesekm při zvonění\" je zapnutá.</string>
+    <string name="permission_missing_message_detail__record_audio">Funkce \"sledování hlasitosti\" je zapnutá. Tato funkce umožňnuje kontrolovatsprávnou hlasitost budíku a reagovat na hlasitý zvuk (například odložením budíku).</string>
+    <string name="permission_missing_message_grant">Přidělte odpovídající Androidové oprávnění v následujícím dialogu.</string>
+    <string name="permission_missing_message_combine">%1$s\n\n%2$s</string>
     <string name="permission_missing_button">OK</string>
 
     <!-- Default activity -->
@@ -37,6 +40,7 @@
     <string name="muted">Ztišený na <xliff:g example="5" id="seconds">%1$d</xliff:g> sekund</string>
     <string name="next_calendar_with_location">Příští schůzka: <xliff:g example="07:00" id="time">%1$s</xliff:g> <xliff:g example="Dentist" id="title">%2$s</xliff:g> (<xliff:g example="Main St" id="location">%3$s</xliff:g>)</string>
     <string name="next_calendar_without_location">Příští schůzka: <xliff:g example="07:00" id="time">%1$s</xliff:g> <xliff:g example="Dentist" id="title">%2$s</xliff:g></string>
+    <string name="no_sound_detected">Zvuk nebyl detekován. Spuštěna panika (siréna, vibrace, blesk).</string>
 
     <plurals name="snooze_time_text">
         <item quantity="one">Odložit o <xliff:g example="1" id="minutes">%1$d</xliff:g> minutu</item>
@@ -80,6 +84,7 @@
 <p><b>ACCESS_FINE_LOCATION</b> – pro zjištění polohy (podle polohy se určí svátky platné ve vaší zemi)</p>
 <p><b>INTERNET</b> – pro použití sítě (aktualizace seznamu svátků)</p>
 <p><b>CAMERA</b> – pro blikání blesem při zvonění</p>
+<p><b>RECORD_AUDIO</b> – pro detekci hlasitosti budíku (používá se pro kontrolu, že budík zvoní správně nahlas)</p>
 ]]></string>
 
     <string name="wizard_done_title">Vše je hotovo</string>

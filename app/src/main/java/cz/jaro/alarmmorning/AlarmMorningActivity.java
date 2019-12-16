@@ -17,7 +17,6 @@
 */
 package cz.jaro.alarmmorning;
 
-import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -236,8 +235,8 @@ public class AlarmMorningActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         // Possibly run the wizard
-        boolean wizardPreference = Wizard.loadWizardFinished();
-        if (!wizardPreference) {
+        boolean wizardFinished = Wizard.loadWizardFinished();
+        if (!wizardFinished) {
             Intent wizardIntent = new Intent(this, Wizard.class);
             startActivityForResult(wizardIntent, REQUEST_CODE_WIZARD);
         }
@@ -288,8 +287,9 @@ public class AlarmMorningActivity extends AppCompatActivity {
         bManager.registerReceiver(bReceiver, s_intentFilterInternal);
 
         if (savedInstanceState == null) {
-            mFragment = new CalendarFragment();
-            getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, mFragment).commit();
+            CalendarFragment calendarFragment = new CalendarFragment();
+            calendarFragment.setDoCheckPermission(wizardFinished);
+            mFragment = calendarFragment;
 
             // Highlight the menu item
             MenuItem calendarMenu = mNavigationView.getMenu().findItem(R.id.navigation_calendar);
@@ -327,10 +327,25 @@ public class AlarmMorningActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         MyLog.v("onActivityResult(requestCode=" + requestCode + ", resultCode=" + resultCode + ")");
-        if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_CODE_WIZARD) {
+        if (requestCode == REQUEST_CODE_WIZARD) {
+            if (!(mFragment instanceof CalendarFragment)) {
+                throw new IllegalStateException("Unsupported fragment " + (mFragment != null ? mFragment.getClass() : mFragment));
+            }
+
+            CalendarFragment calendarFragment = (CalendarFragment) mFragment;
+            calendarFragment.onResume();
+
+            calendarFragment.setDoCheckPermission(true);
+            calendarFragment.checkPermissions();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == REQUEST_CODE_PERMISSION) {
             if (mFragment instanceof CalendarFragment) {
                 CalendarFragment calendarFragment = (CalendarFragment) mFragment;
-                calendarFragment.onResume();
+                calendarFragment.checkNextPermission();
             } else {
                 throw new IllegalStateException("Unsupported fragment " + (mFragment != null ? mFragment.getClass() : mFragment));
             }
@@ -545,7 +560,8 @@ public class AlarmMorningActivity extends AppCompatActivity {
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         // Sync the toggle state after onRestoreInstanceState has occurred.
-        mDrawerToggle.syncState();
+        if (mDrawerToggle != null)
+            mDrawerToggle.syncState();
     }
 
     @Override

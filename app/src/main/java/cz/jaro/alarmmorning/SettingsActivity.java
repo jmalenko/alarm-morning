@@ -100,6 +100,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     public static final String PREF_ACTION_ON_FLIP = "pref_action_on_flip";
     public static final String PREF_ACTION_ON_SHAKE = "pref_action_on_shake";
     public static final String PREF_ACTION_ON_PROXIMITY = "pref_action_on_proximity";
+    public static final String PREF_ACTION_ON_CLAP = "pref_action_on_clap";
 
     public static final String PREF_ACTION_NOTHING = "0";
     public static final String PREF_ACTION_MUTE = "1";
@@ -113,6 +114,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     public static final String PREF_NIGHTTIME_BELL = "pref_nighttime_bell";
     public static final String PREF_NIGHTTIME_BELL_AT = "pref_nighttime_bell_at";
     public static final String PREF_NIGHTTIME_BELL_RINGTONE = "pref_nighttime_bell_ringtone";
+
+    public static final String PREF_RELIABILITY_CHECK_ENABLED = "pref_reliability_check_enabled";
 
     public static final String PREF_HOLIDAY = "pref_holiday";
 
@@ -135,11 +138,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     public static final boolean PREF_CHECK_ALARM_TIME_DEFAULT = true;
     public static final String PREF_CHECK_ALARM_TIME_AT_DEFAULT = "22:00";
     public static final int PREF_CHECK_ALARM_TIME_GAP_DEFAULT = 60;
-
     public static final boolean PREF_NIGHTTIME_BELL_DEFAULT = true;
     public static final String PREF_NIGHTTIME_BELL_AT_DEFAULT = "22:00";
     public static final String PREF_NIGHTTIME_BELL_RINGTONE_DEFAULT = "raw://church_clock_strikes_3";
-
+    public static final boolean PREF_RELIABILITY_CHECK_ENABLED_DEFAULT = true;
     public static final String PREF_HOLIDAY_NONE = HolidayHelper.PATH_TOP;
     public static final String PREF_HOLIDAY_DEFAULT = PREF_HOLIDAY_NONE;
 
@@ -175,6 +177,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         bindPreferenceSummaryToValue(findPreference(PREF_ACTION_ON_FLIP));
         bindPreferenceSummaryToValue(findPreference(PREF_ACTION_ON_SHAKE));
         bindPreferenceSummaryToValue(findPreference(PREF_ACTION_ON_PROXIMITY));
+        bindPreferenceSummaryToValue(findPreference(PREF_ACTION_ON_CLAP));
         bindPreferenceSummaryToValue(findPreference(PREF_CHECK_ALARM_TIME));
         bindPreferenceSummaryToValue(findPreference(PREF_CHECK_ALARM_TIME_AT));
         bindPreferenceSummaryToValue(findPreference(PREF_CHECK_ALARM_TIME_GAP));
@@ -184,6 +187,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         bindPreferenceSummaryToValue(findPreference(PREF_NEAR_FUTURE_TIME));
         bindPreferenceSummaryToValue(findPreference(PREF_NAP_ENABLED));
         bindPreferenceSummaryToValue(findPreference(PREF_NAP_TIME));
+        bindPreferenceSummaryToValue(findPreference(PREF_RELIABILITY_CHECK_ENABLED));
         bindPreferenceSummaryToValue(findPreference(PREF_HOLIDAY));
 
         // Start/stop services
@@ -378,7 +382,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 String summaryText = res.getString(R.string.pref_summary_time_preference, timeText);
 
                 preference.setSummary(summaryText);
-            } else if (key.equals(PREF_ACTION_ON_BUTTON) || key.equals(PREF_ACTION_ON_MOVE) || key.equals(PREF_ACTION_ON_FLIP) || key.equals(PREF_ACTION_ON_SHAKE) || key.equals(PREF_ACTION_ON_PROXIMITY)) {
+            } else if (key.equals(PREF_ACTION_ON_BUTTON) || key.equals(PREF_ACTION_ON_MOVE) || key.equals(PREF_ACTION_ON_FLIP) || key.equals(PREF_ACTION_ON_SHAKE) || key.equals(PREF_ACTION_ON_PROXIMITY) || key.equals(PREF_ACTION_ON_CLAP)) {
                 int intValue = Integer.valueOf(stringValue);
 
                 Context context = preference.getContext();
@@ -494,6 +498,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             case PREF_ACTION_ON_FLIP:
             case PREF_ACTION_ON_SHAKE:
             case PREF_ACTION_ON_PROXIMITY:
+            case PREF_ACTION_ON_CLAP:
                 newValue = SharedPreferencesHelper.load(preference.getKey(), PREF_ACTION_DEFAULT);
                 break;
             case PREF_CHECK_ALARM_TIME:
@@ -522,6 +527,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 break;
             case PREF_NAP_TIME:
                 newValue = SharedPreferencesHelper.load(preference.getKey(), PREF_NAP_TIME_DEFAULT);
+                break;
+            case PREF_RELIABILITY_CHECK_ENABLED:
+                newValue = SharedPreferencesHelper.load(preference.getKey(), PREF_RELIABILITY_CHECK_ENABLED_DEFAULT);
                 break;
             case PREF_HOLIDAY:
                 newValue = SharedPreferencesHelper.load(preference.getKey(), PREF_HOLIDAY_DEFAULT);

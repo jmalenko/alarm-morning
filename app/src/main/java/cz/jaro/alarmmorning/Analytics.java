@@ -532,6 +532,11 @@ public class Analytics {
                 return SettingsActivity.actionCodeToString(proximityActionPreference);
             });
 
+            put(confPreferences, SettingsActivity.PREF_ACTION_ON_CLAP, () -> {
+                String proximityActionPreference = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_ACTION_ON_CLAP, SettingsActivity.PREF_ACTION_DEFAULT);
+                return SettingsActivity.actionCodeToString(proximityActionPreference);
+            });
+
             put(confPreferences, SettingsActivity.PREF_CHECK_ALARM_TIME, () -> SharedPreferencesHelper.load(SettingsActivity.PREF_CHECK_ALARM_TIME, SettingsActivity.PREF_CHECK_ALARM_TIME_DEFAULT));
 
             put(confPreferences, SettingsActivity.PREF_CHECK_ALARM_TIME_AT, () -> SharedPreferencesHelper.load(SettingsActivity.PREF_CHECK_ALARM_TIME_AT, SettingsActivity.PREF_CHECK_ALARM_TIME_AT_DEFAULT));
@@ -543,6 +548,8 @@ public class Analytics {
             put(confPreferences, SettingsActivity.PREF_NIGHTTIME_BELL_AT, () -> SharedPreferencesHelper.load(SettingsActivity.PREF_NIGHTTIME_BELL_AT, SettingsActivity.PREF_NIGHTTIME_BELL_AT_DEFAULT));
 
             put(confPreferences, SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE, () -> SharedPreferencesHelper.load(SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE, SettingsActivity.PREF_NIGHTTIME_BELL_RINGTONE_DEFAULT));
+
+            put(confPreferences, SettingsActivity.PREF_RELIABILITY_CHECK_ENABLED, () -> SharedPreferencesHelper.load(SettingsActivity.PREF_RELIABILITY_CHECK_ENABLED, SettingsActivity.PREF_RELIABILITY_CHECK_ENABLED_DEFAULT));
 
             conf.put("preferences", confPreferences);
 

@@ -34,7 +34,8 @@ public class Wizard extends AppIntro {
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.CAMERA,
-            Manifest.permission.INTERNET
+            Manifest.permission.INTERNET,
+            Manifest.permission.RECORD_AUDIO
     };
 
     @Override

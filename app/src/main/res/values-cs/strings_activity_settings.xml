@@ -42,6 +42,7 @@
     <string name="pref_title_action_on_flip">Při obrácení vzůru nohama</string>
     <string name="pref_title_action_on_shake">Při zatřesení</string>
     <string name="pref_title_action_on_proximity">Při přiblížení</string>
+    <string name="pref_title_action_on_clap">Při potleskání (nebo obecněji při hlasitém zvuku)</string>
 
 
     <string name="pref_category_check_alarm_time_title">@string/pref_title_check_alarm_time</string>
@@ -75,6 +76,10 @@
     <string name="pref_summaryon_nap_enabled">… minut od současnosti</string>
 
     <string name="pref_title_nap_time">Jak dlouho od současnosti</string>
+
+    <string name="pref_title_reliability_check_enabled">Kontrola spolehlivosti</string>
+    <string name="pref_summaryoff_reliability_check_enabled">Nekontrolovat spolehlivost</string>
+    <string name="pref_summaryon_reliability_check_enabled">Kontrolovat skutečnou hlasitost budíku a spoustit panický zvuk pokud je nedostatečná</string>
 
     <string name="pref_title_holiday">Svátky</string>
 

@@ -72,6 +72,9 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
 
     private CalendarAdapter.CalendarViewHolder editingNameViewHolder; // Reference to the currently edited name of a one-time alarm
 
+    private int permissionToCheck;
+    private boolean doCheckPermission = true;
+
     public CalendarFragment() {
         // Empty constructor required for fragment subclasses
     }
@@ -255,7 +258,7 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         OneTimeAlarm oneTimeAlarm = null;
         for (AppAlarm appAlarm : items) {
             if (appAlarm instanceof OneTimeAlarm
-                    && ((OneTimeAlarm) appAlarm).getId() == oneTimeAlarmId) {
+                && ((OneTimeAlarm) appAlarm).getId() == oneTimeAlarmId) {
                 oneTimeAlarm = (OneTimeAlarm) appAlarm;
                 break;
             }
@@ -485,12 +488,12 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         for (int i = 0; i < items.size(); i++) {
             AppAlarm appAlarm2 = items.get(i);
             if (appAlarm2 instanceof Day
-                    && appAlarm instanceof Day
-                    && onTheSameDate(appAlarm2.getDateTime(), appAlarm.getDateTime()))
+                && appAlarm instanceof Day
+                && onTheSameDate(appAlarm2.getDateTime(), appAlarm.getDateTime()))
                 return i;
             if (appAlarm2 instanceof OneTimeAlarm
-                    && appAlarm instanceof OneTimeAlarm
-                    && ((OneTimeAlarm) appAlarm2).getId() == ((OneTimeAlarm) appAlarm).getId()) {
+                && appAlarm instanceof OneTimeAlarm
+                && ((OneTimeAlarm) appAlarm2).getId() == ((OneTimeAlarm) appAlarm).getId()) {
                 return i;
             }
         }
@@ -1006,19 +1009,68 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         return super.onContextItemSelected(item);
     }
 
-    private void checkPermissions() {
-        final int MY_PERMISSIONS_REQUEST_CAMERA = 1;
+    public void setDoCheckPermission(boolean doCheckPermission) {
+        this.doCheckPermission = doCheckPermission;
+    }
 
-        int permissionCheck = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA);
+    void checkPermissions() {
+        if (doCheckPermission) {
+            permissionToCheck = 0;
+            checkNextPermission();
+        }
+    }
+
+    void checkNextPermission() {
+        // Only the permission that the user can enable in the Settings should be handled here. Other permissions should be handled gracefully in the app.
+
+        // Configuration
+
+        final boolean[] conditions = new boolean[]{
+                (boolean) SharedPreferencesHelper.load(SettingsActivity.PREF_FLASHLIGHT, SettingsActivity.PREF_FLASHLIGHT_DEFAULT),
+                RingActivity.enableSoundMeter()
+        };
+
+        final String[] permissions = new String[]{
+                Manifest.permission.CAMERA,
+                Manifest.permission.RECORD_AUDIO
+        };
+
+        final int[] messageResIds = new int[]{
+                R.string.permission_missing_message_detail__camera,
+                R.string.permission_missing_message_detail__record_audio
+        };
+
+        // Algorithm
+        while (permissionToCheck < permissions.length) {
+            boolean condition = conditions[permissionToCheck];
+            String permission = permissions[permissionToCheck];
+            int messageResId = messageResIds[permissionToCheck];
+            permissionToCheck++;
+
+            if (condition) {
+                boolean permissionDialogDisplayed = askForPermissionIfNotGranted(permission, messageResId);
+                if (permissionDialogDisplayed) return;
+            }
+        }
+    }
+
+    private boolean askForPermissionIfNotGranted(String permission, int messageResId) {
+        int permissionCheck = ContextCompat.checkSelfPermission(getActivity(), permission);
         if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
             AlertDialog alertDialog = new AlertDialog.Builder(getActivity()).create();
             alertDialog.setTitle(getString(R.string.permission_missing_title));
-            alertDialog.setMessage(getString(R.string.permission_missing_message));
+            alertDialog.setMessage(getString(R.string.permission_missing_message_combine,
+                    getString(messageResId),
+                    getString(R.string.permission_missing_message_grant)
+            ));
             alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.permission_missing_button), (dialog, which) -> {
                 dialog.dismiss();
-                ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA}, MY_PERMISSIONS_REQUEST_CAMERA);
+                ActivityCompat.requestPermissions(getActivity(), new String[]{permission}, AlarmMorningActivity.REQUEST_CODE_PERMISSION);
             });
             alertDialog.show();
+            return true;
+        } else {
+            return false;
         }
     }
 

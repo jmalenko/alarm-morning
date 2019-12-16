@@ -42,6 +42,7 @@
     <string name="pref_title_action_on_flip">On device flip</string>
     <string name="pref_title_action_on_shake">On device shake</string>
     <string name="pref_title_action_on_proximity">On proximity</string>
+    <string name="pref_title_action_on_clap">On clap (or generally on a loud sound)</string>
 
 
     <string name="pref_category_check_alarm_time_title">@string/pref_title_check_alarm_time</string>
@@ -75,6 +76,10 @@
     <string name="pref_summaryon_nap_enabled">… minutes from now</string>
 
     <string name="pref_title_nap_time">How far from now</string>
+
+    <string name="pref_title_reliability_check_enabled">Reliability check</string>
+    <string name="pref_summaryoff_reliability_check_enabled">Don\'t do the reliability check</string>
+    <string name="pref_summaryon_reliability_check_enabled">Monitor the alarm volume and play panic sound when the alarm is not loud enough</string>
 
     <string name="pref_title_holiday">Holidays</string>
 

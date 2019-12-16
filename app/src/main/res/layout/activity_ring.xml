@@ -141,6 +141,23 @@
                 android:gravity="center"
                 tools:text="Next appointment: 8:00 Dentist" />
 
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="0dip"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/silenceDetected"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginLeft="@dimen/margin_medium"
+                android:layout_marginRight="@dimen/margin_medium"
+                android:gravity="center"
+                android:text="@string/no_sound_detected"
+                android:textColor="@color/Red_500"
+                android:visibility="invisible" />
+
             <SurfaceView
                 android:id="@+id/cameraPreview"
                 android:layout_width="1dip"
