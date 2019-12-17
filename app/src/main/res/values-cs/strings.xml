@@ -48,6 +48,10 @@
         <item quantity="other">Odložit o <xliff:g example="5" id="minutes">%1$d</xliff:g> minut</item>
     </plurals>
 
+    <string name="test_panic_title">Panika je spuštěna!</string>
+    <string name="test_panic_message">Zní siréna, zaříení vibruje a blesk fotoapátu bliká.\n\nJestliže něco nefunguje, pak jste aplikaci nepřidělili odpovidající Androidová práva nebo toho zařízení není schopné.</string>
+    <string name="test_panic_button">Zastavit</string>
+
     <!-- Wizard activity -->
     <string name="title_activity_wizard">Průvodce nastavením</string>
 

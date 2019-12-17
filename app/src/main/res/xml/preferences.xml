@@ -207,6 +207,11 @@
             android:summaryOn="@string/pref_summaryon_reliability_check_enabled"
             android:title="@string/pref_title_reliability_check_enabled" />
 
+        <Preference
+            android:key="pref_test_panic"
+            android:title="@string/pref_title_test_panic"
+            android:summary="@string/pref_summary_test_panic" />
+
         <cz.jaro.alarmmorning.graphics.HolidayPreference
             android:key="pref_holiday"
             android:title="@string/pref_title_holiday"

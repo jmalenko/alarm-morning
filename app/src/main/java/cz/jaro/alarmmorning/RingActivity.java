@@ -17,6 +17,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Vibrator;
 import android.view.KeyEvent;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
@@ -978,23 +979,28 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
         MyLog.d("startVibrate()");
 
         boolean vibratePreference = (boolean) SharedPreferencesHelper.load(SettingsActivity.PREF_VIBRATE, SettingsActivity.PREF_VIBRATE_DEFAULT);
+        if (vibratePreference) {
+            startVibrateForce(this);
+        }
+    }
+
+    private void startVibrateForce(Context context) {
+        MyLog.v("startVibrateForce()");
 
         isVibrating = false;
 
-        if (vibratePreference) {
-            vibrator = (Vibrator) getBaseContext().getSystemService(Context.VIBRATOR_SERVICE);
+        vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
 
-            if (vibrator.hasVibrator()) {
-                isVibrating = true;
+        if (vibrator.hasVibrator()) {
+            isVibrating = true;
 
-                vibrator.vibrate(VIBRATOR_PATTERN, 0);
+            vibrator.vibrate(VIBRATOR_PATTERN, 0);
 
-                // To continue vibrating when screen goes off
-                IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
-                registerReceiver(vibrateReceiver, filter);
-            } else {
-                MyLog.w("The device cannot vibrate");
-            }
+            // To continue vibrating when screen goes off
+            IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
+            context.registerReceiver(vibrateReceiver, filter);
+        } else {
+            MyLog.w("The device cannot vibrate");
         }
     }
 
@@ -1009,11 +1015,16 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
 
     private void stopVibrate() {
         MyLog.d("stopVibrate()");
+        stopVibrate(this);
+    }
+
+    private void stopVibrate(Context context) {
+        MyLog.v("stopVibrate()");
 
         if (isVibrating) {
             vibrator.cancel();
 
-            unregisterReceiver(vibrateReceiver);
+            context.unregisterReceiver(vibrateReceiver);
         }
     }
 
@@ -1043,25 +1054,34 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
         MyLog.d("startFlashlight()");
 
         boolean flashPreference = (boolean) SharedPreferencesHelper.load(SettingsActivity.PREF_FLASHLIGHT, SettingsActivity.PREF_FLASHLIGHT_DEFAULT);
+        if (flashPreference) {
+            startFlashlightForce();
+        }
+    }
+
+    private void startFlashlightForce() {
+        startFlashlightForce(this, findViewById(R.id.cameraPreview));
+    }
+
+    private void startFlashlightForce(Context context, SurfaceView surfaceView) {
+        MyLog.v("startFlashlightForce()");
 
         isFlashlight = false;
 
-        if (flashPreference) {
-            int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
-            if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-                flashlightBlinker = new FlashlightBlinker(this);
+        int permissionCheck = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA);
+        if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
+            flashlightBlinker = new FlashlightBlinker(context);
 
-                if (flashlightBlinker.hasFlashlightBlinker()) {
-                    flashlightBlinker.blink(FLASHLIGHT_PATTERN, FLASHLIGHT_REPEAT, findViewById(R.id.cameraPreview));
+            if (flashlightBlinker.hasFlashlightBlinker()) {
+                flashlightBlinker.blink(FLASHLIGHT_PATTERN, FLASHLIGHT_REPEAT, surfaceView);
 
-                    isFlashlight = true;
-                } else {
-                    MyLog.w("The device doesn't have a flashlight blinker");
-                }
+                isFlashlight = true;
             } else {
-                MyLog.w("The CAMERA permission is not granted");
-                // It doesn't make sense to ask for permission while ringing
+                MyLog.w("The device doesn't have a flashlight blinker");
             }
+        } else {
+            MyLog.w("The CAMERA permission is not granted");
+            // It doesn't make sense to ask for permission while ringing
         }
     }
 
@@ -1234,12 +1254,28 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
             audioManager.setStreamVolume(ALARM_MANAGER_STREAM, maxVolume, 0); // Set volume to max
 
         if (!isFlashlight)
-            startFlashlight();
+            startFlashlightForce();
 
         if (!isVibrating)
-            startVibrate();
+            startVibrateForce(this);
 
         startSoundBuzzer();
+    }
+
+    public void testSilenceDetectedStart(Context context, SurfaceView surfaceView) {
+        MyLog.v("testSilenceDetectedStart()");
+
+        startFlashlightForce(context, surfaceView);
+        startVibrateForce(context);
+        startSoundBuzzer();
+    }
+
+    public void testSilenceDetectedStop(Context context) {
+        MyLog.v("testSilenceDetectedStop()");
+
+        stopFlashlight();
+        stopVibrate(context);
+        stopSoundBuzzer();
     }
 
     private void startSoundBuzzer() {

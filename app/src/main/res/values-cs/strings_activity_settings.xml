@@ -79,7 +79,10 @@
 
     <string name="pref_title_reliability_check_enabled">Kontrola spolehlivosti</string>
     <string name="pref_summaryoff_reliability_check_enabled">Nekontrolovat spolehlivost</string>
-    <string name="pref_summaryon_reliability_check_enabled">Kontrolovat skutečnou hlasitost budíku a spoustit panický zvuk pokud je nedostatečná</string>
+    <string name="pref_summaryon_reliability_check_enabled">Kontrolovat skutečnou hlasitost budíku a spoustit paniku (siréna, vibrace, blesk) pokud je nedostatečná</string>
+
+    <string name="pref_title_test_panic">Test paniky…</string>
+    <string name="pref_summary_test_panic">Spustit paniku (siréna, vibrace, blesk)</string>
 
     <string name="pref_title_holiday">Svátky</string>
 

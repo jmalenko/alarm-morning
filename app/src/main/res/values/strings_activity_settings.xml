@@ -79,7 +79,10 @@
 
     <string name="pref_title_reliability_check_enabled">Reliability check</string>
     <string name="pref_summaryoff_reliability_check_enabled">Don\'t do the reliability check</string>
-    <string name="pref_summaryon_reliability_check_enabled">Monitor the alarm volume and play panic sound when the alarm is not loud enough</string>
+    <string name="pref_summaryon_reliability_check_enabled">Monitor the alarm volume and start panic (buzzer, vibration, flashlight) when the alarm is not loud enough</string>
+
+    <string name="pref_title_test_panic">Test panic…</string>
+    <string name="pref_summary_test_panic">Start panic (buzzer, vibration, flashlight)</string>
 
     <string name="pref_title_holiday">Holidays</string>
 

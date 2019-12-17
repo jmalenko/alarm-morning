@@ -3,17 +3,12 @@ package cz.jaro.alarmmorning;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.Settings;
-import android.telephony.TelephonyManager;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -31,23 +26,17 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 import java.util.Random;
-import java.util.TimeZone;
 import java.util.concurrent.Callable;
 
 import cz.jaro.alarmmorning.calendar.CalendarUtils;
 import cz.jaro.alarmmorning.clock.Clock;
 import cz.jaro.alarmmorning.clock.SystemClock;
-import cz.jaro.alarmmorning.holiday.HolidayHelper;
-import cz.jaro.alarmmorning.model.AlarmDataSource;
 import cz.jaro.alarmmorning.model.AppAlarm;
 import cz.jaro.alarmmorning.model.Day;
 import cz.jaro.alarmmorning.model.Defaults;
 import cz.jaro.alarmmorning.model.OneTimeAlarm;
-import cz.jaro.alarmmorning.wizard.Wizard;
-import de.galgtonold.jollydayandroid.Holiday;
 
 import static cz.jaro.alarmmorning.calendar.CalendarUtils.dayOfWeekToString;
 
@@ -86,6 +75,7 @@ public class Analytics {
     public static final String CHECK_ALARM_TIME_METHOD__QUICK = "Quick";
     public static final String CHECK_ALARM_TIME_METHOD__DIALOG = "Dialog";
 
+    public static final String TARGET_TEST_PANIC = "Test panic";
     public static final String TARGET_WIZARD = "Wizard";
 
     public static final String TARGET_MENU_ACTION_CLOSE = "Menu action: Open";

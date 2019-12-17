@@ -37,6 +37,10 @@
         <item quantity="other">Snooze for %d minutes</item>
     </plurals>
 
+    <string name="test_panic_title">The panic is on!</string>
+    <string name="test_panic_message">The buzzer sounds, the vibration is on and flashlight is flashing.\n\nIf something is not working, then you haven\'t granted the respective Android permission or the device isn\'t capable of doing this.</string>
+    <string name="test_panic_button">Stop</string>
+
     <!-- Ring activity -->
     <string name="title_activity_ring">Alarm</string>
 

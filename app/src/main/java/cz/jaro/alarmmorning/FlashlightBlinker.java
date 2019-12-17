@@ -68,9 +68,9 @@ public class FlashlightBlinker {
 
                 @Override
                 public void surfaceCreated(SurfaceHolder holder) {
-                    FlashlightBlinker.this.surfaceHolder = holder;
+                    surfaceHolder = holder;
                     try {
-                        camera.setPreviewDisplay(FlashlightBlinker.this.surfaceHolder);
+                        camera.setPreviewDisplay(surfaceHolder);
                     } catch (IOException e) {
                         MyLog.e("Cannot set preview display", e);
                     }
@@ -78,8 +78,7 @@ public class FlashlightBlinker {
 
                 @Override
                 public void surfaceDestroyed(SurfaceHolder holder) {
-                    camera.stopPreview();
-                    FlashlightBlinker.this.surfaceHolder = null;
+                    surfaceHolder = null;
                 }
             });
 
@@ -99,7 +98,8 @@ public class FlashlightBlinker {
         if (isOn())
             off();
 
-        handler.removeCallbacks(this::opposite);
+        // Note: handler.removeCallbacks(this::opposite); doen't work. Source: https://stackoverflow.com/questions/26546043/android-handler-removecallbacks-not-working
+        handler.removeCallbacksAndMessages(null);
 
         camera.stopPreview();
         camera.release();
