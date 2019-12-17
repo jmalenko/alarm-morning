@@ -159,10 +159,10 @@ public class MyLog {
         StackTraceElement stackTraceElement = Thread.currentThread().getStackTrace()[level];
 
         String fileName = stackTraceElement.getFileName();
-        if (fileName.endsWith(".java"))
+        if (fileName != null && fileName.endsWith(".java"))
             fileName = fileName.substring(0, fileName.length() - 5);
 
-        return fileName + ":" + stackTraceElement.getLineNumber();
+        return fileName + "." + stackTraceElement.getMethodName() + ":" + stackTraceElement.getLineNumber();
     }
 
     private static String stackTraceToString(Throwable tr) {
