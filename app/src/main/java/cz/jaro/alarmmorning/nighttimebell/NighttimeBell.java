@@ -45,7 +45,7 @@ public class NighttimeBell {
 
     public static NighttimeBell getInstance(Context context) {
         if (instance == null) {
-            instance = new NighttimeBell(context);
+            instance = new NighttimeBell(context.getApplicationContext());
         }
         return instance;
     }

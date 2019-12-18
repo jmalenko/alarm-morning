@@ -61,7 +61,7 @@ public class SystemAlarm {
 
     public static SystemAlarm getInstance(Context context) {
         if (instance == null) {
-            instance = new SystemAlarm(context);
+            instance = new SystemAlarm(context.getApplicationContext());
         }
         return instance;
     }

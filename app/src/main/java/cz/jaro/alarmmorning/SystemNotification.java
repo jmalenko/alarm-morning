@@ -48,7 +48,7 @@ public class SystemNotification {
 
     public static SystemNotification getInstance(Context context) {
         if (instance == null) {
-            instance = new SystemNotification(context);
+            instance = new SystemNotification(context.getApplicationContext());
         }
         return instance;
     }

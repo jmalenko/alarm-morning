@@ -93,7 +93,7 @@ public class CheckAlarmTime {
 
     public static CheckAlarmTime getInstance(Context context) {
         if (instance == null) {
-            instance = new CheckAlarmTime(context);
+            instance = new CheckAlarmTime(context.getApplicationContext());
         }
         return instance;
     }

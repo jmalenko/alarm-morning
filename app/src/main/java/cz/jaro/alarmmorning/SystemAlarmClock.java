@@ -33,7 +33,7 @@ public class SystemAlarmClock {
 
     public static SystemAlarmClock getInstance(Context context) {
         if (instance == null) {
-            instance = new SystemAlarmClock(context);
+            instance = new SystemAlarmClock(context.getApplicationContext());
         }
         return instance;
     }

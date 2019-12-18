@@ -797,7 +797,7 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
 
     private void startSoundAsRingtone(Uri ringtoneUri) {
         MyLog.d("startSoundAsRingtone()");
-        ringtone = RingtoneManager.getRingtone(getApplicationContext(), ringtoneUri);
+        ringtone = RingtoneManager.getRingtone(this, ringtoneUri);
         ringtone.play();
     }
 
