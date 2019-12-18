@@ -265,7 +265,7 @@ public class HolidaySelector extends LinearLayout implements AdapterView.OnItemS
         regionDetectors.add(new LocaleRegionDetector(getContext()));
         regionDetectors.add(new TelephonyRegionDetector(getContext()));
         regionDetectors.add(new IPRegionDetector(getContext()));
-        regionDetectors.add(new GPSLocationProviderRegionDetector(getContext()));
+        regionDetectors.add(new GPSLocationProviderRegionDetector(getContext())); // TODO Starting the LocationProviderRegionDetector in a thread like currently implemented causes memory leak (discovered by LeakCanary)
         regionDetectors.add(new NetworkLocationProviderRegionDetector(getContext()));
 
         for (RegionDetector regionDetector : regionDetectors) {
@@ -273,18 +273,22 @@ public class HolidaySelector extends LinearLayout implements AdapterView.OnItemS
 
             // Run in a thread. Thread needed for parallel use of several RegionDetectors and to prevent NetworkOnMainThreadException.
             Thread thread = new Thread() {
+
                 @Override
                 public void run() {
-                    // Looper needed because of GPSLocationProviderRegionDetector (which uses GPS)
-                    if (regionDetector instanceof LocationProviderRegionDetector)
+                    // Looper needed because of LocationProviderRegionDetector
+                    boolean useLooper = regionDetector instanceof LocationProviderRegionDetector;
+
+                    if (useLooper)
                         Looper.prepare();
 
                     regionDetector.detect();
 
-                    if (regionDetector instanceof LocationProviderRegionDetector)
+                    if (useLooper)
                         Looper.loop();
                 }
             };
+            thread.setName("Thread for " + regionDetector.getClass().getSimpleName());
             thread.start();
         }
     }
@@ -313,6 +317,7 @@ public class HolidaySelector extends LinearLayout implements AdapterView.OnItemS
             if (button == null) { // Button for this region doesn't exist
                 String countryName = holidayHelper.preferenceToDisplayName(finalCountryCode);
 
+
                 // Create the button
                 button = new Button(getContext());
                 button.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
@@ -329,7 +334,7 @@ public class HolidaySelector extends LinearLayout implements AdapterView.OnItemS
                 recommendationContainer.addView(button, index);
 
                 // Show...
-                //    in Wizard shown for the 1st time: if there are 2 (or more) regions. Because the 1st resgion is preselected.
+                //    in Wizard shown for the 1st time: if there are 2 (or more) regions. Because the 1st region is preselected.
                 //    otherwise: if a detected region is different from the selected one
                 if (!Wizard.loadWizardFinished()) {
                     if (recommendationContainer.getChildCount() == 2)
