@@ -8,6 +8,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
@@ -68,40 +69,36 @@ public class LocationProviderRegionDetector extends RegionDetector {
     private void useNewLocation(Location location) {
         MyLog.d("useNewLocation()");
 
-        double latitude = location.getLatitude();
-        double longitude = location.getLongitude();
-        String countryCode = getCountryCode(latitude, longitude);
-
-        if (countryCode != null) {
+        try {
+            double latitude = location.getLatitude();
+            double longitude = location.getLongitude();
+            String countryCode = getCountryCode(latitude, longitude);
             callChangeListener(countryCode, location);
+        } catch (IOException e) {
+            MyLog.w("Cannot get address from coordinates", e);
         }
     }
 
-    String getCountryCode(double lat, double lng) {
+    String getCountryCode(double lat, double lng) throws IOException {
         if (!Geocoder.isPresent()) {
             MyLog.e("Geocoder not present");
             return null;
         }
         Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
-        try {
-            List<Address> addresses = geocoder.getFromLocation(lat, lng, 1);
-            Address obj = addresses.get(0);
+        List<Address> addresses = geocoder.getFromLocation(lat, lng, 1);
+        Address obj = addresses.get(0);
 
-//            String address = obj.getAddressLine(0);
-//            address = address + "\n" + obj.getLatitude() + " " + obj.getLongitude();
-//            address = address + "\n" + obj.getCountryName();
-//            address = address + "\n" + obj.getCountryCode();
-//            address = address + "\n" + obj.getAdminArea(); // State
-//            address = address + "\n" + obj.getPostalCode();
-//            address = address + "\n" + obj.getSubAdminArea(); // City
-//            address = address + "\n" + obj.getLocality();
-//            address = address + "\n" + obj.getSubThoroughfare();
+//        String address = obj.getAddressLine(0);
+//        address = address + "\n" + obj.getLatitude() + " " + obj.getLongitude();
+//        address = address + "\n" + obj.getCountryName();
+//        address = address + "\n" + obj.getCountryCode();
+//        address = address + "\n" + obj.getAdminArea(); // State
+//        address = address + "\n" + obj.getPostalCode();
+//        address = address + "\n" + obj.getSubAdminArea(); // City
+//        address = address + "\n" + obj.getLocality();
+//        address = address + "\n" + obj.getSubThoroughfare();
 
-            return obj.getCountryCode();
-        } catch (Exception e) {
-            MyLog.w("Cannot get address from coordinates", e);
-            return null;
-        }
+        return obj.getCountryCode();
     }
 
 }
