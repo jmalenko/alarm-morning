@@ -1147,12 +1147,15 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
     private void updateSoundMeter() {
         MyLog.v("updateSoundMeter()");
 
+        soundMeterHandler.postDelayed(this::updateSoundMeter, SOUND_METER_DELAY_MILLIS);
+
         // Store measurement
         long currentTimeMillis = currentTimeMillis();
 
         double amplitude = soundMeter.getMaxAmplitude();
         double dB = amplitudeToDecibel(amplitude);
-        MyLog.e("Amplitude=" + amplitude + " = " + dB + " dB");
+
+//        MyLog.v("Amplitude=" + amplitude + " = " + dB + " dB");
         if (amplitude == 0) // Sometimes, first few measures have 0 amplitude (= -infinity dB). Skip these.
             return;
 
@@ -1174,8 +1177,6 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
 
         if (onClapActionEnabled())
             checkClapGesture();
-
-        soundMeterHandler.postDelayed(this::updateSoundMeter, SOUND_METER_DELAY_MILLIS);
     }
 
     /**
