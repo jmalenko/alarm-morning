@@ -28,6 +28,9 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import net.mabboud.android_tone_player.ContinuousBuzzer;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
@@ -581,6 +584,12 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
 
             // allow device sleep
             WakeLocker.release();
+
+            // Save sound meter measurements
+            Analytics analytics = new Analytics(this, Analytics.Event.End, Analytics.Channel.Activity, Analytics.ChannelName.Ring);
+            analytics.set(Analytics.Param.General_JSON, soundMeterHistory2JSONString());
+            analytics.setConfigurationInfo();
+            analytics.save();
         }
     }
 
@@ -1162,13 +1171,13 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
         SoundMeterRecord soundMeterRecord = new SoundMeterRecord(currentTimeMillis, dB);
         soundMeterHistory.add(soundMeterRecord);
 
-        // Delete old records from history
-        long maxLength = Math.max(
-                SOUND_METER_SILENCE_DURATION / SOUND_METER_DELAY_MILLIS, // silence detection
-                SOUND_METER_CLAP_PERIODS // clap detection
-        );
-        while (maxLength < soundMeterHistory.size())
-            soundMeterHistory.removeFirst();
+        // Delete old records from history - commented to enable saving all the measurements to analytics
+//        long maxLength = Math.max(
+//                SOUND_METER_SILENCE_DURATION / SOUND_METER_DELAY_MILLIS, // silence detection
+//                SOUND_METER_CLAP_PERIODS // clap detection
+//        );
+//        while (maxLength < soundMeterHistory.size())
+//            soundMeterHistory.removeFirst();
 
         // Check actions
 
@@ -1240,6 +1249,11 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
 
     private void doSilenceDetected() {
         MyLog.i("Silence detected");
+
+        Analytics analytics = new Analytics(this, Analytics.Event.Silence_gesture, Analytics.Channel.Activity, Analytics.ChannelName.Ring);
+        analytics.set(Analytics.Param.General_JSON, soundMeterHistory2JSONString());
+        analytics.setConfigurationInfo();
+        analytics.save();
 
         // Show the message
         TextView silenceDetectedView = findViewById(R.id.silenceDetected);
@@ -1372,7 +1386,15 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
 
     private void doClapDetected() {
         MyLog.i("Clap (loud sound) detected");
+
         String action = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_ACTION_ON_CLAP, SettingsActivity.PREF_ACTION_DEFAULT);
+
+        Analytics analytics = new Analytics(this, Analytics.Event.Clap_gesture, Analytics.Channel.Activity, Analytics.ChannelName.Ring);
+        analytics.set(Analytics.Param.Action, action);
+        analytics.set(Analytics.Param.General_JSON, soundMeterHistory2JSONString());
+        analytics.setConfigurationInfo();
+        analytics.save();
+
         actOnEvent(action);
     }
 
@@ -1397,6 +1419,22 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
     private static boolean onClapActionEnabled() {
         String onClapAction = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_ACTION_ON_CLAP, SettingsActivity.PREF_ACTION_DEFAULT);
         return !onClapAction.equals(SettingsActivity.PREF_ACTION_NOTHING);
+    }
+
+    private String soundMeterHistory2JSONString() {
+        JSONObject o = new JSONObject();
+
+        for (SoundMeterRecord soundMeterRecord : soundMeterHistory) {
+            String key = String.valueOf(soundMeterRecord.timestamp);
+            double value = soundMeterRecord.dB;
+            try {
+                o.put(key, value);
+            } catch (JSONException e) {
+                MyLog.v("Cannot put the key " + key + " to the JSON object (with value " + value + ")", e);
+            }
+        }
+
+        return o.toString();
     }
 
     @Override

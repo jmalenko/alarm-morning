@@ -139,8 +139,11 @@ public class Analytics {
         Preference_value,
 
         Target,
+        Action,
 
-        Configuration
+        Configuration,
+
+        General_JSON
     }
 
     public enum Event {
@@ -181,6 +184,10 @@ public class Analytics {
         Play_nighttime_bell,
 
         Start,
+        End,
+
+        Silence_gesture, // TODO add other actions/gestures
+        Clap_gesture,
 
         Change_setting;
 
@@ -763,51 +770,53 @@ public class Analytics {
     @Override
     public String toString() {
         return padLeft(Param.Datetime_UTC, 23) + " | " +
-                padRight(mEvent.toString(), 20) + " | " +
-                padRight(Param.Channel, 20) + " | " +
-                padRight(Param.Channel_name, 20) + " | " +
-                padRight(Param.Alarm_date, 10) + " | " +
-                padLeft(Param.Alarm_time, 5) + " | " +
-                padRight(Param.Day_of_week, 3) + " | " +
-                padRight(Param.Day_of_week_type, 7) + " | " +
-                padRight(Param.Alarm_state, 15) + " | " +
-                padLeft(Param.Default_alarm_time, 8) + " | " +
-                padRight(Param.Alarm_id, 8) + " | " +
-                padRight(Param.Snooze_count, 2) + " | " +
+               padRight(mEvent.toString(), 20) + " | " +
+               padRight(Param.Channel, 20) + " | " +
+               padRight(Param.Channel_name, 20) + " | " +
+               padRight(Param.Alarm_date, 10) + " | " +
+               padLeft(Param.Alarm_time, 5) + " | " +
+               padRight(Param.Day_of_week, 3) + " | " +
+               padRight(Param.Day_of_week_type, 7) + " | " +
+               padRight(Param.Alarm_state, 15) + " | " +
+               padLeft(Param.Default_alarm_time, 8) + " | " +
+               padRight(Param.Alarm_id, 8) + " | " +
+               padRight(Param.Snooze_count, 2) + " | " +
 
-                padLeft(Param.Alarm_time_old, 8) + " | " +
-                padRight(Param.Skipped_alarm_times, 20) + " | " +
-                padRight(Param.Dismiss_type, 6) + " | " +
+               padLeft(Param.Alarm_time_old, 8) + " | " +
+               padRight(Param.Skipped_alarm_times, 20) + " | " +
+               padRight(Param.Dismiss_type, 6) + " | " +
 
-                padLeft(Param.Location_time, 8) + " | " +
-                padLeft(Param.Location_latitude, 8) + " | " +
-                padLeft(Param.Location_longitude, 8) + " | " +
-                padLeft(Param.Location_accuracy, 8) + " | " +
-                padLeft(Param.Location_altitude, 8) + " | " +
-                padLeft(Param.Location_bearing, 8) + " | " +
-                padLeft(Param.Location_speed, 8) + " | " +
-                padLeft(Param.Location_verticalAccuracyMeters, 8) + " | " +
-                padLeft(Param.Location_bearingAccuracyDegrees, 8) + " | " +
-                padLeft(Param.Location_speedAccuracyMetersPerSecond, 8) + " | " +
+               padLeft(Param.Location_time, 8) + " | " +
+               padLeft(Param.Location_latitude, 8) + " | " +
+               padLeft(Param.Location_longitude, 8) + " | " +
+               padLeft(Param.Location_accuracy, 8) + " | " +
+               padLeft(Param.Location_altitude, 8) + " | " +
+               padLeft(Param.Location_bearing, 8) + " | " +
+               padLeft(Param.Location_speed, 8) + " | " +
+               padLeft(Param.Location_verticalAccuracyMeters, 8) + " | " +
+               padLeft(Param.Location_bearingAccuracyDegrees, 8) + " | " +
+               padLeft(Param.Location_speedAccuracyMetersPerSecond, 8) + " | " +
 
-                padRight(Param.Check_alarm_time_action, 23) + " | " +
-                padRight(Param.Check_alarm_time_gap, 3) + " | " +
-                padRight(Param.Check_alarm_time_method, 6) + " | " +
+               padRight(Param.Check_alarm_time_action, 23) + " | " +
+               padRight(Param.Check_alarm_time_gap, 3) + " | " +
+               padRight(Param.Check_alarm_time_method, 6) + " | " +
 
-                padLeft(Param.Appointment_begin, 5) + " | " +
-                padRight(Param.Appointment_title, 20) + " | " +
-                padRight(Param.Appointment_location, 20) + " | " +
+               padLeft(Param.Appointment_begin, 5) + " | " +
+               padRight(Param.Appointment_title, 20) + " | " +
+               padRight(Param.Appointment_location, 20) + " | " +
 
-                padRight(Param.Preference_key, 30) + " | " +
-                padRight(Param.Preference_value, 10) + " | " +
+               padRight(Param.Preference_key, 30) + " | " +
+               padRight(Param.Preference_value, 10) + " | " +
 
-                padRight(Param.Target, 20) + " | " +
+               padRight(Param.Target, 20) + " | " +
+               padRight(Param.Action, 20) + " | " +
 
-                padRight(Param.Configuration, 10) + " | " +
+               padRight(Param.Configuration, 10) + " | " +
+               padRight(Param.General_JSON, 10) + " | " +
 
-                padLeft(Param.Version, 3) + " | " +
-                padRight(Param.User_ID, USER_ID_LENGTH) + " | " +
-                padRight(Param.Datetime, 1);
+               padLeft(Param.Version, 3) + " | " +
+               padRight(Param.User_ID, USER_ID_LENGTH) + " | " +
+               padRight(Param.Datetime, 1);
     }
 
     private String padLeft(Param param, int n) {
