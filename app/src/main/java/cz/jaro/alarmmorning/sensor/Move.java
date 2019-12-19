@@ -48,7 +48,7 @@ public class Move extends SensorEventDetector {
                 ", gravity=[" + f.format(gravity[0]) + ", " + f.format(gravity[1]) + ", " + f.format(gravity[2]) + "]");
 
         // The "real" acceleration must be high enough
-        final double acceleration_size_min = 10;
+        final double acceleration_size_min = 4;
         return gravity_ok && acceleration_size_min < acceleration_size;
     }
 
