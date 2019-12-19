@@ -92,6 +92,11 @@ public class Analytics {
     public static final String TARGET_MENU_DONATE = "Donate";
     public static final String TARGET_MENU_ADD_ONE_TIME_ALARM = "Add one time alarm";
 
+    public static final String GENERAL_KEY__SOUND_METER_HISTORY = "SoundMeter history";
+    public static final String GENERAL_KEY__ACCELEROMETER_HISTORY = "Accelerometer history";
+    public static final String GENERAL_KEY__PROXIMITY_HISTORY = "Proximity history";
+    public static final String GENERAL_KEY__SENSORS_HISTORY = "Sensors history";
+
     private Task<Location> locationTask;
     private boolean shouldSave = false; // Save the event after the asynchronous locationTask task finishes
 
@@ -139,11 +144,14 @@ public class Analytics {
         Preference_value,
 
         Target,
+
+        Sensor_name,
         Action,
 
-        Configuration,
+        General_key,
+        General_value,
 
-        General_JSON
+        Configuration
     }
 
     public enum Event {
@@ -186,8 +194,7 @@ public class Analytics {
         Start,
         End,
 
-        Silence_gesture, // TODO add other actions/gestures
-        Clap_gesture,
+        Gesture, // includes sensor gestures, sound meter (silence and clap) detection, key press
 
         Change_setting;
 
@@ -809,10 +816,14 @@ public class Analytics {
                padRight(Param.Preference_value, 10) + " | " +
 
                padRight(Param.Target, 20) + " | " +
+
+               padRight(Param.Sensor_name, 10) + " | " +
                padRight(Param.Action, 20) + " | " +
 
+               padRight(Param.General_key, 10) + " | " +
+               padRight(Param.General_value, 10) + " | " +
+
                padRight(Param.Configuration, 10) + " | " +
-               padRight(Param.General_JSON, 10) + " | " +
 
                padLeft(Param.Version, 3) + " | " +
                padRight(Param.User_ID, USER_ID_LENGTH) + " | " +

@@ -81,8 +81,10 @@ public abstract class SensorEventDetector implements SensorEventListener {
         if (isAccurate(event.accuracy)) {
             boolean isFiringNew = isFiring(event);
 
-            if (isFiringSet) {
-                if (!isFiring && isFiringNew) {
+            ringInterface.addSensorRecordToHistory(name, event, isFiring);
+
+            if (isFiringSet) { // We must have two events
+                if (!isFiring && isFiringNew) { // The previous event isn't firing and this event is
                     onFire();
                 }
             }
@@ -120,7 +122,7 @@ public abstract class SensorEventDetector implements SensorEventListener {
 
         MyLog.i("Sensor " + name + " fired");
         String action = getActionFromPreference();
-        ringInterface.actOnEvent(action);
+        ringInterface.actOnEvent(action, name);
     }
 
     /**

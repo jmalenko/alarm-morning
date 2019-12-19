@@ -6,6 +6,7 @@ import android.hardware.SensorEvent;
 import java.util.Arrays;
 
 import cz.jaro.alarmmorning.MyLog;
+import cz.jaro.alarmmorning.RingActivity;
 import cz.jaro.alarmmorning.RingInterface;
 import cz.jaro.alarmmorning.SettingsActivity;
 
@@ -22,7 +23,7 @@ public class Shake extends SensorEventDetector {
     private long mShakeStartTime;
 
     public Shake(RingInterface ringInterface) {
-        super(ringInterface, "shake", Sensor.TYPE_ACCELEROMETER, SettingsActivity.PREF_ACTION_ON_SHAKE);
+        super(ringInterface, RingActivity.SENSOR_NAME__SHAKE, Sensor.TYPE_ACCELEROMETER, SettingsActivity.PREF_ACTION_ON_SHAKE);
     }
 
     protected boolean isFiring(SensorEvent event) {

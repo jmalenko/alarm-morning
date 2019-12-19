@@ -6,6 +6,7 @@ import android.hardware.SensorEvent;
 import java.util.Arrays;
 
 import cz.jaro.alarmmorning.MyLog;
+import cz.jaro.alarmmorning.RingActivity;
 import cz.jaro.alarmmorning.RingInterface;
 import cz.jaro.alarmmorning.SettingsActivity;
 
@@ -20,7 +21,7 @@ public class Proximity extends SensorEventDetector {
     private float mMax;
 
     public Proximity(RingInterface ringInterface) {
-        super(ringInterface, "proximity", Sensor.TYPE_PROXIMITY, SettingsActivity.PREF_ACTION_ON_PROXIMITY);
+        super(ringInterface, RingActivity.SENSOR_NAME__PROXIMITY, Sensor.TYPE_PROXIMITY, SettingsActivity.PREF_ACTION_ON_PROXIMITY);
     }
 
     protected boolean isFiring(SensorEvent event) {

@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.hardware.SensorEvent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.Ringtone;
@@ -28,6 +29,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import net.mabboud.android_tone_player.ContinuousBuzzer;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -89,6 +91,14 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
     public static final int SOUND_METER_CLAP_MIN_DIFFERENCE = 5; // The exceptionally loud volume must be at least 5 dB louder than mean.
     public static final int SOUND_METER_CLAP_MIN_ABS = 10; // The exceptionally loud volume must be at least 10 dB loud.
 
+    public static final String SENSOR_NAME__MOVE = "Move";
+    public static final String SENSOR_NAME__FLIP = "Flip";
+    public static final String SENSOR_NAME__SHAKE = "Shake";
+    public static final String SENSOR_NAME__PROXIMITY = "Proximity";
+    public static final String SENSOR_NAME__CLAP = "Clap";
+    public static final String SENSOR_NAME__SILENCE = "Silence";
+    public static final String SENSOR_NAME__KEY = "Key";
+
     private AppAlarm appAlarm;
 
     private static final String LAST_RINGING_START_TIME = "last_ringing_start_time";
@@ -141,6 +151,7 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
     private TextView snoozeTimeTextView;
 
     private Set<SensorEventDetector> sensorEventDetectors;
+    private JSONObject sensorsHistoryJSON = new JSONObject();
 
     private boolean actionPerformed = false; // User performed and action (snooze or dismiss) in the activity. That includes auto-snooze and auto-actions.
 
@@ -586,9 +597,19 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
             // allow device sleep
             WakeLocker.release();
 
-            // Save sound meter measurements
+            // Save sensors history
+
+            // Sound meter
             Analytics analytics = new Analytics(this, Analytics.Event.End, Analytics.Channel.Activity, Analytics.ChannelName.Ring);
-            analytics.set(Analytics.Param.General_JSON, soundMeterHistory2JSONString());
+            analytics.set(Analytics.Param.General_key, Analytics.GENERAL_KEY__SOUND_METER_HISTORY);
+            analytics.set(Analytics.Param.General_value, soundMeterHistory2JSONString());
+            analytics.setConfigurationInfo();
+            analytics.save();
+
+            // Other sensors
+            analytics = new Analytics(this, Analytics.Event.End, Analytics.Channel.Activity, Analytics.ChannelName.Ring);
+            analytics.set(Analytics.Param.General_key, Analytics.GENERAL_KEY__SENSORS_HISTORY);
+            analytics.set(Analytics.Param.General_value, sensorsHistoryJSON.toString());
             analytics.setConfigurationInfo();
             analytics.save();
         }
@@ -1211,11 +1232,8 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
             // volumePreference range is 0 .. SettingsActivity.PREF_VOLUME_MAX
             // skip (add appropriate number of seconds) the period during which the alarm volume is increasing
             detectSoundStartMS += volumePreference * 10 * 1000;
-            MyLog.v("adding " + volumePreference + " * 10 * 1000 ms because the alarm is increasing");
-            MyLog.v("detectSoundStartMS=" + detectSoundStartMS);
         }
         detectSoundStartMS += SOUND_METER_SILENCE_START_AFTER; // Always add few seconds
-        MyLog.v("adding " + SOUND_METER_SILENCE_START_AFTER + " ms");
 
         Calendar detectSoundStart = Calendar.getInstance();
         detectSoundStart.setTimeInMillis(detectSoundStartMS);
@@ -1258,8 +1276,10 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
     private void doSilenceDetected() {
         MyLog.i("Silence detected");
 
-        Analytics analytics = new Analytics(this, Analytics.Event.Silence_gesture, Analytics.Channel.Activity, Analytics.ChannelName.Ring);
-        analytics.set(Analytics.Param.General_JSON, soundMeterHistory2JSONString());
+        Analytics analytics = new Analytics(this, Analytics.Event.Gesture, Analytics.Channel.Activity, Analytics.ChannelName.Ring);
+        analytics.set(Analytics.Param.Sensor_name, SENSOR_NAME__SILENCE);
+        analytics.set(Analytics.Param.General_key, Analytics.GENERAL_KEY__SOUND_METER_HISTORY);
+        analytics.set(Analytics.Param.General_value, soundMeterHistory2JSONString());
         analytics.setConfigurationInfo();
         analytics.save();
 
@@ -1396,14 +1416,7 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
         MyLog.i("Clap (loud sound) detected");
 
         String action = (String) SharedPreferencesHelper.load(SettingsActivity.PREF_ACTION_ON_CLAP, SettingsActivity.PREF_ACTION_DEFAULT);
-
-        Analytics analytics = new Analytics(this, Analytics.Event.Clap_gesture, Analytics.Channel.Activity, Analytics.ChannelName.Ring);
-        analytics.set(Analytics.Param.Action, action);
-        analytics.set(Analytics.Param.General_JSON, soundMeterHistory2JSONString());
-        analytics.setConfigurationInfo();
-        analytics.save();
-
-        actOnEvent(action);
+        actOnEvent(action, SENSOR_NAME__CLAP);
     }
 
     /**
@@ -1461,7 +1474,7 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
             }
         } else {
             MyLog.i("Act on key press detected");
-            actOnEvent(buttonActionPreference);
+            actOnEvent(buttonActionPreference, SENSOR_NAME__KEY);
             return true;
         }
     }
@@ -1494,8 +1507,43 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
     }
 
     @Override
-    public void actOnEvent(String action) {
+    public void actOnEvent(String action, String sensorName) {
         MyLog.v("actOnEvent(action=" + SettingsActivity.actionCodeToString(action) + ")");
+
+        // Save analytics
+        Analytics analytics = new Analytics(this, Analytics.Event.Gesture, Analytics.Channel.Activity, Analytics.ChannelName.Ring);
+        analytics.set(Analytics.Param.Action, action);
+        analytics.setConfigurationInfo();
+
+        if (sensorName.equals(SENSOR_NAME__KEY)) {
+            analytics.set(Analytics.Param.Sensor_name, SENSOR_NAME__KEY);
+        } else if (sensorName.equals(SENSOR_NAME__CLAP)) {
+            analytics.set(Analytics.Param.Sensor_name, SENSOR_NAME__CLAP);
+            analytics.set(Analytics.Param.General_key, Analytics.GENERAL_KEY__SOUND_METER_HISTORY);
+            analytics.set(Analytics.Param.General_value, soundMeterHistory2JSONString());
+        } else if (sensorName.equals(SENSOR_NAME__PROXIMITY) || sensorName.equals(SENSOR_NAME__FLIP) || sensorName.equals(SENSOR_NAME__MOVE) || sensorName.equals(SENSOR_NAME__SHAKE)) {
+            analytics.set(Analytics.Param.Sensor_name, sensorName);
+
+            analytics.set(Analytics.Param.General_key, sensorName.equals(SENSOR_NAME__PROXIMITY)
+                    ? Analytics.GENERAL_KEY__PROXIMITY_HISTORY
+                    : Analytics.GENERAL_KEY__ACCELEROMETER_HISTORY
+            );
+
+            JSONObject sensorData;
+            try {
+                sensorData = sensorsHistoryJSON.getJSONObject(sensorName);
+            } catch (JSONException e) {
+                sensorData = new JSONObject();
+            }
+            analytics.set(Analytics.Param.General_value, sensorData.toString());
+        } else {
+            throw new IllegalArgumentException("Unexpected sensor " + sensorName);
+        }
+
+        analytics.save();
+
+        // Do action
+
         switch (action) {
             case SettingsActivity.PREF_ACTION_DEFAULT:
                 MyLog.d("Doing nothing");
@@ -1515,6 +1563,41 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
 
             default:
                 throw new IllegalArgumentException("Unexpected argument " + action);
+        }
+    }
+
+    @Override
+    public void addSensorRecordToHistory(String sensorName, SensorEvent event, boolean isFiring) {
+        JSONObject sensorData;
+        try {
+            sensorData = sensorsHistoryJSON.getJSONObject(sensorName);
+        } catch (JSONException e) {
+            try {
+                sensorData = new JSONObject();
+                sensorData.put("sensor", event.sensor.toString());
+                sensorsHistoryJSON.put(sensorName, sensorData);
+            } catch (JSONException ex) {
+                MyLog.w("Cannot save sensor data to history", e);
+                return;
+            }
+        }
+
+        try {
+            JSONObject o = new JSONObject();
+
+            JSONArray valuesJSON = new JSONArray();
+            for (double d : event.values)
+                valuesJSON.put(d);
+            o.put("values", valuesJSON);
+
+            o.put("accuracy", event.accuracy);
+
+            o.put("isFiring", isFiring);
+
+            String key = String.valueOf(event.timestamp);
+            sensorData.put(key, o);
+        } catch (JSONException e) {
+            MyLog.w("Cannot save sensor data to history", e);
         }
     }
 }

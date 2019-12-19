@@ -6,6 +6,7 @@ import android.hardware.SensorEvent;
 import java.util.Arrays;
 
 import cz.jaro.alarmmorning.MyLog;
+import cz.jaro.alarmmorning.RingActivity;
 import cz.jaro.alarmmorning.RingInterface;
 import cz.jaro.alarmmorning.SettingsActivity;
 
@@ -20,7 +21,7 @@ public class Flip extends SensorEventDetector {
     private boolean mUp;
 
     public Flip(RingInterface ringInterface) {
-        super(ringInterface, "flip", Sensor.TYPE_ACCELEROMETER, SettingsActivity.PREF_ACTION_ON_FLIP);
+        super(ringInterface, RingActivity.SENSOR_NAME__FLIP, Sensor.TYPE_ACCELEROMETER, SettingsActivity.PREF_ACTION_ON_FLIP);
     }
 
     protected boolean isFiring(SensorEvent event) {

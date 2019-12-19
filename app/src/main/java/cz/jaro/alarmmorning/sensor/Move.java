@@ -7,6 +7,7 @@ import java.text.DecimalFormat;
 import java.util.Arrays;
 
 import cz.jaro.alarmmorning.MyLog;
+import cz.jaro.alarmmorning.RingActivity;
 import cz.jaro.alarmmorning.RingInterface;
 import cz.jaro.alarmmorning.SettingsActivity;
 
@@ -18,7 +19,7 @@ public class Move extends SensorEventDetector {
     private double[] gravity = new double[3];
 
     public Move(RingInterface ringInterface) {
-        super(ringInterface, "move", Sensor.TYPE_ACCELEROMETER, SettingsActivity.PREF_ACTION_ON_MOVE);
+        super(ringInterface, RingActivity.SENSOR_NAME__MOVE, Sensor.TYPE_ACCELEROMETER, SettingsActivity.PREF_ACTION_ON_MOVE);
     }
 
     protected boolean isFiring(SensorEvent event) {
