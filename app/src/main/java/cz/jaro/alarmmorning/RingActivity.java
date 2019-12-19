@@ -1576,8 +1576,8 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
                 sensorData = new JSONObject();
                 sensorData.put("sensor", event.sensor.toString());
                 sensorsHistoryJSON.put(sensorName, sensorData);
-            } catch (JSONException ex) {
-                MyLog.w("Cannot save sensor data to history", e);
+            } catch (JSONException e2) {
+                MyLog.w("Cannot save sensor data to history", e2);
                 return;
             }
         }
