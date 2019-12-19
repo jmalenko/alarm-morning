@@ -134,7 +134,7 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
 
     private TextView mutedTextView;
     private boolean isMuted;
-    private boolean mutedInPast;
+    private Calendar muteStart;
     private int mutedSecondsLeft;
     public static final int MUTE_SECONDS = 10;
 
@@ -475,19 +475,20 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
     private void initMute() {
         mutedTextView = findViewById(R.id.muted);
 
-        mutedInPast = false;
+        muteStart = null;
     }
 
     private boolean muteAvailable() {
         MyLog.d("muteAvailable()");
-        return !mutedInPast;
+        return muteStart == null;
     }
 
     private void startMute() {
         MyLog.d("startMute()");
 
         isMuted = true;
-        mutedInPast = true;
+        GlobalManager globalManager = GlobalManager.getInstance();
+        muteStart = globalManager.clock().now();
         mutedSecondsLeft = MUTE_SECONDS + 1;
 
         muteSound();
@@ -1196,8 +1197,15 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
     private boolean checkSilence() {
         MyLog.v("checkSilence()");
 
+        long currentTimeMillis = currentTimeMillis();
+
+        boolean skipBecauseMuted = muteStart != null && currentTimeMillis - muteStart.getTimeInMillis() < MUTE_SECONDS * 1000 + SOUND_METER_SILENCE_DURATION;
+        if (skipBecauseMuted) {
+            MyLog.v("Skipping the silence check because the ringtone is or was recently muted");
+            return false;
+        }
+
         long detectSoundStartMS = lastRingingStartTime.getTimeInMillis(); // In milliseconds, start of applying this logics, from activity start adjusted for the initial silent period
-        MyLog.v("detectSoundStartMS=" + detectSoundStartMS + " ms = " + lastRingingStartTime.getTime());
         if (increasing) {
             int volumePreference = (int) SharedPreferencesHelper.load(SettingsActivity.PREF_VOLUME, SettingsActivity.PREF_VOLUME_DEFAULT);
             // volumePreference range is 0 .. SettingsActivity.PREF_VOLUME_MAX
@@ -1212,8 +1220,6 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
         Calendar detectSoundStart = Calendar.getInstance();
         detectSoundStart.setTimeInMillis(detectSoundStartMS);
         MyLog.v("detectSoundStartMS=" + detectSoundStartMS + " ms = " + detectSoundStart.getTime());
-
-        long currentTimeMillis = currentTimeMillis();
 
         if (detectSoundStartMS < currentTimeMillis - SOUND_METER_SILENCE_DURATION) {
             int count_above_limit = 0;
@@ -1242,6 +1248,8 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
                 doSilenceDetected();
                 return true;
             }
+        } else {
+            MyLog.v("Skipping the silence check because we are too cloe to start");
         }
 
         return false;
