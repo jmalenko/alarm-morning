@@ -109,6 +109,7 @@ public class AlarmMorningActivity extends AppCompatActivity {
     );
 
     public static final int REQUEST_CODE_WIZARD = 1;
+    public static final int REQUEST_CODE_PERMISSION = 2;
 
     private DrawerLayout mDrawerLayout;
     private NavigationView mNavigationView;
