@@ -149,8 +149,8 @@ public class AlarmMorningActivity extends AppCompatActivity {
     private final BroadcastReceiver timeChangedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.d(TAG, "onReceive()");
-            Log.i(TAG, "Refreshing view on time or timezone change");
+            MyLog.v("onReceive()");
+            MyLog.i("Refreshing view on time or timezone change");
 
             Analytics analytics = new Analytics(context, Analytics.Event.Start, Analytics.Channel.External, Analytics.ChannelName.TimeZoneChange);
             analytics.save();
@@ -158,6 +158,8 @@ public class AlarmMorningActivity extends AppCompatActivity {
             if (mFragment instanceof CalendarFragment) {
                 CalendarFragment calendarFragment = (CalendarFragment) mFragment;
                 calendarFragment.onTimeOrTimeZoneChange();
+            } else {
+                throw new IllegalStateException("Unsupported fragment " + (mFragment != null ? mFragment.getClass() : mFragment));
             }
         }
     };
@@ -166,7 +168,7 @@ public class AlarmMorningActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            Log.d(TAG, "onReceive(action=" + action + ")");
+            MyLog.v("onReceive(action=" + action + ")");
 
             if (mFragment instanceof CalendarFragment) {
                 CalendarFragment calendarFragment = (CalendarFragment) mFragment;
@@ -226,6 +228,8 @@ public class AlarmMorningActivity extends AppCompatActivity {
                     default:
                         throw new IllegalArgumentException("Unexpected argument " + action);
                 }
+            } else {
+                throw new IllegalStateException("Unsupported fragment " + (mFragment != null ? mFragment.getClass() : mFragment));
             }
         }
     };
@@ -392,6 +396,7 @@ public class AlarmMorningActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        MyLog.v("onBackPressed()");
         if (isNavigationDrawerOpen())
             closeNavigationDrawer();
         else
@@ -412,6 +417,7 @@ public class AlarmMorningActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        MyLog.v("onDestroy()");
         super.onDestroy();
 
         unregisterReceiver(timeChangedReceiver);
@@ -591,6 +597,8 @@ public class AlarmMorningActivity extends AppCompatActivity {
                         return true;
                     break;
             }
+        } else {
+            throw new IllegalStateException("Unsupported fragment " + (mFragment != null ? mFragment.getClass() : mFragment));
         }
 
         return super.dispatchTouchEvent(ev);
