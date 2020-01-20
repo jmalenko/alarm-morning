@@ -32,7 +32,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -110,6 +112,8 @@ public class AlarmMorningActivity extends AppCompatActivity {
 
     public static final int REQUEST_CODE_WIZARD = 1;
     public static final int REQUEST_CODE_PERMISSION = 2;
+
+    public static final String FRAGMENT_NAME = "FRAGMENT_NAME";
 
     private DrawerLayout mDrawerLayout;
     private NavigationView mNavigationView;
@@ -299,7 +303,12 @@ public class AlarmMorningActivity extends AppCompatActivity {
             // Highlight the menu item
             MenuItem calendarMenu = mNavigationView.getMenu().findItem(R.id.navigation_calendar);
             highlightMenuItem(calendarMenu);
+        } else {
+            // Restore the fragment's instance
+            mFragment = getSupportFragmentManager().getFragment(savedInstanceState, FRAGMENT_NAME);
+            Toast.makeText(this, "Fragment restored. Check menu", Toast.LENGTH_LONG).show(); // XXX check menu is highlighted
         }
+        getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, mFragment).commit();
 
         // Show Translate menu item only if the user language is not translated yet
         Resources resources = getResources();
@@ -327,6 +336,14 @@ public class AlarmMorningActivity extends AppCompatActivity {
             translateMenuItem.setTitle(title);
             translateMenuItem.setVisible(true);
         }
+    }
+
+    //    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        // Save the fragment's instance
+        getSupportFragmentManager().putFragment(outState, FRAGMENT_NAME, mFragment);
     }
 
     @Override
@@ -458,7 +475,7 @@ public class AlarmMorningActivity extends AppCompatActivity {
                 mFragment = new CalendarFragment();
 
                 // Insert the mFragment by replacing any existing mFragment
-                getFragmentManager().beginTransaction().replace(R.id.content_frame, mFragment).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, mFragment).commit();
 
                 // Highlight the selected item, update the title, and close the drawer
                 highlightMenuItem(item);

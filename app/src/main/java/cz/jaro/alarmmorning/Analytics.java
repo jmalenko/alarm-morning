@@ -557,176 +557,177 @@ public class Analytics {
 
             conf.put("preferences", confPreferences);
 
-            // System
-
-            JSONObject confSystem = new JSONObject();
-
-            put(confSystem, "build_brand", () -> Build.BRAND);
-            put(confSystem, "build_device", () -> Build.DEVICE);
-            put(confSystem, "build_display", () -> Build.DISPLAY);
-            put(confSystem, "build_fingerprint", () -> Build.FINGERPRINT);
-            put(confSystem, "build_manufacturer", () -> Build.MANUFACTURER);
-            put(confSystem, "build_model", () -> Build.MODEL);
-            put(confSystem, "build_product", () -> Build.PRODUCT);
-            put(confSystem, "build_hardware", () -> Build.HARDWARE);
-            put(confSystem, "build_host", () -> Build.HOST);
-            put(confSystem, "build_id", () -> Build.ID);
-            put(confSystem, "build_user", () -> Build.USER);
-            put(confSystem, "build_board", () -> Build.BOARD);
-            put(confSystem, "build_serial", () -> Build.SERIAL);
-
-            put(confSystem, "build_version_release", () -> Build.VERSION.RELEASE);
-            put(confSystem, "build_version_sdk_int", () -> Build.VERSION.SDK_INT);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                put(confSystem, "build_version_base_os", () -> Build.VERSION.BASE_OS);
-            }
-
-            put(confSystem, "buildConfig_application_id", () -> BuildConfig.APPLICATION_ID);
-            put(confSystem, "buildConfig_build_type", () -> BuildConfig.BUILD_TYPE);
-            put(confSystem, "buildConfig_debug", () -> BuildConfig.DEBUG);
-            put(confSystem, "buildConfig_flavor", () -> BuildConfig.FLAVOR);
-            put(confSystem, "buildConfig_version_code", () -> BuildConfig.VERSION_CODE);
-            put(confSystem, "buildConfig_version_name", () -> BuildConfig.VERSION_NAME);
-
-            final Configuration configuration = mContext.getResources().getConfiguration();
-            put(confSystem, "configuration_mcc", () -> configuration.mcc);
-            put(confSystem, "configuration_mnc", () -> configuration.mnc);
-            put(confSystem, "configuration_uiMode", () -> configuration.uiMode);
-            put(confSystem, "configuration_locale", () -> configuration.locale);
-
-            put(confSystem, "settingsSystem_time_12_24", () -> Settings.System.getString(mContext.getContentResolver(), Settings.System.TIME_12_24));
-
-//            put(confSystem, "google_advertising_id", () -> { // TODO Sometimes the following error is thrown: IllegalStateException: Calling this from your main thread can lead to deadlock
-//                AdvertisingIdClient.Info idInfo = AdvertisingIdClient.getAdvertisingIdInfo(getContext());
-//                return idInfo.getId();
+//            // System
+//
+//            JSONObject confSystem = new JSONObject();
+//
+//            put(confSystem, "build_brand", () -> Build.BRAND);
+//            put(confSystem, "build_device", () -> Build.DEVICE);
+//            put(confSystem, "build_display", () -> Build.DISPLAY);
+//            put(confSystem, "build_fingerprint", () -> Build.FINGERPRINT);
+//            put(confSystem, "build_manufacturer", () -> Build.MANUFACTURER);
+//            put(confSystem, "build_model", () -> Build.MODEL);
+//            put(confSystem, "build_product", () -> Build.PRODUCT);
+//            put(confSystem, "build_hardware", () -> Build.HARDWARE);
+//            put(confSystem, "build_host", () -> Build.HOST);
+//            put(confSystem, "build_id", () -> Build.ID);
+//            put(confSystem, "build_user", () -> Build.USER);
+//            put(confSystem, "build_board", () -> Build.BOARD);
+//            put(confSystem, "build_serial", () -> Build.SERIAL);
+//
+//            put(confSystem, "build_version_release", () -> Build.VERSION.RELEASE);
+//            put(confSystem, "build_version_sdk_int", () -> Build.VERSION.SDK_INT);
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//                put(confSystem, "build_version_base_os", () -> Build.VERSION.BASE_OS);
+//            }
+//
+//            put(confSystem, "buildConfig_application_id", () -> BuildConfig.APPLICATION_ID);
+//            put(confSystem, "buildConfig_build_type", () -> BuildConfig.BUILD_TYPE);
+//            put(confSystem, "buildConfig_debug", () -> BuildConfig.DEBUG);
+//            put(confSystem, "buildConfig_flavor", () -> BuildConfig.FLAVOR);
+//            put(confSystem, "buildConfig_version_code", () -> BuildConfig.VERSION_CODE);
+//            put(confSystem, "buildConfig_version_name", () -> BuildConfig.VERSION_NAME);
+//
+//            final General_JSON configuration = mContext.getResources().getConfiguration();
+//            put(confSystem, "configuration_mcc", () -> configuration.mcc);
+//            put(confSystem, "configuration_mnc", () -> configuration.mnc);
+//            put(confSystem, "configuration_uiMode", () -> configuration.uiMode);
+//            put(confSystem, "configuration_locale", () -> configuration.locale);
+//
+//            put(confSystem, "settingsSystem_time_12_24", () -> Settings.System.getString(mContext.getContentResolver(), Settings.System.TIME_12_24));
+//
+////            put(confSystem, "google_advertising_id", () -> { // TODO Sometimes the following error is thrown: IllegalStateException: Calling this from your main thread can lead to deadlock
+////                AdvertisingIdClient.Info idInfo = AdvertisingIdClient.getAdvertisingIdInfo(getContext());
+////                return idInfo.getId();
+////            });
+//
+//            put(confSystem, "settings_secure_android_id", () -> Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID));
+//            put(confSystem, "settings_secure_default_input_method", () -> Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.DEFAULT_INPUT_METHOD));
+//
+//            final TelephonyManager tm = (TelephonyManager) getContext().getSystemService(Context.TELEPHONY_SERVICE);
+//
+//            put(confSystem, "telephonyManager_simCountryIso", tm::getSimCountryIso);
+//            put(confSystem, "telephonyManager_simOperator", tm::getSimOperator);
+//            put(confSystem, "telephonyManager_simOperatorName", tm::getSimOperatorName);
+//            // The commented lines require new permissions or requires a higher API level
+////            put(confSystem, "telephonyManager_simSerialNumber", tm::getSimSerialNumber);
+//
+//            put(confSystem, "telephonyManager_networkCountryIso", tm::getNetworkCountryIso);
+//            put(confSystem, "telephonyManager_networkOperator", tm::getNetworkOperator);
+//            put(confSystem, "telephonyManager_networkOperatorName", tm::getNetworkOperatorName);
+//            put(confSystem, "telephonyManager_networkType", tm::getNetworkType);
+//
+//            put(confSystem, "telephonyManager_phoneType", tm::getPhoneType);
+//
+////            put(confSystem, "telephonyManager_voiceMailNumber", tm::getVoiceMailNumber);
+////            put(confSystem, "telephonyManager_voiceNetworkType", tm::getVoiceNetworkType);
+////            put(confSystem, "telephonyManager_voiceMailAlphaTag", tm::getVoiceMailAlphaTag);
+////
+////            put(confSystem, "telephonyManager_dataEnabled", tm::isDataEnabled);
+////            put(confSystem, "telephonyManager_smsCapable", tm::isSmsCapable);
+////            put(confSystem, "telephonyManager_voiceCapable", tm::isVoiceCapable);
+////
+////            put(confSystem, "telephonyManager_deviceId", tm::getDeviceId);
+////            put(confSystem, "telephonyManager_imei", tm::getImei);
+////            put(confSystem, "telephonyManager_meid", tm::getMeid);
+////            put(confSystem, "telephonyManager_deviceSoftwareVersion", tm::getDeviceSoftwareVersion);
+////            put(confSystem, "telephonyManager_line1Number", tm::getLine1Number);
+////            put(confSystem, "telephonyManager_nai", tm::getNai);
+////            put(confSystem, "telephonyManager_subscriberId", tm::getSubscriberId);
+//
+//            put(confSystem, "packageInfo_versionName", () -> {
+//                PackageInfo pInfo = getContext().getPackageManager().getPackageInfo(this.getClass().getPackage().getName(), 0);
+//                return pInfo.versionName;
 //            });
-
-            put(confSystem, "settings_secure_android_id", () -> Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID));
-            put(confSystem, "settings_secure_default_input_method", () -> Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.DEFAULT_INPUT_METHOD));
-
-            final TelephonyManager tm = (TelephonyManager) getContext().getSystemService(Context.TELEPHONY_SERVICE);
-
-            put(confSystem, "telephonyManager_simCountryIso", tm::getSimCountryIso);
-            put(confSystem, "telephonyManager_simOperator", tm::getSimOperator);
-            put(confSystem, "telephonyManager_simOperatorName", tm::getSimOperatorName);
-            // The commented lines require new permissions or requires a higher API level
-//            put(confSystem, "telephonyManager_simSerialNumber", tm::getSimSerialNumber);
-
-            put(confSystem, "telephonyManager_networkCountryIso", tm::getNetworkCountryIso);
-            put(confSystem, "telephonyManager_networkOperator", tm::getNetworkOperator);
-            put(confSystem, "telephonyManager_networkOperatorName", tm::getNetworkOperatorName);
-            put(confSystem, "telephonyManager_networkType", tm::getNetworkType);
-
-            put(confSystem, "telephonyManager_phoneType", tm::getPhoneType);
-
-//            put(confSystem, "telephonyManager_voiceMailNumber", tm::getVoiceMailNumber);
-//            put(confSystem, "telephonyManager_voiceNetworkType", tm::getVoiceNetworkType);
-//            put(confSystem, "telephonyManager_voiceMailAlphaTag", tm::getVoiceMailAlphaTag);
 //
-//            put(confSystem, "telephonyManager_dataEnabled", tm::isDataEnabled);
-//            put(confSystem, "telephonyManager_smsCapable", tm::isSmsCapable);
-//            put(confSystem, "telephonyManager_voiceCapable", tm::isVoiceCapable);
+//            /*
+//            Other sources of data for analytics:
 //
-//            put(confSystem, "telephonyManager_deviceId", tm::getDeviceId);
-//            put(confSystem, "telephonyManager_imei", tm::getImei);
-//            put(confSystem, "telephonyManager_meid", tm::getMeid);
-//            put(confSystem, "telephonyManager_deviceSoftwareVersion", tm::getDeviceSoftwareVersion);
-//            put(confSystem, "telephonyManager_line1Number", tm::getLine1Number);
-//            put(confSystem, "telephonyManager_nai", tm::getNai);
-//            put(confSystem, "telephonyManager_subscriberId", tm::getSubscriberId);
-
-            put(confSystem, "packageInfo_versionName", () -> {
-                PackageInfo pInfo = getContext().getPackageManager().getPackageInfo(this.getClass().getPackage().getName(), 0);
-                return pInfo.versionName;
-            });
-
-            /*
-            Other sources of data for analytics:
-
-            Google account - https://stackoverflow.com/questions/2245545/accessing-google-account-id-username-via-android
-            Primary e-mail address - https://stackoverflow.com/questions/2112965/how-to-get-the-android-devices-primary-e-mail-address
-            Wifi MAC address - https://stackoverflow.com/questions/11705906/programmatically-getting-the-mac-of-an-android-device
-            Wifi SSID - https://stackoverflow.com/questions/21391395/get-ssid-when-wifi-is-connected
-            Bluetooth MAC address - https://stackoverflow.com/questions/41014764/is-it-possible-to-get-bluetooth-mac-address-in-android-jar-library
-            Network connection type - https://stackoverflow.com/questions/2802472/detect-network-connection-type-on-android
-            Device serial number - https://stackoverflow.com/questions/11029294/android-how-to-programmatically-access-the-device-serial-number-shown-in-the-av
-             */
-
-            conf.put("system", confSystem);
-
-            // Locale
-
-            JSONObject confLocale = new JSONObject();
-
-            final Locale locale = Locale.getDefault();
-            put(confLocale, "locale", locale::toString);
-
-            put(confLocale, "locale_Country", locale::getCountry);
-            put(confLocale, "locale_Language", locale::getLanguage);
-            put(confLocale, "locale_Variant", locale::getVariant);
-
-            put(confLocale, "locale_DisplayCountry", locale::getDisplayCountry);
-            put(confLocale, "locale_DisplayLanguage", locale::getDisplayLanguage);
-            put(confLocale, "locale_DisplayVariant", locale::getDisplayVariant);
-
-            put(confLocale, "locale_DisplayName", locale::getDisplayName);
-            put(confLocale, "locale_ISO3Country", locale::getISO3Country);
-            put(confLocale, "locale_ISO3Language", locale::getISO3Language);
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                put(confLocale, "locale_Script", locale::getScript);
-                put(confLocale, "locale_DisplayScript", locale::getDisplayScript);
-            }
-
-            final TimeZone timeZone = TimeZone.getDefault();
-            put(confLocale, "timeZone_ID", timeZone::getID);
-            put(confLocale, "timeZone_DisplayName", timeZone::getDisplayName);
-            put(confLocale, "timeZone_RawOffset", timeZone::getRawOffset);
-            put(confLocale, "timeZone_DSTSavings", timeZone::getDSTSavings);
-
-            conf.put("locale", confLocale);
-
-            // Calendar
-
-            JSONObject confCalendar = new JSONObject();
-
-            com.ibm.icu.util.Calendar cal = com.ibm.icu.util.Calendar.getInstance();
-            for (int dayOfWeek : AlarmDataSource.allDaysOfWeek) {
-                String dayOfWeekText = Localization.dayOfWeekToStringShort(mContext.getResources(), dayOfWeek);
-                int dayOfWeekType = cal.getDayOfWeekType(dayOfWeek);
-                put(confCalendar, dayOfWeekText, () -> dayOfWeekTypeToString(dayOfWeekType));
-            }
-
-            conf.put("dayOfWeekType", confCalendar);
-
-            // Holidays
-
-            JSONObject confHoliday = new JSONObject();
-
-            HolidayHelper holidayHelper = HolidayHelper.getInstance();
-            if (holidayHelper.useHoliday()) {
-                List<Holiday> holidays = holidayHelper.listHolidays();
-
-                for (Holiday h : holidays) {
-                    put(confHoliday, String.valueOf(h.getDate()), h::getDescription);
-                }
-            }
-
-            conf.put("holiday", confHoliday);
-
-            // Permissions
-
-            JSONObject confPermissions = new JSONObject();
-
-            for (String permission : Wizard.allPermissions) {
-                int permissionCheck = ContextCompat.checkSelfPermission(getContext(), permission);
-                put(confPermissions, permission, () -> permissionCheckToString(permissionCheck));
-            }
-
-            conf.put("permission", confPermissions);
+//            Google account - https://stackoverflow.com/questions/2245545/accessing-google-account-id-username-via-android
+//            Primary e-mail address - https://stackoverflow.com/questions/2112965/how-to-get-the-android-devices-primary-e-mail-address
+//            Wifi MAC address - https://stackoverflow.com/questions/11705906/programmatically-getting-the-mac-of-an-android-device
+//            Wifi SSID - https://stackoverflow.com/questions/21391395/get-ssid-when-wifi-is-connected
+//            Bluetooth MAC address - https://stackoverflow.com/questions/41014764/is-it-possible-to-get-bluetooth-mac-address-in-android-jar-library
+//            Network connection type - https://stackoverflow.com/questions/2802472/detect-network-connection-type-on-android
+//            Device serial number - https://stackoverflow.com/questions/11029294/android-how-to-programmatically-access-the-device-serial-number-shown-in-the-av
+//             */
+//
+//            conf.put("system", confSystem);
+//
+//            // Locale
+//
+//            JSONObject confLocale = new JSONObject();
+//
+//            final Locale locale = Locale.getDefault();
+//            put(confLocale, "locale", locale::toString);
+//
+//            put(confLocale, "locale_Country", locale::getCountry);
+//            put(confLocale, "locale_Language", locale::getLanguage);
+//            put(confLocale, "locale_Variant", locale::getVariant);
+//
+//            put(confLocale, "locale_DisplayCountry", locale::getDisplayCountry);
+//            put(confLocale, "locale_DisplayLanguage", locale::getDisplayLanguage);
+//            put(confLocale, "locale_DisplayVariant", locale::getDisplayVariant);
+//
+//            put(confLocale, "locale_DisplayName", locale::getDisplayName);
+//            put(confLocale, "locale_ISO3Country", locale::getISO3Country);
+//            put(confLocale, "locale_ISO3Language", locale::getISO3Language);
+//
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//                put(confLocale, "locale_Script", locale::getScript);
+//                put(confLocale, "locale_DisplayScript", locale::getDisplayScript);
+//            }
+//
+//            final TimeZone timeZone = TimeZone.getDefault();
+//            put(confLocale, "timeZone_ID", timeZone::getID);
+//            put(confLocale, "timeZone_DisplayName", timeZone::getDisplayName);
+//            put(confLocale, "timeZone_RawOffset", timeZone::getRawOffset);
+//            put(confLocale, "timeZone_DSTSavings", timeZone::getDSTSavings);
+//
+//            conf.put("locale", confLocale);
+//
+//            // Calendar
+//
+//            JSONObject confCalendar = new JSONObject();
+//
+//            com.ibm.icu.util.Calendar cal = com.ibm.icu.util.Calendar.getInstance();
+//            for (int dayOfWeek : AlarmDataSource.allDaysOfWeek) {
+//                String dayOfWeekText = Localization.dayOfWeekToStringShort(mContext.getResources(), dayOfWeek);
+//                int dayOfWeekType = cal.getDayOfWeekType(dayOfWeek);
+//                put(confCalendar, dayOfWeekText, () -> dayOfWeekTypeToString(dayOfWeekType));
+//            }
+//
+//            conf.put("dayOfWeekType", confCalendar);
+//
+//            // Holidays
+//
+//            JSONObject confHoliday = new JSONObject();
+//
+//            HolidayHelper holidayHelper = HolidayHelper.getInstance();
+//            if (holidayHelper.useHoliday()) {
+//                List<Holiday> holidays = holidayHelper.listHolidays();
+//
+//                for (Holiday h : holidays) {
+//                    put(confHoliday, String.valueOf(h.getDate()), h::getDescription);
+//                }
+//            }
+//
+//            conf.put("holiday", confHoliday);
+//
+//            // Permissions
+//
+//            JSONObject confPermissions = new JSONObject();
+//
+//            for (String permission : Wizard.allPermissions) {
+//                int permissionCheck = ContextCompat.checkSelfPermission(getContext(), permission);
+//                put(confPermissions, permission, () -> permissionCheckToString(permissionCheck));
+//            }
+//
+//            conf.put("permission", confPermissions);
         } catch (JSONException e) {
             MyLog.w("Cannot create configuration record", e);
         }
+
         return conf;
     }
 
