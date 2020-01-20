@@ -1,11 +1,9 @@
 {
   "settings_version": 2,
-  "cache_duration": 7200,
+  "cache_duration": 86400,
   "features": {
     "collect_logged_exceptions": true,
     "collect_reports": true,
-    "collect_analytics": false,
-    "prompt_enabled": false,
     "push_enabled": true,
     "firebase_crashlytics_enabled": true
   },
@@ -15,17 +13,13 @@
     "max_file_count_per_send": 1,
     "track_custom_events": true,
     "track_predefined_events": true,
-    "track_view_controllers": false,
     "flush_on_background": true,
     "max_byte_size_per_file": 40000,
     "max_pending_send_file_count": 20,
-    "sampling_rate": 1,
-    "forward_to_google_analytics": false,
-    "include_purchase_events_in_forwarded_events": false
+    "sampling_rate": 1
   },
   "beta": {
-    "update_suspend_duration": 1209600,
-    "update_endpoint": ""
+    "update_suspend_duration": 1209600
   },
   "app": {
     "identifier": "cz.jaro.alarmmorning",
@@ -52,5 +46,5 @@
     "show_always_send_button": true,
     "always_send_button_title": "Always Send"
   },
-  "expires_at": 1567184462190
+  "expires_at": 1576972745971
 }
