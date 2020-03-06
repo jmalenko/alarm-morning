@@ -32,7 +32,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
@@ -306,7 +305,6 @@ public class AlarmMorningActivity extends AppCompatActivity {
         } else {
             // Restore the fragment's instance
             mFragment = getSupportFragmentManager().getFragment(savedInstanceState, FRAGMENT_NAME);
-            Toast.makeText(this, "Fragment restored. Check menu", Toast.LENGTH_LONG).show(); // XXX check menu is highlighted
         }
         getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, mFragment).commit();
 
