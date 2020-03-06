@@ -97,8 +97,9 @@ public class Analytics {
     public static final String GENERAL_KEY__PROXIMITY_HISTORY = "Proximity history";
     public static final String GENERAL_KEY__SENSORS_HISTORY = "Sensors history";
 
-    private Task<Location> locationTask;
-    private boolean shouldSave = false; // Save the event after the asynchronous locationTask task finishes
+    // TODO Commented because of error in getting location - see comment in setLocation()
+//    private Task<Location> locationTask;
+//    private boolean shouldSaveAnalyticsAfterLocationAcquired = false; // Save the event after the asynchronous locationTask task finishes
 
     public enum Param {
         Version,
@@ -765,11 +766,11 @@ public class Analytics {
 
         if (mFirebaseAnalytics == null) throw new IllegalStateException("Analytics is null");
 
-        if (locationTask != null && !locationTask.isComplete()) {
-            MyLog.v("Saving postponed until the location is acquired");
-            shouldSave = true;
-            return;
-        }
+//        if (locationTask != null && !locationTask.isComplete()) { // TODO Commented because of error in getting location - see comment in setLocation()
+//            MyLog.v("Saving postponed until the location is acquired");
+//            shouldSaveAnalyticsAfterLocationAcquired = true;
+//            return;
+//        }
 
         mFirebaseAnalytics.logEvent(mEvent.name(), mPayload);
         MyLog.i(toString());
@@ -928,49 +929,50 @@ public class Analytics {
     }
 
     private void setLocation() {
-        try {
-            GoogleApiAvailability googleApiAvailability = GoogleApiAvailability.getInstance();
-            int available = googleApiAvailability.isGooglePlayServicesAvailable(mContext);
-            if (available == ConnectionResult.SUCCESS) {
-                FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(mContext);
-
-                locationTask = fusedLocationClient.getLastLocation();
-                locationTask.addOnCompleteListener(result -> {
-                    if (result.isSuccessful()) {
-                        Location location = result.getResult();
-                        if (location != null) {
-                            set(Param.Location_time, location.getTime());
-                            set(Param.Location_latitude, location.getLatitude());
-                            set(Param.Location_longitude, location.getLongitude());
-                            set(Param.Location_accuracy, location.getAccuracy());
-                            if (location.hasAltitude())
-                                set(Param.Location_altitude, location.getAltitude());
-                            if (location.hasBearing())
-                                set(Param.Location_bearing, location.getBearing());
-                            if (location.hasSpeed())
-                                set(Param.Location_speed, location.getSpeed());
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                if (location.hasVerticalAccuracy())
-                                    set(Param.Location_verticalAccuracyMeters, location.getVerticalAccuracyMeters());
-                                if (location.hasBearingAccuracy())
-                                    set(Param.Location_bearingAccuracyDegrees, location.getBearingAccuracyDegrees());
-                                if (location.hasSpeedAccuracy())
-                                    set(Param.Location_speedAccuracyMetersPerSecond, location.getSpeedAccuracyMetersPerSecond());
-                            }
-                            MyLog.d("Location acquired: " + location.getLatitude() + ", " + location.getLongitude());
-                        } else {
-                            MyLog.d("The location is null.");
-                        }
-                    }
-                    if (shouldSave)
-                        save();
-                });
-            } else {
-                MyLog.d("Google API not available for location acquisition. Details: " + new ConnectionResult(available));
-            }
-        } catch (Exception e) {
-            MyLog.w("Exception while getting location", e);
-        }
+//        try {
+//            GoogleApiAvailability googleApiAvailability = GoogleApiAvailability.getInstance();
+//            int available = googleApiAvailability.isGooglePlayServicesAvailable(mContext);
+//            if (available == ConnectionResult.SUCCESS) {
+//                FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(mContext);
+//                locationTask = fusedLocationClient.getLastLocation(); // TODO This command makes the app freeze (and as it's asynchronous, it's difficult to identify)
+//                locationTask.addOnCompleteListener(result -> {
+//                    if (result.isSuccessful()) {
+//                        Location location = result.getResult();
+//                        if (location != null) {
+//                            set(Param.Location_time, location.getTime());
+//                            set(Param.Location_latitude, location.getLatitude());
+//                            set(Param.Location_longitude, location.getLongitude());
+//                            set(Param.Location_accuracy, location.getAccuracy());
+//                            if (location.hasAltitude())
+//                                set(Param.Location_altitude, location.getAltitude());
+//                            if (location.hasBearing())
+//                                set(Param.Location_bearing, location.getBearing());
+//                            if (location.hasSpeed())
+//                                set(Param.Location_speed, location.getSpeed());
+//                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                                if (location.hasVerticalAccuracy())
+//                                    set(Param.Location_verticalAccuracyMeters, location.getVerticalAccuracyMeters());
+//                                if (location.hasBearingAccuracy())
+//                                    set(Param.Location_bearingAccuracyDegrees, location.getBearingAccuracyDegrees());
+//                                if (location.hasSpeedAccuracy())
+//                                    set(Param.Location_speedAccuracyMetersPerSecond, location.getSpeedAccuracyMetersPerSecond());
+//                            }
+//                            MyLog.d("Location acquired: " + location.getLatitude() + ", " + location.getLongitude());
+//                        } else {
+//                            MyLog.d("The location is null.");
+//                        }
+//                    } else {
+//                        MyLog.d("The task result is not successful.");
+//                    }
+//                    if (shouldSaveAnalyticsAfterLocationAcquired)
+//                        save();
+//                });
+//            } else {
+//                MyLog.d("Google API not available for location acquisition. Details: " + new ConnectionResult(available));
+//            }
+//        } catch (Exception e) {
+//            MyLog.w("Exception while getting location", e);
+//        }
     }
 
     @NonNull
