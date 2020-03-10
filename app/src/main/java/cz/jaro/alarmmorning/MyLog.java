@@ -27,7 +27,16 @@ public class MyLog {
 
     static {
         if (logToFile) {
-            logFile = new File(Environment.getExternalStorageDirectory(), "AlarmMorning.log");
+            // Path suitable for opening with CatLog application on an Android device
+            File path = new File(new File(Environment.getExternalStorageDirectory(), "catlog"), "saved_logs");
+            if (!path.exists()) {
+                if (!path.mkdirs()) {
+                    MyLog.w("Cannot make parent directories for the log file");
+                }
+                ;
+            }
+
+            logFile = new File(path, "AlarmMorning.log");
             if (!logFile.exists()) {
                 try {
                     logFile.createNewFile();
@@ -133,16 +142,20 @@ public class MyLog {
         if (logToFile) {
             final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.US);
 
+            // Format suitable for opening with CatLog application on an Android device
             String line =
                     sdf.format(new Date()) +
-                    " : " +
-                    priorityToString(priority) +
-                    " : " +
+                    " " +
+                    priorityToString(priority).substring(0, 1) +
+                    "/" +
                     useTag +
-                    " : " +
+                    "(" + android.os.Process.myPid() + ")" +
+                    ": " +
                     message +
                     NEW_LINE +
-                    useThrowable;
+                    (useThrowable.equals("")
+                            ? ""
+                            : useThrowable);
             try {
                 final FileWriter fileOut = new FileWriter(logFile, true);
                 fileOut.append(line);
