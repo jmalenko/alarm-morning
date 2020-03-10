@@ -483,6 +483,8 @@ public class Analytics {
 
     @NonNull
     JSONObject createConfiguration() {
+        MyLog.v("createConfiguration() start");
+
         JSONObject conf = new JSONObject();
 
         try {
@@ -733,6 +735,8 @@ public class Analytics {
         } catch (JSONException e) {
             MyLog.w("Cannot create configuration record", e);
         }
+
+        MyLog.v("createConfiguration() end");
 
         return conf;
     }
