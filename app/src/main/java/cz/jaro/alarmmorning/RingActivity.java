@@ -1183,12 +1183,20 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
         // Store measurement
         long currentTimeMillis = currentTimeMillis();
 
-        double amplitude = soundMeter.getMaxAmplitude();
-        double dB = amplitudeToDecibel(amplitude);
-
-//        MyLog.v("Amplitude=" + amplitude + " = " + dB + " dB");
-        if (amplitude == 0) // Sometimes, first few measures have 0 amplitude (= -infinity dB). Skip these.
+        double amplitude;
+        try {
+            amplitude = soundMeter.getMaxAmplitude();
+        } catch (NullPointerException e) {
+            MyLog.v("Unable to get amplitude. Exiting.");
             return;
+        }
+        if (amplitude == 0) {// Sometimes, first few measures have 0 amplitude (= -infinity dB). Skip these.
+            MyLog.v("Amplitude is zero. Exiting.");
+            return;
+        }
+
+        double dB = amplitudeToDecibel(amplitude);
+//        MyLog.v("Amplitude=" + amplitude + " = " + dB + " dB");
 
         SoundMeterRecord soundMeterRecord = new SoundMeterRecord(currentTimeMillis, dB);
         soundMeterHistory.add(soundMeterRecord);
