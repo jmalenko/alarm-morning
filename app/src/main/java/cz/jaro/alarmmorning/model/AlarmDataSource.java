@@ -56,7 +56,7 @@ public class AlarmDataSource {
     /**
      * Close the open database.
      * <p>
-     * Note: The database should be never called. Source: https://nfrolov.wordpress.com/2014/08/16/android-sqlitedatabase-locking-and-multi-threading/
+     * Note: The database should be never closed. Source: https://nfrolov.wordpress.com/2014/08/16/android-sqlitedatabase-locking-and-multi-threading/
      */
     public void close() {
         dbHelper.close();
