@@ -31,9 +31,8 @@ public class MyLog {
             File path = new File(new File(Environment.getExternalStorageDirectory(), "catlog"), "saved_logs");
             if (!path.exists()) {
                 if (!path.mkdirs()) {
-                    MyLog.w("Cannot make parent directories for the log file");
+                    Log.w(TAG, "Cannot make parent directories for the log file");
                 }
-                ;
             }
 
             logFile = new File(path, "AlarmMorning.log");
