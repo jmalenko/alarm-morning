@@ -346,6 +346,8 @@ public class AlarmMorningActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
         MyLog.v("onActivityResult(requestCode=" + requestCode + ", resultCode=" + resultCode + ")");
         if (requestCode == REQUEST_CODE_WIZARD) {
             if (!(mFragment instanceof CalendarFragment)) {

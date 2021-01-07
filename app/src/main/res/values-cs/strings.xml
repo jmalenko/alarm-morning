@@ -15,6 +15,9 @@
     <string name="permission_missing_message_combine">%1$s\n\n%2$s</string>
     <string name="permission_missing_button">OK</string>
 
+    <string name="permission_missing_SYSTEM_ALERT_WINDOW_title">Chybí oprávnění \"Zobrazit přes ostatní aplikace\"</string>
+    <string name="permission_missing_SYSTEM_ALERT_WINDOW_message">Toto oprávnění je nutné pro zobrazení budíku při zvonění.\n\Povolte toto oprávnění na následující obrazovce.</string>
+
     <!-- Default activity -->
     <string name="title_activity_defaults">Pravidla pro dny</string>
 
@@ -90,6 +93,9 @@
 <p><b>CAMERA</b> – pro blikání blesem při zvonění</p>
 <p><b>RECORD_AUDIO</b> – pro detekci hlasitosti budíku (používá se pro kontrolu, že budík zvoní správně nahlas)</p>
 ]]></string>
+
+    <string name="wizard_set_permission_SYSTEM_ALERT_WINDOW_title">Povolte ještě jedno oprávnění</string>
+    <string name="wizard_set_permission_SYSTEM_ALERT_WINDOW_description">Oprávnění \"Zobrazit přes ostatní aplikace\" je nutné pro zobrazení budíku při zvonění.\n\nPovolte odpovídající Androidové oprávnění na následující obrazovce.</string>
 
     <string name="wizard_done_title">Vše je hotovo</string>
     <string name="wizard_done_description">Přejeme klidný spánek a ať se nemusíte starat o nastavování budíku.</string>

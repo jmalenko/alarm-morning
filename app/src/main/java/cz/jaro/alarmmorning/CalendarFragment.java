@@ -2,9 +2,13 @@ package cz.jaro.alarmmorning;
 
 import android.Manifest;
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
@@ -18,6 +22,7 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -54,6 +59,8 @@ import static cz.jaro.alarmmorning.calendar.CalendarUtils.onTheSameDate;
  * Fragment that appears in the "content_frame".
  */
 public class CalendarFragment extends Fragment implements View.OnClickListener, TimePickerDialogWithDisable.OnTimeSetWithDisableListener, DatePickerDialog.OnDateSetListener {
+
+    public static final int REQUEST_CODE_ACTION_MANAGE_OVERLAY_PERMISSION = 1;
 
     private CalendarAdapter adapter;
 
@@ -1052,6 +1059,9 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
                 if (permissionDialogDisplayed) return;
             }
         }
+
+        // Handle Manifest.permission.SYSTEM_ALERT_WINDOW permission
+        checkPermission__SYSTEM_ALERT_WINDOW();
     }
 
     private boolean askForPermissionIfNotGranted(String permission, int messageResId) {
@@ -1074,4 +1084,40 @@ public class CalendarFragment extends Fragment implements View.OnClickListener, 
         }
     }
 
+    void checkPermission__SYSTEM_ALERT_WINDOW() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            boolean canDrawOverlays = Settings.canDrawOverlays(getContext());
+            if (!canDrawOverlays) {
+                // Show dialog
+                AlertDialog alertDialog = new AlertDialog.Builder(getContext()).create();
+                alertDialog.setTitle(getString(R.string.permission_missing_SYSTEM_ALERT_WINDOW_title));
+                alertDialog.setMessage(getString(R.string.permission_missing_SYSTEM_ALERT_WINDOW_message));
+                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.permission_missing_button), (dialog, which) -> {
+                    Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                            Uri.parse("package:" + getContext().getPackageName()));
+                    startActivityForResult(intent, REQUEST_CODE_ACTION_MANAGE_OVERLAY_PERMISSION);
+                });
+                alertDialog.show();
+            }
+        }
+        // Note: For older Android versions the app gets the permission automatically.
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_CODE_ACTION_MANAGE_OVERLAY_PERMISSION) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                boolean canDrawOverlays = Settings.canDrawOverlays(getContext());
+                if (!canDrawOverlays) {
+                    // You don't have permission
+                    checkPermission__SYSTEM_ALERT_WINDOW();
+                } else {
+                    // Continue with the activity logic
+                    // Nothing is needed here as the permission is needed only to start the ring activity.
+                }
+            }
+        }
+    }
 }

@@ -1419,6 +1419,9 @@ public class GlobalManager {
         AppAlarm ringingAlarm = getRingingAlarm();
         ringIntent.putExtra(PERSIST_ALARM_TYPE, ringingAlarm.getClass().getSimpleName());
         ringIntent.putExtra(PERSIST_ALARM_ID, ringingAlarm.getPersistenceId());
+
+        // Beginning from Android Q it's restricted to launch any activity, when app is in background. We resolve that by requiring the SYSTEM_ALERT_WINDOW permission.
+        // Source: https://developer.android.com/guide/components/activities/background-starts
         context.startActivity(ringIntent);
     }
 

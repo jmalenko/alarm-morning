@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.provider.Settings;
 
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -71,6 +72,19 @@ public class Wizard extends AppIntro {
         } else {
             MyLog.v("All permissions are granted. Skipping permission slide.");
         }
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            // Show the "Allow display over other apps" slide only when the related permissions isn't granted
+            boolean canDrawOverlays = Settings.canDrawOverlays(this);
+            if (!canDrawOverlays) {
+                MyLog.v("Following permission is not granted: SYSTEM_ALERT_WINDOW (Allow display over other apps)");
+
+                addSlide(new SetPermissionSlide__SYSTEM_ALERT_WINDOW());
+            } else {
+                MyLog.v("The SYSTEM_ALERT_WINDOW (Allow display over other apps) permission is granted. Skipping it's permission slide.");
+            }
+        }
+        // Note: For older Android versions the app gets the permission automatically.
 
         addSlide(new SetDoneSlide());
     }

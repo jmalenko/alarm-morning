@@ -15,6 +15,9 @@
     <string name="permission_missing_message_combine">%1$s\n\n%2$s</string>
     <string name="permission_missing_button">OK</string>
 
+    <string name="permission_missing_SYSTEM_ALERT_WINDOW_title">Missing \"Display over other apps\" permission</string>
+    <string name="permission_missing_SYSTEM_ALERT_WINDOW_message">The app needs this permission to be able to appear when the alarm goes off.\n\nGrant the permission in the next screen.</string>
+
     <!-- Default activity -->
     <string name="title_activity_defaults">Default alarms</string>
 
@@ -89,6 +92,9 @@
 <p><b>CAMERA</b> – to blink the flashlight when ringing</p>
 <p><b>RECORD_AUDIO</b> – to detect the volume of the alarm (used as a reliability check that the alarm is ringing)</p>
 ]]></string>
+
+    <string name="wizard_set_permission_SYSTEM_ALERT_WINDOW_title">Allow one more permission</string>
+    <string name="wizard_set_permission_SYSTEM_ALERT_WINDOW_description">The app needs the \"Display over other apps\" permission to be able to appear when the alarm goes off.\n\nGrant this permission in the next screen.</string>
 
     <string name="wizard_done_title">You are all set</string>
     <string name="wizard_done_description">Sleep well and don\'t worry about alarm clock management.</string>
