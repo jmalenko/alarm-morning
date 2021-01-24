@@ -198,19 +198,19 @@
             android:title="@string/pref_title_nap_time"
             android:dependency="pref_nap_enabled"
             android:defaultValue="30"
-            custom:maxHour="6"/>
+            custom:maxHour="6" />
 
-        <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="pref_reliability_check_enabled"
-            android:summaryOff="@string/pref_summaryoff_reliability_check_enabled"
-            android:summaryOn="@string/pref_summaryon_reliability_check_enabled"
-            android:title="@string/pref_title_reliability_check_enabled" />
+        <!--        <CheckBoxPreference-->
+        <!--            android:defaultValue="true"-->
+        <!--            android:key="pref_reliability_check_enabled"-->
+        <!--            android:summaryOff="@string/pref_summaryoff_reliability_check_enabled"-->
+        <!--            android:summaryOn="@string/pref_summaryon_reliability_check_enabled"-->
+        <!--            android:title="@string/pref_title_reliability_check_enabled" />-->
 
-        <Preference
-            android:key="pref_test_panic"
-            android:title="@string/pref_title_test_panic"
-            android:summary="@string/pref_summary_test_panic" />
+        <!--        <Preference-->
+        <!--            android:key="pref_test_panic"-->
+        <!--            android:title="@string/pref_title_test_panic"-->
+        <!--            android:summary="@string/pref_summary_test_panic" />-->
 
         <cz.jaro.alarmmorning.graphics.HolidayPreference
             android:key="pref_holiday"
@@ -219,6 +219,6 @@
 
         <Preference
             android:key="pref_start_wizard"
-            android:title="@string/pref_title_start_wizard"/>
+            android:title="@string/pref_title_start_wizard" />
     </PreferenceCategory>
 </PreferenceScreen>

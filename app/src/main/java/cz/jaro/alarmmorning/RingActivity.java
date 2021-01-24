@@ -1292,25 +1292,25 @@ public class RingActivity extends AppCompatActivity implements RingInterface {
         analytics.save();
 
         // Show the message
-        TextView silenceDetectedView = findViewById(R.id.silenceDetected);
-        silenceDetectedView.setVisibility(View.VISIBLE);
-
-        // Do panic
-
-        // Let the standard ringtone keep ringing, but adjust it...
-        // Stop increasing
-        handlerVolume.removeCallbacks(runnableVolume);
-        // Set volume to maximum
-        if (audioManager != null)
-            audioManager.setStreamVolume(ALARM_MANAGER_STREAM, maxVolume, 0); // Set volume to max
-
-        if (!isFlashlight)
-            startFlashlightForce();
-
-        if (!isVibrating)
-            startVibrateForce(this);
-
-        startSoundBuzzer();
+//        TextView silenceDetectedView = findViewById(R.id.silenceDetected);
+//        silenceDetectedView.setVisibility(View.VISIBLE);
+//
+//        // Do panic
+//
+//        // Let the standard ringtone keep ringing, but adjust it...
+//        // Stop increasing
+//        handlerVolume.removeCallbacks(runnableVolume);
+//        // Set volume to maximum
+//        if (audioManager != null)
+//            audioManager.setStreamVolume(ALARM_MANAGER_STREAM, maxVolume, 0); // Set volume to max
+//
+//        if (!isFlashlight)
+//            startFlashlightForce();
+//
+//        if (!isVibrating)
+//            startVibrateForce(this);
+//
+//        startSoundBuzzer();
     }
 
     public void testSilenceDetectedStart(Context context, SurfaceView surfaceView) {
