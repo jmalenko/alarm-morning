@@ -592,7 +592,6 @@ public class Analytics {
             put(confSystem, "buildConfig_application_id", () -> BuildConfig.APPLICATION_ID);
             put(confSystem, "buildConfig_build_type", () -> BuildConfig.BUILD_TYPE);
             put(confSystem, "buildConfig_debug", () -> BuildConfig.DEBUG);
-            put(confSystem, "buildConfig_flavor", () -> BuildConfig.FLAVOR);
             put(confSystem, "buildConfig_version_code", () -> BuildConfig.VERSION_CODE);
             put(confSystem, "buildConfig_version_name", () -> BuildConfig.VERSION_NAME);
 
