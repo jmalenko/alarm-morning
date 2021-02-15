@@ -16,12 +16,9 @@ import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
-import android.view.SurfaceView;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NavUtils;
@@ -145,7 +142,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     public static final boolean PREF_NIGHTTIME_BELL_DEFAULT = true;
     public static final String PREF_NIGHTTIME_BELL_AT_DEFAULT = "22:00";
     public static final String PREF_NIGHTTIME_BELL_RINGTONE_DEFAULT = "raw://church_clock_strikes_3";
-    public static final boolean PREF_RELIABILITY_CHECK_ENABLED_DEFAULT = true;
+    public static final boolean PREF_RELIABILITY_CHECK_ENABLED_DEFAULT = false;
     public static final String PREF_HOLIDAY_NONE = HolidayHelper.PATH_TOP;
     public static final String PREF_HOLIDAY_DEFAULT = PREF_HOLIDAY_NONE;
 
@@ -191,7 +188,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         bindPreferenceSummaryToValue(findPreference(PREF_NEAR_FUTURE_TIME));
         bindPreferenceSummaryToValue(findPreference(PREF_NAP_ENABLED));
         bindPreferenceSummaryToValue(findPreference(PREF_NAP_TIME));
-        bindPreferenceSummaryToValue(findPreference(PREF_RELIABILITY_CHECK_ENABLED));
+//        bindPreferenceSummaryToValue(findPreference(PREF_RELIABILITY_CHECK_ENABLED));
         bindPreferenceSummaryToValue(findPreference(PREF_HOLIDAY));
 
         // Start/stop services
@@ -242,41 +239,41 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             return true;
         });
 
-        Preference prefTestPanic = findPreference(PREF_TEST_PANIC);
-        prefTestPanic.setOnPreferenceClickListener(preference -> {
-            Analytics analytics = new Analytics(preference.getContext(), Analytics.Event.Start, Analytics.Channel.Activity, Analytics.ChannelName.Settings);
-            analytics.set(Analytics.Param.Target, Analytics.TARGET_TEST_PANIC);
-            analytics.save();
-
-            // The SurfaceView (that shows the camera) must be visible for the flashlight to work...
-            // Moreover, to add it to dialog, it must be (according to my experiments) included in a layout.
-            LinearLayout layout = new LinearLayout(this);
-            layout.setOrientation(LinearLayout.VERTICAL);
-            layout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
-
-            SurfaceView surfaceView = new SurfaceView(this);
-            layout.addView(surfaceView);
-
-            surfaceView.getLayoutParams().width = 1; // in pixels
-            surfaceView.getLayoutParams().height = 1;
-
-            // Start the panic
-            RingActivity ringActivity = new RingActivity();
-            ringActivity.testSilenceDetectedStart(this, surfaceView);
-
-            // Show dialog with stop button
-            AlertDialog alertDialog = new AlertDialog.Builder(this).create();
-            alertDialog.setTitle(getString(R.string.test_panic_title));
-            alertDialog.setMessage(getString(R.string.test_panic_message));
-            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.test_panic_button), (dialog, which) -> {
-                ringActivity.testSilenceDetectedStop(this);
-                dialog.dismiss();
-            });
-            alertDialog.setView(layout);
-            alertDialog.show();
-
-            return true;
-        });
+//        Preference prefTestPanic = findPreference(PREF_TEST_PANIC);
+//        prefTestPanic.setOnPreferenceClickListener(preference -> {
+//            Analytics analytics = new Analytics(preference.getContext(), Analytics.Event.Start, Analytics.Channel.Activity, Analytics.ChannelName.Settings);
+//            analytics.set(Analytics.Param.Target, Analytics.TARGET_TEST_PANIC);
+//            analytics.save();
+//
+//            // The SurfaceView (that shows the camera) must be visible for the flashlight to work...
+//            // Moreover, to add it to dialog, it must be (according to my experiments) included in a layout.
+//            LinearLayout layout = new LinearLayout(this);
+//            layout.setOrientation(LinearLayout.VERTICAL);
+//            layout.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+//
+//            SurfaceView surfaceView = new SurfaceView(this);
+//            layout.addView(surfaceView);
+//
+//            surfaceView.getLayoutParams().width = 1; // in pixels
+//            surfaceView.getLayoutParams().height = 1;
+//
+//            // Start the panic
+//            RingActivity ringActivity = new RingActivity();
+//            ringActivity.testSilenceDetectedStart(this, surfaceView);
+//
+//            // Show dialog with stop button
+//            AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+//            alertDialog.setTitle(getString(R.string.test_panic_title));
+//            alertDialog.setMessage(getString(R.string.test_panic_message));
+//            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.test_panic_button), (dialog, which) -> {
+//                ringActivity.testSilenceDetectedStop(this);
+//                dialog.dismiss();
+//            });
+//            alertDialog.setView(layout);
+//            alertDialog.show();
+//
+//            return true;
+//        });
 
         Preference prefFlashlight = findPreference(PREF_FLASHLIGHT);
         prefFlashlight.setOnPreferenceClickListener(preference -> {
