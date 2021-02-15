@@ -61,10 +61,10 @@
             android:checkable="false"
             android:icon="@drawable/ic_star_rate_white_18dp" />
 
-        <item
-            android:id="@+id/navigation_donate"
-            android:title="@string/menu_donate_title"
-            android:checkable="false"
-            android:icon="@drawable/ic_attach_money_white_24dp" />
+        <!--        <item-->
+        <!--            android:id="@+id/navigation_donate"-->
+        <!--            android:title="@string/menu_donate_title"-->
+        <!--            android:checkable="false"-->
+        <!--            android:icon="@drawable/ic_attach_money_white_24dp" />-->
     </group>
 </menu>

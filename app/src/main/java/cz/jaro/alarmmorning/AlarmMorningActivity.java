@@ -79,7 +79,7 @@ public class AlarmMorningActivity extends AppCompatActivity {
     public static final String URL_CHANGE_LOG = "https://github.com/jmalenko/alarm-morning/wiki/Change-Log";
     public static final String URL_REPORT_BUG = "https://github.com/jmalenko/alarm-morning/issues";
     public static final String URL_TRANSLATE = "https://crowdin.com/project/alarm-morning";
-    public static final String URL_DONATE = "https://www.paypal.me/jaromirmalenko/10usd";
+//    public static final String URL_DONATE = "https://www.paypal.me/jaromirmalenko/10usd";
 
     // TODO Set list of languages programmatically (when that becomes possible in Android). For now, keep consistent with res/values directories. https://stackoverflow.com/questions/34797956/android-programmatically-check-if-app-is-localized-for-a-language
     private static final List<String> TRANSLATIONS = Arrays.asList(
@@ -547,13 +547,13 @@ public class AlarmMorningActivity extends AppCompatActivity {
                 analyticsTarget = Analytics.TARGET_MENU_RATE;
                 break;
 
-            case R.id.navigation_donate:
-                Intent donateIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(URL_DONATE));
-                startActivity(donateIntent);
-
-                analyticsTarget = Analytics.TARGET_MENU_DONATE;
-
-                break;
+//            case R.id.navigation_donate:
+//                Intent donateIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(URL_DONATE));
+//                startActivity(donateIntent);
+//
+//                analyticsTarget = Analytics.TARGET_MENU_DONATE;
+//
+//                break;
 
             case R.id.day_add_alarm:
                 if (mFragment instanceof CalendarFragment) {
